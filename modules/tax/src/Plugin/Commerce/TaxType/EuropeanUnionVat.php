@@ -2,7 +2,6 @@
 
 namespace Drupal\commerce_tax\Plugin\Commerce\TaxType;
 
-use Drupal\commerce_order\Entity\OrderInterface;
 use Drupal\commerce_order\Entity\OrderItemInterface;
 use Drupal\commerce_tax\TaxableType;
 use Drupal\commerce_tax\TaxZone;
@@ -48,29 +47,6 @@ class EuropeanUnionVat extends LocalTaxTypeBase {
   /**
    * {@inheritdoc}
    */
-  public function applies(OrderInterface $order) {
-    $eu_countries = [
-      'AT', 'BE', 'BG', 'CY', 'CZ', 'DE', 'DK', 'EE', 'ES', 'FI',
-      'FR', 'GB', 'GR', 'HR', 'HU', 'IE', 'IT', 'LT', 'LU', 'LV',
-      'MT', 'NL', 'PL', 'PT', 'RO', 'SE', 'SI', 'SK',
-    ];
-    // The store must be in an EU country or registered to collect taxes there.
-    $store = $order->getStore();
-    if (in_array($store->getAddress()->getCountryCode(), $eu_countries)) {
-      return TRUE;
-    }
-    $store_registrations = $store->get('tax_registrations')->getValue();
-    $store_registrations = array_column($store_registrations, 'value');
-    if (array_intersect($store_registrations, $eu_countries)) {
-      return TRUE;
-    }
-
-    return FALSE;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   protected function resolveZones(OrderItemInterface $order_item, ProfileInterface $customer_profile) {
     $zones = $this->getZones();
     $customer_address = $customer_profile->address->first();
@@ -93,7 +69,7 @@ class EuropeanUnionVat extends LocalTaxTypeBase {
     });
     $store_registration_zones = array_filter($zones, function ($zone) use ($store) {
       /** @var \Drupal\commerce_tax\TaxZone $zone */
-      return $this->checkStoreRegistration($store, $zone);
+      return $this->checkRegistrations($store, $zone);
     });
 
     // @todo Replace with $customer_profile->get('tax_number')->value
@@ -129,7 +105,7 @@ class EuropeanUnionVat extends LocalTaxTypeBase {
       // See http://www.vatlive.com/eu-vat-rules/vat-registration-threshold/
       $resolved_zones = $store_zones;
       $customer_zone = reset($customer_zones);
-      if ($this->checkStoreRegistration($store, $customer_zone)) {
+      if ($this->checkRegistrations($store, $customer_zone)) {
         $resolved_zones = $customer_zones;
       }
     }

@@ -78,38 +78,24 @@ abstract class LocalTaxTypeBase extends TaxTypeBase implements LocalTaxTypeInter
    * {@inheritdoc}
    */
   public function applies(OrderInterface $order) {
-    // The store must belong to one of the zones,
-    // or be registered to collect taxes there.
     $store = $order->getStore();
-    foreach ($this->getZones() as $zone) {
-      if ($zone->match($store->getAddress())) {
-        return TRUE;
-      }
-      elseif ($this->checkStoreRegistration($store, $zone)) {
-        return TRUE;
-      }
-    }
-    return FALSE;
+    return $this->matchesAddress($store) || $this->matchesRegistrations($store);
   }
 
   /**
    * {@inheritdoc}
    */
   public function apply(OrderInterface $order) {
-    $prices_include_tax = $order->getStore()->get('prices_include_tax')->value;
+    $store = $order->getStore();
+    $prices_include_tax = $store->get('prices_include_tax')->value;
     foreach ($order->getItems() as $order_item) {
       $customer_profile = $this->resolveCustomerProfile($order_item);
       if (!$customer_profile) {
         continue;
       }
 
-      $zones = $this->resolveZones($order_item, $customer_profile);
-      foreach ($zones as $zone) {
-        $rate = $this->chainRateResolver->resolve($zone, $order_item, $customer_profile);
-        if (!is_object($rate)) {
-          // No applicable rate found.
-          continue;
-        }
+      $rates = $this->resolveRates($order_item, $customer_profile);
+      foreach ($rates as $source_id => $rate) {
         $unit_price = $order_item->getUnitPrice();
         $rate_amount = $rate->getAmount()->getAmount();
         $tax_amount = $unit_price->multiply($rate_amount);
@@ -133,11 +119,100 @@ abstract class LocalTaxTypeBase extends TaxTypeBase implements LocalTaxTypeInter
           'type' => 'tax',
           'label' => $this->getDisplayLabel(),
           'amount' => $tax_amount,
-          'source_id' => $this->entityId . '|' . $zone->getId() . '|' . $rate->getId(),
+          'source_id' => $source_id,
           'included' => $this->isDisplayInclusive(),
         ]));
       }
     }
+  }
+
+  /**
+   * Checks whether the tax type matches the store's billing address.
+   *
+   * @param \Drupal\commerce_store\Entity\StoreInterface $store
+   *   The store.
+   *
+   * @return bool
+   *   TRUE if the tax type matches the billing address, FALSE otherwise.
+   */
+  protected function matchesAddress(StoreInterface $store) {
+    foreach ($this->getZones() as $zone) {
+      if ($zone->match($store->getAddress())) {
+        return TRUE;
+      }
+    }
+    return FALSE;
+  }
+
+  /**
+   * Checks whether the tax type matches the store's tax registrations.
+   *
+   * Countries have a yearly transaction threshold (such as $30k) which
+   * when breached requires companies to register for tax collection.
+   * This also often applies to foreign companies selling to that
+   * country's residents. Furthermore, many countries are now trying to
+   * make foreign companies collect their tax when selling digital products
+   * to their residents, regardless of any threshold.
+   * The $store->tax_registrations field allows merchants to precisely specify
+   * for which countries they are collecting tax.
+   *
+   * @param \Drupal\commerce_store\Entity\StoreInterface $store
+   *   The store.
+   *
+   * @return bool
+   *   TRUE if the tax type matches the tax registrations, FALSE otherwise.
+   */
+  protected function matchesRegistrations(StoreInterface $store) {
+    foreach ($this->getZones() as $zone) {
+      if ($this->checkRegistrations($store, $zone)) {
+        return TRUE;
+      }
+    }
+    return FALSE;
+  }
+
+  /**
+   * Checks whether the store is registered to collect taxes in the given zone.
+   *
+   * @param \Drupal\commerce_store\Entity\StoreInterface $store
+   *   The store.
+   * @param \Drupal\commerce_tax\TaxZone $zone
+   *   The tax zone.
+   *
+   * @return bool
+   *   TRUE if the store is registered in the given zone, FALSE otherwise.
+   */
+  protected function checkRegistrations(StoreInterface $store, TaxZone $zone) {
+    foreach ($store->get('tax_registrations') as $field_item) {
+      if ($zone->match(new Address($field_item->value))) {
+        return TRUE;
+      }
+    }
+    return FALSE;
+  }
+
+  /**
+   * Resolves the tax rates for the given order item and customer profile.
+   *
+   * @param \Drupal\commerce_order\Entity\OrderItemInterface $order_item
+   *   The order item.
+   * @param \Drupal\profile\Entity\ProfileInterface $customer_profile
+   *   The customer profile. Contains the address and tax number.
+   *
+   * @return \Drupal\commerce_tax\TaxRate[]
+   *   The tax rates.
+   */
+  protected function resolveRates(OrderItemInterface $order_item, ProfileInterface $customer_profile) {
+    $rates = [];
+    $zones = $this->resolveZones($order_item, $customer_profile);
+    foreach ($zones as $zone) {
+      $rate = $this->chainRateResolver->resolve($zone, $order_item, $customer_profile);
+      if (is_object($rate)) {
+        $source_id = $this->entityId . '|' . $zone->getId() . '|' . $rate->getId();
+        $rates[$source_id] = $rate;
+      }
+    }
+    return $rates;
   }
 
   /**
@@ -152,7 +227,7 @@ abstract class LocalTaxTypeBase extends TaxTypeBase implements LocalTaxTypeInter
    *   The tax zones.
    */
   protected function resolveZones(OrderItemInterface $order_item, ProfileInterface $customer_profile) {
-    $customer_address = $customer_profile->address->first();
+    $customer_address = $customer_profile->get('address')->first();
     $resolved_zones = [];
     foreach ($this->getZones() as $zone) {
       if ($zone->match($customer_address)) {
@@ -213,26 +288,6 @@ abstract class LocalTaxTypeBase extends TaxTypeBase implements LocalTaxTypeInter
     }
 
     return $element;
-  }
-
-  /**
-   * Checks whether the store is registered to collect taxes in the given zone.
-   *
-   * @param \Drupal\commerce_store\Entity\StoreInterface $store
-   *   The store.
-   * @param \Drupal\commerce_tax\TaxZone $zone
-   *   The tax zone.
-   *
-   * @return bool
-   *   TRUE if the store is registered in the given zone, FALSE otherwise.
-   */
-  protected function checkStoreRegistration(StoreInterface $store, TaxZone $zone) {
-    foreach ($store->get('tax_registrations') as $field_item) {
-      if ($zone->match(new Address($field_item->value))) {
-        return TRUE;
-      }
-    }
-    return FALSE;
   }
 
 }

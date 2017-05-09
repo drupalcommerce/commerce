@@ -63,6 +63,10 @@ interface TaxTypeInterface extends ConfigurablePluginInterface, PluginFormInterf
   /**
    * Applies the tax type to the given order.
    *
+   * Taxes should be added on the order item level, to make returns
+   * and refunds easier. This is true even for taxes that are only
+   * shown at the order level, such as sales taxes.
+   *
    * @param \Drupal\commerce_order\Entity\OrderInterface $order
    *   The order.
    */

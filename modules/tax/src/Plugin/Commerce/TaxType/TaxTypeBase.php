@@ -4,6 +4,7 @@ namespace Drupal\commerce_tax\Plugin\Commerce\TaxType;
 
 use Drupal\commerce_order\Entity\OrderInterface;
 use Drupal\commerce_order\Entity\OrderItemInterface;
+use Drupal\commerce_store\Entity\StoreInterface;
 use Drupal\commerce_tax\Event\TaxEvents;
 use Drupal\commerce_tax\Event\CustomerProfileEvent;
 use Drupal\commerce_tax\TaxableType;
@@ -41,6 +42,13 @@ abstract class TaxTypeBase extends PluginBase implements TaxTypeInterface, Conta
    * @var string
    */
   protected $entityId;
+
+  /**
+   * A cache of instantiated store profiles.
+   *
+   * @var \Drupal\profile\Entity\ProfileInterface
+   */
+  protected $storeProfiles = [];
 
   /**
    * Constructs a new TaxTypeBase object.
@@ -227,15 +235,33 @@ abstract class TaxTypeBase extends PluginBase implements TaxTypeInterface, Conta
     if (!$customer_profile && $prices_include_tax) {
       // The customer is still unknown, but prices include tax (VAT scenario),
       // better to show the store's default tax than nothing.
+      $customer_profile = $this->buildStoreProfile($store);
+    }
+
+    return $customer_profile;
+  }
+
+  /**
+   * Builds a customer profile for the given store.
+   *
+   * @param \Drupal\commerce_store\Entity\StoreInterface $store
+   *   The store.
+   *
+   * @return \Drupal\profile\Entity\ProfileInterface
+   *   The customer profile.
+   */
+  protected function buildStoreProfile(StoreInterface $store) {
+    $store_id = $store->id();
+    if (!isset($this->storeProfiles[$store_id])) {
       $profile_storage = $this->entityTypeManager->getStorage('profile');
-      $customer_profile = $profile_storage->create([
+      $this->storeProfiles[$store_id] = $profile_storage->create([
         'type' => 'customer',
-        'uid' => $order->getCustomerId(),
+        'uid' => $store->getOwnerId(),
         'address' => $store->getAddress(),
       ]);
     }
 
-    return $customer_profile;
+    return $this->storeProfiles[$store_id];
   }
 
 }
