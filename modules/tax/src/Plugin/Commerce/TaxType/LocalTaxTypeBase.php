@@ -88,13 +88,46 @@ abstract class LocalTaxTypeBase extends TaxTypeBase implements LocalTaxTypeInter
   public function apply(OrderInterface $order) {
     $store = $order->getStore();
     $prices_include_tax = $store->get('prices_include_tax')->value;
+    $matches_store_address = $this->matchesAddress($store);
     foreach ($order->getItems() as $order_item) {
       $customer_profile = $this->resolveCustomerProfile($order_item);
       if (!$customer_profile) {
         continue;
       }
 
+      $adjustments = $order_item->getAdjustments();
       $rates = $this->resolveRates($order_item, $customer_profile);
+      // Don't overcharge a tax-exempt customer if the price is tax-inclusive.
+      // A negative adjustment is added with the difference, and optionally
+      // applied to the unit price in the TaxOrderProcessor.
+      $negate = FALSE;
+      if (!$rates && $prices_include_tax && $matches_store_address) {
+        // The price difference is calculated using the store's default tax
+        // type, but only if no other tax type added its own tax.
+        // For example, a 12 EUR price with 20% EU VAT gets a -2 EUR
+        // adjustment if the customer is from Japan, but only if no
+        // Japanese tax was added due to a JP store registration.
+        $positive_tax_adjustments = array_filter($adjustments, function ($adjustment) {
+          /** @var \Drupal\commerce_order\Adjustment $adjustment */
+          return $adjustment->getType() == 'tax' && $adjustment->isPositive();
+        });
+        if (empty($positive_tax_adjustments)) {
+          $store_profile = $this->buildStoreProfile($store);
+          $rates = $this->resolveRates($order_item, $store_profile);
+          $negate = TRUE;
+        }
+      }
+      else {
+        // A different tax type added a negative adjustment, but this tax type
+        // has its own tax to add, removing the need for a negative adjustment.
+        $negative_tax_adjustments = array_filter($adjustments, function ($adjustment) {
+          /** @var \Drupal\commerce_order\Adjustment $adjustment */
+          return $adjustment->getType() == 'tax' && $adjustment->isNegative();
+        });
+        $adjustments = array_diff_key($adjustments, $negative_tax_adjustments);
+        $order_item->setAdjustments($adjustments);
+      }
+
       foreach ($rates as $source_id => $rate) {
         $unit_price = $order_item->getUnitPrice();
         $rate_amount = $rate->getAmount()->getAmount();
@@ -118,9 +151,9 @@ abstract class LocalTaxTypeBase extends TaxTypeBase implements LocalTaxTypeInter
         $order_item->addAdjustment(new Adjustment([
           'type' => 'tax',
           'label' => $this->getDisplayLabel(),
-          'amount' => $tax_amount,
+          'amount' => $negate ? $tax_amount->multiply('-1') : $tax_amount,
           'source_id' => $source_id,
-          'included' => $this->isDisplayInclusive(),
+          'included' => !$negate && $this->isDisplayInclusive(),
         ]));
       }
     }

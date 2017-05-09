@@ -188,6 +188,65 @@ class CustomTest extends CommerceKernelTestBase {
   }
 
   /**
+   * @covers ::apply
+   */
+  public function testTaxExemptPrices() {
+    $configuration = [
+      '_entity_id' => 'japanese_vat',
+      'display_inclusive' => TRUE,
+      'display_label' => 'vat',
+      'round' => TRUE,
+      'rates' => [
+        [
+          'id' => 'standard',
+          'label' => 'Standard',
+          'amount' => '0.1',
+        ],
+      ],
+      'territories' => [
+        ['country_code' => 'JP'],
+      ],
+    ];
+    $second_plugin = Custom::create($this->container, $configuration, 'custom', ['label' => 'Custom']);
+
+    // Serbian store and Japanese customer, tax-inclusive prices.
+    // No tax applies, the price must be reduced using a negative adjustment.
+    $order = $this->buildOrder('JP', 'RS', ['JP'], TRUE);
+    $this->assertTrue($this->plugin->applies($order));
+    $this->plugin->apply($order);
+    $this->assertCount(1, $order->collectAdjustments());
+    $adjustments = $order->collectAdjustments();
+    $adjustment = reset($adjustments);
+    $this->assertEquals(new Price('-1.72', 'USD'), $adjustment->getAmount());
+    $this->assertFalse($adjustment->isIncluded());
+    $order_items = $order->getItems();
+    $order_item = reset($order_items);
+    $this->assertEquals(new Price('10.33', 'USD'), $order_item->getUnitPrice());
+
+    // Applying the Japanese tax should replace the negative adjustment.
+    // The price should stay the same in RS and JP regardless of which
+    // tax is included.
+    $second_plugin->apply($order);
+    $this->assertCount(1, $order->collectAdjustments());
+    $adjustments = $order->collectAdjustments();
+    $adjustment = reset($adjustments);
+    $this->assertEquals(new Price('0.94', 'USD'), $adjustment->getAmount());
+    $this->assertTrue($adjustment->isIncluded());
+    $order_items = $order->getItems();
+    $order_item = reset($order_items);
+    $this->assertEquals(new Price('10.33', 'USD'), $order_item->getUnitPrice());
+
+    // No negative adjustment should be added if there's an existing positive
+    // tax, so re-applying the Serbian tax should make no difference.
+    $this->plugin->apply($order);
+    $this->assertCount(1, $order->collectAdjustments());
+    $adjustments = $order->collectAdjustments();
+    $adjustment = reset($adjustments);
+    $this->assertEquals(new Price('0.94', 'USD'), $adjustment->getAmount());
+    $this->assertTrue($adjustment->isIncluded());
+  }
+
+  /**
    * Builds an order for testing purposes.
    *
    * @return \Drupal\commerce_order\Entity\OrderInterface
@@ -226,6 +285,7 @@ class CustomTest extends CommerceKernelTestBase {
       'billing_profile' => $customer_profile,
       'order_items' => [$order_item],
     ]);
+    $order->setRefreshState(Order::REFRESH_SKIP);
     $order->save();
 
     return $order;
