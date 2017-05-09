@@ -44,7 +44,7 @@ class Custom extends LocalTaxTypeBase {
    *   The event dispatcher.
    * @param \Drupal\commerce_price\RounderInterface $rounder
    *   The rounder.
-   * @param \Drupal\commerce_tax\ChainTaxRateResolverInterface $chain_rate_resolver
+   * @param \Drupal\commerce_tax\Resolver\ChainTaxRateResolverInterface $chain_rate_resolver
    *   The chain tax rate resolver.
    * @param \Drupal\Component\Uuid\UuidInterface $uuid_generator
    *   The UUID generator.
@@ -142,7 +142,7 @@ class Custom extends LocalTaxTypeBase {
         '#required' => TRUE,
       ];
       $rate_form['amount'] = [
-        '#type' => 'number',
+        '#type' => 'commerce_number',
         '#title' => 'Amount',
         '#default_value' => $rate ? $rate['amount'] * 100 : 0,
         '#field_suffix' => $this->t('%'),
