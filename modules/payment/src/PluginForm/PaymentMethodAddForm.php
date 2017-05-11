@@ -117,7 +117,8 @@ class PaymentMethodAddForm extends PaymentGatewayFormBase {
     // The payment method form is customer facing. For security reasons
     // the returned errors need to be more generic.
     try {
-      $payment_gateway_plugin->createPaymentMethod($payment_method, $values['payment_details']);
+      $paymentDetails = empty($values['payment_details']) ? array() : $values['payment_details'];
+      $payment_gateway_plugin->createPaymentMethod($payment_method, $paymentDetails);
     }
     catch (DeclineException $e) {
       \Drupal::logger('commerce_payment')->warning($e->getMessage());
