@@ -36,7 +36,7 @@ class PriceItem extends FieldItemBase {
 
     return $properties;
   }
-  
+
   /**
    * {@inheritdoc}
    */
