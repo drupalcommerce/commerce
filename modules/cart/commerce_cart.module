@@ -208,6 +208,44 @@ function commerce_cart_form_commerce_order_type_form_alter(array &$form, FormSta
 }
 
 /**
+ * Implements hook_form_FORM_ID_alter() for 'field_ui_field_edit_form'.
+ */
+function commerce_cart_form_field_config_edit_form_alter(array &$form, FormStateInterface $form_state) {
+  $field = $form_state->getFormObject()->getEntity();
+  if (!$field->isLocked() && $field->get('entity_type') == 'commerce_line_item') {
+
+    // Get the current instance's line item form settings for use as default values.
+    $instance = $form['#instance'];
+    if (empty($instance['commerce_cart_settings']) || !is_array($instance['commerce_cart_settings'])) {
+      $commerceCartSettings = array();
+    }
+    else {
+      $commerceCartSettings = $instance['commerce_cart_settings'];
+    }
+
+    // Supply default values for the cart settings pertaining here to field access
+    // on the Add to Cart form.
+    $commerceCartSettings += array(
+      'field_access' => FALSE,
+    );
+
+    $form['instance']['commerce_cart_settings'] = array(
+      '#type' => 'fieldset',
+      '#title' => t('Add to Cart form settings'),
+      '#description' =>t('Fields attached to product line item types can be included in the Add to Cart form to collect additional information from customers in conjunction with their purchase of particular products.'),
+      '#weight' => 5,
+      '#collapsible' => FALSE,
+    );
+    $form['instance']['commerce_cart_settings']['field_access'] = array(
+      '#type' => 'checkbox',
+      '#title' => t('Include this field on Add to Cart forms for line items of this type.'),
+      '#default_value' => $commerce_cart_settings['field_access'],
+    );
+  }
+}
+
+
+/**
  * Form submission handler for 'commerce_order_type_form'.
  */
 function commerce_cart_order_type_form_submit($form, FormStateInterface $form_state) {
