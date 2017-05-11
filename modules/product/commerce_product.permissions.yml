@@ -2,3 +2,6 @@
   title: 'Administer product types'
   description: 'Maintain the types of products available and the fields that are associated with those types.'
   'restrict access': TRUE
+
+permission_callbacks:
+  - \Drupal\commerce_product\ProductPermissions::productTypePermissions
