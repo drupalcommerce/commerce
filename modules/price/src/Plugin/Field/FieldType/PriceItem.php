@@ -41,7 +41,7 @@ class PriceItem extends FieldItemBase {
    * {@inheritdoc}
    */
   public static function mainPropertyName() {
-    return 'number';
+    return NULL;
   }
 
   /**
