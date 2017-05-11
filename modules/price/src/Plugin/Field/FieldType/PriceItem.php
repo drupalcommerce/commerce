@@ -36,6 +36,13 @@ class PriceItem extends FieldItemBase {
 
     return $properties;
   }
+  
+  /**
+   * {@inheritdoc}
+   */
+  public static function mainPropertyName() {
+    return 'number';
+  }
 
   /**
    * {@inheritdoc}
