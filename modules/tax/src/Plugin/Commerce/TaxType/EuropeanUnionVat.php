@@ -66,7 +66,7 @@ class EuropeanUnionVat extends LocalTaxTypeBase {
     // to Germany needs to have German VAT applied.
     $taxable_type = $this->getTaxableType($order_item);
     $year = $this->getCalculationDate($order)->format('Y');
-    $is_digital = $taxable_type == TaxableType::DIGITAL_GOODS && $year >= '2015';
+    $is_digital = $taxable_type == TaxableType::DIGITAL_GOODS && $year >= 2015;
     $resolved_zones = [];
     if (empty($store_zones) && !empty($store_registration_zones)) {
       // The store is not in the EU but is registered to collect VAT.
