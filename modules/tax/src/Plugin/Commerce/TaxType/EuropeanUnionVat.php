@@ -1043,7 +1043,7 @@ class EuropeanUnionVat extends LocalTaxTypeBase {
       'id' => 'sk',
       'label' => $this->t('Slovakia'),
       'territories' => [
-        ['country_code' => 'SE'],
+        ['country_code' => 'SK'],
       ],
       'rates' => [
         [
