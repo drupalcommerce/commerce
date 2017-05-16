@@ -869,7 +869,7 @@ class EuropeanUnionVat extends LocalTaxTypeBase {
           'id' => 'standard',
           'label' => $this->t('Standard'),
           'amounts' => [
-            ['amount' => '0.22', 'start_date' => '2016-01-01'],
+            ['amount' => '0.23', 'start_date' => '2011-01-01'],
           ],
           'default' => TRUE,
         ],
