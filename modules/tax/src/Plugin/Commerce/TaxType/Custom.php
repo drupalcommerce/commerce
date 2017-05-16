@@ -187,7 +187,7 @@ class Custom extends LocalTaxTypeBase {
     foreach ($form_state->get('territories') as $index => $territory) {
       $territory_form = &$form['territories'][$index];
       $territory_form['territory'] = [
-        '#type' => 'zone_territory',
+        '#type' => 'address_zone_territory',
         '#default_value' => $territory,
         '#required' => TRUE,
       ];
