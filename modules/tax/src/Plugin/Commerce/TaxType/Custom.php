@@ -143,7 +143,7 @@ class Custom extends LocalTaxTypeBase {
       ];
       $rate_form['amount'] = [
         '#type' => 'commerce_number',
-        '#title' => 'Amount',
+        '#title' => $this->t('Amount'),
         '#default_value' => $rate ? $rate['amount'] * 100 : 0,
         '#field_suffix' => $this->t('%'),
         '#min' => 0,
@@ -296,6 +296,7 @@ class Custom extends LocalTaxTypeBase {
 
     if (!$form_state->getErrors()) {
       $values = $form_state->getValue($form['#parents']);
+      $this->configuration['display_label'] = $values['display_label'];
       $this->configuration['round'] = $values['round'];
       $this->configuration['rates'] = [];
       foreach (array_filter($values['rates']) as $rate) {
