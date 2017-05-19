@@ -40,13 +40,6 @@ class EuropeanUnionVat extends LocalTaxTypeBase {
   /**
    * {@inheritdoc}
    */
-  public function shouldRound() {
-    return TRUE;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   protected function resolveZones(OrderItemInterface $order_item, ProfileInterface $customer_profile) {
     $zones = $this->getZones();
     $customer_address = $customer_profile->address->first();

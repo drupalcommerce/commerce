@@ -77,6 +77,13 @@ abstract class LocalTaxTypeBase extends TaxTypeBase implements LocalTaxTypeInter
   /**
    * {@inheritdoc}
    */
+  public function shouldRound() {
+    return TRUE;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function applies(OrderInterface $order) {
     $store = $order->getStore();
     return $this->matchesAddress($store) || $this->matchesRegistrations($store);
@@ -292,17 +299,20 @@ abstract class LocalTaxTypeBase extends TaxTypeBase implements LocalTaxTypeInter
       ],
       '#input' => FALSE,
     ];
-    foreach ($this->getZones() as $tax_zone) {
-      $element['table']['zone-' . $tax_zone->getId()] = [
-        '#attributes' => [
-          'class' => ['region-title'],
-          'no_striping' => TRUE,
-        ],
-        'label' => [
-          '#markup' => $tax_zone->getLabel(),
-          '#wrapper_attributes' => ['colspan' => 3],
-        ],
-      ];
+    $tax_zones = $this->getZones();
+    foreach ($tax_zones as $tax_zone) {
+      if (count($tax_zones) > 1) {
+        $element['table']['zone-' . $tax_zone->getId()] = [
+          '#attributes' => [
+            'class' => ['region-title'],
+            'no_striping' => TRUE,
+          ],
+          'label' => [
+            '#markup' => $tax_zone->getLabel(),
+            '#wrapper_attributes' => ['colspan' => 3],
+          ],
+        ];
+      }
       foreach ($tax_zone->getRates() as $tax_rate) {
         $formatted_amounts = array_map(function ($amount) {
           /** @var \Drupal\commerce_tax\TaxRateAmount $amount */
