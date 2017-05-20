@@ -284,6 +284,13 @@ abstract class LocalTaxTypeBase extends TaxTypeBase implements LocalTaxTypeInter
    *   The summary form element.
    */
   protected function buildRateSummary() {
+    $tax_zones = $this->getZones();
+    usort($tax_zones, function($a, $b) {
+      /** @var \Drupal\commerce_tax\TaxZone $a */
+      /** @var \Drupal\commerce_tax\TaxZone $b */
+      return strcmp($a->getLabel(), $b->getLabel());
+    });
+
     $element = [
       '#type' => 'details',
       '#title' => $this->t('Tax rates'),
@@ -299,7 +306,6 @@ abstract class LocalTaxTypeBase extends TaxTypeBase implements LocalTaxTypeInter
       ],
       '#input' => FALSE,
     ];
-    $tax_zones = $this->getZones();
     foreach ($tax_zones as $tax_zone) {
       if (count($tax_zones) > 1) {
         $element['table']['zone-' . $tax_zone->getId()] = [
