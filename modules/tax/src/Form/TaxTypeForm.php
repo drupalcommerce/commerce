@@ -45,6 +45,9 @@ class TaxTypeForm extends CommercePluginEntityFormBase {
     $type = $this->entity;
     $plugins = array_column($this->pluginManager->getDefinitions(), 'label', 'id');
     asort($plugins);
+    // Move the Custom plugin to the front.
+    unset($plugins['custom']);
+    $plugins = ['custom' => $this->t('Custom')] + $plugins;
 
     // Use the first available plugin as the default value.
     if (!$type->getPluginId()) {
