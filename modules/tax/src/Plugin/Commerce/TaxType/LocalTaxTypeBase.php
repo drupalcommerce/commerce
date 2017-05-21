@@ -285,7 +285,7 @@ abstract class LocalTaxTypeBase extends TaxTypeBase implements LocalTaxTypeInter
    */
   protected function buildRateSummary() {
     $tax_zones = $this->getZones();
-    usort($tax_zones, function($a, $b) {
+    usort($tax_zones, function ($a, $b) {
       /** @var \Drupal\commerce_tax\TaxZone $a */
       /** @var \Drupal\commerce_tax\TaxZone $b */
       return strcmp($a->getLabel(), $b->getLabel());
