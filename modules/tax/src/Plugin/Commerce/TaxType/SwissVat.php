@@ -37,7 +37,7 @@ class SwissVat extends LocalTaxTypeBase {
   /**
    * {@inheritdoc}
    */
-  public function getZones() {
+  public function buildZones() {
     $zones = [];
     $zones['ch'] = new TaxZone([
       'id' => 'ch',

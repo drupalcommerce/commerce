@@ -35,6 +35,13 @@ abstract class LocalTaxTypeBase extends TaxTypeBase implements LocalTaxTypeInter
   protected $chainRateResolver;
 
   /**
+   * The zones.
+   *
+   * @var \Drupal\commerce_tax\TaxZone[]
+   */
+  protected $zones;
+
+  /**
    * Constructs a new LocalTaxTypeBase object.
    *
    * @param array $configuration
@@ -338,5 +345,24 @@ abstract class LocalTaxTypeBase extends TaxTypeBase implements LocalTaxTypeInter
 
     return $element;
   }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getZones() {
+    if (empty($this->zones)) {
+      $this->zones = $this->buildZones();
+    }
+
+    return $this->zones;
+  }
+
+  /**
+   * Builds the tax zones.
+   *
+   * @return \Drupal\commerce_tax\TaxZone[]
+   *   The tax zones.
+   */
+  abstract protected function buildZones();
 
 }

@@ -355,7 +355,7 @@ class Custom extends LocalTaxTypeBase {
   /**
    * {@inheritdoc}
    */
-  public function getZones() {
+  public function buildZones() {
     $rates = $this->configuration['rates'];
     // The plugin doesn't support defining multiple amounts with own
     // start/end dates for UX reasons, so a start date is invented here.

@@ -109,7 +109,18 @@ class EuropeanUnionVat extends LocalTaxTypeBase {
   /**
    * {@inheritdoc}
    */
-  public function getZones() {
+  public function buildZones() {
+    // Avoid instantiating the same labels dozens of times.
+    $labels = [
+      'standard' => $this->t('Standard'),
+      'intermediate' => $this->t('Intermediate'),
+      'reduced' => $this->t('Reduced'),
+      'second_reduced' => $this->t('Second Reduced'),
+      'super_reduced' => $this->t('Super Reduced'),
+      'special' => $this->t('Special'),
+      'zero' => $this->t('Zero'),
+    ];
+
     $zones = [];
     $zones['at'] = new TaxZone([
       'id' => 'at',
@@ -121,7 +132,7 @@ class EuropeanUnionVat extends LocalTaxTypeBase {
       'rates' => [
         [
           'id' => 'standard',
-          'label' => $this->t('Standard'),
+          'label' => $labels['standard'],
           'amounts' => [
             ['amount' => '0.2', 'start_date' => '1995-01-01'],
           ],
@@ -129,14 +140,14 @@ class EuropeanUnionVat extends LocalTaxTypeBase {
         ],
         [
           'id' => 'intermediate',
-          'label' => $this->t('Intermediate'),
+          'label' => $labels['intermediate'],
           'amounts' => [
             ['amount' => '0.13', 'start_date' => '2016-01-01'],
           ],
         ],
         [
           'id' => 'reduced',
-          'label' => $this->t('Reduced'),
+          'label' => $labels['reduced'],
           'amounts' => [
             ['amount' => '0.1', 'start_date' => '1995-01-01'],
           ],
@@ -152,7 +163,7 @@ class EuropeanUnionVat extends LocalTaxTypeBase {
       'rates' => [
         [
           'id' => 'standard',
-          'label' => $this->t('Standard'),
+          'label' => $labels['standard'],
           'amounts' => [
             ['amount' => '0.21', 'start_date' => '1996-01-01'],
           ],
@@ -160,21 +171,21 @@ class EuropeanUnionVat extends LocalTaxTypeBase {
         ],
         [
           'id' => 'intermediate',
-          'label' => $this->t('Intermediate'),
+          'label' => $labels['intermediate'],
           'amounts' => [
             ['amount' => '0.12', 'start_date' => '1992-04-01'],
           ],
         ],
         [
           'id' => 'reduced',
-          'label' => $this->t('Reduced'),
+          'label' => $labels['reduced'],
           'amounts' => [
             ['amount' => '0.06', 'start_date' => '1971-01-01'],
           ],
         ],
         [
           'id' => 'zero',
-          'label' => $this->t('Zero'),
+          'label' => $labels['zero'],
           'amounts' => [
             ['amount' => '0', 'start_date' => '1971-01-01'],
           ],
@@ -190,7 +201,7 @@ class EuropeanUnionVat extends LocalTaxTypeBase {
       'rates' => [
         [
           'id' => 'standard',
-          'label' => $this->t('Standard'),
+          'label' => $labels['standard'],
           'amounts' => [
             ['amount' => '0.2', 'start_date' => '2007-01-01'],
           ],
@@ -198,7 +209,7 @@ class EuropeanUnionVat extends LocalTaxTypeBase {
         ],
         [
           'id' => 'reduced',
-          'label' => $this->t('Reduced'),
+          'label' => $labels['reduced'],
           'amounts' => [
             ['amount' => '0.09', 'start_date' => '2011-04-01'],
           ],
@@ -214,7 +225,7 @@ class EuropeanUnionVat extends LocalTaxTypeBase {
       'rates' => [
         [
           'id' => 'standard',
-          'label' => $this->t('Standard'),
+          'label' => $labels['standard'],
           'amounts' => [
             ['amount' => '0.19', 'start_date' => '2014-01-13'],
           ],
@@ -222,14 +233,14 @@ class EuropeanUnionVat extends LocalTaxTypeBase {
         ],
         [
           'id' => 'intermediate',
-          'label' => $this->t('Intermediate'),
+          'label' => $labels['intermediate'],
           'amounts' => [
             ['amount' => '0.09', 'start_date' => '2014-01-13'],
           ],
         ],
         [
           'id' => 'reduced',
-          'label' => $this->t('Reduced'),
+          'label' => $labels['reduced'],
           'amounts' => [
             ['amount' => '0.05', 'start_date' => '2004-05-01'],
           ],
@@ -245,7 +256,7 @@ class EuropeanUnionVat extends LocalTaxTypeBase {
       'rates' => [
         [
           'id' => 'standard',
-          'label' => $this->t('Standard'),
+          'label' => $labels['standard'],
           'amounts' => [
             ['amount' => '0.21', 'start_date' => '2013-01-01'],
           ],
@@ -253,21 +264,21 @@ class EuropeanUnionVat extends LocalTaxTypeBase {
         ],
         [
           'id' => 'reduced',
-          'label' => $this->t('Reduced'),
+          'label' => $labels['reduced'],
           'amounts' => [
             ['amount' => '0.15', 'start_date' => '2013-01-01'],
           ],
         ],
         [
           'id' => 'super_reduced',
-          'label' => $this->t('Super Reduced'),
+          'label' => $labels['super_reduced'],
           'amounts' => [
             ['amount' => '0.1', 'start_date' => '2015-01-01'],
           ],
         ],
         [
           'id' => 'zero',
-          'label' => $this->t('Zero'),
+          'label' => $labels['zero'],
           'amounts' => [
             ['amount' => '0', 'start_date' => '2004-05-01'],
           ],
@@ -286,7 +297,7 @@ class EuropeanUnionVat extends LocalTaxTypeBase {
       'rates' => [
         [
           'id' => 'standard',
-          'label' => $this->t('Standard'),
+          'label' => $labels['standard'],
           'amounts' => [
             ['amount' => '0.19', 'start_date' => '2007-01-01'],
           ],
@@ -294,7 +305,7 @@ class EuropeanUnionVat extends LocalTaxTypeBase {
         ],
         [
           'id' => 'reduced',
-          'label' => $this->t('Reduced'),
+          'label' => $labels['reduced'],
           'amounts' => [
             ['amount' => '0.07', 'start_date' => '1983-07-01'],
           ],
@@ -310,7 +321,7 @@ class EuropeanUnionVat extends LocalTaxTypeBase {
       'rates' => [
         [
           'id' => 'standard',
-          'label' => $this->t('Standard'),
+          'label' => $labels['standard'],
           'amounts' => [
             ['amount' => '0.25', 'start_date' => '1992-01-01'],
           ],
@@ -318,7 +329,7 @@ class EuropeanUnionVat extends LocalTaxTypeBase {
         ],
         [
           'id' => 'zero',
-          'label' => $this->t('Zero'),
+          'label' => $labels['zero'],
           'amounts' => [
             ['amount' => '0', 'start_date' => '1973-01-01'],
           ],
@@ -334,7 +345,7 @@ class EuropeanUnionVat extends LocalTaxTypeBase {
       'rates' => [
         [
           'id' => 'standard',
-          'label' => $this->t('Standard'),
+          'label' => $labels['standard'],
           'amounts' => [
             ['amount' => '0.2', 'start_date' => '2009-07-01'],
           ],
@@ -342,7 +353,7 @@ class EuropeanUnionVat extends LocalTaxTypeBase {
         ],
         [
           'id' => 'reduced',
-          'label' => $this->t('Reduced'),
+          'label' => $labels['reduced'],
           'amounts' => [
             ['amount' => '0.09', 'start_date' => '2009-01-01'],
           ],
@@ -359,7 +370,7 @@ class EuropeanUnionVat extends LocalTaxTypeBase {
       'rates' => [
         [
           'id' => 'standard',
-          'label' => $this->t('Standard'),
+          'label' => $labels['standard'],
           'amounts' => [
             ['amount' => '0.21', 'start_date' => '2012-09-01'],
           ],
@@ -367,14 +378,14 @@ class EuropeanUnionVat extends LocalTaxTypeBase {
         ],
         [
           'id' => 'reduced',
-          'label' => $this->t('Reduced'),
+          'label' => $labels['reduced'],
           'amounts' => [
             ['amount' => '0.1', 'start_date' => '2012-09-01'],
           ],
         ],
         [
           'id' => 'super_reduced',
-          'label' => $this->t('Super Reduced'),
+          'label' => $labels['super_reduced'],
           'amounts' => [
             ['amount' => '0.04', 'start_date' => '1995-01-01'],
           ],
@@ -391,7 +402,7 @@ class EuropeanUnionVat extends LocalTaxTypeBase {
       'rates' => [
         [
           'id' => 'standard',
-          'label' => $this->t('Standard'),
+          'label' => $labels['standard'],
           'amounts' => [
             ['amount' => '0.24', 'start_date' => '2013-01-01'],
           ],
@@ -399,14 +410,14 @@ class EuropeanUnionVat extends LocalTaxTypeBase {
         ],
         [
           'id' => 'intermediate',
-          'label' => $this->t('Intermediate'),
+          'label' => $labels['intermediate'],
           'amounts' => [
             ['amount' => '0.14', 'start_date' => '2013-01-01'],
           ],
         ],
         [
           'id' => 'reduced',
-          'label' => $this->t('Reduced'),
+          'label' => $labels['reduced'],
           'amounts' => [
             ['amount' => '0.1', 'start_date' => '2013-01-01'],
           ],
@@ -424,7 +435,7 @@ class EuropeanUnionVat extends LocalTaxTypeBase {
       'rates' => [
         [
           'id' => 'standard',
-          'label' => $this->t('Standard'),
+          'label' => $labels['standard'],
           'amounts' => [
             ['amount' => '0.2', 'start_date' => '2014-01-01'],
           ],
@@ -432,21 +443,21 @@ class EuropeanUnionVat extends LocalTaxTypeBase {
         ],
         [
           'id' => 'intermediate',
-          'label' => $this->t('Intermediate'),
+          'label' => $labels['intermediate'],
           'amounts' => [
             ['amount' => '0.1', 'start_date' => '2014-01-01'],
           ],
         ],
         [
           'id' => 'reduced',
-          'label' => $this->t('Reduced'),
+          'label' => $labels['reduced'],
           'amounts' => [
             ['amount' => '0.055', 'start_date' => '1982-07-01'],
           ],
         ],
         [
           'id' => 'super_reduced',
-          'label' => $this->t('Super Reduced'),
+          'label' => $labels['super_reduced'],
           'amounts' => [
             ['amount' => '0.021', 'start_date' => '1986-07-01'],
           ],
@@ -463,7 +474,7 @@ class EuropeanUnionVat extends LocalTaxTypeBase {
       'rates' => [
         [
           'id' => 'standard',
-          'label' => $this->t('Standard'),
+          'label' => $labels['standard'],
           'amounts' => [
             ['amount' => '0.2', 'start_date' => '2014-01-01'],
           ],
@@ -471,21 +482,21 @@ class EuropeanUnionVat extends LocalTaxTypeBase {
         ],
         [
           'id' => 'special',
-          'label' => $this->t('Special'),
+          'label' => $labels['special'],
           'amounts' => [
             ['amount' => '0.1', 'start_date' => '2014-01-01'],
           ],
         ],
         [
           'id' => 'reduced',
-          'label' => $this->t('Reduced'),
+          'label' => $labels['reduced'],
           'amounts' => [
             ['amount' => '0.021', 'start_date' => '1997-09-01'],
           ],
         ],
         [
           'id' => 'super_reduced',
-          'label' => $this->t('Super Reduced'),
+          'label' => $labels['super_reduced'],
           'amounts' => [
             ['amount' => '0.009', 'start_date' => '1972-04-01'],
           ],
@@ -502,7 +513,7 @@ class EuropeanUnionVat extends LocalTaxTypeBase {
       'rates' => [
         [
           'id' => 'standard',
-          'label' => $this->t('Standard'),
+          'label' => $labels['standard'],
           'amounts' => [
             ['amount' => '0.2', 'start_date' => '2011-01-04'],
           ],
@@ -510,14 +521,14 @@ class EuropeanUnionVat extends LocalTaxTypeBase {
         ],
         [
           'id' => 'reduced',
-          'label' => $this->t('Reduced'),
+          'label' => $labels['reduced'],
           'amounts' => [
             ['amount' => '0.05', 'start_date' => '1997-09-01'],
           ],
         ],
         [
           'id' => 'zero',
-          'label' => $this->t('Zero'),
+          'label' => $labels['zero'],
           'amounts' => [
             ['amount' => '0', 'start_date' => '1973-01-01'],
           ],
@@ -534,7 +545,7 @@ class EuropeanUnionVat extends LocalTaxTypeBase {
       'rates' => [
         [
           'id' => 'standard',
-          'label' => $this->t('Standard'),
+          'label' => $labels['standard'],
           'amounts' => [
             ['amount' => '0.23', 'start_date' => '2010-07-01', 'end_date' => '2015-05-31'],
             ['amount' => '0.24', 'start_date' => '2016-06-01'],
@@ -543,14 +554,14 @@ class EuropeanUnionVat extends LocalTaxTypeBase {
         ],
         [
           'id' => 'intermediate',
-          'label' => $this->t('Intermediate'),
+          'label' => $labels['intermediate'],
           'amounts' => [
             ['amount' => '0.13', 'start_date' => '2011-01-01'],
           ],
         ],
         [
           'id' => 'reduced',
-          'label' => $this->t('Reduced'),
+          'label' => $labels['reduced'],
           'amounts' => [
             ['amount' => '0.06', 'start_date' => '2015-07-01'],
           ],
@@ -566,7 +577,7 @@ class EuropeanUnionVat extends LocalTaxTypeBase {
       'rates' => [
         [
           'id' => 'standard',
-          'label' => $this->t('Standard'),
+          'label' => $labels['standard'],
           'amounts' => [
             ['amount' => '0.25', 'start_date' => '2013-07-01'],
           ],
@@ -574,21 +585,21 @@ class EuropeanUnionVat extends LocalTaxTypeBase {
         ],
         [
           'id' => 'reduced',
-          'label' => $this->t('Reduced'),
+          'label' => $labels['reduced'],
           'amounts' => [
             ['amount' => '0.13', 'start_date' => '2014-01-01'],
           ],
         ],
         [
           'id' => 'super_reduced',
-          'label' => $this->t('Super Reduced'),
+          'label' => $labels['super_reduced'],
           'amounts' => [
             ['amount' => '0.05', 'start_date' => '2014-01-01'],
           ],
         ],
         [
           'id' => 'zero',
-          'label' => $this->t('Zero'),
+          'label' => $labels['zero'],
           'amounts' => [
             ['amount' => '0', 'start_date' => '2013-07-01'],
           ],
@@ -604,7 +615,7 @@ class EuropeanUnionVat extends LocalTaxTypeBase {
       'rates' => [
         [
           'id' => 'standard',
-          'label' => $this->t('Standard'),
+          'label' => $labels['standard'],
           'amounts' => [
             ['amount' => '0.27', 'start_date' => '2012-01-01'],
           ],
@@ -612,14 +623,14 @@ class EuropeanUnionVat extends LocalTaxTypeBase {
         ],
         [
           'id' => 'intermediate',
-          'label' => $this->t('Intermediate'),
+          'label' => $labels['intermediate'],
           'amounts' => [
             ['amount' => '0.18', 'start_date' => '2009-07-01'],
           ],
         ],
         [
           'id' => 'reduced',
-          'label' => $this->t('Reduced'),
+          'label' => $labels['reduced'],
           'amounts' => [
             ['amount' => '0.05', 'start_date' => '2004-05-01'],
           ],
@@ -635,7 +646,7 @@ class EuropeanUnionVat extends LocalTaxTypeBase {
       'rates' => [
         [
           'id' => 'standard',
-          'label' => $this->t('Standard'),
+          'label' => $labels['standard'],
           'amounts' => [
             ['amount' => '0.23', 'start_date' => '2012-01-01'],
           ],
@@ -643,28 +654,28 @@ class EuropeanUnionVat extends LocalTaxTypeBase {
         ],
         [
           'id' => 'reduced',
-          'label' => $this->t('Reduced'),
+          'label' => $labels['reduced'],
           'amounts' => [
             ['amount' => '0.135', 'start_date' => '2003-01-01'],
           ],
         ],
         [
           'id' => 'second_reduced',
-          'label' => $this->t('Second Reduced'),
+          'label' => $labels['second_reduced'],
           'amounts' => [
             ['amount' => '0.09', 'start_date' => '2011-07-01'],
           ],
         ],
         [
           'id' => 'super_reduced',
-          'label' => $this->t('Super Reduced'),
+          'label' => $labels['super_reduced'],
           'amounts' => [
             ['amount' => '0.048', 'start_date' => '2005-01-01'],
           ],
         ],
         [
           'id' => 'zero',
-          'label' => $this->t('Zero'),
+          'label' => $labels['zero'],
           'amounts' => [
             ['amount' => '0', 'start_date' => '1972-04-01'],
           ],
@@ -681,7 +692,7 @@ class EuropeanUnionVat extends LocalTaxTypeBase {
       'rates' => [
         [
           'id' => 'standard',
-          'label' => $this->t('Standard'),
+          'label' => $labels['standard'],
           'amounts' => [
             ['amount' => '0.22', 'start_date' => '2013-10-01'],
           ],
@@ -689,14 +700,14 @@ class EuropeanUnionVat extends LocalTaxTypeBase {
         ],
         [
           'id' => 'reduced',
-          'label' => $this->t('Reduced'),
+          'label' => $labels['reduced'],
           'amounts' => [
             ['amount' => '0.1', 'start_date' => '1995-02-24'],
           ],
         ],
         [
           'id' => 'super_reduced',
-          'label' => $this->t('Super Reduced'),
+          'label' => $labels['super_reduced'],
           'amounts' => [
             ['amount' => '0.04', 'start_date' => '1989-01-01'],
           ],
@@ -712,7 +723,7 @@ class EuropeanUnionVat extends LocalTaxTypeBase {
       'rates' => [
         [
           'id' => 'standard',
-          'label' => $this->t('Standard'),
+          'label' => $labels['standard'],
           'amounts' => [
             ['amount' => '0.21', 'start_date' => '2009-09-01'],
           ],
@@ -720,14 +731,14 @@ class EuropeanUnionVat extends LocalTaxTypeBase {
         ],
         [
           'id' => 'intermediate',
-          'label' => $this->t('Intermediate'),
+          'label' => $labels['intermediate'],
           'amounts' => [
             ['amount' => '0.09', 'start_date' => '2004-05-01'],
           ],
         ],
         [
           'id' => 'reduced',
-          'label' => $this->t('Reduced'),
+          'label' => $labels['reduced'],
           'amounts' => [
             ['amount' => '0.05', 'start_date' => '2004-05-01'],
           ],
@@ -743,7 +754,7 @@ class EuropeanUnionVat extends LocalTaxTypeBase {
       'rates' => [
         [
           'id' => 'standard',
-          'label' => $this->t('Standard'),
+          'label' => $labels['standard'],
           'amounts' => [
             ['amount' => '0.17', 'start_date' => '2015-01-01'],
           ],
@@ -751,21 +762,21 @@ class EuropeanUnionVat extends LocalTaxTypeBase {
         ],
         [
           'id' => 'intermediate',
-          'label' => $this->t('Intermediate'),
+          'label' => $labels['intermediate'],
           'amounts' => [
             ['amount' => '0.14', 'start_date' => '2015-01-01'],
           ],
         ],
         [
           'id' => 'reduced',
-          'label' => $this->t('Reduced'),
+          'label' => $labels['reduced'],
           'amounts' => [
             ['amount' => '0.08', 'start_date' => '2015-01-01'],
           ],
         ],
         [
           'id' => 'super_reduced',
-          'label' => $this->t('Super Reduced'),
+          'label' => $labels['super_reduced'],
           'amounts' => [
             ['amount' => '0.03', 'start_date' => '1983-07-01'],
           ],
@@ -781,7 +792,7 @@ class EuropeanUnionVat extends LocalTaxTypeBase {
       'rates' => [
         [
           'id' => 'standard',
-          'label' => $this->t('Standard'),
+          'label' => $labels['standard'],
           'amounts' => [
             ['amount' => '0.21', 'start_date' => '2012-07-01'],
           ],
@@ -789,7 +800,7 @@ class EuropeanUnionVat extends LocalTaxTypeBase {
         ],
         [
           'id' => 'reduced',
-          'label' => $this->t('Reduced'),
+          'label' => $labels['reduced'],
           'amounts' => [
             ['amount' => '0.12', 'start_date' => '2011-01-01'],
           ],
@@ -805,7 +816,7 @@ class EuropeanUnionVat extends LocalTaxTypeBase {
       'rates' => [
         [
           'id' => 'standard',
-          'label' => $this->t('Standard'),
+          'label' => $labels['standard'],
           'amounts' => [
             ['amount' => '0.18', 'start_date' => '2004-05-01'],
           ],
@@ -813,14 +824,14 @@ class EuropeanUnionVat extends LocalTaxTypeBase {
         ],
         [
           'id' => 'intermediate',
-          'label' => $this->t('Intermediate'),
+          'label' => $labels['intermediate'],
           'amounts' => [
             ['amount' => '0.07', 'start_date' => '2011-01-01'],
           ],
         ],
         [
           'id' => 'reduced',
-          'label' => $this->t('Reduced'),
+          'label' => $labels['reduced'],
           'amounts' => [
             ['amount' => '0.05', 'start_date' => '2004-05-01'],
           ],
@@ -836,7 +847,7 @@ class EuropeanUnionVat extends LocalTaxTypeBase {
       'rates' => [
         [
           'id' => 'standard',
-          'label' => $this->t('Standard'),
+          'label' => $labels['standard'],
           'amounts' => [
             ['amount' => '0.21', 'start_date' => '2012-10-01'],
           ],
@@ -844,7 +855,7 @@ class EuropeanUnionVat extends LocalTaxTypeBase {
         ],
         [
           'id' => 'reduced',
-          'label' => $this->t('Reduced'),
+          'label' => $labels['reduced'],
           'amounts' => [
             ['amount' => '0.06', 'start_date' => '1986-10-01'],
           ],
@@ -860,7 +871,7 @@ class EuropeanUnionVat extends LocalTaxTypeBase {
       'rates' => [
         [
           'id' => 'standard',
-          'label' => $this->t('Standard'),
+          'label' => $labels['standard'],
           'amounts' => [
             ['amount' => '0.23', 'start_date' => '2011-01-01'],
           ],
@@ -868,14 +879,14 @@ class EuropeanUnionVat extends LocalTaxTypeBase {
         ],
         [
           'id' => 'intermediate',
-          'label' => $this->t('Intermediate'),
+          'label' => $labels['intermediate'],
           'amounts' => [
             ['amount' => '0.08', 'start_date' => '2011-01-01'],
           ],
         ],
         [
           'id' => 'reduced',
-          'label' => $this->t('Reduced'),
+          'label' => $labels['reduced'],
           'amounts' => [
             ['amount' => '0.05', 'start_date' => '2011-01-01'],
           ],
@@ -892,7 +903,7 @@ class EuropeanUnionVat extends LocalTaxTypeBase {
       'rates' => [
         [
           'id' => 'standard',
-          'label' => $this->t('Standard'),
+          'label' => $labels['standard'],
           'amounts' => [
             ['amount' => '0.23', 'start_date' => '2011-01-01'],
           ],
@@ -900,14 +911,14 @@ class EuropeanUnionVat extends LocalTaxTypeBase {
         ],
         [
           'id' => 'intermediate',
-          'label' => $this->t('Intermediate'),
+          'label' => $labels['intermediate'],
           'amounts' => [
             ['amount' => '0.13', 'start_date' => '2010-07-01'],
           ],
         ],
         [
           'id' => 'reduced',
-          'label' => $this->t('Reduced'),
+          'label' => $labels['reduced'],
           'amounts' => [
             ['amount' => '0.06', 'start_date' => '2010-07-01'],
           ],
@@ -923,7 +934,7 @@ class EuropeanUnionVat extends LocalTaxTypeBase {
       'rates' => [
         [
           'id' => 'standard',
-          'label' => $this->t('Standard'),
+          'label' => $labels['standard'],
           'amounts' => [
             ['amount' => '0.22', 'start_date' => '2012-04-01'],
           ],
@@ -931,14 +942,14 @@ class EuropeanUnionVat extends LocalTaxTypeBase {
         ],
         [
           'id' => 'intermediate',
-          'label' => $this->t('Intermediate'),
+          'label' => $labels['intermediate'],
           'amounts' => [
             ['amount' => '0.12', 'start_date' => '2012-04-01'],
           ],
         ],
         [
           'id' => 'reduced',
-          'label' => $this->t('Reduced'),
+          'label' => $labels['reduced'],
           'amounts' => [
             ['amount' => '0.05', 'start_date' => '2012-04-01'],
           ],
@@ -954,7 +965,7 @@ class EuropeanUnionVat extends LocalTaxTypeBase {
       'rates' => [
         [
           'id' => 'standard',
-          'label' => $this->t('Standard'),
+          'label' => $labels['standard'],
           'amounts' => [
             ['amount' => '0.20', 'start_date' => '2016-01-01', 'end_date' => '2016-12-31'],
             ['amount' => '0.19', 'start_date' => '2017-01-01'],
@@ -963,14 +974,14 @@ class EuropeanUnionVat extends LocalTaxTypeBase {
         ],
         [
           'id' => 'intermediate',
-          'label' => $this->t('Intermediate'),
+          'label' => $labels['intermediate'],
           'amounts' => [
             ['amount' => '0.09', 'start_date' => '2008-12-01'],
           ],
         ],
         [
           'id' => 'reduced',
-          'label' => $this->t('Reduced'),
+          'label' => $labels['reduced'],
           'amounts' => [
             ['amount' => '0.05', 'start_date' => '2008-12-01'],
           ],
@@ -986,7 +997,7 @@ class EuropeanUnionVat extends LocalTaxTypeBase {
       'rates' => [
         [
           'id' => 'standard',
-          'label' => $this->t('Standard'),
+          'label' => $labels['standard'],
           'amounts' => [
             ['amount' => '0.25', 'start_date' => '1995-01-01'],
           ],
@@ -994,14 +1005,14 @@ class EuropeanUnionVat extends LocalTaxTypeBase {
         ],
         [
           'id' => 'intermediate',
-          'label' => $this->t('Intermediate'),
+          'label' => $labels['intermediate'],
           'amounts' => [
             ['amount' => '0.12', 'start_date' => '1995-01-01'],
           ],
         ],
         [
           'id' => 'reduced',
-          'label' => $this->t('Reduced'),
+          'label' => $labels['reduced'],
           'amounts' => [
             ['amount' => '0.06', 'start_date' => '1996-01-01'],
           ],
@@ -1017,7 +1028,7 @@ class EuropeanUnionVat extends LocalTaxTypeBase {
       'rates' => [
         [
           'id' => 'standard',
-          'label' => $this->t('Standard'),
+          'label' => $labels['standard'],
           'amounts' => [
             ['amount' => '0.22', 'start_date' => '2013-07-01'],
           ],
@@ -1025,7 +1036,7 @@ class EuropeanUnionVat extends LocalTaxTypeBase {
         ],
         [
           'id' => 'reduced',
-          'label' => $this->t('Reduced'),
+          'label' => $labels['reduced'],
           'amounts' => [
             ['amount' => '0.095', 'start_date' => '2013-07-01'],
           ],
@@ -1041,7 +1052,7 @@ class EuropeanUnionVat extends LocalTaxTypeBase {
       'rates' => [
         [
           'id' => 'standard',
-          'label' => $this->t('Standard'),
+          'label' => $labels['standard'],
           'amounts' => [
             ['amount' => '0.2', 'start_date' => '2011-01-01'],
           ],
@@ -1049,7 +1060,7 @@ class EuropeanUnionVat extends LocalTaxTypeBase {
         ],
         [
           'id' => 'reduced',
-          'label' => $this->t('Reduced'),
+          'label' => $labels['reduced'],
           'amounts' => [
             ['amount' => '0.1', 'start_date' => '2011-01-01'],
           ],
