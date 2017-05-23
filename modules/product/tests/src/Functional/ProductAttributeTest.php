@@ -3,6 +3,8 @@
 namespace Drupal\Tests\commerce_product\Functional;
 
 use Drupal\commerce_product\Entity\ProductAttribute;
+use Drupal\field\Entity\FieldConfig;
+use Drupal\field\Entity\FieldStorageConfig;
 
 /**
  * Create, edit, delete, and change product attributes.
@@ -104,6 +106,56 @@ class ProductAttributeTest extends ProductBrowserTestBase {
     $this->submitForm($edit, t('Save'));
     $this->drupalGet('admin/commerce/config/product-variation-types/default/edit/fields');
     $this->assertSession()->pageTextNotContains('attribute_color', 'The color attribute field has been deleted');
+  }
+
+  /**
+   * Tests a manually created attribute field.
+   *
+   * The product attribute field manager would fail on fields it could not
+   * delete, when it should simply ignore fields it did not create.
+   *
+   * @see https://www.drupal.org/node/2880927
+   */
+  public function testManualAttributeField() {
+    /** @var \Drupal\commerce_product\Entity\ProductAttributeInterface $attribute */
+    $attribute = $this->createEntity('commerce_product_attribute', [
+      'id' => 'color',
+      'label' => 'Color',
+    ]);
+
+    $field_name = 'field_my_attribute';
+    $field_storage = FieldStorageConfig::create([
+      'field_name' => $field_name,
+      'entity_type' => 'commerce_product_variation',
+      'type' => 'entity_reference',
+      'cardinality' => 1,
+      'settings' => [
+        'target_type' => 'commerce_product_attribute_value',
+      ],
+      'translatable' => FALSE,
+    ]);
+    $field_storage->save();
+    $field = FieldConfig::create([
+      'field_storage' => $field_storage,
+      'bundle' => 'default',
+      'label' => 'Custom Color',
+      'required' => TRUE,
+      'settings' => [
+        'handler' => 'default',
+        'handler_settings' => [
+          'target_bundles' => ['color'],
+        ],
+      ],
+      'translatable' => FALSE,
+    ]);
+    $field->save();
+
+    $this->drupalGet($attribute->toUrl('edit-form'));
+    $this->assertSession()->statusCodeEquals(200);
+
+    $this->drupalGet('admin/commerce/config/product-variation-types/default/edit');
+    $this->assertSession()->statusCodeEquals(200);
+
   }
 
 }
