@@ -284,8 +284,8 @@ abstract class LocalTaxTypeBase extends TaxTypeBase implements LocalTaxTypeInter
    *   The summary form element.
    */
   protected function buildRateSummary() {
-    $tax_zones = $this->getZones();
-    usort($tax_zones, function ($a, $b) {
+    $zones = $this->getZones();
+    usort($zones, function ($a, $b) {
       /** @var \Drupal\commerce_tax\TaxZone $a */
       /** @var \Drupal\commerce_tax\TaxZone $b */
       return strcmp($a->getLabel(), $b->getLabel());
@@ -306,28 +306,28 @@ abstract class LocalTaxTypeBase extends TaxTypeBase implements LocalTaxTypeInter
       ],
       '#input' => FALSE,
     ];
-    foreach ($tax_zones as $tax_zone) {
-      if (count($tax_zones) > 1) {
-        $element['table']['zone-' . $tax_zone->getId()] = [
+    foreach ($zones as $zone) {
+      if (count($zones) > 1) {
+        $element['table']['zone-' . $zone->getId()] = [
           '#attributes' => [
             'class' => ['region-title'],
             'no_striping' => TRUE,
           ],
           'label' => [
-            '#markup' => $tax_zone->getLabel(),
+            '#markup' => $zone->getLabel(),
             '#wrapper_attributes' => ['colspan' => 3],
           ],
         ];
       }
-      foreach ($tax_zone->getRates() as $tax_rate) {
+      foreach ($zone->getRates() as $rate) {
         $formatted_amounts = array_map(function ($amount) {
           /** @var \Drupal\commerce_tax\TaxRateAmount $amount */
           return $amount->toString();
-        }, $tax_rate->getAmounts());
+        }, $rate->getAmounts());
 
         $element['table'][] = [
-          'tax_rate' => [
-            '#markup' => $tax_rate->getLabel(),
+          'rate' => [
+            '#markup' => $rate->getLabel(),
           ],
           'amounts' => [
             '#markup' => implode('<br>', $formatted_amounts),
