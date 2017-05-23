@@ -30,18 +30,12 @@ class SwissVat extends LocalTaxTypeBase {
   /**
    * {@inheritdoc}
    */
-  public function getDisplayLabel() {
-    return $this->t('VAT');
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function buildZones() {
     $zones = [];
     $zones['ch'] = new TaxZone([
       'id' => 'ch',
       'label' => $this->t('Switzerland'),
+      'display_label' => $this->t('VAT'),
       'territories' => [
         ['country_code' => 'CH'],
         ['country_code' => 'LI'],

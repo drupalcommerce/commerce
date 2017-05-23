@@ -91,13 +91,11 @@ class CustomTest extends CommerceKernelTestBase {
   }
 
   /**
-   * @covers ::getDisplayLabel
    * @covers ::isDisplayInclusive
    * @covers ::shouldRound
    * @covers ::getZones
    */
   public function testGetters() {
-    $this->assertEquals(t('VAT'), $this->plugin->getDisplayLabel());
     $this->assertTrue($this->plugin->isDisplayInclusive());
     $this->assertTrue($this->plugin->shouldRound());
 
@@ -153,7 +151,7 @@ class CustomTest extends CommerceKernelTestBase {
     $adjustments = $order->collectAdjustments();
     $adjustment = reset($adjustments);
     $this->assertEquals('tax', $adjustment->getType());
-    $this->assertEquals($this->plugin->getDisplayLabel(), $adjustment->getLabel());
+    $this->assertEquals(t('VAT'), $adjustment->getLabel());
     $this->assertEquals(new Price('2.07', 'USD'), $adjustment->getAmount());
     $this->assertEquals('serbian_vat|default|standard', $adjustment->getSourceId());
     $this->assertTrue($adjustment->isIncluded());

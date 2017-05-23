@@ -28,16 +28,6 @@ interface TaxTypeInterface extends ConfigurablePluginInterface, PluginFormInterf
   public function getLabel();
 
   /**
-   * Gets the tax type display label.
-   *
-   * Used to identify the applied tax in order summaries.
-   *
-   * @return string
-   *   The tax type display label.
-   */
-  public function getDisplayLabel();
-
-  /**
    * Gets whether the tax type is display inclusive.
    *
    * E.g. US sales tax is not display inclusive, a $5 price is shown as $5

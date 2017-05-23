@@ -103,6 +103,7 @@ abstract class LocalTaxTypeBase extends TaxTypeBase implements LocalTaxTypeInter
     $store = $order->getStore();
     $prices_include_tax = $store->get('prices_include_tax')->value;
     $matches_store_address = $this->matchesAddress($store);
+    $zones = $this->getZones();
     foreach ($order->getItems() as $order_item) {
       $customer_profile = $this->resolveCustomerProfile($order_item);
       if (!$customer_profile) {
@@ -142,7 +143,8 @@ abstract class LocalTaxTypeBase extends TaxTypeBase implements LocalTaxTypeInter
         $order_item->setAdjustments($adjustments);
       }
 
-      foreach ($rates as $source_id => $rate) {
+      foreach ($rates as $zone_id => $rate) {
+        $zone = $zones[$zone_id];
         $unit_price = $order_item->getUnitPrice();
         $rate_amount = $rate->getAmount()->getAmount();
         $tax_amount = $unit_price->multiply($rate_amount);
@@ -164,9 +166,9 @@ abstract class LocalTaxTypeBase extends TaxTypeBase implements LocalTaxTypeInter
 
         $order_item->addAdjustment(new Adjustment([
           'type' => 'tax',
-          'label' => $this->getDisplayLabel(),
+          'label' => $zone->getDisplayLabel(),
           'amount' => $negate ? $tax_amount->multiply('-1') : $tax_amount,
-          'source_id' => $source_id,
+          'source_id' => $this->entityId . '|' . $zone->getId() . '|' . $rate->getId(),
           'included' => !$negate && $this->isDisplayInclusive(),
         ]));
       }
@@ -247,7 +249,7 @@ abstract class LocalTaxTypeBase extends TaxTypeBase implements LocalTaxTypeInter
    *   The customer profile. Contains the address and tax number.
    *
    * @return \Drupal\commerce_tax\TaxRate[]
-   *   The tax rates.
+   *   The tax rates, keyed by tax zone ID.
    */
   protected function resolveRates(OrderItemInterface $order_item, ProfileInterface $customer_profile) {
     $rates = [];
@@ -255,8 +257,7 @@ abstract class LocalTaxTypeBase extends TaxTypeBase implements LocalTaxTypeInter
     foreach ($zones as $zone) {
       $rate = $this->chainRateResolver->resolve($zone, $order_item, $customer_profile);
       if (is_object($rate)) {
-        $source_id = $this->entityId . '|' . $zone->getId() . '|' . $rate->getId();
-        $rates[$source_id] = $rate;
+        $rates[$zone->getId()] = $rate;
       }
     }
     return $rates;

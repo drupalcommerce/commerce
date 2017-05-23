@@ -33,13 +33,6 @@ class EuropeanUnionVat extends LocalTaxTypeBase {
   /**
    * {@inheritdoc}
    */
-  public function getDisplayLabel() {
-    return $this->t('VAT');
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   protected function resolveZones(OrderItemInterface $order_item, ProfileInterface $customer_profile) {
     $zones = $this->getZones();
     $customer_address = $customer_profile->address->first();
@@ -119,12 +112,14 @@ class EuropeanUnionVat extends LocalTaxTypeBase {
       'super_reduced' => $this->t('Super Reduced'),
       'special' => $this->t('Special'),
       'zero' => $this->t('Zero'),
+      'vat' => $this->t('VAT'),
     ];
 
     $zones = [];
     $zones['at'] = new TaxZone([
       'id' => 'at',
       'label' => $this->t('Austria'),
+      'display_label' => $labels['vat'],
       'territories' => [
         // Austria without Jungholz and Mittelberg.
         ['country_code' => 'AT', 'excluded_postal_codes' => '6691, 6991:6993'],
@@ -157,6 +152,7 @@ class EuropeanUnionVat extends LocalTaxTypeBase {
     $zones['be'] = new TaxZone([
       'id' => 'be',
       'label' => $this->t('Belgium'),
+      'display_label' => $labels['vat'],
       'territories' => [
         ['country_code' => 'BE'],
       ],
@@ -195,6 +191,7 @@ class EuropeanUnionVat extends LocalTaxTypeBase {
     $zones['bg'] = new TaxZone([
       'id' => 'bg',
       'label' => $this->t('Bulgaria'),
+      'display_label' => $labels['vat'],
       'territories' => [
         ['country_code' => 'BG'],
       ],
@@ -219,6 +216,7 @@ class EuropeanUnionVat extends LocalTaxTypeBase {
     $zones['cy'] = new TaxZone([
       'id' => 'cy',
       'label' => $this->t('Cyprus'),
+      'display_label' => $labels['vat'],
       'territories' => [
         ['country_code' => 'CY'],
       ],
@@ -250,6 +248,7 @@ class EuropeanUnionVat extends LocalTaxTypeBase {
     $zones['cz'] = new TaxZone([
       'id' => 'cz',
       'label' => $this->t('Czech Republic'),
+      'display_label' => $labels['vat'],
       'territories' => [
         ['country_code' => 'CZ'],
       ],
@@ -288,6 +287,7 @@ class EuropeanUnionVat extends LocalTaxTypeBase {
     $zones['de'] = new TaxZone([
       'id' => 'de',
       'label' => $this->t('Germany'),
+      'display_label' => $labels['vat'],
       'territories' => [
         // Germany without Heligoland and Büsingen.
         ['country_code' => 'DE', 'excluded_postal_codes' => '27498, 78266'],
@@ -315,6 +315,7 @@ class EuropeanUnionVat extends LocalTaxTypeBase {
     $zones['dk'] = new TaxZone([
       'id' => 'dk',
       'label' => $this->t('Denmark'),
+      'display_label' => $labels['vat'],
       'territories' => [
         ['country_code' => 'DK'],
       ],
@@ -339,6 +340,7 @@ class EuropeanUnionVat extends LocalTaxTypeBase {
     $zones['ee'] = new TaxZone([
       'id' => 'ee',
       'label' => $this->t('Estonia'),
+      'display_label' => $labels['vat'],
       'territories' => [
         ['country_code' => 'EE'],
       ],
@@ -363,6 +365,7 @@ class EuropeanUnionVat extends LocalTaxTypeBase {
     $zones['es'] = new TaxZone([
       'id' => 'es',
       'label' => $this->t('Spain'),
+      'display_label' => $labels['vat'],
       'territories' => [
         // Spain without Canary Islands, Ceuta and Melilla.
         ['country_code' => 'ES', 'excluded_postal_codes' => '/(35|38|51|52)[0-9]{3}/'],
@@ -395,6 +398,7 @@ class EuropeanUnionVat extends LocalTaxTypeBase {
     $zones['fi'] = new TaxZone([
       'id' => 'fi',
       'label' => $this->t('Finland'),
+      'display_label' => $labels['vat'],
       'territories' => [
         // Finland without Åland Islands.
         ['country_code' => 'FI', 'excluded_postal_codes' => '22000:22999'],
@@ -427,6 +431,7 @@ class EuropeanUnionVat extends LocalTaxTypeBase {
     $zones['fr'] = new TaxZone([
       'id' => 'fr',
       'label' => $this->t('France'),
+      'display_label' => $labels['vat'],
       'territories' => [
         // France without Corsica.
         ['country_code' => 'FR', 'excluded_postal_codes' => '/(20)[0-9]{3}/'],
@@ -467,6 +472,7 @@ class EuropeanUnionVat extends LocalTaxTypeBase {
     $zones['fr_h'] = new TaxZone([
       'id' => 'fr_h',
       'label' => $this->t('France (Corsica)'),
+      'display_label' => $labels['vat'],
       'territories' => [
         // France without Corsica.
         ['country_code' => 'FR', 'included_postal_codes' => '/(20)[0-9]{3}/'],
@@ -506,6 +512,7 @@ class EuropeanUnionVat extends LocalTaxTypeBase {
     $zones['gb'] = new TaxZone([
       'id' => 'gb',
       'label' => $this->t('Great Britain'),
+      'display_label' => $labels['vat'],
       'territories' => [
         ['country_code' => 'GB'],
         ['country_code' => 'IM'],
@@ -538,6 +545,7 @@ class EuropeanUnionVat extends LocalTaxTypeBase {
     $zones['gr'] = new TaxZone([
       'id' => 'gr',
       'label' => $this->t('Greece'),
+      'display_label' => $labels['vat'],
       'territories' => [
         // Greece without Thassos, Samothrace, Skiros, Northern Sporades, Lesbos, Chios, The Cyclades, The Dodecanese.
         ['country_code' => 'GR', 'excluded_postal_codes' => '/640 ?04|680 ?02|340 ?07|((370|811|821|840|851) ?[0-9]{2})/'],
@@ -571,6 +579,7 @@ class EuropeanUnionVat extends LocalTaxTypeBase {
     $zones['hr'] = new TaxZone([
       'id' => 'hr',
       'label' => $this->t('Croatia'),
+      'display_label' => $labels['vat'],
       'territories' => [
         ['country_code' => 'HR'],
       ],
@@ -609,6 +618,7 @@ class EuropeanUnionVat extends LocalTaxTypeBase {
     $zones['hu'] = new TaxZone([
       'id' => 'hu',
       'label' => $this->t('Hungary'),
+      'display_label' => $labels['vat'],
       'territories' => [
         ['country_code' => 'HU'],
       ],
@@ -640,6 +650,7 @@ class EuropeanUnionVat extends LocalTaxTypeBase {
     $zones['ie'] = new TaxZone([
       'id' => 'ie',
       'label' => $this->t('Ireland'),
+      'display_label' => $labels['vat'],
       'territories' => [
         ['country_code' => 'IE'],
       ],
@@ -685,6 +696,7 @@ class EuropeanUnionVat extends LocalTaxTypeBase {
     $zones['it'] = new TaxZone([
       'id' => 'it',
       'label' => $this->t('Italy'),
+      'display_label' => $labels['vat'],
       'territories' => [
         // Italy without Livigno, Campione d’Italia and Lake Lugano.
         ['country_code' => 'IT', 'excluded_postal_codes' => '23030, 22060'],
@@ -717,6 +729,7 @@ class EuropeanUnionVat extends LocalTaxTypeBase {
     $zones['lt'] = new TaxZone([
       'id' => 'lt',
       'label' => $this->t('Lithuania'),
+      'display_label' => $labels['vat'],
       'territories' => [
         ['country_code' => 'LT'],
       ],
@@ -748,6 +761,7 @@ class EuropeanUnionVat extends LocalTaxTypeBase {
     $zones['lu'] = new TaxZone([
       'id' => 'lu',
       'label' => $this->t('Luxembourg'),
+      'display_label' => $labels['vat'],
       'territories' => [
         ['country_code' => 'LU'],
       ],
@@ -786,6 +800,7 @@ class EuropeanUnionVat extends LocalTaxTypeBase {
     $zones['lv'] = new TaxZone([
       'id' => 'lv',
       'label' => $this->t('Latvia'),
+      'display_label' => $labels['vat'],
       'territories' => [
         ['country_code' => 'LV'],
       ],
@@ -810,6 +825,7 @@ class EuropeanUnionVat extends LocalTaxTypeBase {
     $zones['mt'] = new TaxZone([
       'id' => 'mt',
       'label' => $this->t('Malta'),
+      'display_label' => $labels['vat'],
       'territories' => [
         ['country_code' => 'MT'],
       ],
@@ -841,6 +857,7 @@ class EuropeanUnionVat extends LocalTaxTypeBase {
     $zones['nl'] = new TaxZone([
       'id' => 'nl',
       'label' => $this->t('Netherlands'),
+      'display_label' => $labels['vat'],
       'territories' => [
         ['country_code' => 'NL'],
       ],
@@ -865,6 +882,7 @@ class EuropeanUnionVat extends LocalTaxTypeBase {
     $zones['pl'] = new TaxZone([
       'id' => 'pl',
       'label' => $this->t('Poland'),
+      'display_label' => $labels['vat'],
       'territories' => [
         ['country_code' => 'PL'],
       ],
@@ -896,6 +914,7 @@ class EuropeanUnionVat extends LocalTaxTypeBase {
     $zones['pt'] = new TaxZone([
       'id' => 'pt',
       'label' => $this->t('Portugal'),
+      'display_label' => $labels['vat'],
       'territories' => [
         // Portugal without Azores and Madeira.
         ['country_code' => 'PT', 'excluded_postal_codes' => '/(9)[0-9]{3}-[0-9]{3}/'],
@@ -928,6 +947,7 @@ class EuropeanUnionVat extends LocalTaxTypeBase {
     $zones['pt_30'] = new TaxZone([
       'id' => 'pt_30',
       'label' => $this->t('Portugal (Madeira)'),
+      'display_label' => $labels['vat'],
       'territories' => [
         ['country_code' => 'PT', 'included_postal_codes' => '/(9)[5-9][0-9]{2}-[0-9]{3}/'],
       ],
@@ -959,6 +979,7 @@ class EuropeanUnionVat extends LocalTaxTypeBase {
     $zones['ro'] = new TaxZone([
       'id' => 'ro',
       'label' => $this->t('Romania'),
+      'display_label' => $labels['vat'],
       'territories' => [
         ['country_code' => 'RO'],
       ],
@@ -991,6 +1012,7 @@ class EuropeanUnionVat extends LocalTaxTypeBase {
     $zones['se'] = new TaxZone([
       'id' => 'se',
       'label' => $this->t('Sweden'),
+      'display_label' => $labels['vat'],
       'territories' => [
         ['country_code' => 'SE'],
       ],
@@ -1022,6 +1044,7 @@ class EuropeanUnionVat extends LocalTaxTypeBase {
     $zones['si'] = new TaxZone([
       'id' => 'si',
       'label' => $this->t('Slovenia'),
+      'display_label' => $labels['vat'],
       'territories' => [
         ['country_code' => 'SI'],
       ],
@@ -1046,6 +1069,7 @@ class EuropeanUnionVat extends LocalTaxTypeBase {
     $zones['sk'] = new TaxZone([
       'id' => 'sk',
       'label' => $this->t('Slovakia'),
+      'display_label' => $labels['vat'],
       'territories' => [
         ['country_code' => 'SK'],
       ],

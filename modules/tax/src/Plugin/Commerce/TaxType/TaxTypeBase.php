@@ -32,7 +32,7 @@ abstract class TaxTypeBase extends PluginBase implements TaxTypeInterface, Conta
   /**
    * The event dispatcher.
    *
-   * @var \Symfony\Component\EventDispatcher\EventDispatchInterface
+   * @var \Symfony\Component\EventDispatcher\EventDispatcherInterface
    */
   protected $eventDispatcher;
 
@@ -151,13 +151,6 @@ abstract class TaxTypeBase extends PluginBase implements TaxTypeInterface, Conta
    */
   public function getLabel() {
     return (string) $this->pluginDefinition['label'];
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getDisplayLabel() {
-    return $this->t('Tax');
   }
 
   /**

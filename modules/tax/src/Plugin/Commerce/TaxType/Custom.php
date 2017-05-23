@@ -331,9 +331,12 @@ class Custom extends LocalTaxTypeBase {
   }
 
   /**
-   * {@inheritdoc}
+   * Gets the configured display label.
+   *
+   * @return string
+   *   The configured display label.
    */
-  public function getDisplayLabel() {
+  protected function getDisplayLabel() {
     $display_labels = $this->getDisplayLabels();
     $display_label_id = $this->configuration['display_label'];
     if (isset($display_labels[$display_label_id])) {
@@ -373,6 +376,7 @@ class Custom extends LocalTaxTypeBase {
     $zones['default'] = new TaxZone([
       'id' => 'default',
       'label' => 'Default',
+      'display_label' => $this->getDisplayLabel(),
       'territories' => $this->configuration['territories'],
       'rates' => $rates,
     ]);
