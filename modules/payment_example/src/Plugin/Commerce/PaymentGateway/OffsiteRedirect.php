@@ -14,7 +14,7 @@ use Symfony\Component\HttpFoundation\Request;
  *   id = "example_offsite_redirect",
  *   label = "Example (Off-site redirect)",
  *   display_label = "Example",
- *    forms = {
+ *   forms = {
  *     "offsite-payment" = "Drupal\commerce_payment_example\PluginForm\OffsiteRedirect\PaymentOffsiteForm",
  *   },
  *   payment_method_types = {"credit_card"},

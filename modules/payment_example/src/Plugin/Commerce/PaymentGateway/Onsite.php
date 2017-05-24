@@ -21,7 +21,7 @@ use Drupal\Core\Form\FormStateInterface;
  *   id = "example_onsite",
  *   label = "Example (On-site)",
  *   display_label = "Example",
- *    forms = {
+ *   forms = {
  *     "add-payment-method" = "Drupal\commerce_payment_example\PluginForm\Onsite\PaymentMethodAddForm",
  *   },
  *   payment_method_types = {"credit_card"},

@@ -108,6 +108,21 @@ class PaymentCheckoutTest extends CommerceBrowserTestBase {
     ]);
     $gateway->save();
 
+    /** @var \Drupal\commerce_payment\Entity\PaymentGateway $gateway */
+    $gateway = PaymentGateway::create([
+      'id' => 'manual',
+      'label' => 'Manual',
+      'plugin' => 'manual',
+    ]);
+    $gateway->getPlugin()->setConfiguration([
+      'display_label' => 'Cash on delivery',
+      'instructions' => [
+        'value' => 'Sample payment instructions.',
+        'format' => 'plain_text',
+      ],
+    ]);
+    $gateway->save();
+
     $profile = $this->createEntity('profile', [
       'type' => 'customer',
       'address' => [
@@ -199,6 +214,9 @@ class PaymentCheckoutTest extends CommerceBrowserTestBase {
     $second_onsite_gateway = PaymentGateway::load('onsite2');
     $second_onsite_gateway->setStatus(FALSE);
     $second_onsite_gateway->save();
+    $manual_gateway = PaymentGateway::load('manual');
+    $manual_gateway->setStatus(FALSE);
+    $manual_gateway->save();
 
     // A single radio button should be selected and hidden.
     $this->drupalGet('checkout/1');
@@ -370,6 +388,9 @@ class PaymentCheckoutTest extends CommerceBrowserTestBase {
     $onsite_gateway = PaymentGateway::load('onsite');
     $onsite_gateway->setStatus(FALSE);
     $onsite_gateway->save();
+    $manual_gateway = PaymentGateway::load('manual');
+    $manual_gateway->setStatus(FALSE);
+    $manual_gateway->save();
 
     $payment_gateway = PaymentGateway::load('offsite');
     $payment_gateway->getPlugin()->setConfiguration([
@@ -398,6 +419,41 @@ class PaymentCheckoutTest extends CommerceBrowserTestBase {
     $this->assertSession()->pageTextContains('Your order number is 1. You can view your order on your account page when logged in.');
     $order = Order::load(1);
     $this->assertEquals('offsite', $order->get('payment_gateway')->target_id);
+
+    // Verify that a payment was created.
+    $payment = Payment::load(1);
+    $this->assertNotNull($payment);
+    $this->assertEquals($payment->getAmount(), $order->getTotalPrice());
+  }
+
+  /**
+   * Tests checkout with a manual gateway.
+   */
+  public function testCheckoutWithManual() {
+    $this->drupalGet($this->product->toUrl()->toString());
+    $this->submitForm([], 'Add to cart');
+    $this->drupalGet('checkout/1');
+    $radio_button = $this->getSession()->getPage()->findField('Cash on delivery');
+    $radio_button->click();
+    $this->waitForAjaxToFinish();
+
+    $this->submitForm([
+      'payment_information[billing_information][address][0][address][given_name]' => 'Johnny',
+      'payment_information[billing_information][address][0][address][family_name]' => 'Appleseed',
+      'payment_information[billing_information][address][0][address][address_line1]' => '123 New York Drive',
+      'payment_information[billing_information][address][0][address][locality]' => 'New York City',
+      'payment_information[billing_information][address][0][address][administrative_area]' => 'NY',
+      'payment_information[billing_information][address][0][address][postal_code]' => '10001',
+    ], 'Continue to review');
+    $this->assertSession()->pageTextContains('Payment information');
+    $this->assertSession()->pageTextContains('Example');
+    $this->assertSession()->pageTextContains('Johnny Appleseed');
+    $this->assertSession()->pageTextContains('123 New York Drive');
+    $this->submitForm([], 'Pay and complete purchase');
+    $this->assertSession()->pageTextContains('Your order number is 1. You can view your order on your account page when logged in.');
+    $this->assertSession()->pageTextContains('Sample payment instructions.');
+    $order = Order::load(1);
+    $this->assertEquals('manual', $order->get('payment_gateway')->target_id);
 
     // Verify that a payment was created.
     $payment = Payment::load(1);

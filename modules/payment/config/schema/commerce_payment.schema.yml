@@ -20,9 +20,20 @@ commerce_payment.commerce_payment_gateway.*:
 commerce_payment.commerce_payment_gateway.plugin.*:
   type: commerce_payment_gateway_configuration
 
+commerce_payment.commerce_payment_gateway.plugin.manual:
+  type: commerce_payment_gateway_configuration
+  mapping:
+    instructions:
+      type: text_format
+      label: 'Payment instructions'
+      translatable: true
+
 commerce_payment_gateway_configuration:
   type: mapping
   mapping:
+    display_label:
+      type: label
+      label: 'Display label'
     mode:
       type: string
       label: 'Mode'

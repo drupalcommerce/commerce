@@ -6,6 +6,7 @@ use Drupal\commerce_checkout\Plugin\Commerce\CheckoutPane\CheckoutPaneBase;
 use Drupal\commerce_order\Entity\OrderInterface;
 use Drupal\commerce_payment\Exception\DeclineException;
 use Drupal\commerce_payment\Exception\PaymentGatewayException;
+use Drupal\commerce_payment\Plugin\Commerce\PaymentGateway\ManualPaymentGatewayInterface;
 use Drupal\commerce_payment\Plugin\Commerce\PaymentGateway\OffsitePaymentGatewayInterface;
 use Drupal\commerce_payment\Plugin\Commerce\PaymentGateway\OnsitePaymentGatewayInterface;
 use Drupal\Core\Form\FormStateInterface;
@@ -101,6 +102,7 @@ class PaymentProcess extends CheckoutPaneBase {
     $payment_gateway_plugin = $payment_gateway->getPlugin();
 
     $payment_storage = $this->entityTypeManager->getStorage('commerce_payment');
+    /** @var \Drupal\commerce_payment\Entity\PaymentInterface $payment */
     $payment = $payment_storage->create([
       'state' => 'new',
       'amount' => $this->order->getTotalPrice(),
@@ -142,6 +144,18 @@ class PaymentProcess extends CheckoutPaneBase {
       ]);
 
       return $pane_form;
+    }
+    elseif ($payment_gateway_plugin instanceof ManualPaymentGatewayInterface) {
+      try {
+        $payment_gateway_plugin->createPayment($payment);
+        $this->checkoutFlow->redirectToStep($next_step_id);
+      }
+      catch (PaymentGatewayException $e) {
+        \Drupal::logger('commerce_payment')->error($e->getMessage());
+        $message = $this->t('We encountered an unexpected error processing your payment. Please try again later.');
+        drupal_set_message($message, 'error');
+        $this->redirectToPreviousStep();
+      }
     }
     else {
       $this->checkoutFlow->redirectToStep($next_step_id);

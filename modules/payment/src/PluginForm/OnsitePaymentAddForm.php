@@ -5,7 +5,7 @@ namespace Drupal\commerce_payment\PluginForm;
 use Drupal\commerce_payment\Plugin\Commerce\PaymentGateway\SupportsAuthorizationsInterface;
 use Drupal\Core\Form\FormStateInterface;
 
-class PaymentAddForm extends PaymentGatewayFormBase {
+class OnsitePaymentAddForm extends PaymentGatewayFormBase {
 
   /**
    * {@inheritdoc}

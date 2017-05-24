@@ -104,7 +104,6 @@ abstract class PaymentGatewayBase extends PluginBase implements PaymentGatewayIn
   protected function getDefaultForms() {
     $default_forms = [];
     if ($this instanceof SupportsStoredPaymentMethodsInterface) {
-      $default_forms['add-payment'] = 'Drupal\commerce_payment\PluginForm\PaymentAddForm';
       $default_forms['add-payment-method'] = 'Drupal\commerce_payment\PluginForm\PaymentMethodAddForm';
     }
     if ($this instanceof SupportsUpdatingStoredPaymentMethodsInterface) {
@@ -112,6 +111,8 @@ abstract class PaymentGatewayBase extends PluginBase implements PaymentGatewayIn
     }
     if ($this instanceof SupportsAuthorizationsInterface) {
       $default_forms['capture-payment'] = 'Drupal\commerce_payment\PluginForm\PaymentCaptureForm';
+    }
+    if ($this instanceof SupportsVoidsInterface) {
       $default_forms['void-payment'] = 'Drupal\commerce_payment\PluginForm\PaymentVoidForm';
     }
     if ($this instanceof SupportsRefundsInterface) {
@@ -132,7 +133,7 @@ abstract class PaymentGatewayBase extends PluginBase implements PaymentGatewayIn
    * {@inheritdoc}
    */
   public function getDisplayLabel() {
-    return $this->pluginDefinition['display_label'];
+    return $this->configuration['display_label'];
   }
 
   /**
@@ -227,6 +228,7 @@ abstract class PaymentGatewayBase extends PluginBase implements PaymentGatewayIn
     $modes = array_keys($this->getSupportedModes());
 
     return [
+      'display_label' => $this->pluginDefinition['display_label'],
       'mode' => $modes ? reset($modes) : '',
       'payment_method_types' => [],
     ];
@@ -241,14 +243,30 @@ abstract class PaymentGatewayBase extends PluginBase implements PaymentGatewayIn
       return $payment_method_type->getLabel();
     }, $this->paymentMethodTypes);
 
-    $form['mode'] = [
-      '#type' => 'radios',
-      '#title' => $this->t('Mode'),
-      '#options' => $modes,
-      '#default_value' => $this->configuration['mode'],
-      '#required' => TRUE,
-      '#access' => !empty($modes),
+    $form['display_label'] = [
+      '#type' => 'textfield',
+      '#title' => $this->t('Display name'),
+      '#description' => t('Shown to customers during checkout.'),
+      '#default_value' => $this->configuration['display_label'],
     ];
+
+    if (count($modes) > 1) {
+      $form['mode'] = [
+        '#type' => 'radios',
+        '#title' => $this->t('Mode'),
+        '#options' => $modes,
+        '#default_value' => $this->configuration['mode'],
+        '#required' => TRUE,
+      ];
+    }
+    else {
+      $mode_names = array_keys($modes);
+      $form['mode'] = [
+        '#type' => 'value',
+        '#value' => reset($mode_names),
+      ];
+    }
+
     if (count($payment_method_types) > 1) {
       $form['payment_method_types'] = [
         '#type' => 'checkboxes',
@@ -281,6 +299,7 @@ abstract class PaymentGatewayBase extends PluginBase implements PaymentGatewayIn
       $values = $form_state->getValue($form['#parents']);
       $values['payment_method_types'] = array_filter($values['payment_method_types']);
 
+      $this->configuration['display_label'] = $values['display_label'];
       $this->configuration['mode'] = $values['mode'];
       $this->configuration['payment_method_types'] = array_keys($values['payment_method_types']);
     }
@@ -290,29 +309,30 @@ abstract class PaymentGatewayBase extends PluginBase implements PaymentGatewayIn
    * {@inheritdoc}
    */
   public function buildPaymentOperations(PaymentInterface $payment) {
+    $payment_state = $payment->getState()->value;
     $operations = [];
     if ($this instanceof SupportsAuthorizationsInterface) {
-      $access = $payment->getState()->value == 'authorization';
       $operations['capture'] = [
         'title' => $this->t('Capture'),
         'page_title' => $this->t('Capture payment'),
         'plugin_form' => 'capture-payment',
-        'access' => $access,
+        'access' => $payment_state == 'authorization',
       ];
+    }
+    if ($this instanceof SupportsVoidsInterface) {
       $operations['void'] = [
         'title' => $this->t('Void'),
         'page_title' => $this->t('Void payment'),
         'plugin_form' => 'void-payment',
-        'access' => $access,
+        'access' => $payment_state == 'authorization',
       ];
     }
     if ($this instanceof SupportsRefundsInterface) {
-      $access = in_array($payment->getState()->value, ['capture_completed', 'capture_partially_refunded']);
       $operations['refund'] = [
         'title' => $this->t('Refund'),
         'page_title' => $this->t('Refund payment'),
         'plugin_form' => 'refund-payment',
-        'access' => $access,
+        'access' => in_array($payment_state, ['capture_completed', 'capture_partially_refunded']),
       ];
     }
 

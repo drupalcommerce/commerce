@@ -2,17 +2,18 @@
 
 namespace Drupal\Tests\commerce_payment\Functional;
 
+use Drupal\commerce_order\Entity\OrderItemType;
 use Drupal\commerce_payment\Entity\Payment;
 use Drupal\commerce_price\Price;
 use Drupal\Core\Url;
 use Drupal\Tests\commerce\Functional\CommerceBrowserTestBase;
 
 /**
- * Tests the admin payment UI.
+ * Tests the admin UI for payments of type 'payment_default'.
  *
  * @group commerce
  */
-class PaymentAdminTest extends CommerceBrowserTestBase {
+class DefaultPaymentAdminTest extends CommerceBrowserTestBase {
 
   /**
    * An on-site payment gateway.
@@ -102,16 +103,16 @@ class PaymentAdminTest extends CommerceBrowserTestBase {
     ];
     $this->paymentGateway->getPlugin()->createPaymentMethod($this->paymentMethod, $details);
 
-    $variation = $this->createEntity('commerce_product_variation', [
-      'type' => 'default',
-      'sku' => 'test-product-01',
-      'price' => new Price('10', 'USD'),
-    ]);
+    // An order item type that doesn't need a purchasable entity, for simplicity.
+    OrderItemType::create([
+      'id' => 'test',
+      'label' => 'Test',
+      'orderType' => 'default',
+    ])->save();
 
     $order_item = $this->createEntity('commerce_order_item', [
-      'type' => 'default',
+      'type' => 'test',
       'quantity' => 1,
-      'purchased_entity' => $variation,
       'unit_price' => new Price('10', 'USD'),
     ]);
 
