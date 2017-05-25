@@ -5,6 +5,7 @@ namespace Drupal\commerce_promotion;
 use Drupal\commerce\CommerceContentEntityStorage;
 use Drupal\commerce_order\Entity\OrderTypeInterface;
 use Drupal\commerce_store\Entity\StoreInterface;
+use Drupal\Component\Datetime\TimeInterface;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Entity\EntityManagerInterface;
@@ -26,6 +27,13 @@ class PromotionStorage extends CommerceContentEntityStorage implements Promotion
   protected $usage;
 
   /**
+   * The time.
+   *
+   * @var \Drupal\Component\Datetime\TimeInterface
+   */
+  protected $time;
+
+  /**
    * Constructs a new PromotionStorage object.
    *
    * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
@@ -42,11 +50,14 @@ class PromotionStorage extends CommerceContentEntityStorage implements Promotion
    *   The event dispatcher.
    * @param \Drupal\commerce_promotion\PromotionUsageInterface $usage
    *   The usage.
+   * @param \Drupal\Component\Datetime\TimeInterface $time
+   *   The time.
    */
-  public function __construct(EntityTypeInterface $entity_type, Connection $database, EntityManagerInterface $entity_manager, CacheBackendInterface $cache, LanguageManagerInterface $language_manager, EventDispatcherInterface $event_dispatcher, PromotionUsageInterface $usage) {
+  public function __construct(EntityTypeInterface $entity_type, Connection $database, EntityManagerInterface $entity_manager, CacheBackendInterface $cache, LanguageManagerInterface $language_manager, EventDispatcherInterface $event_dispatcher, PromotionUsageInterface $usage, TimeInterface $time) {
     parent::__construct($entity_type, $database, $entity_manager, $cache, $language_manager, $event_dispatcher);
 
     $this->usage = $usage;
+    $this->time = $time;
   }
 
   /**
@@ -60,7 +71,8 @@ class PromotionStorage extends CommerceContentEntityStorage implements Promotion
       $container->get('cache.entity'),
       $container->get('language_manager'),
       $container->get('event_dispatcher'),
-      $container->get('commerce_promotion.usage')
+      $container->get('commerce_promotion.usage'),
+      $container->get('datetime.time')
     );
   }
 
@@ -68,14 +80,15 @@ class PromotionStorage extends CommerceContentEntityStorage implements Promotion
    * {@inheritdoc}
    */
   public function loadAvailable(OrderTypeInterface $order_type, StoreInterface $store) {
+    $today = gmdate('Y-m-d', $this->time->getRequestTime());
     $query = $this->getQuery();
     $or_condition = $query->orConditionGroup()
-      ->condition('end_date', gmdate('Y-m-d'), '>=')
-      ->notExists('end_date', gmdate('Y-m-d'));
+      ->condition('end_date', $today, '>=')
+      ->notExists('end_date', $today);
     $query
       ->condition('stores', [$store->id()], 'IN')
       ->condition('order_types', [$order_type->id()], 'IN')
-      ->condition('start_date', gmdate('Y-m-d'), '<=')
+      ->condition('start_date', $today, '<=')
       ->condition('status', TRUE)
       ->condition($or_condition);
     // Only load promotions without coupons. Promotions with coupons are loaded

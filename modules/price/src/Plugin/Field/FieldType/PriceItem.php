@@ -40,6 +40,13 @@ class PriceItem extends FieldItemBase {
   /**
    * {@inheritdoc}
    */
+  public static function mainPropertyName() {
+    return NULL;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public static function schema(FieldStorageDefinitionInterface $field_definition) {
     return [
       'columns' => [

@@ -216,18 +216,27 @@ class OrderTest extends CommerceKernelTestBase {
       'label' => 'Handling fee',
       'amount' => new Price('10.00', 'USD'),
     ]);
+    // Included adjustments do not affect the order total.
+    $adjustments[] = new Adjustment([
+      'type' => 'custom',
+      'label' => 'Tax',
+      'amount' => new Price('12.00', 'USD'),
+      'included' => TRUE,
+    ]);
     $order->addAdjustment($adjustments[0]);
     $order->addAdjustment($adjustments[1]);
+    $order->addAdjustment($adjustments[2]);
     $adjustments = $order->getAdjustments();
     $this->assertEquals($adjustments, $order->getAdjustments());
     $collected_adjustments = $order->collectAdjustments();
     $this->assertEquals($adjustments[0]->getAmount(), $collected_adjustments[0]->getAmount());
     $this->assertEquals($adjustments[1]->getAmount(), $collected_adjustments[1]->getAmount());
+    $this->assertEquals($adjustments[2]->getAmount(), $collected_adjustments[2]->getAmount());
     $order->removeAdjustment($adjustments[0]);
     $this->assertEquals(new Price('8.00', 'USD'), $order->getSubtotalPrice());
     $this->assertEquals(new Price('18.00', 'USD'), $order->getTotalPrice());
     $this->assertEquals(new Price('18.00', 'USD'), $order->getBalance());
-    $this->assertEquals([$adjustments[1]], $order->getAdjustments());
+    $this->assertEquals([$adjustments[1], $adjustments[2]], $order->getAdjustments());
     $order->setAdjustments($adjustments);
     $this->assertEquals($adjustments, $order->getAdjustments());
     $this->assertEquals(new Price('17.00', 'USD'), $order->getTotalPrice());

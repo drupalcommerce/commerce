@@ -126,25 +126,26 @@ class OrderRefresh implements OrderRefreshInterface {
    * {@inheritdoc}
    */
   public function refresh(OrderInterface $order) {
-    // Do not remove adjustments added in the user interface.
-    $adjustments = $order->getAdjustments();
-    foreach ($adjustments as $key => $adjustment) {
-      if ($adjustment->getType() != 'custom') {
-        unset($adjustments[$key]);
-      }
+    $current_time = $this->time->getCurrentTime();
+    $order->setChangedTime($current_time);
+    $order->clearAdjustments();
+    // Nothing else can be done while the order is empty.
+    if (!$order->hasItems()) {
+      return;
     }
-    $order->setAdjustments($adjustments);
 
     $context = new Context($order->getCustomer(), $order->getStore());
     foreach ($order->getItems() as $order_item) {
-      $order_item->setAdjustments([]);
-
       $purchased_entity = $order_item->getPurchasedEntity();
       if ($purchased_entity) {
         $order_item->setTitle($purchased_entity->getOrderItemTitle());
         $unit_price = $this->chainPriceResolver->resolve($purchased_entity, $order_item->getQuantity(), $context);
         $order_item->setUnitPrice($unit_price);
       }
+      // If the order refresh is running during order preSave(),
+      // $order_item->getOrder() will point to the original order (or
+      // NULL, in case the order item is new).
+      $order_item->order_id->entity = $order;
     }
 
     // Allow the processors to modify the order and its items.
@@ -152,13 +153,14 @@ class OrderRefresh implements OrderRefreshInterface {
       $processor->process($order);
     }
 
-    $current_time = $this->time->getCurrentTime();
     // @todo Evaluate which order items have changed.
     foreach ($order->getItems() as $order_item) {
+      // Remove the order that was set above, to avoid
+      // crashes during the entity save process.
+      $order_item->order_id->entity = NULL;
       $order_item->setChangedTime($current_time);
       $order_item->save();
     }
-    $order->setChangedTime($current_time);
   }
 
 }

@@ -187,14 +187,15 @@ class AddToCartForm extends ContentEntityForm {
     /** @var \Drupal\commerce\PurchasableEntityInterface $purchased_entity */
     $purchased_entity = $order_item->getPurchasedEntity();
 
-    $order_type = $this->orderTypeResolver->resolve($order_item);
-
+    $order_type_id = $this->orderTypeResolver->resolve($order_item);
     $store = $this->selectStore($purchased_entity);
-    $cart = $this->cartProvider->getCart($order_type, $store);
+    $cart = $this->cartProvider->getCart($order_type_id, $store);
     if (!$cart) {
-      $cart = $this->cartProvider->createCart($order_type, $store);
+      $cart = $this->cartProvider->createCart($order_type_id, $store);
     }
     $this->cartManager->addOrderItem($cart, $order_item, $form_state->get(['settings', 'combine']));
+    // Other submit handlers might need the cart ID.
+    $form_state->set('cart_id', $cart->id());
 
     drupal_set_message($this->t('@entity added to @cart-link.', [
       '@entity' => $purchased_entity->label(),
@@ -239,6 +240,10 @@ class AddToCartForm extends ContentEntityForm {
     $stores = $entity->getStores();
     if (count($stores) === 1) {
       $store = reset($stores);
+    }
+    elseif (count($stores) === 0) {
+      // Malformed entity.
+      throw new \Exception('The given entity is not assigned to any store.');
     }
     else {
       $store = $this->storeContext->getStore();
