@@ -75,6 +75,11 @@ class PaymentMethodAddForm extends PaymentGatewayFormBase {
       '#default_country' => $store ? $store->getAddress()->getCountryCode() : NULL,
       '#available_countries' => $store ? $store->getBillingCountries() : [],
     ];
+    if ($order = $this->routeMatch->getParameter('commerce_order')) {
+      $store = $order->getStore();
+      $form['billing_information']['#default_country'] = $store->getAddress()->getCountryCode();
+      $form['billing_information']['#available_countries'] = $store->getBillingCountries();
+    }
 
     return $form;
   }
