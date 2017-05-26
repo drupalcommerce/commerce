@@ -51,6 +51,9 @@ class PaymentMethodAddForm extends PaymentGatewayFormBase {
     elseif ($payment_method->bundle() == 'paypal') {
       $form['payment_details'] = $this->buildPayPalForm($form['payment_details'], $form_state);
     }
+    elseif ($payment_method->bundle() == 'manual') {
+      $form['payment_details'] = $this->buildManualForm($form['payment_details'], $form_state);
+    }
 
     /** @var \Drupal\commerce_payment\Entity\PaymentMethodInterface $payment_method */
     $payment_method = $this->entity;
@@ -249,6 +252,30 @@ class PaymentMethodAddForm extends PaymentGatewayFormBase {
     $this->entity->card_number = substr($values['number'], -4);
     $this->entity->card_exp_month = $values['expiration']['month'];
     $this->entity->card_exp_year = $values['expiration']['year'];
+  }
+
+  /**
+   * Builds the Manual form.
+   *
+   * Empty by default because there is no generic Manual form, it's always
+   * payment gateway specific.
+   *
+   * @param array $element
+   *   The target element.
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   *   The current state of the complete form.
+   *
+   * @return array
+   *   The built manual form.
+   */
+  protected function buildManualForm(array $element, FormStateInterface $form_state) {
+    // Placeholder for the PayPal mail.
+    $element['manual'] = [
+      '#type' => 'hidden',
+      '#value' => '',
+    ];
+
+    return $element;
   }
 
   /**

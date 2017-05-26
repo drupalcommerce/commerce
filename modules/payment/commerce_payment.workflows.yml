@@ -48,3 +48,48 @@ payment_default:
       label: 'Refund payment'
       from: [capture_completed, capture_partially_refunded]
       to: capture_refunded
+
+payment_manual:
+  id: payment_manual
+  group: commerce_payment
+  label: 'Manual'
+  states:
+    new:
+      label: 'New'
+    pending:
+      label: 'Pending'
+    completed:
+      label: 'Completed'
+    refunded:
+      label: 'Refunded'
+    partially_refunded:
+      label: 'Partially refunded'
+    expired:
+      label: 'Expired'
+    canceled:
+      label: 'Canceled'
+  transitions:
+    pending_payment:
+      label: 'Pending payment'
+      from: [new]
+      to: pending
+    cancel:
+      label: 'Cancel payment'
+      from: [pending]
+      to: canceled
+    expire:
+      label: 'Expire payment'
+      from: [pending]
+      to: expired
+    payment_received:
+      label: 'Payment received'
+      from: [pending]
+      to: completed
+    partially_refund:
+      label: 'Partially refund payment'
+      from: [completed]
+      to: partially_refunded
+    refund:
+      label: 'Refund payment'
+      from: [completed, partially_refunded]
+      to: refunded

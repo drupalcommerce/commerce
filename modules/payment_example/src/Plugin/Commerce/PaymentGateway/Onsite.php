@@ -92,7 +92,7 @@ class Onsite extends OnsitePaymentGatewayBase implements OnsiteInterface {
     if (empty($payment_method)) {
       throw new \InvalidArgumentException('The provided payment has no payment method referenced.');
     }
-    if (\Drupal::time()->getRequestTime() >= $payment_method->getExpiresTime()) {
+    if ($payment_method->isExpired()) {
       throw new HardDeclineException('The provided payment method has expired');
     }
 

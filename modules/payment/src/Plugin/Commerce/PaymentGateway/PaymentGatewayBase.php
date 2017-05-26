@@ -114,6 +114,11 @@ abstract class PaymentGatewayBase extends PluginBase implements PaymentGatewayIn
       $default_forms['capture-payment'] = 'Drupal\commerce_payment\PluginForm\PaymentCaptureForm';
       $default_forms['void-payment'] = 'Drupal\commerce_payment\PluginForm\PaymentVoidForm';
     }
+    if ($this instanceof SupportsManualWorkflowInterface) {
+      $default_forms['manual-payment-method'] = 'Drupal\commerce_payment\PluginForm\PaymentMethodManualForm';
+      $default_forms['complete-payment'] = 'Drupal\commerce_payment\PluginForm\PaymentCompleteForm';
+      $default_forms['cancel-payment'] = 'Drupal\commerce_payment\PluginForm\PaymentCancelForm';
+    }
     if ($this instanceof SupportsRefundsInterface) {
       $default_forms['refund-payment'] = 'Drupal\commerce_payment\PluginForm\PaymentRefundForm';
     }
@@ -241,14 +246,27 @@ abstract class PaymentGatewayBase extends PluginBase implements PaymentGatewayIn
       return $payment_method_type->getLabel();
     }, $this->paymentMethodTypes);
 
-    $form['mode'] = [
-      '#type' => 'radios',
-      '#title' => $this->t('Mode'),
-      '#options' => $modes,
-      '#default_value' => $this->configuration['mode'],
-      '#required' => TRUE,
-      '#access' => !empty($modes),
-    ];
+    if (count($modes) > 1) {
+      // Ajax sometimes mixes up with modes.
+      if (!in_array($this->configuration['mode'], array_keys($modes))) {
+        $this->configuration = $this->defaultConfiguration();
+      }
+      $form['mode'] = [
+        '#type' => 'radios',
+        '#title' => $this->t('Mode'),
+        '#options' => $modes,
+        '#default_value' => $this->configuration['mode'],
+        '#required' => TRUE,
+        '#access' => !empty($modes),
+      ];
+    }
+    else {
+      $form['mode'] = [
+        '#type' => 'value',
+        '#value' => $this->configuration['mode'],
+      ];
+    }
+
     if (count($payment_method_types) > 1) {
       $form['payment_method_types'] = [
         '#type' => 'checkboxes',
@@ -277,7 +295,7 @@ abstract class PaymentGatewayBase extends PluginBase implements PaymentGatewayIn
    * {@inheritdoc}
    */
   public function submitConfigurationForm(array &$form, FormStateInterface $form_state) {
-    if (!$form_state->getErrors()) {
+    if (!$form_state->getErrors() && $form_state->isSubmitted()) {
       $values = $form_state->getValue($form['#parents']);
       $values['payment_method_types'] = array_filter($values['payment_method_types']);
 
@@ -306,8 +324,23 @@ abstract class PaymentGatewayBase extends PluginBase implements PaymentGatewayIn
         'access' => $access,
       ];
     }
+    if ($this instanceof SupportsManualWorkflowInterface) {
+      $access = $payment->getState()->value == 'pending';
+      $operations['complete'] = [
+        'title' => $this->t('Complete'),
+        'page_title' => $this->t('Complete payment'),
+        'plugin_form' => 'complete-payment',
+        'access' => $access,
+      ];
+      $operations['cancel'] = [
+        'title' => $this->t('Cancel payment'),
+        'page_title' => $this->t('Cancel payment'),
+        'plugin_form' => 'cancel-payment',
+        'access' => $access,
+      ];
+    }
     if ($this instanceof SupportsRefundsInterface) {
-      $access = in_array($payment->getState()->value, ['capture_completed', 'capture_partially_refunded']);
+      $access = in_array($payment->getState()->value, ['capture_completed', 'capture_partially_refunded', 'completed']);
       $operations['refund'] = [
         'title' => $this->t('Refund'),
         'page_title' => $this->t('Refund payment'),

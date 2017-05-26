@@ -228,11 +228,11 @@ class PaymentInformation extends CheckoutPaneBase {
       $payment_method_types = $payment_gateway_plugin->getPaymentMethodTypes();
       foreach ($payment_method_types as $payment_method_type_id => $payment_method_type) {
         $option_id = 'new--' . $payment_method_type_id . '--' . $payment_gateway->id();
-        $option_label = $payment_method_type->getCreateLabel();
+        $option_label = $payment_method_type->getCreateLabel($payment_gateway);
         if ($payment_method_type_counts[$payment_method_type_id] > 1) {
           // Append the payment gateway label to avoid duplicate labels.
           $option_label = $this->t('@payment_method_label (@payment_gateway_label)', [
-            '@payment_method_label' => $payment_method_type->getCreateLabel(),
+            '@payment_method_label' => $payment_method_type->getCreateLabel($payment_gateway),
             '@payment_gateway_label' => $payment_gateway_plugin->getDisplayLabel(),
           ]);
         }
