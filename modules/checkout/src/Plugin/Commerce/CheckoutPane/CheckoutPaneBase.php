@@ -3,6 +3,7 @@
 namespace Drupal\commerce_checkout\Plugin\Commerce\CheckoutPane;
 
 use Drupal\commerce_checkout\Plugin\Commerce\CheckoutFlow\CheckoutFlowInterface;
+use Drupal\commerce_order\Entity\OrderInterface;
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\FormStateInterface;
@@ -191,6 +192,14 @@ abstract class CheckoutPaneBase extends PluginBase implements CheckoutPaneInterf
    */
   public function setWeight($weight) {
     $this->configuration['weight'] = $weight;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setOrder(OrderInterface $order) {
+    $this->order = $order;
+    return $this;
   }
 
   /**

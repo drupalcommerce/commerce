@@ -2,6 +2,7 @@
 
 namespace Drupal\commerce_checkout\Plugin\Commerce\CheckoutPane;
 
+use Drupal\commerce_order\Entity\OrderInterface;
 use Drupal\Component\Plugin\ConfigurablePluginInterface;
 use Drupal\Component\Plugin\DerivativeInspectionInterface;
 use Drupal\Component\Plugin\PluginInspectionInterface;
@@ -85,6 +86,20 @@ interface CheckoutPaneInterface extends ConfigurablePluginInterface, PluginFormI
    * @return $this
    */
   public function setWeight($weight);
+
+  /**
+   * Sets the current order.
+   *
+   * Whenever the buildPaneForm, validatePaneForm, and submitPaneForm methods
+   * are invoked, the Checkout Flow plugin uses this method to refresh the
+   * pane's order object.
+   *
+   * @param \Drupal\commerce_order\Entity\OrderInterface $order
+   *   The order.
+   *
+   * @return $this
+   */
+  public function setOrder(OrderInterface $order);
 
   /**
    * Builds a summary of the pane configuration.
