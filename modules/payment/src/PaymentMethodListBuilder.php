@@ -47,6 +47,7 @@ class PaymentMethodListBuilder extends EntityListBuilder {
    */
   public function buildHeader() {
     $header['label'] = $this->t('Payment method');
+    $header['gateway'] = $this->t('Payment gateway');
     $header['expires'] = $this->t('Expires');
     return $header + parent::buildHeader();
   }
@@ -65,6 +66,9 @@ class PaymentMethodListBuilder extends EntityListBuilder {
       $icon = 'payment-method-icon--' . $entity->card_type->value;
       $row['label']['data']['#prefix'] = '<span class="payment-method-icon ' . $icon . '"></span>';
     }
+    $row['gateway']['data'] = [
+      '#markup' => $entity->getPaymentGateway()->getPlugin()->getDisplayLabel(),
+    ];
     $row['expires']['data'] = [
       '#markup' => $expires ? date('n/Y', $expires) : $this->t('Never'),
     ];
