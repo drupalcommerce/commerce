@@ -80,15 +80,6 @@ class PaymentProcess extends CheckoutPaneBase {
   /**
    * {@inheritdoc}
    */
-  public function isVisible() {
-    // This pane can't be used without the PaymentInformation pane.
-    $payment_info_pane = $this->checkoutFlow->getPane('payment_information');
-    return $payment_info_pane->isVisible() && $payment_info_pane->getStepId() != '_disabled';
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function buildPaneForm(array $pane_form, FormStateInterface $form_state, array &$complete_form) {
     // The payment gateway is currently always required to be set.
     if ($this->order->get('payment_gateway')->isEmpty()) {
