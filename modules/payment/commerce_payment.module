@@ -127,7 +127,7 @@ function commerce_payment_preprocess_commerce_checkout_completion_message(&$vari
   /** @var \Drupal\commerce_payment\Plugin\Commerce\PaymentGateway\HasPaymentInstructionsInterface $payment_gateway_plugin */
   $payment_gateway_plugin = $payment_gateway->getPlugin();
   if ($payment_gateway_plugin instanceof HasPaymentInstructionsInterface) {
-    $variables['payment_information'] = $payment_gateway_plugin->buildPaymentInstructions();
+    $variables['payment_instructions'] = $payment_gateway_plugin->buildPaymentInstructions();
   }
 }
 

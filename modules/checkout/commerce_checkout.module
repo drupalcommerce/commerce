@@ -24,7 +24,7 @@ function commerce_checkout_theme() {
     'commerce_checkout_completion_message' => [
       'variables' => [
         'order_entity' => NULL,
-        'payment_information' => NULL,
+        'payment_instructions' => NULL,
       ],
     ],
     'commerce_checkout_form' => [
