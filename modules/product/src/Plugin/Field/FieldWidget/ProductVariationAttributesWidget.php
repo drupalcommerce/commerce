@@ -232,16 +232,18 @@ class ProductVariationAttributesWidget extends ProductVariationWidgetBase implem
     $field_definitions = $this->attributeFieldManager->getFieldDefinitions($selected_variation->bundle());
     $field_map = $this->attributeFieldManager->getFieldMap($selected_variation->bundle());
     $field_names = array_column($field_map, 'field_name');
+    $attribute_ids = array_column($field_map, 'attribute_id');
     $index = 0;
     foreach ($field_names as $field_name) {
-      /** @var \Drupal\commerce_product\Entity\ProductAttributeInterface $attribute_type */
-      $attribute_type = $this->attributeStorage->load(substr($field_name, 10));
       $field = $field_definitions[$field_name];
+      /** @var \Drupal\commerce_product\Entity\ProductAttributeInterface $attribute */
+      $attribute = $this->attributeStorage->load($attribute_ids[$index]);
+
       $attributes[$field_name] = [
         'field_name' => $field_name,
         'title' => $field->getLabel(),
         'required' => $field->isRequired(),
-        'element_type' => $attribute_type->getElementType(),
+        'element_type' => $attribute->getElementType(),
       ];
       // The first attribute gets all values. Every next attribute gets only
       // the values from variations matching the previous attribute value.
