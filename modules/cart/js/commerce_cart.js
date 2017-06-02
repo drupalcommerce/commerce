@@ -9,7 +9,7 @@
   Drupal.behaviors.commerceCartBlock = {
     attach: function (context) {
       var $context = $(context);
-      var $cart = $context.find('.cart--cart-block');
+      var $cart = $context.find('.js-cart--cart-block');
       var $cartButton = $context.find('.cart-block--link__expand');
       var $cartContents = $cart.find('.cart-block--contents');
 

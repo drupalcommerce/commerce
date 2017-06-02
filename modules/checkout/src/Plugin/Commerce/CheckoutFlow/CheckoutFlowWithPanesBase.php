@@ -237,7 +237,7 @@ abstract class CheckoutFlowWithPanesBase extends CheckoutFlowBase implements Che
         ['data' => $this->t('Settings'), 'colspan' => 2],
       ],
       '#attributes' => [
-        'class' => ['checkout-pane-overview'],
+        'class' => ['js-checkout-pane-overview'],
         // Used by the JS code when attaching behaviors.
         'id' => 'checkout-pane-overview',
       ],
