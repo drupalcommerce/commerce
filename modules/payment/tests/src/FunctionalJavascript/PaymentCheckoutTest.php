@@ -245,8 +245,14 @@ class PaymentCheckoutTest extends CommerceBrowserTestBase {
     $this->assertSession()->pageTextContains('Your order number is 1. You can view your order on your account page when logged in.');
 
     $order = Order::load(1);
-    $this->assertEquals('onsite', $order->get('payment_gateway')->target_id);
-    $this->assertEquals('1', $order->get('payment_method')->target_id);
+    /** @var \Drupal\commerce_payment\Entity\PaymentMethodInterface $payment_method */
+    $payment_method = $order->get('payment_method')->entity;
+    $this->assertEquals('1', $payment_method->id());
+    /** @var \Drupal\commerce_payment\Entity\PaymentGatewayInterface $payment_gateway */
+    $payment_gateway = $order->get('payment_gateway')->entity;
+    $this->assertEquals('onsite', $payment_gateway->id());
+    $payment_gateway_plugin = $payment_gateway->getPlugin();
+    $this->assertNull($payment_gateway_plugin->getOwnerRemoteId($payment_method->getOwner()));
 
     // Verify that a payment was created.
     $payment = Payment::load(1);
@@ -301,6 +307,11 @@ class PaymentCheckoutTest extends CommerceBrowserTestBase {
     $payment_method = $order->get('payment_method')->entity;
     $this->assertEquals('1881', $payment_method->get('card_number')->value);
     $this->assertEquals('123 New York Drive', $payment_method->getBillingProfile()->get('address')->address_line1);
+    /** @var \Drupal\commerce_payment\Entity\PaymentGatewayInterface $payment_gateway */
+    $payment_gateway = $order->get('payment_gateway')->entity;
+    $payment_gateway_plugin = $payment_gateway->getPlugin();
+    $owner = $payment_method->getOwner();
+    $this->assertEquals($owner->id(), $payment_gateway_plugin->getOwnerRemoteId($owner));
 
     // Verify that a payment was created.
     $payment = Payment::load(1);

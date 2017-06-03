@@ -7,6 +7,7 @@ use Drupal\Component\Plugin\ConfigurablePluginInterface;
 use Drupal\Component\Plugin\DerivativeInspectionInterface;
 use Drupal\Core\Plugin\PluginFormInterface;
 use Drupal\Core\Plugin\PluginWithFormsInterface;
+use Drupal\user\UserInterface;
 
 /**
  * Defines the base interface for payment gateways.
@@ -111,5 +112,26 @@ interface PaymentGatewayInterface extends PluginWithFormsInterface, Configurable
    *   - access: Whether the operation is allowed for the given payment.
    */
   public function buildPaymentOperations(PaymentInterface $payment);
+
+  /**
+   * Gets the user remote ID for the payment gateway if any.
+   *
+   * @param \Drupal\user\UserInterface $user
+   *   The user.
+   *
+   * @return string|null
+   *   The user remote ID for the payment gateway or NULL.
+   */
+  public function getOwnerRemoteId(UserInterface $user);
+
+  /**
+   * Sets the user remote ID for the payment gateway.
+   *
+   * @param \Drupal\user\UserInterface $user
+   *   The user.
+   * @param string $remote_id
+   *   The remote ID.
+   */
+  public function setOwnerRemoteId(UserInterface $user, $remote_id);
 
 }

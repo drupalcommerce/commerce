@@ -209,6 +209,12 @@ class Onsite extends OnsitePaymentGatewayBase implements OnsiteInterface {
       }
     }
 
+    // Payment method remote owner id.
+    $owner = $payment_method->getOwner();
+    if (!$this->getOwnerRemoteId($owner)) {
+      $this->setOwnerRemoteId($owner, $owner->id());
+    }
+
     // Perform the create request here, throw an exception if it fails.
     // See \Drupal\commerce_payment\Exception for the available exceptions.
     // You might need to do different API requests based on whether the
