@@ -154,8 +154,8 @@ abstract class CheckoutPaneBase extends PluginBase implements CheckoutPaneInterf
   /**
    * {@inheritdoc}
    */
-  public function getAdminLabel() {
-    return $this->pluginDefinition['admin_label'];
+  public function getDisplayLabel() {
+    return $this->pluginDefinition['display_label'];
   }
 
   /**

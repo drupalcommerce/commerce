@@ -26,18 +26,23 @@ interface CheckoutPaneInterface extends ConfigurablePluginInterface, PluginFormI
   /**
    * Gets the pane label.
    *
+   * This label is admin-facing.
+   *
    * @return string
    *   The pane label.
    */
   public function getLabel();
 
   /**
-   * Gets the pane administrative label.
+   * Gets the pane display label.
+   *
+   * This label is customer-facing.
+   * Shown as the title of the pane form if the wrapper_element is 'fieldset'.
    *
    * @return string
-   *   The pane administrative label.
+   *   The pane display label.
    */
-  public function getAdminLabel();
+  public function getDisplayLabel();
 
   /**
    * Gets the pane wrapper element.

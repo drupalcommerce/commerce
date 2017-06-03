@@ -309,7 +309,7 @@ abstract class CheckoutFlowWithPanesBase extends CheckoutFlowBase implements Che
    */
   protected function buildPaneRow(CheckoutPaneInterface $pane, array &$form, FormStateInterface $form_state) {
     $pane_id = $pane->getPluginId();
-    $label = $pane->getAdminLabel();
+    $label = $pane->getLabel();
     $region_titles = array_map(function ($region) {
       return $region['title'];
     }, $this->getTableRegions());
@@ -538,7 +538,7 @@ abstract class CheckoutFlowWithPanesBase extends CheckoutFlowBase implements Che
       $form[$pane_id] = [
         '#parents' => [$pane_id],
         '#type' => $pane->getWrapperElement(),
-        '#title' => $pane->getLabel(),
+        '#title' => $pane->getDisplayLabel(),
       ];
       $form[$pane_id] = $pane->buildPaneForm($form[$pane_id], $form_state, $form);
     }
@@ -551,7 +551,7 @@ abstract class CheckoutFlowWithPanesBase extends CheckoutFlowBase implements Che
         $form['sidebar'][$pane_id] = [
           '#parents' => ['sidebar', $pane_id],
           '#type' => $pane->getWrapperElement(),
-          '#title' => $pane->getLabel(),
+          '#title' => $pane->getDisplayLabel(),
         ];
         $form['sidebar'][$pane_id] = $pane->buildPaneForm($form['sidebar'][$pane_id], $form_state, $form);
       }
