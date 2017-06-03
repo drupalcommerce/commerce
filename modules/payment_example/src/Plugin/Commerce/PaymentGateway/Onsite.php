@@ -6,7 +6,6 @@ use Drupal\commerce_payment\CreditCard;
 use Drupal\commerce_payment\Entity\PaymentInterface;
 use Drupal\commerce_payment\Entity\PaymentMethodInterface;
 use Drupal\commerce_payment\Exception\HardDeclineException;
-use Drupal\commerce_payment\Exception\InvalidRequestException;
 use Drupal\commerce_payment\PaymentMethodTypeManager;
 use Drupal\commerce_payment\PaymentTypeManager;
 use Drupal\commerce_payment\Plugin\Commerce\PaymentGateway\OnsitePaymentGatewayBase;
@@ -85,16 +84,9 @@ class Onsite extends OnsitePaymentGatewayBase implements OnsiteInterface {
    * {@inheritdoc}
    */
   public function createPayment(PaymentInterface $payment, $capture = TRUE) {
-    if ($payment->getState()->value != 'new') {
-      throw new \InvalidArgumentException('The provided payment is in an invalid state.');
-    }
+    $this->assertPaymentState($payment, ['new']);
     $payment_method = $payment->getPaymentMethod();
-    if (empty($payment_method)) {
-      throw new \InvalidArgumentException('The provided payment has no payment method referenced.');
-    }
-    if (\Drupal::time()->getRequestTime() >= $payment_method->getExpiresTime()) {
-      throw new HardDeclineException('The provided payment method has expired');
-    }
+    $this->assertPaymentMethod($payment_method);
 
     // Add a built in test for testing decline exceptions.
     /** @var \Drupal\address\Plugin\Field\FieldType\AddressItem $billing_address */
@@ -114,8 +106,6 @@ class Onsite extends OnsitePaymentGatewayBase implements OnsiteInterface {
     $remote_id = '123456';
 
     $payment->state = $capture ? 'capture_completed' : 'authorization';
-    $test = $this->getMode() == 'test';
-    $payment->setTest($test);
     $payment->setRemoteId($remote_id);
     $payment->setAuthorizedTime(\Drupal::time()->getRequestTime());
     if ($capture) {
@@ -128,9 +118,7 @@ class Onsite extends OnsitePaymentGatewayBase implements OnsiteInterface {
    * {@inheritdoc}
    */
   public function capturePayment(PaymentInterface $payment, Price $amount = NULL) {
-    if ($payment->getState()->value != 'authorization') {
-      throw new \InvalidArgumentException('Only payments in the "authorization" state can be captured.');
-    }
+    $this->assertPaymentState($payment, ['authorization']);
     // If not specified, capture the entire amount.
     $amount = $amount ?: $payment->getAmount();
 
@@ -149,10 +137,7 @@ class Onsite extends OnsitePaymentGatewayBase implements OnsiteInterface {
    * {@inheritdoc}
    */
   public function voidPayment(PaymentInterface $payment) {
-    if ($payment->getState()->value != 'authorization') {
-      throw new \InvalidArgumentException('Only payments in the "authorization" state can be voided.');
-    }
-
+    $this->assertPaymentState($payment, ['authorization']);
     // Perform the void request here, throw an exception if it fails.
     // See \Drupal\commerce_payment\Exception for the available exceptions.
     $remote_id = $payment->getRemoteId();
@@ -165,16 +150,10 @@ class Onsite extends OnsitePaymentGatewayBase implements OnsiteInterface {
    * {@inheritdoc}
    */
   public function refundPayment(PaymentInterface $payment, Price $amount = NULL) {
-    if (!in_array($payment->getState()->value, ['capture_completed', 'capture_partially_refunded'])) {
-      throw new \InvalidArgumentException('Only payments in the "capture_completed" and "capture_partially_refunded" states can be refunded.');
-    }
+    $this->assertPaymentState($payment, ['capture_completed', 'capture_partially_refunded']);
     // If not specified, refund the entire amount.
     $amount = $amount ?: $payment->getAmount();
-    // Validate the requested amount.
-    $balance = $payment->getBalance();
-    if ($amount->greaterThan($balance)) {
-      throw new InvalidRequestException(sprintf("Can't refund more than %s.", $balance->__toString()));
-    }
+    $this->assertRefundAmount($payment, $amount);
 
     // Perform the refund request here, throw an exception if it fails.
     // See \Drupal\commerce_payment\Exception for the available exceptions.

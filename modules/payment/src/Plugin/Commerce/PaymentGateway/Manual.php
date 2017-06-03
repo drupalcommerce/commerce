@@ -115,12 +115,8 @@ class Manual extends PaymentGatewayBase implements ManualPaymentGatewayInterface
    * {@inheritdoc}
    */
   public function createPayment(PaymentInterface $payment, $received = FALSE) {
-    if ($payment->getState()->value != 'new') {
-      throw new \InvalidArgumentException('The provided payment is in an invalid state.');
-    }
+    $this->assertPaymentState($payment, ['new']);
 
-    $test = $this->getMode() == 'test';
-    $payment->setTest($test);
     $payment->state = $received ? 'received' : 'pending';
     if ($received) {
       $payment->setCapturedTime(\Drupal::time()->getRequestTime());
@@ -132,9 +128,7 @@ class Manual extends PaymentGatewayBase implements ManualPaymentGatewayInterface
    * {@inheritdoc}
    */
   public function receivePayment(PaymentInterface $payment, Price $amount = NULL) {
-    if ($payment->getState()->value != 'pending') {
-      throw new \InvalidArgumentException('Only payments in the "pending" state can be received.');
-    }
+    $this->assertPaymentState($payment, ['pending']);
 
     // If not specified, use the entire amount.
     $amount = $amount ?: $payment->getAmount();
@@ -148,9 +142,7 @@ class Manual extends PaymentGatewayBase implements ManualPaymentGatewayInterface
    * {@inheritdoc}
    */
   public function voidPayment(PaymentInterface $payment) {
-    if ($payment->getState()->value != 'pending') {
-      throw new \InvalidArgumentException('Only payments in the "pending" state can be canceled.');
-    }
+    $this->assertPaymentState($payment, ['pending']);
 
     $payment->state = 'voided';
     $payment->save();
@@ -160,17 +152,10 @@ class Manual extends PaymentGatewayBase implements ManualPaymentGatewayInterface
    * {@inheritdoc}
    */
   public function refundPayment(PaymentInterface $payment, Price $amount = NULL) {
-    if (!in_array($payment->getState()->value, ['received', 'partially_refunded'])) {
-      throw new \InvalidArgumentException('Only payments in the "received" and "partially_refunded" states can be refunded.');
-    }
+    $this->assertPaymentState($payment, ['received', 'partially_refunded']);
     // If not specified, refund the entire amount.
     $amount = $amount ?: $payment->getAmount();
-
-    // Validate the requested amount.
-    $balance = $payment->getBalance();
-    if ($amount->greaterThan($balance)) {
-      throw new InvalidRequestException(sprintf("Can't refund more than %s.", $balance->__toString()));
-    }
+    $this->assertRefundAmount($payment, $amount);
 
     $old_refunded_amount = $payment->getRefundedAmount();
     $new_refunded_amount = $old_refunded_amount->add($amount);

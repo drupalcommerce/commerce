@@ -268,11 +268,17 @@ class Payment extends ContentEntityBase implements PaymentInterface {
   public function preSave(EntityStorageInterface $storage) {
     parent::preSave($storage);
 
-    // Initialize the refunded amount.
-    $refunded_amount = $this->getRefundedAmount();
-    if (!$refunded_amount) {
-      $refunded_amount = new Price('0', $this->getAmount()->getCurrencyCode());
-      $this->setRefundedAmount($refunded_amount);
+    if ($this->isNew()) {
+      // Initialize the mode.
+      $payment_gateway = $this->getPaymentGateway();
+      $test = $payment_gateway->getPlugin()->getMode() == 'test';
+      $this->setTest($test);
+      // Initialize the refunded amount.
+      $refunded_amount = $this->getRefundedAmount();
+      if (!$refunded_amount) {
+        $refunded_amount = new Price('0', $this->getAmount()->getCurrencyCode());
+        $this->setRefundedAmount($refunded_amount);
+      }
     }
   }
 

@@ -4,8 +4,12 @@ namespace Drupal\commerce_payment\Plugin\Commerce\PaymentGateway;
 
 use Drupal\commerce_payment\CreditCard;
 use Drupal\commerce_payment\Entity\PaymentInterface;
+use Drupal\commerce_payment\Entity\PaymentMethodInterface;
+use Drupal\commerce_payment\Exception\HardDeclineException;
+use Drupal\commerce_payment\Exception\InvalidRequestException;
 use Drupal\commerce_payment\PaymentMethodTypeManager;
 use Drupal\commerce_payment\PaymentTypeManager;
+use Drupal\commerce_price\Price;
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\FormStateInterface;
@@ -337,6 +341,62 @@ abstract class PaymentGatewayBase extends PluginBase implements PaymentGatewayIn
     }
 
     return $operations;
+  }
+
+  /**
+   * Asserts that the payment state matches one of the allowed states.
+   *
+   * @param \Drupal\commerce_payment\Entity\PaymentInterface $payment
+   *   The payment.
+   * @param string[] $states
+   *   The allowed states.
+   *
+   * @throws \InvalidArgumentException
+   *   Thrown if the payment state does not match the allowed states.
+   */
+  protected function assertPaymentState(PaymentInterface $payment, array $states) {
+    $state = $payment->getState()->value;
+    if (!in_array($state, $states)) {
+      throw new \InvalidArgumentException(sprintf('The provided payment is in an invalid state ("%s").', $state));
+    }
+  }
+
+  /**
+   * Asserts that the payment method is neither empty nor expired.
+   *
+   * @param \Drupal\commerce_payment\Entity\PaymentMethodInterface $payment_method
+   *   The payment method.
+   *
+   * @throws \InvalidArgumentException
+   *   Thrown when the payment method is empty.
+   * @throws \Drupal\commerce_payment\Exception\HardDeclineException
+   *   Thrown when the payment method has expired.
+   */
+  protected function assertPaymentMethod(PaymentMethodInterface $payment_method = NULL) {
+    if (empty($payment_method)) {
+      throw new \InvalidArgumentException('The provided payment has no payment method referenced.');
+    }
+    if ($payment_method->isExpired()) {
+      throw new HardDeclineException('The provided payment method has expired');
+    }
+  }
+
+  /**
+   * Asserts that the refund amount is valid.
+   *
+   * @param \Drupal\commerce_payment\Entity\PaymentInterface $payment
+   *   The payment.
+   * @param \Drupal\commerce_price\Price $refund_amount
+   *   The allowed states.
+   *
+   * @throws \Drupal\commerce_payment\Exception\InvalidRequestException
+   *   Thrown when the refund amount is larger than the payment balance.
+   */
+  protected function assertRefundAmount(PaymentInterface $payment, Price $refund_amount) {
+    $balance = $payment->getBalance();
+    if ($refund_amount->greaterThan($balance)) {
+      throw new InvalidRequestException(sprintf("Can't refund more than %s.", $balance->__toString()));
+    }
   }
 
 }
