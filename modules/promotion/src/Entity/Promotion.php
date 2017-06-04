@@ -260,7 +260,8 @@ class Promotion extends ContentEntityBase implements PromotionInterface {
    * {@inheritdoc}
    */
   public function getStartDate() {
-    return $this->get('start_date')->date;
+    // Can't use the ->date property because it resets the timezone to UTC.
+    return new DrupalDateTime($this->get('start_date')->value);
   }
 
   /**
@@ -275,7 +276,9 @@ class Promotion extends ContentEntityBase implements PromotionInterface {
    * {@inheritdoc}
    */
   public function getEndDate() {
-    return $this->get('end_date')->date;
+    if (!$this->get('end_date')->isEmpty()) {
+      return new DrupalDateTime($this->get('end_date')->value);
+    }
   }
 
   /**

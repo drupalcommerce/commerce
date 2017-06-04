@@ -3,7 +3,6 @@
 namespace Drupal\commerce_payment\Plugin\Commerce\PaymentGateway;
 
 use Drupal\commerce_payment\Entity\PaymentInterface;
-use Drupal\commerce_payment\Exception\InvalidRequestException;
 use Drupal\commerce_price\Price;
 use Drupal\Core\Form\FormStateInterface;
 
