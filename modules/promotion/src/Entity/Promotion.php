@@ -260,7 +260,8 @@ class Promotion extends ContentEntityBase implements PromotionInterface {
    * {@inheritdoc}
    */
   public function getStartDate() {
-    return $this->get('start_date')->date;
+    // @todo use `date` property once https://www.drupal.org/node/2632040 fixed.
+    return DrupalDateTime::createFromFormat(DATETIME_DATE_STORAGE_FORMAT, $this->get('start_date')->value);
   }
 
   /**
@@ -275,7 +276,10 @@ class Promotion extends ContentEntityBase implements PromotionInterface {
    * {@inheritdoc}
    */
   public function getEndDate() {
-    return $this->get('end_date')->date;
+    // @todo use `date` property once https://www.drupal.org/node/2632040 fixed.
+    if (!$this->get('end_date')->isEmpty()) {
+      return DrupalDateTime::createFromFormat(DATETIME_DATE_STORAGE_FORMAT, $this->get('end_date')->value);
+    }
   }
 
   /**
