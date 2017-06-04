@@ -59,15 +59,6 @@ class AddToCartForm extends ContentEntityForm {
   protected $chainPriceResolver;
 
   /**
-   * The form instance ID.
-   *
-   * Numeric counter used to ensure form ID uniqueness.
-   *
-   * @var int
-   */
-  protected static $formInstanceId = 0;
-
-  /**
    * The current user.
    *
    * @var \Drupal\Core\Session\AccountInterface
@@ -106,7 +97,6 @@ class AddToCartForm extends ContentEntityForm {
     $this->chainPriceResolver = $chain_price_resolver;
     $this->currentUser = $current_user;
 
-    self::$formInstanceId++;
   }
 
   /**
@@ -144,7 +134,7 @@ class AddToCartForm extends ContentEntityForm {
     if ($this->operation != 'default') {
       $form_id = $form_id . '_' . $this->operation;
     }
-    $form_id .= '_' . self::$formInstanceId;
+    $form_id .= '_' . $this->entity->getPurchasedEntity()->id();
 
     return $form_id . '_form';
   }
