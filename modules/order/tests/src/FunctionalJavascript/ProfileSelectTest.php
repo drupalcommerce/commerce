@@ -2,15 +2,16 @@
 
 namespace Drupal\Tests\commerce_order\FunctionalJavascript;
 
+use Drupal\Core\Url;
+use Drupal\Tests\commerce\Functional\CommerceBrowserTestBase;
 use Drupal\Tests\commerce\FunctionalJavascript\JavascriptTestTrait;
-use Drupal\FunctionalJavascriptTests\JavascriptTestBase;
 
 /**
  * Tests the ProfileSelect form element.
  *
  * @group commerce
  */
-class ProfileSelectTest extends JavascriptTestBase {
+class ProfileSelectTest extends CommerceBrowserTestBase {
 
   use JavascriptTestTrait;
 
@@ -43,6 +44,11 @@ class ProfileSelectTest extends JavascriptTestBase {
   ];
 
   /**
+   * @var \Drupal\profile\ProfileStorageInterface
+   */
+  protected $profileStorage;
+
+  /**
    * Modules to enable.
    *
    * @var array
@@ -50,6 +56,14 @@ class ProfileSelectTest extends JavascriptTestBase {
   public static $modules = [
     'commerce_order_test',
   ];
+
+  /**
+   * @inheritDoc
+   */
+  protected function setUp() {
+    parent::setUp();
+    $this->profileStorage = $this->container->get('entity_type.manager')->getStorage('profile');
+  }
 
   /**
    * Tests the profile select form element for anonymous user.
@@ -131,43 +145,35 @@ class ProfileSelectTest extends JavascriptTestBase {
    *   The number of profiles before the form submission.
    */
   protected function useProfileForm($uid, array $address_fields, $initial_profile_count = 0) {
-    $profile_ids = \Drupal::service('entity.query')
-      ->get('profile')
-      ->condition('uid', $uid)
-      ->execute();
-    $this->assertEmpty($profile_ids, t('The number of profiles before submitting the profile form is @count.', ['@count' => $initial_profile_count]));
+    $profile_ids = $this->profileStorage->getQuery()->count()->condition('uid', $uid)->execute();
+    $this->assertEmpty($profile_ids);
 
-    $this->drupalGet('/commerce_order_test/profile_select_form');
+    $this->drupalGet(Url::fromRoute('commerce_order_test.profile_select_form'));
     $this->assertSession()->statusCodeEquals(200);
 
     if (0 == $initial_profile_count || 0 == $uid) {
-      $this->assertSession()->fieldNotExists('profile[profile_selection]');
+      $this->assertSession()->fieldNotExists('Select a profile');
     }
     else {
-      $this->assertSession()->fieldExists('profile[profile_selection]');
-      $edit = [
-        'profile[profile_selection]', 'new_profile',
-      ];
-      $this->drupalPostForm(NULL, $edit, ['profile[profile_selection]']);
+      $this->assertSession()->fieldExists('Select a profile');
+      $this->getSession()->getPage()->fillField('Select a profile', 'new_profile');
       $this->waitForAjaxToFinish();
     }
-    $this->assertSession()->fieldNotExists('profile[address][0][address][administrative_area]');
-
-    $this->getSession()->getPage()->fillField('profile[address][0][address][country_code]', $address_fields['country_code']);
+    $this->getSession()->getPage()->fillField('Country', $address_fields['country_code']);
     $this->waitForAjaxToFinish();
 
+    $this->createScreenshot();
+
     $edit = [];
+    unset($address_fields['country_code']);
     foreach ($address_fields as $key => $value) {
       $edit['profile[address][0][address][' . $key . ']'] = $value;
     }
 
     $this->submitForm($edit, 'Submit');
 
-    $profile_ids = \Drupal::service('entity.query')
-      ->get('profile')
-      ->condition('uid', $uid)
-      ->execute();
-    $this->Equals($initial_profile_count + 1, count($profile_ids), t('There are @count profiles after creating a new one.', ['@count' => $initial_profile_count + 1]));
+    $profile_ids = $this->profileStorage->getQuery()->count()->condition('uid', $uid)->execute();
+    $this->assertEquals($initial_profile_count + 1, count($profile_ids));
   }
 
 }

@@ -42,7 +42,7 @@ class ProfileSelectTestForm extends FormBase {
    * {@inheritdoc}
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
-    drupal_set_message(t('Profile saved".'));
+    drupal_set_message('Profile saved.');
   }
 
 }

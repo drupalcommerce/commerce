@@ -10,7 +10,6 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\Element;
 use Drupal\Core\Render\Element\RenderElement;
 use Drupal\profile\Entity\ProfileInterface;
-use Drupal\profile\Entity\Profile;
 
 /**
  * Provides a form element for selecting a customer profile.
@@ -83,40 +82,18 @@ class ProfileSelect extends RenderElement {
     if (empty($element['#default_value'])) {
       throw new \InvalidArgumentException('The commerce_profile_select element requires the #default_value property.');
     }
-    elseif (isset($element['#default_value']) && !($element['#default_value'] instanceof ProfileInterface)) {
+    if (!($element['#default_value'] instanceof ProfileInterface)) {
       throw new \InvalidArgumentException('The commerce_profile_select #default_value property must be a profile entity.');
     }
     if (!is_array($element['#available_countries'])) {
       throw new \InvalidArgumentException('The commerce_profile_select #available_countries property must be an array.');
     }
 
+    $storage = \Drupal::entityTypeManager()->getStorage('profile');
+
     $element['#profile'] = $element['#default_value'];
-    $bundle = $element['#profile']->bundle();
     $default_profile_id = $element['#profile']->id();
     $default_profile = $element['#profile'];
-    // Fetch all profiles of the user for an addressbook functionality.
-    $profile_uid = $element['#profile']->getOwnerId();
-    // Anonymous users don't get an addressbook.
-    if ($profile_uid) {
-      $profile_ids = \Drupal::service('entity.query')
-        ->get('profile')
-        ->condition('uid', $profile_uid)
-        ->condition('type', $bundle)
-        ->condition('status', TRUE)
-        ->sort('profile_id', 'DESC')
-        ->execute();
-      $profiles = Profile::loadMultiple($profile_ids);
-      $profile_options = [];
-      /** @var \Drupal\profile\Entity\Profile $profile_option */
-      foreach ($profiles as $profile_option) {
-        if (empty($default_profile_id)) {
-          $default_profile_id = $profile_option->id();
-          $default_profile = $profile_option;
-        }
-        $profile_options[$profile_option->id()] = $profile_option->label();
-      }
-      $profile_options['new_profile'] = t('+ Enter a new profile');
-    }
     $mode = 'view';
     $triggering_element = $form_state->getTriggeringElement();
     if (!empty($triggering_element)) {
@@ -132,6 +109,10 @@ class ProfileSelect extends RenderElement {
         elseif ($last_parent == 'profile_selection' && $triggering_element['#value'] == 'new_profile') {
           $mode = 'new';
         }
+      }
+      // If first element parent matches, assume field within Profile did AJAX.
+      elseif ($triggering_element_parents[0] == $element['#parents'][0]) {
+        $mode = 'edit';
       }
     }
     else {
@@ -151,7 +132,7 @@ class ProfileSelect extends RenderElement {
         'type' => $element['#profile']->bundle(),
         'uid' => $element['#profile']->getOwnerId(),
       ];
-      $default_profile = Profile::create($values);
+      $default_profile = $storage->create($values);
       $default_profile_id = NULL;
     }
 
@@ -171,7 +152,29 @@ class ProfileSelect extends RenderElement {
       }
     }
 
-    $called_class = get_called_class();
+    // Fetch all profiles of the user for an addressbook functionality.
+    $profile_uid = $element['#profile']->getOwnerId();
+    // Anonymous users don't get an addressbook.
+    if ($profile_uid) {
+      $profile_ids = $storage->getQuery()
+        ->condition('uid', $profile_uid)
+        ->condition('type', $element['#profile']->bundle())
+        ->condition('status', TRUE)
+        ->sort('profile_id', 'DESC')
+        ->execute();
+      /** @var \Drupal\profile\Entity\Profile[] $profiles */
+      $profiles = $storage->loadMultiple($profile_ids);
+      $profile_options = [];
+      foreach ($profiles as $profile_option) {
+        if (empty($default_profile_id) && $profile_option->isDefault()) {
+          $default_profile_id = $profile_option->id();
+          $default_profile = $profile_option;
+        }
+        $profile_options[$profile_option->id()] = $profile_option->label();
+      }
+      $profile_options['new_profile'] = t('+ Enter a new profile');
+    }
+
     if (!empty($profile_uid) && $mode != 'edit' && !empty($profile_options) && count($profile_options) > 1) {
       $element['profile_selection'] = [
         '#title' => t('Select a profile'),
@@ -180,7 +183,7 @@ class ProfileSelect extends RenderElement {
         '#weight' => -5,
         '#default_value' => $default_profile_id,
         '#ajax' => [
-          'callback' => [$called_class, 'profileSelectAjax'],
+          'callback' => [get_called_class(), 'profileSelectAjax'],
           'wrapper' => $ajax_wrapper_id,
         ],
       ];
@@ -193,7 +196,7 @@ class ProfileSelect extends RenderElement {
       '#limit_validation_errors' => [],
       '#name' => $name . '[' . implode('][', $element['#parents']) . '][cancel_button]',
       '#ajax' => [
-        'callback' => [$called_class, 'profileSelectAjax'],
+        'callback' => [get_called_class(), 'profileSelectAjax'],
         'wrapper' => $ajax_wrapper_id,
       ],
       '#weight' => 99,
@@ -217,20 +220,24 @@ class ProfileSelect extends RenderElement {
         '#name' => $name . '[' . implode('][', $element['#parents']) . '][edit_button]',
         '#limit_validation_errors' => [],
         '#ajax' => [
-          'callback' => [$called_class, 'profileSelectAjax'],
+          'callback' => [get_called_class(), 'profileSelectAjax'],
           'wrapper' => $ajax_wrapper_id,
         ],
       ];
       array_unshift($element['#parents'], $name);
 
       foreach (Element::children($element) as $key) {
-        if (!in_array($key, ['edit_button', 'rendered_profile', 'profile_selection'])) {
-          hide($element[$key]);
+        if (!in_array($key, [
+          'edit_button',
+          'rendered_profile',
+          'profile_selection',
+        ])) {
+          $element[$key]['#access'] = FALSE;
         }
       }
     }
     if (empty($profiles) || $mode != 'edit') {
-      hide($element['cancel_button']);
+      $element['cancel_button']['#access'] = FALSE;
     }
 
     return $element;
@@ -251,7 +258,12 @@ class ProfileSelect extends RenderElement {
   public static function validateForm(array &$element, FormStateInterface $form_state) {
     $triggering_parents = $form_state->getTriggeringElement()['#parents'];
     $triggering_last_parent = array_pop($triggering_parents);
-    if (!in_array($triggering_last_parent, ['edit_button', 'cancel_button', 'profile_selection', 'country_code'])) {
+    if (!in_array($triggering_last_parent, [
+      'edit_button',
+      'cancel_button',
+      'profile_selection',
+      'country_code',
+    ])) {
       $form_display = EntityFormDisplay::collectRenderDisplay($element['#profile'], 'default');
       $form_display->extractFormValues($element['#profile'], $element, $form_state);
       $form_display->validateFormValues($element['#profile'], $element, $form_state);
