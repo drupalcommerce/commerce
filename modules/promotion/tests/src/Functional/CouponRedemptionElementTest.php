@@ -2,6 +2,7 @@
 
 namespace Drupal\Tests\commerce_promotion\Functional;
 
+use Drupal\Component\Render\FormattableMarkup;
 use Drupal\Core\Url;
 use Drupal\Tests\commerce\Functional\CommerceBrowserTestBase;
 
@@ -10,7 +11,7 @@ use Drupal\Tests\commerce\Functional\CommerceBrowserTestBase;
  *
  * @group commerce
  */
-class CouponRedemptionTest extends CommerceBrowserTestBase {
+class CouponRedemptionElementTest extends CommerceBrowserTestBase {
 
   /**
    * The cart order to test against.
@@ -86,19 +87,19 @@ class CouponRedemptionTest extends CommerceBrowserTestBase {
       'name' => 'Promotion (with coupon)',
       'order_types' => ['default'],
       'stores' => [$this->store->id()],
+      'status' => TRUE,
       'offer' => [
         'target_plugin_id' => 'commerce_promotion_order_percentage_off',
         'target_plugin_configuration' => [
           'amount' => '0.10',
         ],
       ],
-      'conditions' => [],
       'start_date' => '2017-01-01',
-      'status' => TRUE,
+      'conditions' => [],
     ]);
 
     $coupon = $this->createEntity('commerce_promotion_coupon', [
-      'code' => $this->randomString(),
+      'code' => $this->getRandomGenerator()->word(8),
       'status' => TRUE,
     ]);
     $coupon->save();
@@ -117,31 +118,65 @@ class CouponRedemptionTest extends CommerceBrowserTestBase {
     /** @var \Drupal\commerce_promotion\Entity\CouponInterface $existing_coupon */
     $existing_coupon = $this->promotion->get('coupons')->first()->entity;
 
-    $this->assertSession()->pageTextContains('Enter your promotion code to redeem a discount.');
-    $this->assertSession()->elementTextNotContains('css', '.order-total-line', 'Discount');
+    $this->assertSession()->pageTextContains('Enter your coupon code to redeem a promotion.');
 
     // Test entering an invalid coupon.
-    $this->getSession()->getPage()->fillField('Promotion code', $this->randomString());
-    $this->getSession()->getPage()->pressButton('Apply');
+    $this->getSession()->getPage()->fillField('Coupon code', $this->randomString());
+    $this->getSession()->getPage()->pressButton('Redeem');
     $this->assertSession()->pageTextContains('Coupon is invalid');
 
-    $this->getSession()->getPage()->fillField('coupons[code]', $existing_coupon->getCode());
-    $this->getSession()->getPage()->pressButton('Apply');
+    $this->getSession()->getPage()->fillField('Coupon code', $existing_coupon->getCode());
+    $this->getSession()->getPage()->pressButton('Redeem');
 
     $this->assertSession()->pageTextContains('Coupon applied');
-    // The view is processed before the coupon element, so it
-    // won't reflect the updated order until the page reloads.
-    $this->drupalGet(Url::fromRoute('commerce_cart.page'));
-    $this->assertSession()->pageTextContains('-$99.90');
+    $this->assertSession()->pageTextContains(new FormattableMarkup(':title (:code)', [
+      ':title' => $existing_coupon->getPromotion()->getName(),
+      ':code' => $existing_coupon->getCode(),
+    ]));
+    $this->assertSession()->fieldNotExists('Coupon code');
+    $this->assertSession()->buttonNotExists('Redeem');
+    $this->getSession()->getPage()->pressButton('Remove coupon');
 
-    $this->assertSession()->fieldNotExists('coupons[code]');
-    $this->assertSession()->buttonNotExists('Apply');
-    $this->getSession()->getPage()->pressButton('Remove promotion');
+    $this->assertSession()->fieldExists('Coupon code');
+    $this->assertSession()->buttonExists('Redeem');
+  }
 
-    $this->drupalGet(Url::fromRoute('commerce_cart.page'));
-    $this->assertSession()->pageTextNotContains('-$99.90');
-    $this->assertSession()->fieldExists('coupons[code]');
-    $this->assertSession()->buttonExists('Apply');
+  /**
+   * Tests redeeming coupon on the cart form, with multiple coupons allowed.
+   *
+   * @see commerce_promotion_test_form_views_form_commerce_cart_form_default_alter
+   */
+  public function testMultipleCouponRedemption() {
+    $this->drupalGet(Url::fromRoute('commerce_cart.page', [], ['query' => ['test_multiple_coupons' => TRUE]]));
+
+    /** @var \Drupal\commerce_promotion\Entity\CouponInterface $existing_coupon */
+    $existing_coupon = $this->promotion->get('coupons')->first()->entity;
+
+    $this->assertSession()->pageTextContains('Enter your coupon code to redeem a promotion.');
+
+    // Test entering an invalid coupon.
+    $this->getSession()->getPage()->fillField('Coupon code', $this->randomString());
+    $this->getSession()->getPage()->pressButton('Redeem');
+    $this->assertSession()->pageTextContains('Coupon is invalid');
+
+    $this->getSession()->getPage()->fillField('Coupon code', $existing_coupon->getCode());
+    $this->getSession()->getPage()->pressButton('Redeem');
+    $this->assertSession()->pageTextContains('Coupon applied');
+
+    $this->assertSession()->fieldExists('Coupon code');
+    $this->assertSession()->fieldValueNotEquals('Coupon code', $existing_coupon->getCode());
+    $this->assertSession()->pageTextContains(new FormattableMarkup(':title (:code)', [
+      ':title' => $existing_coupon->getPromotion()->getName(),
+      ':code' => $existing_coupon->getCode(),
+    ]));
+    $this->getSession()->getPage()->pressButton('Remove coupon');
+
+    $this->getSession()->getPage()->fillField('Coupon code', $existing_coupon->getCode());
+    $this->getSession()->getPage()->pressButton('Redeem');
+    $this->assertSession()->pageTextContains('Coupon applied');
+    $this->getSession()->getPage()->fillField('Coupon code', $existing_coupon->getCode());
+    $this->getSession()->getPage()->pressButton('Redeem');
+    $this->assertSession()->pageTextContains('Coupon has already been redeemed');
   }
 
 }

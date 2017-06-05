@@ -235,6 +235,10 @@ abstract class CheckoutFlowBase extends PluginBase implements CheckoutFlowInterf
       throw new \InvalidArgumentException('The $step_id cannot be empty.');
     }
 
+    if ($form_state->isRebuilding()) {
+      $this->order = $this->entityTypeManager->getStorage('commerce_order')->load($this->order->id());
+    }
+
     $steps = $this->getVisibleSteps();
     $form['#tree'] = TRUE;
     $form['#step_id'] = $step_id;

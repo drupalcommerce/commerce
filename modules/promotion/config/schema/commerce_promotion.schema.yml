@@ -1,0 +1,6 @@
+commerce_checkout.commerce_checkout_pane.coupon_redemption:
+  type: commerce_checkout_pane_configuration
+  mapping:
+    multiple_coupons:
+      type: boolean
+      label: 'Allow multiple coupons'
