@@ -74,15 +74,16 @@ class ProfileSelectTest extends CommerceBrowserTestBase {
 
   /**
    * Tests the profile select form element for authenticated user.
+   *
+   * @group debug
    */
   public function testProfileSelectAuthenticated() {
     $account = $this->createUser();
     $this->drupalLogin($account);
     $this->useProfileForm($account->id(), $this->address1);
-    // Create one more profile to test how the form behaves with two existing profiles.
     $this->useProfileForm($account->id(), $this->address2, 1);
 
-    $this->drupalGet('/commerce_order_test/profile_select_form');
+    $this->drupalGet(Url::fromRoute('commerce_order_test.profile_select_form'));
     $this->assertSession()->statusCodeEquals(200);
     $this->assertSession()->fieldExists('profile_selection');
     // The last created profile should be selected by default.
@@ -99,14 +100,14 @@ class ProfileSelectTest extends CommerceBrowserTestBase {
     }
 
     // Edit a profile.
-    $this->drupalGet('/commerce_order_test/profile_select_form');
+    $this->drupalGet(Url::fromRoute('commerce_order_test.profile_select_form'));
     $this->assertSession()->statusCodeEquals(200);
     $this->assertSession()->fieldExists('profile[profile_selection]');
     // The last created profile should be selected by default.
     $this->assertSession()->elementTextContains('css', '.locality', $this->address2['locality']);
     $this->assertSession()->fieldNotExists('profile[cancel]');
 
-    $this->drupalPostForm(NULL, [], ['profile[edit]']);
+    $this->submitForm([], 'profile[edit]');
     foreach ($this->address1 as $key => $value) {
       $this->assertSession()->fieldValueEquals('profile[address][0][address][' . $key . ']', $value);
     }
@@ -116,8 +117,8 @@ class ProfileSelectTest extends CommerceBrowserTestBase {
       'profile[address][0][address][address_line1]' => 'Andrássy út 22',
     ];
     $this->submitForm([], 'Submit');
-    $profile = \Drupal::entityTypeManager()->getStorage('profile')->resetCache([1]);
-    $profile = \Drupal::entityTypeManager()->getStorage('profile')->load([1]);
+    $this->profileStorage->resetCache([1]);
+    $profile = $this->profileStorage->load([1]);
     // Assert that only address_line1 has changed.
     foreach ($this->address1 as $key => $value) {
       if ($key == 'address_line1') {
@@ -127,11 +128,8 @@ class ProfileSelectTest extends CommerceBrowserTestBase {
         $this->assertEquals($this->address1[$key], $profile->address->getValue()[0][$key], t('@key of address has not changed.', ['@key' => $key]));
       }
     }
-    $profile_ids = \Drupal::service('entity.query')
-      ->get('profile')
-      ->condition('uid', $account->id())
-      ->execute();
-    $this->Equals(2, count($profile_ids), t('No new profile has been created after editing an existing one.'));
+    $profile_ids = $this->profileStorage->getQuery()->count()->condition('uid', $account->id())->execute();
+    $this->assertEquals(2, $profile_ids, t('No new profile has been created after editing an existing one.'));
   }
 
   /**
@@ -146,7 +144,7 @@ class ProfileSelectTest extends CommerceBrowserTestBase {
    */
   protected function useProfileForm($uid, array $address_fields, $initial_profile_count = 0) {
     $profile_ids = $this->profileStorage->getQuery()->count()->condition('uid', $uid)->execute();
-    $this->assertEmpty($profile_ids);
+    $this->assertEquals($initial_profile_count, $profile_ids);
 
     $this->drupalGet(Url::fromRoute('commerce_order_test.profile_select_form'));
     $this->assertSession()->statusCodeEquals(200);
@@ -159,10 +157,9 @@ class ProfileSelectTest extends CommerceBrowserTestBase {
       $this->getSession()->getPage()->fillField('Select a profile', 'new_profile');
       $this->waitForAjaxToFinish();
     }
+    $this->createScreenshot();
     $this->getSession()->getPage()->fillField('Country', $address_fields['country_code']);
     $this->waitForAjaxToFinish();
-
-    $this->createScreenshot();
 
     $edit = [];
     unset($address_fields['country_code']);
