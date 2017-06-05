@@ -533,6 +533,14 @@ abstract class CheckoutFlowWithPanesBase extends CheckoutFlowBase implements Che
    */
   public function buildForm(array $form, FormStateInterface $form_state, $step_id = NULL) {
     $form = parent::buildForm($form, $form_state, $step_id);
+    if ($form_state->isRebuilding()) {
+      // The order reference on the panes might be outdated due to
+      // the form cache, so update the order manually once the
+      // parent class reloads it.
+      foreach ($this->panes as $pane_id => $pane) {
+        $this->panes[$pane_id] = $pane->setOrder($this->order);
+      }
+    }
 
     foreach ($this->getVisiblePanes($step_id) as $pane_id => $pane) {
       $form[$pane_id] = [

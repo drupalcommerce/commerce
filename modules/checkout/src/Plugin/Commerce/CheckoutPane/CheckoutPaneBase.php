@@ -3,6 +3,7 @@
 namespace Drupal\commerce_checkout\Plugin\Commerce\CheckoutPane;
 
 use Drupal\commerce_checkout\Plugin\Commerce\CheckoutFlow\CheckoutFlowInterface;
+use Drupal\commerce_order\Entity\OrderInterface;
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\FormStateInterface;
@@ -136,6 +137,14 @@ abstract class CheckoutPaneBase extends PluginBase implements CheckoutPaneInterf
    * {@inheritdoc}
    */
   public function submitConfigurationForm(array &$form, FormStateInterface $form_state) {}
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setOrder(OrderInterface $order) {
+    $this->order = $order;
+    return $this;
+  }
 
   /**
    * {@inheritdoc}

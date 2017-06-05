@@ -20,6 +20,9 @@ function commerce_promotion_theme() {
     'commerce_promotion_form' => [
       'render element' => 'form',
     ],
+    'commerce_coupon_redemption_form' => [
+      'render element' => 'form',
+    ],
   ];
 }
 
