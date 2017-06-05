@@ -11,7 +11,6 @@ use Drupal\Core\Render\Element;
 use Drupal\Core\Render\Element\RenderElement;
 use Drupal\profile\Entity\ProfileInterface;
 use Drupal\profile\Entity\Profile;
-use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Provides a form element for selecting a customer profile.
@@ -202,7 +201,7 @@ class ProfileSelect extends RenderElement {
     array_unshift($element['#parents'], $name);
 
     // Viewing a profile.
-    if ($mode == 'view' ) {
+    if ($mode == 'view') {
       $view_builder = \Drupal::entityTypeManager()
         ->getViewBuilder('profile');
       $content = $view_builder->view($default_profile, 'default');
@@ -280,15 +279,14 @@ class ProfileSelect extends RenderElement {
    *   The complete form array.
    * @param \Drupal\Core\Form\FormStateInterface $form_state
    *   The current state of the form.
-   * @param \Symfony\Component\HttpFoundation\Request $request
-   *   The Request object.
    *
    * @return array
    *   The form element replace the wrapper with.
    */
-  public static function profileSelectAjax(array &$form, FormStateInterface $form_state, Request $request) {
+  public static function profileSelectAjax(array &$form, FormStateInterface $form_state) {
     $triggering_parents = $form_state->getTriggeringElement()['#parents'];
     array_pop($triggering_parents);
     return NestedArray::getValue($form, $triggering_parents);
   }
+
 }

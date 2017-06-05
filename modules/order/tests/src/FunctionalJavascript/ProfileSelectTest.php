@@ -117,7 +117,7 @@ class ProfileSelectTest extends JavascriptTestBase {
       ->get('profile')
       ->condition('uid', $account->id())
       ->execute();
-    $this->Equals(2, count($profile_ids), t('No new profile has been created after editing an existing one.') );
+    $this->Equals(2, count($profile_ids), t('No new profile has been created after editing an existing one.'));
   }
 
   /**
@@ -127,10 +127,10 @@ class ProfileSelectTest extends JavascriptTestBase {
    *   The user uid using the form.
    * @param array $address_fields
    *   An associative array of address fields to submit.
-   * @param number $initial_profile_count
+   * @param int $initial_profile_count
    *   The number of profiles before the form submission.
    */
-  protected function useProfileForm($uid, $address_fields, $initial_profile_count = 0) {
+  protected function useProfileForm($uid, array $address_fields, $initial_profile_count = 0) {
     $profile_ids = \Drupal::service('entity.query')
       ->get('profile')
       ->condition('uid', $uid)
