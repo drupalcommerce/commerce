@@ -3,11 +3,11 @@
 namespace Drupal\commerce_order\Element;
 
 use Drupal\commerce\Element\CommerceElementTrait;
+use Drupal\Component\Utility\Html;
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Entity\Entity\EntityFormDisplay;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\Core\Render\Element\RenderElement;
-use Drupal\profile\Entity\ProfileInterface;
+use Drupal\Core\Render\Element\FormElement;
 
 /**
  * Provides a form element for selecting a customer profile.
@@ -25,9 +25,9 @@ use Drupal\profile\Entity\ProfileInterface;
  * $form['billing_profile']['#profile']. Due to Drupal core limitations the
  * profile can't be accessed via $form_state->getValue('billing_profile').
  *
- * @RenderElement("commerce_profile_select")
+ * @FormElement("commerce_profile_select")
  */
-class ProfileSelect extends RenderElement {
+class ProfileSelect extends FormElement {
 
   use CommerceElementTrait;
 
@@ -43,7 +43,9 @@ class ProfileSelect extends RenderElement {
       '#available_countries' => [],
 
       // The profile entity operated on. Required.
-      '#default_value' => NULL,
+      '#default_value' => '_new',
+      '#owner_uid' => 0,
+      '#profile_type' => NULL,
       '#process' => [
         [$class, 'attachElementSubmit'],
         [$class, 'processForm'],
@@ -57,6 +59,16 @@ class ProfileSelect extends RenderElement {
       ],
       '#theme_wrappers' => ['container'],
     ];
+  }
+
+  /**
+   * @inheritDoc
+   */
+  public static function valueCallback(&$element, $input, FormStateInterface $form_state) {
+    if (!empty($input)) {
+      return $input['profile_selection'];
+    }
+    return parent::valueCallback($element, $input, $form_state);
   }
 
   /**
@@ -77,129 +89,105 @@ class ProfileSelect extends RenderElement {
    *   The processed form element.
    */
   public static function processForm(array $element, FormStateInterface $form_state, array &$complete_form) {
-    if (empty($element['#default_value'])) {
-      throw new \InvalidArgumentException('The commerce_profile_select element requires the #default_value property.');
-    }
-    if (!($element['#default_value'] instanceof ProfileInterface)) {
-      throw new \InvalidArgumentException('The commerce_profile_select #default_value property must be a profile entity.');
-    }
     if (!is_array($element['#available_countries'])) {
       throw new \InvalidArgumentException('The commerce_profile_select #available_countries property must be an array.');
     }
-
-    // Prefix and suffix used for Ajax replacement.
-    $ajax_wrapper_id = 'profile-select-ajax-wrapper';
-    $element['#prefix'] = '<div id="' . $ajax_wrapper_id . '">';
-    $element['#suffix'] = '</div>';
-
-    /** @var \Drupal\profile\ProfileStorageInterface $storage */
-    $storage = \Drupal::entityTypeManager()->getStorage('profile');
-
-    $element['#profile'] = $element['#default_value'];
-    $default_profile_id = $element['#profile']->id();
-    $default_profile = $element['#profile'];
-
-    // Fetch all profiles of the user for an addressbook functionality.
-    $profile_uid = $element['#profile']->getOwnerId();
-    // Anonymous users don't get an addressbook.
-    if ($profile_uid) {
-      /** @var \Drupal\profile\Entity\Profile[] $profiles */
-      $profiles = $storage->loadMultipleByUser($element['#profile']->getOwner(), $element['#profile']->bundle(), TRUE);
-      $profile_options = [];
-      foreach ($profiles as $profile_option) {
-        if (empty($default_profile_id) && $profile_option->isDefault()) {
-          $default_profile_id = $profile_option->id();
-          $default_profile = $profile_option;
-        }
-        $profile_options[$profile_option->id()] = $profile_option->label();
-      }
-      $profile_options['new_profile'] = t('+ Enter a new profile');
+    if (empty($element['#profile_type'])) {
+      throw new \InvalidArgumentException('The commerce_profile_select #profile_type property must be provided.');
     }
-    else {
-      $profiles = [];
-      $profile_options = [];
-      $default_profile_id = 'new_profile';
-    }
+    $entity_type_manager = \Drupal::entityTypeManager();
+    /** @var \Drupal\profile\ProfileStorageInterface $profile_storage */
+    $profile_storage = $entity_type_manager->getStorage('profile');
+    /** @var \Drupal\profile\Entity\ProfileTypeInterface $profile_type */
+    $profile_type = $entity_type_manager->getStorage('profile_type')->load($element['#profile_type']);
 
-    $mode = 'view';
-    $triggering_element = $form_state->getTriggeringElement();
-    if (!empty($triggering_element)) {
-      $triggering_element_parents = $triggering_element['#array_parents'];
-      $last_parent = array_pop($triggering_element_parents);
-      if ($triggering_element_parents == $element['#parents']) {
-        if ($last_parent == 'edit_button') {
-          $mode = 'edit';
+    $user_profiles = [];
+    /** @var \Drupal\user\UserInterface $user */
+    $user = $entity_type_manager->getStorage('user')->load($element['#owner_uid']);
+    if (!$user->isAnonymous()) {
+      // If the user exists, attempt to load other profiles for selection.
+      foreach ($profile_storage->loadMultipleByUser($user, $profile_type->id(), TRUE) as $existing_profile) {
+        $user_profiles[$existing_profile->id()] = $existing_profile->label();
+
+        // If there is no default value, and the user has a default profile,
+        // use that as the current value.
+        if (empty($element['#value']) && $existing_profile->isDefault()) {
+          $element['#value'] = $existing_profile->id();
         }
-        elseif ($last_parent == 'cancel_button') {
-          $mode = 'view';
-        }
-        elseif ($last_parent == 'profile_selection' && $triggering_element['#value'] == 'new_profile') {
-          $mode = 'new';
-        }
-        elseif ($last_parent == 'profile_selection') {
-          $default_profile_id = $triggering_element['#value'];
-          $default_profile = $storage->load($default_profile_id);
-          $mode = 'view';
-        }
-      }
-      // If first element parent matches, assume field within Profile did AJAX.
-      elseif ($triggering_element_parents[0] == $element['#parents'][0]) {
-        $mode = 'edit';
       }
     }
     else {
-      if (empty($profiles)) {
-        $mode = 'new';
-      }
+      $element['#value'] = '_new';
     }
 
-    // No profiles found or user wants to create a new one.
-    if ($mode == 'new') {
-      $values = [
-        'type' => $element['#profile']->bundle(),
-        'uid' => $element['#profile']->getOwnerId(),
-      ];
-      $default_profile = $storage->create($values);
-      $default_profile_id = 'new_profile';
-    }
-
+    $id_prefix = implode('-', $element['#parents']);
+    $wrapper_id = Html::getUniqueId($id_prefix . '-ajax-wrapper');
+    $element = [
+      '#tree' => TRUE,
+      '#prefix' => '<div id="' . $wrapper_id . '">',
+      '#suffix' => '</div>',
+      // Pass the id along to other methods.
+      '#wrapper_id' => $wrapper_id,
+    ] + $element;
     $element['profile_selection'] = [
       '#title' => t('Select a profile'),
-      '#options' => $profile_options,
+      '#options' => $user_profiles + ['_new' => t('+ Create new :label', [':label' => $profile_type->label()])],
       '#type' => 'select',
       '#weight' => -5,
-      '#default_value' => $default_profile_id,
+      '#default_value' => $element['#value'],
       '#ajax' => [
-        'callback' => [get_called_class(), 'profileSelectAjax'],
-        'wrapper' => $ajax_wrapper_id,
+        'callback' => [get_called_class(), 'ajaxRefresh'],
+        'wrapper' => $wrapper_id,
       ],
-      '#access' => count($profile_options) > 1,
+      '#element_mode' => 'view',
+      '#access' => !empty($user_profiles),
     ];
 
-    // Viewing a profile.
-    if ($mode == 'view') {
-      $view_builder = \Drupal::entityTypeManager()
-        ->getViewBuilder('profile');
-      $content = $view_builder->view($default_profile, 'default');
+    /** @var \Drupal\profile\Entity\ProfileInterface $element_profile */
+    if ($element['#value'] == '_new') {
+      $element_profile = $profile_storage->create([
+        'type' => $profile_type->id(),
+        'uid' => $user->id(),
+      ]);
+      $element['#element_mode'] = 'create';
+    }
+    else {
+      $element_profile = $profile_storage->load($element['#value']);
+      $element['#element_mode'] = 'view';
 
-      $element['rendered_profile'] = [
-        $content,
-      ];
+      $triggering_element = $form_state->getTriggeringElement();
+      if ($triggering_element) {
+        $element['#element_mode'] = $triggering_element['#element_mode'];
+      }
+    }
+
+    // Viewing a profile.
+    if ($element['#element_mode'] == 'view') {
+      $view_builder = $entity_type_manager->getViewBuilder('profile');
+      $element['rendered_profile'] = $view_builder->view($element_profile, 'default');
 
       $element['edit_button'] = [
         '#type' => 'button',
         '#value' => t('Edit'),
-        '#limit_validation_errors' => [],
-        '#ajax' => [
-          'callback' => [get_called_class(), 'profileSelectAjax'],
-          'wrapper' => $ajax_wrapper_id,
+        '#limit_validation_errors' => [
+          $element['#parents'],
         ],
-        '#access' => $mode != 'edit',
+        '#ajax' => [
+          'callback' => [get_called_class(), 'ajaxRefresh'],
+          'wrapper' => $wrapper_id,
+        ],
+        '#name' => 'edit_profile',
+        '#element_mode' => 'edit',
+        // @todo Allow editing.
+        // '#access' => $element['#element_mode'] == 'view',
+        '#access' => FALSE,
       ];
     }
     else {
-      $form_display = EntityFormDisplay::collectRenderDisplay($default_profile, 'default');
-      $form_display->buildForm($default_profile, $element, $form_state);
+      $form_display = EntityFormDisplay::collectRenderDisplay($element_profile, 'default');
+      $form_display->buildForm($element_profile, $element, $form_state);
+
+      // @todo Loop over all possible address fields.
       if (!empty($element['address']['widget'][0])) {
         $widget_element = &$element['address']['widget'][0];
         // Remove the details wrapper from the address widget.
@@ -216,13 +204,16 @@ class ProfileSelect extends RenderElement {
       $element['cancel_button'] = [
         '#type' => 'button',
         '#value' => t('Return to profile selection'),
-        '#limit_validation_errors' => [],
-        '#ajax' => [
-          'callback' => [get_called_class(), 'profileSelectAjax'],
-          'wrapper' => $ajax_wrapper_id,
+        '#limit_validation_errors' => [
+          $element['#parents'],
         ],
-        '#access' => $mode == 'edit',
-        '#weight' => 99,
+        '#ajax' => [
+          'callback' => [get_called_class(), 'ajaxRefresh'],
+          'wrapper' => $wrapper_id,
+        ],
+        '#name' => 'cancel_edit_profile',
+        '#element_mode' => 'view',
+        '#access' => $element['#element_mode'] == 'edit',
       ];
     }
 
@@ -242,17 +233,26 @@ class ProfileSelect extends RenderElement {
    *   form, as a protection against buggy behavior.
    */
   public static function validateForm(array &$element, FormStateInterface $form_state) {
-    $triggering_parents = $form_state->getTriggeringElement()['#parents'];
-    $triggering_last_parent = array_pop($triggering_parents);
-    if (!in_array($triggering_last_parent, [
-      'edit_button',
-      'cancel_button',
-      'profile_selection',
-      'country_code',
-    ])) {
-      $form_display = EntityFormDisplay::collectRenderDisplay($element['#profile'], 'default');
-      $form_display->extractFormValues($element['#profile'], $element, $form_state);
-      $form_display->validateFormValues($element['#profile'], $element, $form_state);
+    $value = $form_state->getValue($element['#parents']);
+
+    $entity_type_manager = \Drupal::entityTypeManager();
+    /** @var \Drupal\profile\ProfileStorageInterface $profile_storage */
+    $profile_storage = $entity_type_manager->getStorage('profile');
+    /** @var \Drupal\profile\Entity\ProfileInterface $element_profile */
+    if ($value['profile_selection'] == '_new') {
+      $element_profile = $profile_storage->create([
+        'type' => $element['#profile_type'],
+        'uid' => $element['#owner_uid'],
+      ]);
+    }
+    else {
+      $element_profile = $profile_storage->load($value['profile_selection']);
+    }
+
+    if ($element['#element_mode'] != 'view') {
+      $form_display = EntityFormDisplay::collectRenderDisplay($element_profile, 'default');
+      $form_display->extractFormValues($element_profile, $element, $form_state);
+      $form_display->validateFormValues($element_profile, $element, $form_state);
     }
   }
 
@@ -265,26 +265,38 @@ class ProfileSelect extends RenderElement {
    *   The current state of the form.
    */
   public static function submitForm(array &$element, FormStateInterface $form_state) {
-    $form_display = EntityFormDisplay::collectRenderDisplay($element['#profile'], 'default');
-    $form_display->extractFormValues($element['#profile'], $element, $form_state);
-    $element['#profile']->save();
+    $value = $form_state->getValue($element['#parents']);
+
+    $entity_type_manager = \Drupal::entityTypeManager();
+    /** @var \Drupal\profile\ProfileStorageInterface $profile_storage */
+    $profile_storage = $entity_type_manager->getStorage('profile');
+    /** @var \Drupal\profile\Entity\ProfileInterface $element_profile */
+    if ($value['profile_selection'] == '_new') {
+      $element_profile = $profile_storage->create([
+        'type' => $element['#profile_type'],
+        'uid' => $element['#owner_uid'],
+      ]);
+    }
+    else {
+      $element_profile = $profile_storage->load($value['profile_selection']);
+    }
+
+    if ($element['#element_mode'] != 'view') {
+      $form_display = EntityFormDisplay::collectRenderDisplay($element_profile, 'default');
+      $form_display->extractFormValues($element_profile, $element, $form_state);
+      $element_profile->save();
+    }
+
+    $form_state->setValueForElement($element, $element_profile);
   }
 
   /**
-   * Profile form AJAX callback.
-   *
-   * @param array $form
-   *   The complete form array.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
-   *   The current state of the form.
-   *
-   * @return array
-   *   The form element replace the wrapper with.
+   * Ajax callback.
    */
-  public static function profileSelectAjax(array &$form, FormStateInterface $form_state) {
-    $triggering_parents = $form_state->getTriggeringElement()['#array_parents'];
-    array_pop($triggering_parents);
-    return NestedArray::getValue($form, $triggering_parents);
+  public static function ajaxRefresh(array &$form, FormStateInterface $form_state) {
+    $triggering_element = $form_state->getTriggeringElement();
+    $element = NestedArray::getValue($form, array_slice($triggering_element['#array_parents'], 0, -1));
+    return $element;
   }
 
 }

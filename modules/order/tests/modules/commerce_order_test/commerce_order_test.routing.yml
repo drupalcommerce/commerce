@@ -5,3 +5,5 @@ commerce_order_test.profile_select_form:
     _title: 'Profile select test form'
   requirements:
     _access: 'TRUE'
+  options:
+    no_cache: TRUE

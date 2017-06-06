@@ -18,17 +18,13 @@ class ProfileSelectTestForm extends FormBase {
    * {@inheritdoc}
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
-    $profile_storage = \Drupal::getContainer()->get('entity_type.manager')->getStorage('profile');
-
-    $profile = $profile_storage->create([
-      'type' => 'customer',
-      'uid' => \Drupal::currentUser()->id(),
-    ]);
-
     $form['profile'] = [
       '#type' => 'commerce_profile_select',
       '#title' => $this->t('Profile'),
-      '#default_value' => $profile,
+      '#default_value' => NULL,
+      '#profile_type' => 'customer',
+      '#owner_uid' => \Drupal::currentUser()->id(),
+      '#available_countries' => ['HU', 'FR', 'US', 'RS'],
     ];
     $form['submit'] = [
       '#type' => 'submit',
@@ -42,7 +38,8 @@ class ProfileSelectTestForm extends FormBase {
    * {@inheritdoc}
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
-    drupal_set_message('Profile saved.');
+    $profile = $form_state->getValue('profile');
+    drupal_set_message($this->t('Profile saved: :label', [':label' => $profile->label()]));
   }
 
 }
