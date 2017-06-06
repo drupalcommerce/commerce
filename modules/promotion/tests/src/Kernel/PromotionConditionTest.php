@@ -159,6 +159,76 @@ class PromotionConditionTest extends CommerceKernelTestBase {
   }
 
   /**
+   * Tests the order total items condition.
+   */
+  public function testOrderTotalItems() {
+    // Use addOrderItem so the total is calculated.
+    $order_item = OrderItem::create([
+      'type' => 'test',
+      'quantity' => 10,
+      'unit_price' => [
+        'number' => '10.00',
+        'currency_code' => 'USD',
+      ],
+    ]);
+    $order_item->save();
+    $this->order->addItem($order_item);
+
+    // Starts now, enabled. No end time.
+    $promotion = Promotion::create([
+      'name' => 'Promotion 1',
+      'order_types' => [$this->order->bundle()],
+      'stores' => [$this->store->id()],
+      'status' => TRUE,
+      'offer' => [
+        'target_plugin_id' => 'commerce_promotion_order_percentage_off',
+        'target_plugin_configuration' => [
+          'amount' => '0.10',
+        ],
+      ],
+      'conditions' => [
+        [
+          'target_plugin_id' => 'commerce_promotion_order_total_items',
+          'target_plugin_configuration' => [
+            'qty' => '10',
+            'operator' => '>=',
+          ],
+        ],
+      ],
+    ]);
+    $promotion->save();
+
+    $result = $promotion->applies($this->order);
+    $this->assertTrue($result);
+
+    $promotion = Promotion::create([
+      'name' => 'Promotion 1',
+      'order_types' => [$this->order->bundle()],
+      'stores' => [$this->store->id()],
+      'status' => TRUE,
+      'offer' => [
+        'target_plugin_id' => 'commerce_promotion_order_percentage_off',
+        'target_plugin_configuration' => [
+          'amount' => '0.10',
+        ],
+      ],
+      'conditions' => [
+        [
+          'target_plugin_id' => 'commerce_promotion_order_total_items',
+          'target_plugin_configuration' => [
+            'qty' => '11',
+            'operator' => '>=',
+          ],
+        ],
+      ],
+    ]);
+    $promotion->save();
+
+    $result = $promotion->applies($this->order);
+    $this->assertFalse($result);
+  }
+
+  /**
    * Tests the specific SKU test condition.
    */
   public function testSpecificSkuCondition() {
