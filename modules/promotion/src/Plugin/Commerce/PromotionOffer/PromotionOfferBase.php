@@ -129,8 +129,7 @@ abstract class PromotionOfferBase extends ExecutablePluginBase implements Promot
   protected function applyAdjustment(EntityAdjustableInterface $entity, Price $amount) {
     $entity->addAdjustment(new Adjustment([
       'type' => 'promotion',
-      // @todo Change to label from UI when added in #2770731.
-      'label' => t('Discount'),
+      'label' => $this->getPromotion()->getDisplayName(),
       'amount' => $amount->multiply('-1'),
       'source_id' => $this->getPromotion()->id(),
     ]));

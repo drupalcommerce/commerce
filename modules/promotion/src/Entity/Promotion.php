@@ -86,6 +86,21 @@ class Promotion extends ContentEntityBase implements PromotionInterface {
   /**
    * {@inheritdoc}
    */
+  public function getDisplayName() {
+    return $this->get('display_name')->value;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setDisplayName($display_name) {
+    $this->set('display_name', $display_name);
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function getDescription() {
     return $this->get('description')->value;
   }
@@ -443,6 +458,18 @@ class Promotion extends ContentEntityBase implements PromotionInterface {
   /**
    * {@inheritdoc}
    */
+  public function preSave(EntityStorageInterface $storage) {
+    parent::preSave($storage);
+
+    // Display name is required, but just use the name if it is not specified.
+    if (empty($this->getDisplayName())) {
+      $this->setDisplayName($this->getName());
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function postSave(EntityStorageInterface $storage, $update = TRUE) {
     parent::postSave($storage, $update);
 
@@ -496,6 +523,21 @@ class Promotion extends ContentEntityBase implements PromotionInterface {
         'weight' => 0,
       ])
       ->setDisplayConfigurable('view', TRUE)
+      ->setDisplayConfigurable('form', TRUE);
+
+    $fields['display_name'] = BaseFieldDefinition::create('string')
+      ->setLabel(t('Display Name'))
+      ->setDescription(t('The promotion name to display to the customer, if not specified, the name will be used.'))
+      ->setRequired(FALSE)
+      ->setTranslatable(TRUE)
+      ->setSettings([
+        'default_value' => '',
+        'max_length' => 255,
+      ])
+      ->setDisplayOptions('form', [
+        'type' => 'string_textfield',
+        'weight' => 0,
+      ])
       ->setDisplayConfigurable('form', TRUE);
 
     $fields['description'] = BaseFieldDefinition::create('string_long')
