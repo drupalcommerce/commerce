@@ -94,6 +94,10 @@ class CheckoutProgressBlock extends BlockBase implements ContainerFactoryPluginI
     $current_step_index = array_search($current_step_id, array_keys($visible_steps));
     $index = 0;
     foreach ($visible_steps as $step_id => $step_definition) {
+      if ($step_id == 'payment') {
+        continue;
+      }
+
       if ($index < $current_step_index) {
         $position = 'previous';
       }
