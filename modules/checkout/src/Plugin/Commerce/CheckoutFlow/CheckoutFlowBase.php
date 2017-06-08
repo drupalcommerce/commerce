@@ -325,7 +325,7 @@ abstract class CheckoutFlowBase extends PluginBase implements CheckoutFlowInterf
     if ($has_next_step) {
       $actions['next'] = [
         '#type' => 'submit',
-        '#value' => $steps[$next_step_id]['next_label'],
+        '#default_value' => $steps[$next_step_id]['next_label'],
         '#button_type' => 'primary',
         '#submit' => ['::submitForm'],
       ];
