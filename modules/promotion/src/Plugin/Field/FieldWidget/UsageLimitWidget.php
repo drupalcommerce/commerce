@@ -73,13 +73,16 @@ class UsageLimitWidget extends WidgetBase implements ContainerFactoryPluginInter
    */
   public function formElement(FieldItemListInterface $items, $delta, array $element, array &$form, FormStateInterface $form_state) {
     $value = isset($items[$delta]->value) ? $items[$delta]->value : NULL;
-    $entity = $items[$delta]->getEntity();
     $usage = 0;
-    if ($entity instanceof PromotionInterface) {
-      $usage = $this->usage->getUsage($entity);
-    }
-    elseif ($entity instanceof CouponInterface) {
-      $usage = $this->usage->getUsage($entity->getPromotion(), $entity);
+    /** @var \Drupal\Core\Entity\EntityInterface $entity */
+    $entity = $items[$delta]->getEntity();
+    if (!$entity->isNew()) {
+      if ($entity instanceof PromotionInterface) {
+        $usage = $this->usage->getUsage($entity);
+      }
+      elseif ($entity instanceof CouponInterface) {
+        $usage = $this->usage->getUsage($entity->getPromotion(), $entity);
+      }
     }
     $formatted_usage = $this->formatPlural($usage, '1 use', '@count uses');
     $radio_parents = array_merge($form['#parents'], [$this->fieldDefinition->getName(), 0, 'limit']);
