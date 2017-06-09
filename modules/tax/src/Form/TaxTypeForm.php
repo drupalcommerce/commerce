@@ -85,6 +85,7 @@ class TaxTypeForm extends CommercePluginEntityFormBase {
       '#default_value' => $plugin,
       '#required' => TRUE,
       '#disabled' => !$type->isNew(),
+      '#limit_validation_errors' => [],
       '#ajax' => [
         'callback' => '::ajaxRefresh',
         'wrapper' => $wrapper_id,

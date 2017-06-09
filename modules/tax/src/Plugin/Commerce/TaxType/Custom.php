@@ -273,6 +273,12 @@ class Custom extends LocalTaxTypeBase {
    * {@inheritdoc}
    */
   public function validateConfigurationForm(array &$form, FormStateInterface $form_state) {
+    if (!isset($form['territories'])) {
+      // The form was built by a different plugin, and is now in the process
+      // of being rebuilt. Temporary workaround for #2884870.
+      return;
+    }
+
     $values = $form_state->getValue($form['#parents']);
     $values['rates'] = array_filter($values['rates'], function ($rate) {
       return !empty($rate) && !isset($rate['add_rate']);
