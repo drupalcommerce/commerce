@@ -79,7 +79,12 @@ class UsageLimitWidget extends WidgetBase implements ContainerFactoryPluginInter
       $usage = $this->usage->getUsage($entity);
     }
     elseif ($entity instanceof CouponInterface) {
-      $usage = $this->usage->getUsage($entity->getPromotion(), $entity);
+      if ($promotion = $entity->getPromotion()) {
+        $usage = $this->usage->getUsage($promotion, $entity);
+      }
+      else {
+        $usage = 0;
+      }
     }
     $formatted_usage = $this->formatPlural($usage, '1 use', '@count uses');
     $radio_parents = array_merge($form['#parents'], [$this->fieldDefinition->getName(), 0, 'limit']);
