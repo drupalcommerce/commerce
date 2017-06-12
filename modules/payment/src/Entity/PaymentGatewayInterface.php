@@ -56,4 +56,22 @@ interface PaymentGatewayInterface extends ConfigEntityInterface, EntityWithPlugi
    */
   public function setPluginId($plugin_id);
 
+  /**
+   * Gets the payment gateway plugin configuration.
+   *
+   * @return string
+   *   The payment gateway plugin configuration.
+   */
+  public function getPluginConfiguration();
+
+  /**
+   * Sets the payment gateway plugin configuration.
+   *
+   * @param array $configuration
+   *   The payment gateway plugin configuration.
+   *
+   * @return $this
+   */
+  public function setPluginConfiguration(array $configuration);
+
 }

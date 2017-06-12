@@ -35,6 +35,8 @@ abstract class PaymentGatewayBase extends PluginBase implements PaymentGatewayIn
   /**
    * The ID of the parent config entity.
    *
+   * Not available while the plugin is being configured.
+   *
    * @var string
    */
   protected $entityId;
@@ -73,9 +75,10 @@ abstract class PaymentGatewayBase extends PluginBase implements PaymentGatewayIn
     parent::__construct($configuration, $plugin_id, $plugin_definition);
 
     $this->entityTypeManager = $entity_type_manager;
-    // The plugin most know the ID of its parent config entity.
-    $this->entityId = $configuration['_entity_id'];
-    unset($configuration['_entity_id']);
+    if (isset($configuration['_entity_id'])) {
+      $this->entityId = $configuration['_entity_id'];
+      unset($configuration['_entity_id']);
+    }
     // Instantiate the types right away to ensure that their IDs are valid.
     $this->paymentType = $payment_type_manager->createInstance($this->pluginDefinition['payment_type']);
     foreach ($this->pluginDefinition['payment_method_types'] as $plugin_id) {

@@ -5,17 +5,11 @@ namespace Drupal\commerce\Element;
 use Drupal\Component\Utility\Html;
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\Core\Plugin\PluginFormInterface;
 use Drupal\Core\Render\Element\FormElement;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Element for selecting plugins, and configuring them.
- *
- * @FormElement("commerce_plugin_select")
- *
- * Properties:
- * - #providers: Modules to restrict options to.
  *
  * Usage example:
  * @code
@@ -25,6 +19,8 @@ use Symfony\Component\HttpFoundation\Request;
  *   '#categories' => ['user', 'system'],
  * ];
  * @endcode
+ *
+ * @FormElement("commerce_plugin_select")
  */
 class PluginSelect extends FormElement {
 
@@ -63,7 +59,7 @@ class PluginSelect extends FormElement {
   /**
    * Process callback.
    */
-  public static function processPluginSelect(&$element, FormStateInterface $form_state, &$complete_form) {
+  public static function processPluginSelect(array &$element, FormStateInterface $form_state, array &$complete_form) {
     if (!$element['#plugin_type']) {
       throw new \InvalidArgumentException('You must specify the plugin type ID.');
     }
@@ -91,9 +87,8 @@ class PluginSelect extends FormElement {
       '#default_value' => $target_plugin_id,
       '#required' => $element['#required'],
     ];
-    // Add a "_none" option if the element is not required.
     if (!$element['#required']) {
-      $element['target_plugin_id']['#options']['_none'] = t('None');
+      $element['target_plugin_id']['#empty_value'] = '';
     }
 
     /** @var \Drupal\Core\Executable\ExecutableManagerInterface $plugin_manager */
@@ -116,27 +111,19 @@ class PluginSelect extends FormElement {
       }
       $definitions[] = $definition['id'];
     }
-
     // If the element is required, set the default value to the first plugin.
     // definition available in the options array.
-    if ($element['#required'] && $target_plugin_id == '_none' && !empty($element['target_plugin_id']['#options'])) {
+    if ($element['#required'] && !$target_plugin_id && !empty($element['target_plugin_id']['#options'])) {
       $target_plugin_id = reset($definitions);
       $element['target_plugin_id']['#default_value'] = $target_plugin_id;
     }
 
     $element['target_plugin_configuration'] = [
-      '#type' => 'container',
+      '#type' => 'commerce_plugin_configuration',
+      '#plugin_type' => $element['#plugin_type'],
+      '#plugin_id' => $target_plugin_id,
+      '#default_value' => $values['target_plugin_configuration'],
     ];
-    if (!empty($target_plugin_id) && $target_plugin_id != '_none') {
-      /** @var \Drupal\Core\Executable\ExecutableInterface $plugin */
-      $plugin = $plugin_manager->createInstance($target_plugin_id, $values['target_plugin_configuration']);
-      if ($plugin instanceof PluginFormInterface) {
-        $element['target_plugin_configuration'] = [
-          '#tree' => TRUE,
-        ];
-        $element['target_plugin_configuration'] = $plugin->buildConfigurationForm($element['target_plugin_configuration'], $form_state);
-      }
-    }
 
     return $element;
   }
@@ -146,11 +133,10 @@ class PluginSelect extends FormElement {
    */
   public static function ajaxRefresh(&$form, FormStateInterface $form_state, Request $request) {
     $target_plugin_id_element = $form_state->getTriggeringElement();
-
     // Radios are an extra parent deep compared to the select.
     $slice_length = ($target_plugin_id_element['#type'] == 'radio') ? -2 : -1;
-
     $plugin_select_element = NestedArray::getValue($form, array_slice($target_plugin_id_element['#array_parents'], 0, $slice_length));
+
     return $plugin_select_element;
   }
 
@@ -162,64 +148,13 @@ class PluginSelect extends FormElement {
       $input = $element['#default_value'];
     }
     if (empty($input['target_plugin_id'])) {
-      $input['target_plugin_id'] = '_none';
+      $input['target_plugin_id'] = '';
     }
     if (empty($input['target_plugin_configuration'])) {
       $input['target_plugin_configuration'] = [];
     }
 
     return $input;
-  }
-
-  /**
-   * Validates the plugin's configuration.
-   *
-   * @param array $element
-   *   An associative array containing the properties of the element.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
-   *   The current state of the form.
-   * @param array $complete_form
-   *   The complete form structure.
-   */
-  public static function validatePlugin(array &$element, FormStateInterface $form_state, array &$complete_form) {
-    $values = $form_state->getValue($element['#parents']);
-    $target_plugin_id = $values['target_plugin_id'];
-    // If a plugin was selected, create an instance and pass the configuration
-    // values to its configuration form validation method.
-    if ($target_plugin_id != '_none') {
-      /** @var \Drupal\Component\Plugin\PluginManagerInterface $plugin_manager */
-      $plugin_manager = \Drupal::service('plugin.manager.' . $element['#plugin_type']);
-      $plugin = $plugin_manager->createInstance($target_plugin_id, $element['#default_value']['target_plugin_configuration']);
-      if ($plugin instanceof PluginFormInterface) {
-        $plugin->validateConfigurationForm($element['target_plugin_configuration'], $form_state);
-      }
-    }
-  }
-
-  /**
-   * Submits the plugin's configuration.
-   *
-   * @param array $element
-   *   An associative array containing the properties of the element.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
-   *   The current state of the form.
-   */
-  public static function submitPlugin(array &$element, FormStateInterface $form_state) {
-    $values = $form_state->getValue($element['#parents']);
-    $target_plugin_id = $values['target_plugin_id'];
-    // If a plugin was selected, create an instance and pass the configuration
-    // values to its configuration form submission method.
-    if ($target_plugin_id != '_none') {
-      /** @var \Drupal\Component\Plugin\PluginManagerInterface $plugin_manager */
-      $plugin_manager = \Drupal::service('plugin.manager.' . $element['#plugin_type']);
-      $plugin = $plugin_manager->createInstance($target_plugin_id, $element['#default_value']['target_plugin_configuration']);
-      if ($plugin instanceof PluginFormInterface) {
-        /** @var \Drupal\Component\Plugin\ConfigurablePluginInterface $plugin */
-        $plugin->submitConfigurationForm($element['target_plugin_configuration'], $form_state);
-        $values['target_plugin_configuration'] = $plugin->getConfiguration();
-        $form_state->setValueForElement($element, $values);
-      }
-    }
   }
 
   /**

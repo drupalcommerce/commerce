@@ -273,19 +273,16 @@ class Custom extends LocalTaxTypeBase {
    * {@inheritdoc}
    */
   public function validateConfigurationForm(array &$form, FormStateInterface $form_state) {
-    if (!isset($form['territories'])) {
-      // The form was built by a different plugin, and is now in the process
-      // of being rebuilt. Temporary workaround for #2884870.
-      return;
-    }
-
     $values = $form_state->getValue($form['#parents']);
+    // Filter out the button rows.
     $values['rates'] = array_filter($values['rates'], function ($rate) {
       return !empty($rate) && !isset($rate['add_rate']);
     });
     $values['territories'] = array_filter($values['territories'], function ($territory) {
       return !empty($territory) && !isset($territory['add_territory']);
     });
+    $form_state->setValue($form['#parents'], $values);
+
     if (empty($values['rates'])) {
       $form_state->setError($form['rates'], $this->t('Please add at least one rate.'));
     }

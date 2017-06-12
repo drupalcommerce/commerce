@@ -39,8 +39,8 @@ class PaymentGatewayTest extends CommerceBrowserTestBase {
     $values = [
       'label' => 'Example',
       'plugin' => 'example_offsite_redirect',
-      'configuration[redirect_method]' => 'post',
-      'configuration[mode]' => 'test',
+      'configuration[form][redirect_method]' => 'post',
+      'configuration[form][mode]' => 'test',
       'status' => '1',
       // Setting the 'id' can fail if focus switches to another field.
       // This is a bug in the machine name JS that can be reproduced manually.
@@ -76,8 +76,8 @@ class PaymentGatewayTest extends CommerceBrowserTestBase {
 
     $this->drupalGet('admin/commerce/config/payment-gateways/manage/' . $payment_gateway->id());
     $values += [
-      'configuration[redirect_method]' => 'get',
-      'configuration[mode]' => 'live',
+      'configuration[form][redirect_method]' => 'get',
+      'configuration[form][mode]' => 'live',
     ];
     $this->submitForm($values, 'Save');
 

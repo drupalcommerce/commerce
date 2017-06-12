@@ -113,6 +113,22 @@ class TaxType extends ConfigEntityBase implements TaxTypeInterface {
   /**
    * {@inheritdoc}
    */
+  public function getPluginConfiguration() {
+    return $this->configuration;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setPluginConfiguration(array $configuration) {
+    $this->configuration = $configuration;
+    $this->pluginCollection = NULL;
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function getPluginCollections() {
     return [
       'configuration' => $this->getPluginCollection(),

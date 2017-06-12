@@ -92,9 +92,11 @@ class TaxTypeForm extends CommercePluginEntityFormBase {
       ],
     ];
     $form['configuration'] = [
-      '#parents' => ['configuration'],
+      '#type' => 'commerce_plugin_configuration',
+      '#plugin_type' => 'commerce_tax_type',
+      '#plugin_id' => $plugin,
+      '#default_value' => $type->getPluginConfiguration(),
     ];
-    $form['configuration'] = $type->getPlugin()->buildConfigurationForm($form['configuration'], $form_state);
     $form['status'] = [
       '#type' => 'checkbox',
       '#title' => $this->t('Enabled'),
@@ -114,23 +116,12 @@ class TaxTypeForm extends CommercePluginEntityFormBase {
   /**
    * {@inheritdoc}
    */
-  public function validateForm(array &$form, FormStateInterface $form_state) {
-    parent::validateForm($form, $form_state);
-
-    /** @var \Drupal\commerce_tax\Entity\TaxTypeInterface $type */
-    $type = $this->entity;
-    $type->getPlugin()->validateConfigurationForm($form['configuration'], $form_state);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function submitForm(array &$form, FormStateInterface $form_state) {
     parent::submitForm($form, $form_state);
 
     /** @var \Drupal\commerce_tax\Entity\TaxTypeInterface $type */
     $type = $this->entity;
-    $type->getPlugin()->submitConfigurationForm($form['configuration'], $form_state);
+    $type->setPluginConfiguration($form_state->getValue(['configuration']));
   }
 
   /**

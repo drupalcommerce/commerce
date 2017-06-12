@@ -102,9 +102,11 @@ class PaymentGatewayForm extends CommercePluginEntityFormBase {
       ],
     ];
     $form['configuration'] = [
-      '#parents' => ['configuration'],
+      '#type' => 'commerce_plugin_configuration',
+      '#plugin_type' => 'commerce_payment_gateway',
+      '#plugin_id' => $plugin,
+      '#default_value' => $gateway->getPluginConfiguration(),
     ];
-    $form['configuration'] = $gateway->getPlugin()->buildConfigurationForm($form['configuration'], $form_state);
     $form['status'] = [
       '#type' => 'checkbox',
       '#title' => $this->t('Enabled'),
@@ -124,23 +126,12 @@ class PaymentGatewayForm extends CommercePluginEntityFormBase {
   /**
    * {@inheritdoc}
    */
-  public function validateForm(array &$form, FormStateInterface $form_state) {
-    parent::validateForm($form, $form_state);
-
-    /** @var \Drupal\commerce_payment\Entity\PaymentGatewayInterface $gateway */
-    $gateway = $this->entity;
-    $gateway->getPlugin()->validateConfigurationForm($form['configuration'], $form_state);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function submitForm(array &$form, FormStateInterface $form_state) {
     parent::submitForm($form, $form_state);
 
     /** @var \Drupal\commerce_payment\Entity\PaymentGatewayInterface $gateway */
     $gateway = $this->entity;
-    $gateway->getPlugin()->submitConfigurationForm($form['configuration'], $form_state);
+    $gateway->setPluginConfiguration($form_state->getValue(['configuration']));
   }
 
   /**

@@ -39,6 +39,8 @@ abstract class TaxTypeBase extends PluginBase implements TaxTypeInterface, Conta
   /**
    * The ID of the parent config entity.
    *
+   * Not available while the plugin is being configured.
+   *
    * @var string
    */
   protected $entityId;
@@ -69,9 +71,10 @@ abstract class TaxTypeBase extends PluginBase implements TaxTypeInterface, Conta
 
     $this->entityTypeManager = $entity_type_manager;
     $this->eventDispatcher = $event_dispatcher;
-    // The plugin most know the ID of its parent config entity.
-    $this->entityId = $configuration['_entity_id'];
-    unset($configuration['_entity_id']);
+    if (isset($configuration['_entity_id'])) {
+      $this->entityId = $configuration['_entity_id'];
+      unset($configuration['_entity_id']);
+    }
     $this->setConfiguration($configuration);
   }
 
