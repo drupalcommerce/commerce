@@ -42,12 +42,8 @@ class PluginSelect extends FormElement {
         [$class, 'processPluginSelect'],
         [$class, 'processAjaxForm'],
       ],
-      '#after_build' => [
-        [$class, 'clearValues'],
-      ],
       '#element_validate' => [
         [$class, 'validateElementSubmit'],
-        [$class, 'validatePlugin'],
       ],
       '#commerce_element_submit' => [
         [$class, 'submitPlugin'],
@@ -155,30 +151,6 @@ class PluginSelect extends FormElement {
     }
 
     return $input;
-  }
-
-  /**
-   * Clears the plugin-specific form values when the target plugin changes.
-   *
-   * Implemented as an #after_build callback because #after_build runs before
-   * validation, allowing the values to be cleared early enough to prevent the
-   * "Illegal choice" error.
-   */
-  public static function clearValues(array $element, FormStateInterface $form_state) {
-    $triggering_element = $form_state->getTriggeringElement();
-    if (!$triggering_element) {
-      return $element;
-    }
-
-    $triggering_element_name = end($triggering_element['#parents']);
-    if ($triggering_element_name == 'target_plugin_id') {
-      $input = &$form_state->getUserInput();
-      $parents = array_merge($element['#parents'], ['target_plugin_configuration']);
-      NestedArray::setValue($input, $parents, '');
-      $element['target_plugin_configuration']['#value'] = '';
-    }
-
-    return $element;
   }
 
 }

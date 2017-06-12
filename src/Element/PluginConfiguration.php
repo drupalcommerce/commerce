@@ -36,6 +36,7 @@ class PluginConfiguration extends FormElement {
   public function getInfo() {
     $class = get_class($this);
     return [
+      '#input' => TRUE,
       '#plugin_type' => NULL,
       '#plugin_id' => NULL,
       '#default_value' => [],
@@ -87,7 +88,11 @@ class PluginConfiguration extends FormElement {
       /** @var \Drupal\Core\Plugin\PluginFormInterface $plugin */
       $plugin = $plugin_manager->createInstance($element['#plugin_id'], $element['#default_value']);
       $element['form'] = [
-        '#parents' => array_merge($element['#parents'], ['form']),
+        // Configuration must be keyed by plugin ID in $form_state to prevent
+        // NestedArray::setValue() crashes when switching between two
+        // plugins that share a configuration element of the same name,
+        // but not the same type (e.g. "amount" of type number/commerce_price).
+        '#parents' => array_merge($element['#parents'], [$element['#plugin_id']]),
       ];
       $element['form'] = $plugin->buildConfigurationForm($element['form'], $form_state);
     }
