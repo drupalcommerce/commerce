@@ -223,14 +223,14 @@ class Custom extends LocalTaxTypeBase {
   /**
    * Ajax callback for tax rate and zone territory operations.
    */
-  public function ajaxCallback(array $form, FormStateInterface $form_state) {
+  public static function ajaxCallback(array $form, FormStateInterface $form_state) {
     return $form['configuration'];
   }
 
   /**
    * Submit callback for adding a new rate.
    */
-  public function addRateSubmit(array $form, FormStateInterface $form_state) {
+  public static function addRateSubmit(array $form, FormStateInterface $form_state) {
     $rates = $form_state->get('rates');
     $rates[] = [];
     $form_state->set('rates', $rates);
@@ -240,7 +240,7 @@ class Custom extends LocalTaxTypeBase {
   /**
    * Submit callback for removing a rate.
    */
-  public function removeRateSubmit(array $form, FormStateInterface $form_state) {
+  public static function removeRateSubmit(array $form, FormStateInterface $form_state) {
     $rates = $form_state->get('rates');
     $index = $form_state->getTriggeringElement()['#rate_index'];
     unset($rates[$index]);
@@ -251,7 +251,7 @@ class Custom extends LocalTaxTypeBase {
   /**
    * Submit callback for adding a new territory.
    */
-  public function addTerritorySubmit(array $form, FormStateInterface $form_state) {
+  public static function addTerritorySubmit(array $form, FormStateInterface $form_state) {
     $territories = $form_state->get('territories');
     $territories[] = [];
     $form_state->set('territories', $territories);
@@ -261,7 +261,7 @@ class Custom extends LocalTaxTypeBase {
   /**
    * Submit callback for removing a territory.
    */
-  public function removeTerritorySubmit(array $form, FormStateInterface $form_state) {
+  public static function removeTerritorySubmit(array $form, FormStateInterface $form_state) {
     $territories = $form_state->get('territories');
     $index = $form_state->getTriggeringElement()['#territory_index'];
     unset($territories[$index]);
