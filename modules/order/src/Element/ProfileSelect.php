@@ -62,13 +62,13 @@ class ProfileSelect extends FormElement {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritdoc}
    */
   public static function valueCallback(&$element, $input, FormStateInterface $form_state) {
     if (!empty($input)) {
       return $input['profile_selection'];
     }
-    return parent::valueCallback($element, $input, $form_state);
+    return '_new';
   }
 
   /**
@@ -120,6 +120,9 @@ class ProfileSelect extends FormElement {
       $element['#value'] = '_new';
     }
 
+    $current_value = $element['#value'];
+    $stop = NULL;
+
     $id_prefix = implode('-', $element['#parents']);
     $wrapper_id = Html::getUniqueId($id_prefix . '-ajax-wrapper');
     $element = [
@@ -153,8 +156,6 @@ class ProfileSelect extends FormElement {
     }
     else {
       $element_profile = $profile_storage->load($element['#value']);
-      $element['#element_mode'] = 'view';
-
       $triggering_element = $form_state->getTriggeringElement();
       if ($triggering_element) {
         $element['#element_mode'] = $triggering_element['#element_mode'];
@@ -162,7 +163,7 @@ class ProfileSelect extends FormElement {
     }
 
     // Viewing a profile.
-    if ($element['#element_mode'] == 'view') {
+    if (!$element_profile->isNew() && $element['#element_mode'] == 'view') {
       $view_builder = $entity_type_manager->getViewBuilder('profile');
       $element['rendered_profile'] = $view_builder->view($element_profile, 'default');
 

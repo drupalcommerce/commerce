@@ -67,15 +67,43 @@ class ProfileSelectTest extends CommerceBrowserTestBase {
 
   /**
    * Tests the profile select form element for anonymous user.
+   *
+   * @group debug
    */
   public function testProfileSelectAnonymous() {
-    $this->useProfileForm(0, $this->address1);
+    $this->drupalLogout();
+    $address_fields = $this->address1;
+    $this->drupalGet(Url::fromRoute('commerce_order_test.profile_select_form'));
+    $this->assertSession()->statusCodeEquals(200);
+
+    $this->assertSession()->fieldNotExists('Select a profile');
+    $this->getSession()->getPage()->fillField('Country', $address_fields['country_code']);
+    $this->waitForAjaxToFinish();
+
+    $edit = [];
+    foreach ($address_fields as $key => $value) {
+      if ($key == 'country_code') {
+        continue;
+      }
+      $edit['profile[address][0][address][' . $key . ']'] = $value;
+    }
+
+    $this->submitForm($edit, 'Submit');
+
+    /** @var \Drupal\profile\Entity\ProfileInterface $profile */
+    $profile = $this->profileStorage->load(1);
+    /** @var \Drupal\address\Plugin\Field\FieldType\AddressItem $address */
+    $address = $profile->get('address')->first();
+    $this->assertEquals($address_fields['country_code'], $address->getCountryCode());
+    $this->assertEquals($address_fields['given_name'], $address->getGivenName());
+    $this->assertEquals($address_fields['family_name'], $address->getFamilyName());
+    $this->assertEquals($address_fields['address_line1'], $address->getAddressLine1());
+    $this->assertEquals($address_fields['locality'], $address->getLocality());
+    $this->assertEquals($address_fields['postal_code'], $address->getPostalCode());
   }
 
   /**
    * Tests the profile select form element for authenticated user.
-   *
-   * @group debug
    */
   public function testProfileSelectAuthenticated() {
     $account = $this->createUser();
