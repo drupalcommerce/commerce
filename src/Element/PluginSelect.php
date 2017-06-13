@@ -16,15 +16,12 @@ use Symfony\Component\HttpFoundation\Request;
  * $form['plugin_item'] = [
  *   '#type' => 'commerce_plugin_select',
  *   '#title' => $this->t('Condition plugin'),
- *   '#categories' => ['user', 'system'],
  * ];
  * @endcode
  *
  * @FormElement("commerce_plugin_select")
  */
 class PluginSelect extends FormElement {
-
-  use CommerceElementTrait;
 
   /**
    * {@inheritdoc}
@@ -35,18 +32,10 @@ class PluginSelect extends FormElement {
       '#input' => TRUE,
       '#plugin_type' => NULL,
       '#plugin_element_type' => 'select',
-      '#categories' => [],
       '#title' => $this->t('Select plugin'),
       '#process' => [
-        [$class, 'attachElementSubmit'],
         [$class, 'processPluginSelect'],
         [$class, 'processAjaxForm'],
-      ],
-      '#element_validate' => [
-        [$class, 'validateElementSubmit'],
-      ],
-      '#commerce_element_submit' => [
-        [$class, 'submitPlugin'],
       ],
       '#theme_wrappers' => ['container'],
     ];
@@ -64,7 +53,17 @@ class PluginSelect extends FormElement {
     }
 
     $values = $element['#value'];
+    /** @var \Drupal\Core\Executable\ExecutableManagerInterface $plugin_manager */
+    $plugin_manager = \Drupal::service('plugin.manager.' . $element['#plugin_type']);
+    $plugins = array_map(function ($definition) {
+      return $definition['label'];
+    }, $plugin_manager->getDefinitions());
     $target_plugin_id = $values['target_plugin_id'];
+    // The element is required, default to the first plugin.
+    if ($element['#required'] && !$target_plugin_id) {
+      $plugin_ids = array_keys($plugins);
+      $target_plugin_id = reset($plugin_ids);
+    }
 
     $ajax_wrapper_id = Html::getUniqueId('ajax-wrapper');
     // Prefix and suffix used for Ajax replacement.
@@ -75,6 +74,7 @@ class PluginSelect extends FormElement {
     $element['target_plugin_id'] = [
       '#type' => $element['#plugin_element_type'],
       '#title' => $element['#title'],
+      '#options' => $plugins,
       '#multiple' => FALSE,
       '#ajax' => [
         'callback' => [get_called_class(), 'ajaxRefresh'],
@@ -85,33 +85,6 @@ class PluginSelect extends FormElement {
     ];
     if (!$element['#required']) {
       $element['target_plugin_id']['#empty_value'] = '';
-    }
-
-    /** @var \Drupal\Core\Executable\ExecutableManagerInterface $plugin_manager */
-    $plugin_manager = \Drupal::service('plugin.manager.' . $element['#plugin_type']);
-    $categories = array_combine($element['#categories'], $element['#categories']);
-    $has_categories = !empty($categories);
-    $definitions = [];
-    foreach ($plugin_manager->getDefinitions() as $definition) {
-      // If categories have been specified, limit definitions based on them.
-      if ($has_categories && !isset($categories[$definition['category']])) {
-        continue;
-      }
-
-      // Group categorized plugins, and if using a select element.
-      if (isset($definition['category']) && $element['#plugin_element_type'] == 'select') {
-        $element['target_plugin_id']['#options'][(string) $definition['category']][$definition['id']] = $definition['label'];
-      }
-      else {
-        $element['target_plugin_id']['#options'][$definition['id']] = $definition['label'];
-      }
-      $definitions[] = $definition['id'];
-    }
-    // If the element is required, set the default value to the first plugin.
-    // definition available in the options array.
-    if ($element['#required'] && !$target_plugin_id && !empty($element['target_plugin_id']['#options'])) {
-      $target_plugin_id = reset($definitions);
-      $element['target_plugin_id']['#default_value'] = $target_plugin_id;
     }
 
     $element['target_plugin_configuration'] = [

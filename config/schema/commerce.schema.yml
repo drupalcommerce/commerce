@@ -37,16 +37,6 @@ field.widget.settings.commerce_entity_select:
       type: string
       label: 'Autocomplete placeholder'
 
-field.field_settings.commerce_plugin_item:*:
-  type: mapping
-  label: 'Plugin item field settings'
-  mapping:
-    categories:
-      type: sequence
-      label: 'Categories'
-      sequence:
-        - type: string
-
 views.argument_validator.commerce_current_user:
   type: mapping
   label: 'Current user'

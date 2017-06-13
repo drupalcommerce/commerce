@@ -4,7 +4,6 @@ namespace Drupal\commerce\Plugin\Field\FieldType;
 
 use Drupal\Core\Field\FieldItemBase;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
-use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\TypedData\DataDefinition;
 use Drupal\Core\TypedData\MapDataDefinition;
 
@@ -55,41 +54,6 @@ class PluginItem extends FieldItemBase implements PluginItemInterface {
         ],
       ],
     ];
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public static function defaultFieldSettings() {
-    return [
-      'categories' => [],
-    ] + parent::defaultFieldSettings();
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function fieldSettingsForm(array $form, FormStateInterface $form_state) {
-    $element = [];
-    $element['categories'] = [
-      '#type' => 'select',
-      '#title' => $this->t('Plugin categories'),
-      '#default_value' => $this->getSetting('categories'),
-      '#multiple' => TRUE,
-      '#size' => 5,
-    ];
-
-    $categories = [];
-    foreach ($this->getPluginManager()->getDefinitions() as $definition) {
-      if (!isset($definition['category'])) {
-        continue;
-      }
-      $categories[$definition['category']] = $definition['category'];
-    }
-
-    $element['categories']['#options'] = $categories;
-
-    return $element;
   }
 
   /**

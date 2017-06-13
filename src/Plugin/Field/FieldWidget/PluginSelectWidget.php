@@ -31,7 +31,6 @@ class PluginSelectWidget extends WidgetBase {
     $element['plugin_select'] = [
       '#type' => 'commerce_plugin_select',
       '#plugin_type' => $derivative,
-      '#categories' => $this->fieldDefinition->getSetting('categories'),
       '#default_value' => [
         'target_plugin_id' => $items[$delta]->target_plugin_id,
         'target_plugin_configuration' => $items[$delta]->target_plugin_configuration ?: [],
