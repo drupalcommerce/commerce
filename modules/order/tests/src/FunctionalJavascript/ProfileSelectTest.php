@@ -296,7 +296,7 @@ class ProfileSelectTest extends CommerceBrowserTestBase {
     $this->assertEquals($this->address2['country_code'], $address->getCountryCode());
     $this->assertEquals($this->address2['given_name'], $address->getGivenName());
     $this->assertEquals($this->address2['family_name'], $address->getFamilyName());
-    $this->assertEquals($this->address2['address_line1'], 'Andrássy út 22');
+    $this->assertEquals('Andrássy út 22', $address->getAddressLine1());
     $this->assertEquals($this->address2['locality'], $address->getLocality());
     $this->assertEquals($this->address2['postal_code'], $address->getPostalCode());
   }

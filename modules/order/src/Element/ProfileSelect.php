@@ -129,7 +129,7 @@ class ProfileSelect extends FormElement {
       '#suffix' => '</div>',
       // Pass the id along to other methods.
       '#wrapper_id' => $wrapper_id,
-      '#element_mode' => 'view',
+      '#element_mode' => $form_state->get('element_mode') ?: 'view',
     ] + $element;
 
     if (!empty($user_profiles)) {
@@ -164,10 +164,6 @@ class ProfileSelect extends FormElement {
     }
     else {
       $element_profile = $profile_storage->load($element['#value']);
-      $triggering_element = $form_state->getTriggeringElement();
-      if ($triggering_element) {
-        $element['#element_mode'] = $triggering_element['#element_mode'];
-      }
     }
 
     // Viewing a profile.
@@ -176,13 +172,14 @@ class ProfileSelect extends FormElement {
       $element['rendered_profile'] = $view_builder->view($element_profile, 'default');
 
       $element['edit_button'] = [
-        '#type' => 'button',
+        '#type' => 'submit',
         '#value' => t('Edit'),
         '#limit_validation_errors' => [],
         '#ajax' => [
           'callback' => [get_called_class(), 'ajaxRefresh'],
           'wrapper' => $wrapper_id,
         ],
+        '#submit' => [[get_called_class(), 'ajaxSubmit']],
         '#name' => 'edit_profile',
         '#element_mode' => 'edit',
       ];
@@ -287,6 +284,15 @@ class ProfileSelect extends FormElement {
     $triggering_element = $form_state->getTriggeringElement();
     $element = NestedArray::getValue($form, array_slice($triggering_element['#array_parents'], 0, -1));
     return $element;
+  }
+
+  /**
+   * Ajax submit callback.
+   */
+  public static function ajaxSubmit(array &$form, FormStateInterface $form_state) {
+    $triggering_element = $form_state->getTriggeringElement();
+    $form_state->set('element_mode', $triggering_element['#element_mode']);
+    $form_state->setRebuild();
   }
 
 }
