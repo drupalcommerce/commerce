@@ -241,6 +241,8 @@ class ProfileSelect extends FormElement {
       $form_display->extractFormValues($element_profile, $element, $form_state);
       $form_display->validateFormValues($element_profile, $element, $form_state);
     }
+
+    $form_state->setValueForElement($element, $element_profile);
   }
 
   /**
@@ -252,21 +254,7 @@ class ProfileSelect extends FormElement {
    *   The current state of the form.
    */
   public static function submitForm(array &$element, FormStateInterface $form_state) {
-    $value = $form_state->getValue($element['#parents']);
-
-    $entity_type_manager = \Drupal::entityTypeManager();
-    /** @var \Drupal\profile\ProfileStorageInterface $profile_storage */
-    $profile_storage = $entity_type_manager->getStorage('profile');
-    /** @var \Drupal\profile\Entity\ProfileInterface $element_profile */
-    if ($value['profile_selection'] == '_new') {
-      $element_profile = $profile_storage->create([
-        'type' => $element['#profile_type'],
-        'uid' => $element['#owner_uid'],
-      ]);
-    }
-    else {
-      $element_profile = $profile_storage->load($value['profile_selection']);
-    }
+    $element_profile = $form_state->getValue($element['#parents']);
 
     if ($element['#element_mode'] != 'view' && $form_state->isSubmitted()) {
       $form_display = EntityFormDisplay::collectRenderDisplay($element_profile, 'default');

@@ -58,7 +58,7 @@ class BillingInformation extends CheckoutPaneBase implements CheckoutPaneInterfa
    * {@inheritdoc}
    */
   public function submitPaneForm(array &$pane_form, FormStateInterface $form_state, array &$complete_form) {
-    $this->order->setBillingProfile($pane_form['profile']['#profile']);
+    $this->order->setBillingProfile($pane_form['profile']['#value']);
   }
 
 }

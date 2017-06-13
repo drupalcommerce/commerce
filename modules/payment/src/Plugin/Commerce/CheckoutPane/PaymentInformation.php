@@ -348,7 +348,7 @@ class PaymentInformation extends CheckoutPaneBase {
     else {
       $this->order->set('payment_gateway', $payment_gateway);
       $this->order->set('payment_method', NULL);
-      $this->order->setBillingProfile($pane_form['billing_information']['#profile']);
+      $this->order->setBillingProfile($pane_form['billing_information']['#value']);
     }
   }
 
