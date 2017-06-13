@@ -65,7 +65,7 @@ class ProfileSelect extends FormElement {
    * {@inheritdoc}
    */
   public static function valueCallback(&$element, $input, FormStateInterface $form_state) {
-    if (!empty($input)) {
+    if (!empty($input['profile_selection'])) {
       return $input['profile_selection'];
     }
     return '_new';
@@ -105,22 +105,18 @@ class ProfileSelect extends FormElement {
     /** @var \Drupal\user\UserInterface $user */
     $user = $entity_type_manager->getStorage('user')->load($element['#owner_uid']);
 
-    $element['#value'] = '_new';
     if (!$user->isAnonymous()) {
       // If the user exists, attempt to load other profiles for selection.
       foreach ($profile_storage->loadMultipleByUser($user, $profile_type->id(), TRUE) as $existing_profile) {
         $user_profiles[$existing_profile->id()] = $existing_profile->label();
 
-        // If there is no default value, and the user has a default profile,
-        // use that as the current value.
-        if (empty($element['#value']) && $existing_profile->isDefault()) {
+        // If this is the first form build, set the element's value based on
+        // the user's default profile.
+        if (!$form_state->isRebuilding() && $existing_profile->isDefault()) {
           $element['#value'] = $existing_profile->id();
         }
       }
     }
-
-    $current_value = $element['#value'];
-    $stop = NULL;
 
     $id_prefix = implode('-', $element['#parents']);
     $wrapper_id = Html::getUniqueId($id_prefix . '-ajax-wrapper');
@@ -130,20 +126,30 @@ class ProfileSelect extends FormElement {
       '#suffix' => '</div>',
       // Pass the id along to other methods.
       '#wrapper_id' => $wrapper_id,
-    ] + $element;
-    $element['profile_selection'] = [
-      '#title' => t('Select a profile'),
-      '#options' => $user_profiles + ['_new' => t('+ Create new :label', [':label' => $profile_type->label()])],
-      '#type' => 'select',
-      '#weight' => -5,
-      '#default_value' => $element['#value'],
-      '#ajax' => [
-        'callback' => [get_called_class(), 'ajaxRefresh'],
-        'wrapper' => $wrapper_id,
-      ],
       '#element_mode' => 'view',
-      '#access' => !empty($user_profiles),
-    ];
+    ] + $element;
+
+    if (!empty($user_profiles)) {
+      $element['profile_selection'] = [
+        '#title' => t('Select a profile'),
+        '#options' => $user_profiles + ['_new' => t('+ Create new :label', [':label' => $profile_type->label()])],
+        '#type' => 'select',
+        '#weight' => -5,
+        '#default_value' => $element['#value'],
+        '#ajax' => [
+          'callback' => [get_called_class(), 'ajaxRefresh'],
+          'wrapper' => $wrapper_id,
+        ],
+        '#element_mode' => 'view',
+      ];
+    }
+    else {
+      $element['profile_selection'] = [
+        '#type' => 'value',
+        '#value' => '_new',
+        '#element_mode' => 'create',
+      ];
+    }
 
     /** @var \Drupal\profile\Entity\ProfileInterface $element_profile */
     if ($element['#value'] == '_new') {

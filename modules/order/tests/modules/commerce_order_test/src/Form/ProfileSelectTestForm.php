@@ -39,7 +39,7 @@ class ProfileSelectTestForm extends FormBase {
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
     $profile = $form_state->getValue('profile');
-    drupal_set_message($this->t('Profile saved: :label', [':label' => $profile->label()]));
+    drupal_set_message($this->t('Profile selected: :label', [':label' => $profile->label()]));
   }
 
 }

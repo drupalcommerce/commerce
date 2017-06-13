@@ -2,6 +2,7 @@
 
 namespace Drupal\Tests\commerce_order\FunctionalJavascript;
 
+use Drupal\Component\Render\FormattableMarkup;
 use Drupal\Core\Url;
 use Drupal\Tests\commerce\Functional\CommerceBrowserTestBase;
 use Drupal\Tests\commerce\FunctionalJavascript\JavascriptTestTrait;
@@ -90,6 +91,9 @@ class ProfileSelectTest extends CommerceBrowserTestBase {
 
     /** @var \Drupal\profile\Entity\ProfileInterface $profile */
     $profile = $this->profileStorage->load(1);
+
+    $this->assertSession()->responseContains(new FormattableMarkup('Profile selected: :label', [':label' => $profile->label()]));
+
     /** @var \Drupal\address\Plugin\Field\FieldType\AddressItem $address */
     $address = $profile->get('address')->first();
     $this->assertEquals($address_fields['country_code'], $address->getCountryCode());
@@ -127,6 +131,9 @@ class ProfileSelectTest extends CommerceBrowserTestBase {
 
     /** @var \Drupal\profile\Entity\ProfileInterface $profile */
     $profile = $this->profileStorage->load(1);
+
+    $this->assertSession()->responseContains(new FormattableMarkup('Profile selected: :label', [':label' => $profile->label()]));
+
     /** @var \Drupal\address\Plugin\Field\FieldType\AddressItem $address */
     $address = $profile->get('address')->first();
     $this->assertEquals($address_fields['country_code'], $address->getCountryCode());
@@ -142,30 +149,81 @@ class ProfileSelectTest extends CommerceBrowserTestBase {
    */
   public function testProfileSelectAuthenticated() {
     $account = $this->createUser();
-    $this->drupalLogin($account);
-    $this->useProfileForm($account->id(), $this->address1);
-    $this->useProfileForm($account->id(), $this->address2, 1);
 
+    $profile_storage = $this->container->get('entity_type.manager')->getStorage('profile');
+    /** @var \Drupal\profile\Entity\ProfileInterface $profile_address1 */
+    $profile_address1 = $profile_storage->create([
+      'type' => 'customer',
+      'uid' => $account->id(),
+      'address' => $this->address1,
+    ]);
+    $profile_address1->save();
+    /** @var \Drupal\profile\Entity\ProfileInterface $profile_address2 */
+    $profile_address2 = $profile_storage->create([
+      'type' => 'customer',
+      'uid' => $account->id(),
+      'address' => $this->address2,
+    ]);
+    $profile_address2->setDefault(TRUE);
+    $profile_address2->save();
+
+    $this->drupalLogin($account);
     $this->drupalGet(Url::fromRoute('commerce_order_test.profile_select_form'));
     $this->assertSession()->statusCodeEquals(200);
-    $this->assertSession()->fieldExists('profile_selection');
+    $this->assertSession()->fieldExists('Select a profile');
     // The last created profile should be selected by default.
     $this->assertSession()->pageTextContains($this->address2['locality']);
 
-    $this->getSession()->getPage()->fillField('profile[profile_selection]', 1);
+    $this->getSession()->getPage()->fillField('Select a profile', $profile_address1->id());
     $this->waitForAjaxToFinish();
     $this->assertSession()->pageTextContains($this->address1['locality']);
     $this->submitForm([], 'Submit');
-    $profile = \Drupal::entityTypeManager()->getStorage('profile')->load(1);
+    $this->assertSession()->responseContains(new FormattableMarkup('Profile selected: :label', [':label' => $profile_address1->label()]));
+
+    $profile_storage->resetCache([$profile_address1->id()]);
+    $profile_address1 = $profile_storage->load($profile_address1->id());
+    /** @var \Drupal\address\Plugin\Field\FieldType\AddressItem $address */
+    $address = $profile_address1->get('address')->first();
     // Assert that field values have not changed.
-    foreach ($this->address1 as $key => $value) {
-      $this->assertEquals($this->address1[$key], $profile->address->getValue()[0][$key], t('@key of address has not changed.', ['@key' => $key]));
-    }
+    $this->assertEquals($this->address1['country_code'], $address->getCountryCode());
+    $this->assertEquals($this->address1['given_name'], $address->getGivenName());
+    $this->assertEquals($this->address1['family_name'], $address->getFamilyName());
+    $this->assertEquals($this->address1['address_line1'], $address->getAddressLine1());
+    $this->assertEquals($this->address1['locality'], $address->getLocality());
+    $this->assertEquals($this->address1['postal_code'], $address->getPostalCode());
+  }
+
+  /**
+   * Tests the profile select form element for authenticated user.
+   */
+  public function testProfileSelectAuthenticatedEdit() {
+    $account = $this->createUser();
+
+    $profile_storage = $this->container->get('entity_type.manager')->getStorage('profile');
+    /** @var \Drupal\profile\Entity\ProfileInterface $profile_address1 */
+    $profile_address1 = $profile_storage->create([
+      'type' => 'customer',
+      'uid' => $account->id(),
+      'address' => $this->address1,
+    ]);
+    $profile_address1->save();
+    /** @var \Drupal\profile\Entity\ProfileInterface $profile_address2 */
+    $profile_address2 = $profile_storage->create([
+      'type' => 'customer',
+      'uid' => $account->id(),
+      'address' => $this->address2,
+    ]);
+    $profile_address2->setDefault(TRUE);
+    $profile_address2->save();
+
+    $this->drupalLogin($account);
+    $this->drupalGet(Url::fromRoute('commerce_order_test.profile_select_form'));
+    $this->assertSession()->statusCodeEquals(200);
 
     // Edit a profile.
     $this->drupalGet(Url::fromRoute('commerce_order_test.profile_select_form'));
     $this->assertSession()->statusCodeEquals(200);
-    $this->assertSession()->fieldExists('profile[profile_selection]');
+    $this->assertSession()->fieldExists('Select a profile');
     // The last created profile should be selected by default.
     $this->assertSession()->elementTextContains('css', '.locality', $this->address2['locality']);
     $this->assertSession()->fieldNotExists('profile[cancel]');
@@ -193,47 +251,6 @@ class ProfileSelectTest extends CommerceBrowserTestBase {
     }
     $profile_ids = $this->profileStorage->getQuery()->count()->condition('uid', $account->id())->execute();
     $this->assertEquals(2, $profile_ids, t('No new profile has been created after editing an existing one.'));
-  }
-
-  /**
-   * Submits the test profile select form.
-   *
-   * @param int $uid
-   *   The user uid using the form.
-   * @param array $address_fields
-   *   An associative array of address fields to submit.
-   * @param int $initial_profile_count
-   *   The number of profiles before the form submission.
-   */
-  protected function useProfileForm($uid, array $address_fields, $initial_profile_count = 0) {
-    $profile_ids = $this->profileStorage->getQuery()->count()->condition('uid', $uid)->execute();
-    $this->assertEquals($initial_profile_count, $profile_ids);
-
-    $this->drupalGet(Url::fromRoute('commerce_order_test.profile_select_form'));
-    $this->assertSession()->statusCodeEquals(200);
-
-    if (0 == $initial_profile_count || 0 == $uid) {
-      $this->assertSession()->fieldNotExists('Select a profile');
-    }
-    else {
-      $this->assertSession()->fieldExists('Select a profile');
-      $this->getSession()->getPage()->fillField('Select a profile', 'new_profile');
-      $this->waitForAjaxToFinish();
-    }
-    $this->createScreenshot();
-    $this->getSession()->getPage()->fillField('Country', $address_fields['country_code']);
-    $this->waitForAjaxToFinish();
-
-    $edit = [];
-    unset($address_fields['country_code']);
-    foreach ($address_fields as $key => $value) {
-      $edit['profile[address][0][address][' . $key . ']'] = $value;
-    }
-
-    $this->submitForm($edit, 'Submit');
-
-    $profile_ids = $this->profileStorage->getQuery()->count()->condition('uid', $uid)->execute();
-    $this->assertEquals($initial_profile_count + 1, count($profile_ids));
   }
 
 }
