@@ -104,6 +104,8 @@ class ProfileSelect extends FormElement {
     $user_profiles = [];
     /** @var \Drupal\user\UserInterface $user */
     $user = $entity_type_manager->getStorage('user')->load($element['#owner_uid']);
+
+    $element['#value'] = '_new';
     if (!$user->isAnonymous()) {
       // If the user exists, attempt to load other profiles for selection.
       foreach ($profile_storage->loadMultipleByUser($user, $profile_type->id(), TRUE) as $existing_profile) {
@@ -115,9 +117,6 @@ class ProfileSelect extends FormElement {
           $element['#value'] = $existing_profile->id();
         }
       }
-    }
-    else {
-      $element['#value'] = '_new';
     }
 
     $current_value = $element['#value'];
