@@ -83,12 +83,12 @@ class PluginSelectTest extends CommerceBrowserTestBase {
       'name' => 'Test',
     ]);
     $this->drupalGet($entity->toUrl('edit-form'));
-    $this->getSession()->getPage()->fillField('test_conditions[0][plugin_select][target_plugin_id]', 'commerce_test_user_role');
+    $this->getSession()->getPage()->fillField('test_conditions[0][target_plugin_id]', 'commerce_test_user_role');
     $this->waitForAjaxToFinish();
 
     $this->submitForm([
-      'test_conditions[0][plugin_select][target_plugin_configuration][commerce_test_user_role][roles][test_role]' => 1,
-      'test_conditions[0][plugin_select][target_plugin_configuration][commerce_test_user_role][negate]' => 0,
+      'test_conditions[0][target_plugin_configuration][commerce_test_user_role][roles][test_role]' => 1,
+      'test_conditions[0][target_plugin_configuration][commerce_test_user_role][negate]' => 0,
     ], 'Save');
     $this->assertSession()->pageTextContains('entity_test 1 has been updated.');
 
@@ -114,8 +114,8 @@ class PluginSelectTest extends CommerceBrowserTestBase {
     // Set the condition to be negated.
     $this->drupalGet($entity->toUrl('edit-form'));
     $this->submitForm([
-      'test_conditions[0][plugin_select][target_plugin_configuration][commerce_test_user_role][roles][test_role]' => 1,
-      'test_conditions[0][plugin_select][target_plugin_configuration][commerce_test_user_role][negate]' => 1,
+      'test_conditions[0][target_plugin_configuration][commerce_test_user_role][roles][test_role]' => 1,
+      'test_conditions[0][target_plugin_configuration][commerce_test_user_role][negate]' => 1,
     ], 'Save');
     $this->assertSession()->pageTextContains('entity_test 1 has been updated.');
 
@@ -144,12 +144,12 @@ class PluginSelectTest extends CommerceBrowserTestBase {
       'name' => 'Test',
     ]);
     $this->drupalGet($entity->toUrl('edit-form'));
-    $this->getSession()->getPage()->fillField('test_conditions[0][plugin_select][target_plugin_id]', 'commerce_test_user_role');
+    $this->getSession()->getPage()->fillField('test_conditions[0][target_plugin_id]', 'commerce_test_user_role');
     $this->waitForAjaxToFinish();
 
     $this->submitForm([
-      'test_conditions[0][plugin_select][target_plugin_configuration][commerce_test_user_role][roles][test_role]' => 1,
-      'test_conditions[0][plugin_select][target_plugin_configuration][commerce_test_user_role][negate]' => 0,
+      'test_conditions[0][target_plugin_configuration][commerce_test_user_role][roles][test_role]' => 1,
+      'test_conditions[0][target_plugin_configuration][commerce_test_user_role][negate]' => 0,
     ], 'Save');
     $this->assertSession()->pageTextContains('entity_test 1 has been updated.');
 
@@ -175,8 +175,8 @@ class PluginSelectTest extends CommerceBrowserTestBase {
     // Set the condition to be negated.
     $this->drupalGet($entity->toUrl('edit-form'));
     $this->submitForm([
-      'test_conditions[0][plugin_select][target_plugin_configuration][commerce_test_user_role][roles][test_role]' => 1,
-      'test_conditions[0][plugin_select][target_plugin_configuration][commerce_test_user_role][negate]' => 1,
+      'test_conditions[0][target_plugin_configuration][commerce_test_user_role][roles][test_role]' => 1,
+      'test_conditions[0][target_plugin_configuration][commerce_test_user_role][negate]' => 1,
     ], 'Save');
     $this->assertSession()->pageTextContains('entity_test 1 has been updated.');
 
