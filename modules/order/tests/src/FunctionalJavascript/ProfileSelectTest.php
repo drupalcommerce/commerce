@@ -219,7 +219,6 @@ class ProfileSelectTest extends CommerceBrowserTestBase {
 
     $this->getSession()->getPage()->fillField('Select a profile', '_new');
     $this->waitForAjaxToFinish();
-    $this->assertSession()->waitForElementVisible('named', ['select', 'Country']);
     $this->getSession()->getPage()->fillField('Country', $address_fields['country_code']);
     $this->waitForAjaxToFinish();
     $this->createScreenshot();

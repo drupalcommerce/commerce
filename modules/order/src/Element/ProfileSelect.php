@@ -112,7 +112,7 @@ class ProfileSelect extends FormElement {
 
         // If this is the first form build, set the element's value based on
         // the user's default profile.
-        if (!$form_state->isRebuilding() && $existing_profile->isDefault()) {
+        if (!$form_state->isProcessingInput() && $existing_profile->isDefault()) {
           $element['#value'] = $existing_profile->id();
         }
       }
@@ -255,7 +255,10 @@ class ProfileSelect extends FormElement {
       $element_profile = $profile_storage->load($value['profile_selection']);
     }
 
-    if ($element['#element_mode'] != 'view') {
+    if ($element['#element_mode'] != 'view' && $form_state->isSubmitted()) {
+      $triggering_element = $form_state->getTriggeringElement();
+      $is_processing = $form_state->isProcessingInput();
+      $is_submitted = $form_state->isSubmitted();
       $form_display = EntityFormDisplay::collectRenderDisplay($element_profile, 'default');
       $form_display->extractFormValues($element_profile, $element, $form_state);
       $form_display->validateFormValues($element_profile, $element, $form_state);
@@ -287,7 +290,7 @@ class ProfileSelect extends FormElement {
       $element_profile = $profile_storage->load($value['profile_selection']);
     }
 
-    if ($element['#element_mode'] != 'view') {
+    if ($element['#element_mode'] != 'view' && $form_state->isSubmitted()) {
       $form_display = EntityFormDisplay::collectRenderDisplay($element_profile, 'default');
       $form_display->extractFormValues($element_profile, $element, $form_state);
       $element_profile->save();
