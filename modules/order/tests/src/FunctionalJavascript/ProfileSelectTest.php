@@ -195,15 +195,12 @@ class ProfileSelectTest extends CommerceBrowserTestBase {
 
   /**
    * Tests the profile select form element for authenticated user.
-   *
-   * @group debug
    */
   public function testProfileSelectAuthenticatedCreateNew() {
     $account = $this->createUser();
     $address_fields = $this->address2;
-    $profile_storage = $this->container->get('entity_type.manager')->getStorage('profile');
     /** @var \Drupal\profile\Entity\ProfileInterface $profile_address1 */
-    $profile_address1 = $profile_storage->create([
+    $profile_address1 = $this->profileStorage->create([
       'type' => 'customer',
       'uid' => $account->id(),
       'address' => $this->address1,
@@ -232,7 +229,7 @@ class ProfileSelectTest extends CommerceBrowserTestBase {
 
     $this->submitForm($edit, 'Submit');
 
-    $new_profile = $profile_storage->load(2);
+    $new_profile = $this->profileStorage->load(2);
     /** @var \Drupal\address\Plugin\Field\FieldType\AddressItem $address */
     $address = $new_profile->get('address')->first();
 
@@ -248,20 +245,20 @@ class ProfileSelectTest extends CommerceBrowserTestBase {
 
   /**
    * Tests the profile select form element for authenticated user.
+   *
+   * @group debug
    */
   public function testProfileSelectAuthenticatedEdit() {
     $account = $this->createUser();
-
-    $profile_storage = $this->container->get('entity_type.manager')->getStorage('profile');
     /** @var \Drupal\profile\Entity\ProfileInterface $profile_address1 */
-    $profile_address1 = $profile_storage->create([
+    $profile_address1 = $this->profileStorage->create([
       'type' => 'customer',
       'uid' => $account->id(),
       'address' => $this->address1,
     ]);
     $profile_address1->save();
     /** @var \Drupal\profile\Entity\ProfileInterface $profile_address2 */
-    $profile_address2 = $profile_storage->create([
+    $profile_address2 = $this->profileStorage->create([
       'type' => 'customer',
       'uid' => $account->id(),
       'address' => $this->address2,
@@ -278,32 +275,30 @@ class ProfileSelectTest extends CommerceBrowserTestBase {
     $this->assertSession()->statusCodeEquals(200);
     $this->assertSession()->fieldExists('Select a profile');
     // The last created profile should be selected by default.
-    $this->assertSession()->elementTextContains('css', '.locality', $this->address2['locality']);
-    $this->assertSession()->fieldNotExists('profile[cancel]');
+    $this->assertSession()->pageTextContains($this->address2['locality']);
+    $this->getSession()->getPage()->pressButton('Edit');
+    $this->waitForAjaxToFinish();
 
-    $this->submitForm([], 'profile[edit]');
-    foreach ($this->address1 as $key => $value) {
+    foreach ($this->address2 as $key => $value) {
       $this->assertSession()->fieldValueEquals('profile[address][0][address][' . $key . ']', $value);
     }
-    $this->assertSession()->fieldExists('profile[cancel]');
-    $this->assertSession()->fieldNotExists('profile[profile_selection]');
-    $edit = [
-      'profile[address][0][address][address_line1]' => 'Andrássy út 22',
-    ];
+    $this->getSession()->getPage()->fillField('Street address', 'Andrássy út 22');
     $this->submitForm([], 'Submit');
-    $this->profileStorage->resetCache([1]);
-    $profile = $this->profileStorage->load([1]);
-    // Assert that only address_line1 has changed.
-    foreach ($this->address1 as $key => $value) {
-      if ($key == 'address_line1') {
-        $this->assertEquals($edit['profile[address][0][address][address_line1]'], $profile->address->getValue()[0][$key], t('@key of address has changed.', ['@key' => $key]));
-      }
-      else {
-        $this->assertEquals($this->address1[$key], $profile->address->getValue()[0][$key], t('@key of address has not changed.', ['@key' => $key]));
-      }
-    }
-    $profile_ids = $this->profileStorage->getQuery()->count()->condition('uid', $account->id())->execute();
-    $this->assertEquals(2, $profile_ids, t('No new profile has been created after editing an existing one.'));
+
+    $this->profileStorage->resetCache([$profile_address2->id()]);
+    $profile_address2 = $this->profileStorage->load($profile_address2->id());
+
+    /** @var \Drupal\address\Plugin\Field\FieldType\AddressItem $address */
+    $address = $profile_address2->get('address')->first();
+
+    $this->assertSession()->responseContains(new FormattableMarkup('Profile selected: :label', [':label' => $profile_address2->label()]));
+    // Assert that field values have not changed.
+    $this->assertEquals($this->address2['country_code'], $address->getCountryCode());
+    $this->assertEquals($this->address2['given_name'], $address->getGivenName());
+    $this->assertEquals($this->address2['family_name'], $address->getFamilyName());
+    $this->assertEquals($this->address2['address_line1'], 'Andrássy út 22');
+    $this->assertEquals($this->address2['locality'], $address->getLocality());
+    $this->assertEquals($this->address2['postal_code'], $address->getPostalCode());
   }
 
 }

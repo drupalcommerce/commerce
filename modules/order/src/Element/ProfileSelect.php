@@ -19,6 +19,8 @@ use Drupal\Core\Render\Element\FormElement;
  *   '#default_value' => $profile,
  *   '#default_country' => 'FR',
  *   '#available_countries' => ['US', 'FR'],
+ *   '#profile_type' => 'customer',
+ *   '#owner_uid' => \Drupal::currentUser()->id(),
  * ];
  * @endcode
  * To access the profile in validation or submission callbacks, use
@@ -45,7 +47,8 @@ class ProfileSelect extends FormElement {
       // The profile entity operated on. Required.
       '#default_value' => '_new',
       '#owner_uid' => 0,
-      '#profile_type' => NULL,
+      // Provide default to not break contrib which have outdated elements.
+      '#profile_type' => 'customer',
       '#process' => [
         [$class, 'attachElementSubmit'],
         [$class, 'processForm'],
@@ -175,18 +178,13 @@ class ProfileSelect extends FormElement {
       $element['edit_button'] = [
         '#type' => 'button',
         '#value' => t('Edit'),
-        '#limit_validation_errors' => [
-          $element['#parents'],
-        ],
+        '#limit_validation_errors' => [],
         '#ajax' => [
           'callback' => [get_called_class(), 'ajaxRefresh'],
           'wrapper' => $wrapper_id,
         ],
         '#name' => 'edit_profile',
         '#element_mode' => 'edit',
-        // @todo Allow editing.
-        // '#access' => $element['#element_mode'] == 'view',
-        '#access' => FALSE,
       ];
     }
     else {
@@ -207,20 +205,6 @@ class ProfileSelect extends FormElement {
           $widget_element['address']['#available_countries'] = $element['#available_countries'];
         }
       }
-      $element['cancel_button'] = [
-        '#type' => 'button',
-        '#value' => t('Return to profile selection'),
-        '#limit_validation_errors' => [
-          $element['#parents'],
-        ],
-        '#ajax' => [
-          'callback' => [get_called_class(), 'ajaxRefresh'],
-          'wrapper' => $wrapper_id,
-        ],
-        '#name' => 'cancel_edit_profile',
-        '#element_mode' => 'view',
-        '#access' => $element['#element_mode'] == 'edit',
-      ];
     }
 
     return $element;
@@ -256,9 +240,6 @@ class ProfileSelect extends FormElement {
     }
 
     if ($element['#element_mode'] != 'view' && $form_state->isSubmitted()) {
-      $triggering_element = $form_state->getTriggeringElement();
-      $is_processing = $form_state->isProcessingInput();
-      $is_submitted = $form_state->isSubmitted();
       $form_display = EntityFormDisplay::collectRenderDisplay($element_profile, 'default');
       $form_display->extractFormValues($element_profile, $element, $form_state);
       $form_display->validateFormValues($element_profile, $element, $form_state);

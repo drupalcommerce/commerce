@@ -91,6 +91,8 @@ class BillingProfileWidget extends WidgetBase implements ContainerFactoryPluginI
       '#default_value' => $profile,
       '#default_country' => $store->getAddress()->getCountryCode(),
       '#available_countries' => $store->getBillingCountries(),
+      '#profile_type' => 'customer',
+      '#owner_uid' => $order->getCustomerId(),
     ];
     // Workaround for massageFormValues() not getting $element.
     $element['array_parents'] = [

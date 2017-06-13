@@ -74,6 +74,8 @@ class PaymentMethodAddForm extends PaymentGatewayFormBase {
       '#default_value' => $billing_profile,
       '#default_country' => $store ? $store->getAddress()->getCountryCode() : NULL,
       '#available_countries' => $store ? $store->getBillingCountries() : [],
+      '#profile_type' => 'customer',
+      '#owner_uid' => $payment_method->getOwnerId(),
     ];
 
     return $form;

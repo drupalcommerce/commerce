@@ -47,6 +47,8 @@ class BillingInformation extends CheckoutPaneBase implements CheckoutPaneInterfa
       '#default_value' => $billing_profile,
       '#default_country' => $store->getAddress()->getCountryCode(),
       '#available_countries' => $store->getBillingCountries(),
+      '#profile_type' => 'customer',
+      '#owner_uid' => $this->order->getCustomerId(),
     ];
 
     return $pane_form;
