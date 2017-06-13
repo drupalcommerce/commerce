@@ -1,3 +1,23 @@
+commerce.commerce_condition.plugin.order_item_quantity:
+  type: commerce_condition_configuration
+  mapping:
+    operator:
+      type: string
+      label: 'Operator'
+    quantity:
+      type: integer
+      label: 'Quantity'
+
+commerce.commerce_condition.plugin.commerce_promotion_order_total_price:
+  type: commerce_condition_configuration
+  mapping:
+    operator:
+      type: string
+      label: 'Operator'
+    amount:
+      type: field.value.commerce_price
+      label: 'Amount'
+
 commerce_order.commerce_order_type.*:
   type: commerce_config_entity_bundle
   label: 'Order type'

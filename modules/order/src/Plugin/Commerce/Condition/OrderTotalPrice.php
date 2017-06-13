@@ -1,28 +1,32 @@
 <?php
 
-namespace Drupal\commerce_promotion\Plugin\Commerce\PromotionCondition;
+namespace Drupal\commerce_order\Plugin\Commerce\Condition;
 
+use Drupal\commerce\Plugin\Commerce\Condition\ConditionBase;
+use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\commerce_price\Price;
 
 /**
- * Provides an 'Order: Total amount comparison' condition.
+ * Provides the total price condition for orders.
  *
- * @CommercePromotionCondition(
+ * @CommerceCondition(
  *   id = "commerce_promotion_order_total_price",
- *   label = @Translation("Total amount"),
- *   target_entity_type = "commerce_order",
+ *   label = @Translation("Total price"),
+ *   display_label = @Translation("Limit by total price"),
+ *   category = @Translation("Order"),
+ *   entity_type = "commerce_order",
  * )
  */
-class OrderTotalPrice extends PromotionConditionBase {
+class OrderTotalPrice extends ConditionBase {
 
   /**
    * {@inheritdoc}
    */
   public function defaultConfiguration() {
     return [
-      'amount' => NULL,
       'operator' => '>',
+      'amount' => NULL,
     ] + parent::defaultConfiguration();
   }
 
@@ -33,7 +37,7 @@ class OrderTotalPrice extends PromotionConditionBase {
     $form = parent::buildConfigurationForm($form, $form_state);
 
     $amount = $this->configuration['amount'];
-    // A bug in the plugin_select form element causes $amount to be incomplete.
+    // An #ajax bug can cause $amount to be incomplete.
     if (isset($amount) && !isset($amount['number'], $amount['currency_code'])) {
       $amount = NULL;
     }
@@ -69,44 +73,35 @@ class OrderTotalPrice extends PromotionConditionBase {
   /**
    * {@inheritdoc}
    */
-  public function evaluate() {
-    $amount = $this->configuration['amount'];
-    if (empty($amount)) {
+  public function evaluate(EntityInterface $entity) {
+    $this->assertEntity($entity);
+    /** @var \Drupal\commerce_order\Entity\OrderInterface $order */
+    $order = $entity;
+    $total_price = $order->getTotalPrice();
+    $condition_price = new Price($this->configuration['amount']['number'], $this->configuration['amount']['currency_code']);
+    if ($total_price->getCurrencyCode() != $condition_price->getCurrencyCode()) {
       return FALSE;
     }
-    /** @var \Drupal\commerce_order\Entity\OrderInterface $order */
-    $order = $this->getTargetEntity();
-    /** @var \Drupal\commerce_price\Price $total_price */
-    $total_price = $order->getTotalPrice();
-    /** @var \Drupal\commerce_price\Price $comparison_price */
-    $comparison_price = new Price($amount['number'], $amount['currency_code']);
 
     switch ($this->configuration['operator']) {
       case '>=':
-        return $total_price->greaterThanOrEqual($comparison_price);
+        return $total_price->greaterThanOrEqual($condition_price);
 
       case '>':
-        return $total_price->greaterThan($comparison_price);
+        return $total_price->greaterThan($condition_price);
 
       case '<=':
-        return $total_price->lessThanOrEqual($comparison_price);
+        return $total_price->lessThanOrEqual($condition_price);
 
       case '<':
-        return $total_price->lessThan($comparison_price);
+        return $total_price->lessThan($condition_price);
 
       case '==':
-        return $total_price->equals($comparison_price);
+        return $total_price->equals($condition_price);
 
       default:
         throw new \InvalidArgumentException("Invalid operator {$this->configuration['operator']}");
     }
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function summary() {
-    return $this->t('Compares the order total amount.');
   }
 
 }

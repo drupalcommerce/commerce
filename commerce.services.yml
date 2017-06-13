@@ -56,6 +56,10 @@ services:
     tags:
       - { name: cache.context}
 
+  plugin.manager.commerce_condition:
+    class: Drupal\commerce\ConditionManager
+    arguments: ['@container.namespaces', '@cache.discovery', '@module_handler', '@entity_type.manager']
+
   plugin.manager.commerce_entity_trait:
     class: Drupal\commerce\EntityTraitManager
     arguments: ['@container.namespaces', '@cache.discovery', '@module_handler', '@commerce.configurable_field_manager']

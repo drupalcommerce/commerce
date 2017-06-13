@@ -62,7 +62,6 @@ class PromotionTest extends CommerceBrowserTestBase {
     $this->getSession()->getPage()->selectFieldOption('conditions[0][target_plugin_id]', 'commerce_promotion_order_total_price');
     $this->waitForAjaxToFinish();
     $this->getSession()->getPage()->fillField('conditions[0][target_plugin_configuration][commerce_promotion_order_total_price][amount][number]', '50.00');
-    $this->getSession()->getPage()->checkField('conditions[0][target_plugin_configuration][commerce_promotion_order_total_price][negate]');
 
     // Confirm that the usage limit widget works properly.
     $this->getSession()->getPage()->hasCheckedField(' Unlimited');
@@ -85,7 +84,6 @@ class PromotionTest extends CommerceBrowserTestBase {
     /** @var \Drupal\commerce\Plugin\Field\FieldType\PluginItem $condition_field */
     $condition_field = $promotion->get('conditions')->first();
     $this->assertEquals('50.00', $condition_field->target_plugin_configuration['amount']['number']);
-    $this->assertEquals(TRUE, $condition_field->target_plugin_configuration['negate']);
 
     $this->assertEquals('99', $promotion->getUsageLimit());
     $this->drupalGet($promotion->toUrl('edit-form'));

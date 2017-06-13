@@ -19,7 +19,7 @@ abstract class PercentageOffBase extends PromotionOfferBase {
   }
 
   /**
-   * Gets the percentage amount, as a decimal, negated.
+   * Gets the percentage amount.
    *
    * @return string
    *   The amount.

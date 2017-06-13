@@ -81,9 +81,11 @@ class PluginSelectWidget extends WidgetBase implements ContainerFactoryPluginInt
     }, $this->pluginManager->getDefinitions());
     $target_plugin_id_parents = array_merge($element['#field_parents'], [$items->getName(), $delta, 'target_plugin_id']);
     $target_plugin_id = NestedArray::getValue($form_state->getUserInput(), $target_plugin_id_parents);
+    $target_plugin_configuration = [];
     // Fallback to the field value if #ajax hasn't been used yet.
     if (is_null($target_plugin_id)) {
       $target_plugin_id = $items[$delta]->target_plugin_id;
+      $target_plugin_configuration = $items[$delta]->target_plugin_configuration ?: [];
     }
     // The element is required, default to the first plugin.
     if (!$target_plugin_id && $this->fieldDefinition->isRequired()) {
@@ -117,7 +119,7 @@ class PluginSelectWidget extends WidgetBase implements ContainerFactoryPluginInt
       '#type' => 'commerce_plugin_configuration',
       '#plugin_type' => $plugin_type,
       '#plugin_id' => $target_plugin_id,
-      '#default_value' => $items[$delta]->target_plugin_configuration ?: [],
+      '#default_value' => $target_plugin_configuration,
     ];
 
     return $element;

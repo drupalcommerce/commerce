@@ -88,6 +88,14 @@ interface PromotionInterface extends ContentEntityInterface, EntityStoresInterfa
   public function setOrderTypeIds(array $order_type_ids);
 
   /**
+   * Gets the conditions.
+   *
+   * @return \Drupal\commerce\Plugin\Commerce\Condition\ConditionInterface[]
+   *   The conditions.
+   */
+  public function getConditions();
+
+  /**
    * Gets the coupon IDs.
    *
    * @return int[]
