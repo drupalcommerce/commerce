@@ -195,6 +195,60 @@ class ProfileSelectTest extends CommerceBrowserTestBase {
 
   /**
    * Tests the profile select form element for authenticated user.
+   *
+   * @group debug
+   */
+  public function testProfileSelectAuthenticatedCreateNew() {
+    $account = $this->createUser();
+    $address_fields = $this->address2;
+    $profile_storage = $this->container->get('entity_type.manager')->getStorage('profile');
+    /** @var \Drupal\profile\Entity\ProfileInterface $profile_address1 */
+    $profile_address1 = $profile_storage->create([
+      'type' => 'customer',
+      'uid' => $account->id(),
+      'address' => $this->address1,
+    ]);
+    $profile_address1->save();
+
+    $this->drupalLogin($account);
+    $this->drupalGet(Url::fromRoute('commerce_order_test.profile_select_form'));
+    $this->assertSession()->statusCodeEquals(200);
+    $this->assertSession()->fieldExists('Select a profile');
+    // The last created profile should be selected by default.
+    $this->assertSession()->pageTextContains($this->address1['locality']);
+
+    $this->getSession()->getPage()->fillField('Select a profile', '_new');
+    $this->waitForAjaxToFinish();
+    $this->assertSession()->waitForElementVisible('named', ['select', 'Country']);
+    $this->getSession()->getPage()->fillField('Country', $address_fields['country_code']);
+    $this->waitForAjaxToFinish();
+    $this->createScreenshot();
+    $edit = [];
+    foreach ($address_fields as $key => $value) {
+      if ($key == 'country_code') {
+        continue;
+      }
+      $edit['profile[address][0][address][' . $key . ']'] = $value;
+    }
+
+    $this->submitForm($edit, 'Submit');
+
+    $new_profile = $profile_storage->load(2);
+    /** @var \Drupal\address\Plugin\Field\FieldType\AddressItem $address */
+    $address = $new_profile->get('address')->first();
+
+    $this->assertSession()->responseContains(new FormattableMarkup('Profile selected: :label', [':label' => $new_profile->label()]));
+    // Assert that field values have not changed.
+    $this->assertEquals($this->address2['country_code'], $address->getCountryCode());
+    $this->assertEquals($this->address2['given_name'], $address->getGivenName());
+    $this->assertEquals($this->address2['family_name'], $address->getFamilyName());
+    $this->assertEquals($this->address2['address_line1'], $address->getAddressLine1());
+    $this->assertEquals($this->address2['locality'], $address->getLocality());
+    $this->assertEquals($this->address2['postal_code'], $address->getPostalCode());
+  }
+
+  /**
+   * Tests the profile select form element for authenticated user.
    */
   public function testProfileSelectAuthenticatedEdit() {
     $account = $this->createUser();

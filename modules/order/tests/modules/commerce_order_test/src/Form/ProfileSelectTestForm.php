@@ -24,7 +24,7 @@ class ProfileSelectTestForm extends FormBase {
       '#default_value' => NULL,
       '#profile_type' => 'customer',
       '#owner_uid' => \Drupal::currentUser()->id(),
-      '#available_countries' => ['HU', 'FR', 'US', 'RS'],
+      '#available_countries' => ['HU', 'FR', 'US', 'RS', 'DE'],
     ];
     $form['submit'] = [
       '#type' => 'submit',
