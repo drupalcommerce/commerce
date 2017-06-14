@@ -111,9 +111,9 @@ class PaymentMethodAddForm extends PaymentGatewayFormBase {
     }
     /** @var \Drupal\commerce_payment\Entity\PaymentMethodInterface $payment_method */
     $payment_method = $this->entity;
-    $payment_method->setBillingProfile($form['billing_information']['#value']);
 
     $values = $form_state->getValue($form['#parents']);
+    $payment_method->setBillingProfile($values['billing_information']);
     /** @var \Drupal\commerce_payment\Plugin\Commerce\PaymentGateway\SupportsStoredPaymentMethodsInterface $payment_gateway_plugin */
     $payment_gateway_plugin = $this->plugin;
     // The payment method form is customer facing. For security reasons
