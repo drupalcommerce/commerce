@@ -204,7 +204,9 @@ class PaymentCheckoutTest extends CommerceBrowserTestBase {
     $this->drupalGet('checkout/1');
     $radio_button = $page->findField('Example');
     $this->assertNull($radio_button);
-    $this->assertSession()->fieldExists('payment_information[billing_information][address][0][address][postal_code]');
+    $this->createScreenshot();
+    $this->assertSession()->fieldExists('Select a profile');
+    $this->assertSession()->pageTextContains('Pabst Blue Ribbon Dr');
   }
 
   /**
@@ -337,7 +339,8 @@ class PaymentCheckoutTest extends CommerceBrowserTestBase {
     $radio_button = $this->getSession()->getPage()->findField('Example');
     $radio_button->click();
     $this->waitForAjaxToFinish();
-
+    $this->getSession()->getPage()->selectFieldOption('Select a profile', '_new');
+    $this->waitForAjaxToFinish();
     $this->submitForm([
       'payment_information[billing_information][address][0][address][given_name]' => 'Johnny',
       'payment_information[billing_information][address][0][address][family_name]' => 'Appleseed',
@@ -381,7 +384,8 @@ class PaymentCheckoutTest extends CommerceBrowserTestBase {
     $this->drupalGet($this->product->toUrl()->toString());
     $this->submitForm([], 'Add to cart');
     $this->drupalGet('checkout/1');
-
+    $this->getSession()->getPage()->selectFieldOption('Select a profile', '_new');
+    $this->waitForAjaxToFinish();
     $this->submitForm([
       'payment_information[billing_information][address][0][address][given_name]' => 'Johnny',
       'payment_information[billing_information][address][0][address][family_name]' => 'Appleseed',
