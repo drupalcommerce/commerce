@@ -8,6 +8,7 @@ use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Entity\Entity\EntityFormDisplay;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\Element\FormElement;
+use Drupal\profile\Entity\ProfileInterface;
 
 /**
  * Provides a form element for selecting a customer profile.
@@ -69,9 +70,19 @@ class ProfileSelect extends FormElement {
    */
   public static function valueCallback(&$element, $input, FormStateInterface $form_state) {
     if (!empty($input['profile_selection'])) {
-      return $input['profile_selection'];
+      $value = $input['profile_selection'];
     }
-    return '_new';
+    elseif ($element['#default_value'] instanceof ProfileInterface) {
+      $value = $element['#default_value']->id();
+    }
+    elseif (!empty($element['#default_value'])) {
+      $value = $element['#default_value'];
+    }
+    else {
+      $value = '_new';
+    }
+
+    return $value;
   }
 
   /**
