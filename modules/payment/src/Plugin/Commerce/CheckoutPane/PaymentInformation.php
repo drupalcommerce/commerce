@@ -135,17 +135,9 @@ class PaymentInformation extends CheckoutPaneBase {
     }
     else {
       $store = $this->order->getStore();
-      $billing_profile = $this->order->getBillingProfile();
-      if (!$billing_profile) {
-        $billing_profile = $this->entityTypeManager->getStorage('profile')->create([
-          'uid' => $this->order->getCustomerId(),
-          'type' => 'customer',
-        ]);
-      }
-
       $pane_form['billing_information'] = [
         '#type' => 'commerce_profile_select',
-        '#default_value' => $billing_profile,
+        '#default_value' => $this->order->getBillingProfile(),
         '#default_country' => $store->getAddress()->getCountryCode(),
         '#available_countries' => $store->getBillingCountries(),
         '#profile_type' => 'customer',

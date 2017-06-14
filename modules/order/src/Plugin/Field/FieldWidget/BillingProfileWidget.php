@@ -74,20 +74,10 @@ class BillingProfileWidget extends WidgetBase implements ContainerFactoryPluginI
     $order = $items[$delta]->getEntity();
     $store = $order->getStore();
 
-    if (!$items[$delta]->isEmpty()) {
-      $profile = $items[$delta]->entity;
-    }
-    else {
-      $profile = $this->entityTypeManager->getStorage('profile')->create([
-        'type' => 'customer',
-        'uid' => $order->getCustomerId(),
-      ]);
-    }
-
     $element['#type'] = 'fieldset';
     $element['profile'] = [
       '#type' => 'commerce_profile_select',
-      '#default_value' => $profile,
+      '#default_value' => $profile = $items[$delta]->entity,
       '#default_country' => $store->getAddress()->getCountryCode(),
       '#available_countries' => $store->getBillingCountries(),
       '#profile_type' => 'customer',

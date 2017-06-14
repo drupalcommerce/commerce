@@ -6,7 +6,6 @@ use Drupal\commerce_payment\CreditCard;
 use Drupal\commerce_payment\Exception\DeclineException;
 use Drupal\commerce_payment\Exception\PaymentGatewayException;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\profile\Entity\Profile;
 
 class PaymentMethodAddForm extends PaymentGatewayFormBase {
 
@@ -54,11 +53,6 @@ class PaymentMethodAddForm extends PaymentGatewayFormBase {
 
     /** @var \Drupal\commerce_payment\Entity\PaymentMethodInterface $payment_method */
     $payment_method = $this->entity;
-    /** @var \Drupal\profile\Entity\ProfileInterface $billing_profile */
-    $billing_profile = Profile::create([
-      'type' => 'customer',
-      'uid' => $payment_method->getOwnerId(),
-    ]);
     if ($order = $this->routeMatch->getParameter('commerce_order')) {
       $store = $order->getStore();
     }
@@ -71,7 +65,6 @@ class PaymentMethodAddForm extends PaymentGatewayFormBase {
     $form['billing_information'] = [
       '#parents' => array_merge($form['#parents'], ['billing_information']),
       '#type' => 'commerce_profile_select',
-      '#default_value' => $billing_profile,
       '#default_country' => $store ? $store->getAddress()->getCountryCode() : NULL,
       '#available_countries' => $store ? $store->getBillingCountries() : [],
       '#profile_type' => 'customer',
