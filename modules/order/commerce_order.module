@@ -181,3 +181,40 @@ function commerce_order_mail($key, &$message, $params) {
   $message['subject'] = $params['subject'];
   $message['body'][] = $params['body'];
 }
+
+/**
+ * Implements hook_ENTITY_TYPE_predelete() for user entity.
+ */
+function commerce_order_user_predelete(EntityInterface $entity) {
+  /** @var \Drupal\commerce_order\Entity\OrderInterface[] $list */
+  $list = \Drupal::entityTypeManager()
+    ->getStorage('commerce_order')
+    ->loadByProperties([
+      'uid' => $entity->id(),
+    ]);
+
+  foreach ($list as $commerce_order) {
+    $commerce_order->delete();
+  }
+}
+
+/**
+ * Implements hook_user_cancel().
+ */
+function commerce_order_user_cancel($edit, $account, $method) {
+  switch ($method) {
+    case 'user_cancel_reassign':
+      /** @var \Drupal\commerce_order\Entity\OrderInterface[] $list */
+      $list = \Drupal::entityTypeManager()
+        ->getStorage('commerce_order')
+        ->loadByProperties([
+          'uid' => $account->id(),
+        ]);
+
+      foreach ($list as $commerce_order) {
+        $commerce_order->setCustomerId(0);
+        $commerce_order->save();
+      }
+      break;
+  }
+}
