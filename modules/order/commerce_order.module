@@ -191,6 +191,7 @@ function commerce_order_user_predelete(EntityInterface $entity) {
     ->getStorage('commerce_order')
     ->loadByProperties([
       'uid' => $entity->id(),
+      'state' => 'draft',
     ]);
 
   foreach ($list as $commerce_order) {
