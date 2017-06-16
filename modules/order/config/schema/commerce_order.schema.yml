@@ -1,3 +1,20 @@
+commerce.commerce_condition.plugin.order_billing_address:
+  type: commerce_condition_configuration
+  mapping:
+    zone:
+      type: address_zone
+      label: 'Zone'
+
+commerce.commerce_condition.plugin.order_customer_role:
+  type: commerce_condition_configuration
+  mapping:
+    roles:
+      type: sequence
+      label: 'Roles'
+      sequence:
+        type: string
+        label: 'Role'
+
 commerce.commerce_condition.plugin.order_item_quantity:
   type: commerce_condition_configuration
   mapping:

@@ -29,7 +29,7 @@ class OrderTotalPriceTest extends UnitTestCase {
     $order->getTotalPrice()->willReturn(new Price('10.00', 'USD'));
     $order = $order->reveal();
 
-    $this->assertEquals(FALSE, $condition->evaluate($order));
+    $this->assertFalse($condition->evaluate($order));
   }
 
   /**
