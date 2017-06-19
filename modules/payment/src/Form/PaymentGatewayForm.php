@@ -68,6 +68,8 @@ class PaymentGatewayForm extends CommercePluginEntityFormBase {
     }
     // The form state will have a plugin value if #ajax was used.
     $plugin = $form_state->getValue('plugin', $gateway->getPluginId());
+    // Pass the plugin configuration only if the plugin hasn't been changed via #ajax.
+    $plugin_configuration = $gateway->getPluginId() == $plugin ? $gateway->getPluginConfiguration() : [];
 
     $wrapper_id = Html::getUniqueId('shipping-method-form');
     $form['#tree'] = TRUE;
@@ -105,7 +107,7 @@ class PaymentGatewayForm extends CommercePluginEntityFormBase {
       '#type' => 'commerce_plugin_configuration',
       '#plugin_type' => 'commerce_payment_gateway',
       '#plugin_id' => $plugin,
-      '#default_value' => $gateway->getPluginConfiguration(),
+      '#default_value' => $plugin_configuration,
     ];
     $form['status'] = [
       '#type' => 'checkbox',

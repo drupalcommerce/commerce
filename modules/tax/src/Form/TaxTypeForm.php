@@ -57,6 +57,8 @@ class TaxTypeForm extends CommercePluginEntityFormBase {
     }
     // The form state will have a plugin value if #ajax was used.
     $plugin = $form_state->getValue('plugin', $type->getPluginId());
+    // Pass the plugin configuration only if the plugin hasn't been changed via #ajax.
+    $plugin_configuration = $type->getPluginId() == $plugin ? $type->getPluginConfiguration() : [];
 
     $wrapper_id = Html::getUniqueId('tax-type-form');
     $form['#tree'] = TRUE;
@@ -95,7 +97,7 @@ class TaxTypeForm extends CommercePluginEntityFormBase {
       '#type' => 'commerce_plugin_configuration',
       '#plugin_type' => 'commerce_tax_type',
       '#plugin_id' => $plugin,
-      '#default_value' => $type->getPluginConfiguration(),
+      '#default_value' => $plugin_configuration,
     ];
     $form['status'] = [
       '#type' => 'checkbox',

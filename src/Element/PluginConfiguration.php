@@ -37,8 +37,10 @@ class PluginConfiguration extends FormElement {
     $class = get_class($this);
     return [
       '#input' => TRUE,
+      '#tree' => TRUE,
       '#plugin_type' => NULL,
       '#plugin_id' => NULL,
+      '#enforce_unique_parents' => TRUE,
       '#default_value' => [],
 
       '#process' => [
@@ -80,22 +82,25 @@ class PluginConfiguration extends FormElement {
     if (!is_array($element['#default_value'])) {
       throw new \InvalidArgumentException('The commerce_plugin_configuration #default_value must be an array.');
     }
+    if (empty($element['#plugin_id'])) {
+      // A plugin hasn't been selected yet.
+      return $element;
+    }
 
-    $element['#tree'] = TRUE;
     /** @var \Drupal\Core\Executable\ExecutableManagerInterface $plugin_manager */
     $plugin_manager = \Drupal::service('plugin.manager.' . $element['#plugin_type']);
-    if (!empty($element['#plugin_id'])) {
-      /** @var \Drupal\Core\Plugin\PluginFormInterface $plugin */
-      $plugin = $plugin_manager->createInstance($element['#plugin_id'], $element['#default_value']);
-      $element['form'] = [
-        // Configuration must be keyed by plugin ID in $form_state to prevent
-        // NestedArray::setValue() crashes when switching between two
-        // plugins that share a configuration element of the same name,
-        // but not the same type (e.g. "amount" of type number/commerce_price).
-        '#parents' => array_merge($element['#parents'], [$element['#plugin_id']]),
-      ];
-      $element['form'] = $plugin->buildConfigurationForm($element['form'], $form_state);
+    /** @var \Drupal\Core\Plugin\PluginFormInterface $plugin */
+    $plugin = $plugin_manager->createInstance($element['#plugin_id'], $element['#default_value']);
+    $element['form'] = [];
+    if (!empty($element['#enforce_unique_parents'])) {
+      // NestedArray::setValue() crashes when switching between two plugins
+      // that share a configuration element of the same name, but not the
+      // same type (e.g. "amount" of type number/commerce_price).
+      // Configuration must be keyed by plugin ID in $form_state to prevent
+      // that, either on this level, or in a parent form element.
+      $element['form']['#parents'] = array_merge($element['#parents'], [$element['#plugin_id']]);
     }
+    $element['form'] = $plugin->buildConfigurationForm($element['form'], $form_state);
 
     return $element;
   }
