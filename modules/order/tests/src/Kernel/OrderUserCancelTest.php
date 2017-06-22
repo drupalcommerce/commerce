@@ -61,16 +61,12 @@ class OrderUserCancelTest extends CommerceKernelTestBase {
     /** @var \Drupal\commerce_order\Entity\Order $order1 */
     $order1 = Order::create([
       'type' => 'default',
-      'state' => 'draft',
+      'state' => 'completed',
       'mail' => 'text@example.com',
       'uid' => $user->id(),
       'ip_address' => '127.0.0.1',
       'store_id' => $this->store->id(),
     ]);
-    $order1->save();
-
-    $transition = $order1->getState()->getTransitions();
-    $order1->getState()->applyTransition($transition['place']);
     $order1->save();
 
     /** @var \Drupal\commerce_order\Entity\Order $order1 */
@@ -104,16 +100,12 @@ class OrderUserCancelTest extends CommerceKernelTestBase {
     /** @var \Drupal\commerce_order\Entity\Order $order1 */
     $order1 = Order::create([
       'type' => 'default',
-      'state' => 'draft',
+      'state' => 'completed',
       'mail' => 'text@example.com',
       'uid' => $user->id(),
       'ip_address' => '127.0.0.1',
       'store_id' => $this->store->id(),
     ]);
-    $order1->save();
-
-    $transition = $order1->getState()->getTransitions();
-    $order1->getState()->applyTransition($transition['place']);
     $order1->save();
 
     /** @var \Drupal\commerce_order\Entity\Order $order1 */
