@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\Tests\commerce_order\Kernel\Entity;
+namespace Drupal\Tests\commerce_order\Kernel;
 
 use Drupal\commerce_order\Entity\Order;
 use Drupal\Tests\commerce\Kernel\CommerceKernelTestBase;
