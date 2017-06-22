@@ -9,6 +9,7 @@ use Drupal\commerce\BundleFieldDefinition;
 use Drupal\commerce_order\Entity\OrderTypeInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\Element;
+use Drupal\Core\Entity\EntityInterface;
 
 /**
  * Implements hook_theme().
