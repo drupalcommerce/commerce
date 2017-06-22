@@ -191,11 +191,17 @@ function commerce_order_user_predelete(EntityInterface $entity) {
     ->getStorage('commerce_order')
     ->loadByProperties([
       'uid' => $entity->id(),
-      'state' => 'draft',
     ]);
 
   foreach ($list as $commerce_order) {
-    $commerce_order->delete();
+    // We can remove only draft orders, other need to be anonymized.
+    if ($commerce_order->getState()->value == 'draft') {
+      $commerce_order->delete();
+    }
+    else {
+      $commerce_order->setCustomerId(0);
+      $commerce_order->save();
+    }
   }
 }
 
