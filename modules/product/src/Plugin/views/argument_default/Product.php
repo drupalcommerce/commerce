@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\commerce\Plugin\views\argument_default;
+namespace Drupal\commerce_product\Plugin\views\argument_default;
 
 use Drupal\commerce_product\Entity\ProductInterface;
 use Drupal\Core\Cache\Cache;
