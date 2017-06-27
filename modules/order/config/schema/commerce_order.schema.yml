@@ -65,3 +65,11 @@ commerce_order.commerce_order_item_type.*:
     orderType:
       type: string
       label: 'Order type'
+
+field.formatter.settings.commerce_line_item_table:
+  type: mapping
+  label: 'Format line items as a configurable view.'
+  mapping:
+    view:
+      type: string
+      label: 'View'
