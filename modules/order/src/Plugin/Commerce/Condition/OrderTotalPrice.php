@@ -11,7 +11,7 @@ use Drupal\commerce_price\Price;
  * Provides the total price condition for orders.
  *
  * @CommerceCondition(
- *   id = "commerce_promotion_order_total_price",
+ *   id = "order_total_price",
  *   label = @Translation("Total price"),
  *   display_label = @Translation("Limit by total price"),
  *   category = @Translation("Order"),

@@ -110,7 +110,7 @@ class PromotionOfferTest extends CommerceKernelTestBase {
       'stores' => [$this->store->id()],
       'status' => TRUE,
       'offer' => [
-        'target_plugin_id' => 'commerce_promotion_order_percentage_off',
+        'target_plugin_id' => 'order_percentage_off',
         'target_plugin_configuration' => [
           'amount' => '0.10',
         ],
@@ -218,10 +218,9 @@ class PromotionOfferTest extends CommerceKernelTestBase {
       'stores' => [$this->store->id()],
       'status' => TRUE,
       'offer' => [
-        'target_plugin_id' => 'commerce_promotion_product_percentage_off',
+        'target_plugin_id' => 'order_item_percentage_off',
         'target_plugin_configuration' => [
           'amount' => '0.50',
-          'product_id' => $product->id(),
         ],
       ],
     ]);
@@ -230,7 +229,6 @@ class PromotionOfferTest extends CommerceKernelTestBase {
     /** @var \Drupal\commerce\Plugin\Field\FieldType\PluginItem $offer_field */
     $offer_field = $promotion->get('offer')->first();
     $this->assertEquals('0.50', $offer_field->target_plugin_configuration['amount']);
-    $this->assertEquals($product->id(), $offer_field->target_plugin_configuration['product_id']);
 
     $this->container->get('commerce_order.order_refresh')->refresh($this->order);
     $this->order = $this->reloadEntity($this->order);

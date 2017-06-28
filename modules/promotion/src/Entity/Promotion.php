@@ -9,8 +9,6 @@ use Drupal\Core\Entity\ContentEntityBase;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
-use Drupal\Core\Plugin\Context\Context;
-use Drupal\Core\Plugin\Context\ContextDefinition;
 
 /**
  * Defines the promotion entity class.
@@ -165,6 +163,15 @@ class Promotion extends ContentEntityBase implements PromotionInterface {
   public function setStoreIds(array $store_ids) {
     $this->set('stores', $store_ids);
     return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getOffer() {
+    if (!$this->get('offer')->isEmpty()) {
+      return $this->get('offer')->first()->getTargetInstance();
+    }
   }
 
   /**
@@ -435,12 +442,23 @@ class Promotion extends ContentEntityBase implements PromotionInterface {
    * {@inheritdoc}
    */
   public function apply(OrderInterface $order) {
-    /** @var \Drupal\commerce_promotion\Plugin\Commerce\PromotionOffer\PromotionOfferInterface $offer */
-    $offer = $this->get('offer')->first()->getTargetInstance([
-      'commerce_promotion' => new Context(new ContextDefinition('entity:commerce_promotion'), $this),
-      'commerce_order' => new Context(new ContextDefinition('entity:commerce_order'), $order),
-    ]);
-    $offer->execute();
+    $offer = $this->getOffer();
+    if ($offer->getEntityTypeId() == 'commerce_order') {
+      $offer->apply($order, $this);
+    }
+    elseif ($offer->getEntityTypeId() == 'commerce_order_item') {
+      $order_item_conditions = array_filter($this->getConditions(), function ($condition) {
+        /** @var \Drupal\commerce\Plugin\Commerce\Condition\ConditionInterface $condition */
+        return $condition->getEntityTypeId() == 'commerce_order_item';
+      });
+      $order_item_conditions = new ConditionGroup($order_item_conditions, 'AND');
+      // Apply the offer to order items that pass the conditions.
+      foreach ($order->getItems() as $order_item) {
+        if ($order_item_conditions->evaluate($order_item)) {
+          $offer->apply($order_item, $this);
+        }
+      }
+    }
   }
 
   /**

@@ -95,7 +95,7 @@ class PaymentCheckoutTest extends CommerceBrowserTestBase {
       ],
       'conditions' => [
         [
-          'plugin' => 'commerce_promotion_order_total_price',
+          'plugin' => 'order_total_price',
           'configuration' => [
             'operator' => '<',
             'amount' => [

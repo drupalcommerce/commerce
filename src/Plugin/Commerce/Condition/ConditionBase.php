@@ -90,6 +90,9 @@ abstract class ConditionBase extends PluginBase implements ConditionInterface {
 
   /**
    * Asserts that the given entity is of the expected type.
+   *
+   * @param \Drupal\Core\Entity\EntityInterface $entity
+   *   The entity.
    */
   protected function assertEntity(EntityInterface $entity) {
     $entity_type_id = $entity->getEntityTypeId();

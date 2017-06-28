@@ -86,14 +86,14 @@ class PromotionConditionTest extends CommerceKernelTestBase {
       'stores' => [$this->store->id()],
       'status' => TRUE,
       'offer' => [
-        'target_plugin_id' => 'commerce_promotion_order_percentage_off',
+        'target_plugin_id' => 'order_percentage_off',
         'target_plugin_configuration' => [
           'amount' => '0.10',
         ],
       ],
       'conditions' => [
         [
-          'target_plugin_id' => 'commerce_promotion_order_total_price',
+          'target_plugin_id' => 'order_total_price',
           'target_plugin_configuration' => [
             'operator' => '>',
             'amount' => [
@@ -137,14 +137,14 @@ class PromotionConditionTest extends CommerceKernelTestBase {
       'stores' => [$this->store->id()],
       'status' => TRUE,
       'offer' => [
-        'target_plugin_id' => 'commerce_promotion_order_percentage_off',
+        'target_plugin_id' => 'order_percentage_off',
         'target_plugin_configuration' => [
           'amount' => '0.10',
         ],
       ],
       'conditions' => [
         [
-          'target_plugin_id' => 'commerce_promotion_order_total_price',
+          'target_plugin_id' => 'order_total_price',
           'target_plugin_configuration' => [
             'operator' => '>',
             'amount' => [

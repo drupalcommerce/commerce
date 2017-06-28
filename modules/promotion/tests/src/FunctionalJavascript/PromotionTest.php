@@ -48,15 +48,15 @@ class PromotionTest extends CommerceBrowserTestBase {
     $this->assertSession()->fieldExists('name[0][value]');
     $name = $this->randomMachineName(8);
     $this->getSession()->getPage()->fillField('name[0][value]', $name);
-    $this->getSession()->getPage()->selectFieldOption('offer[0][target_plugin_id]', 'commerce_promotion_product_percentage_off');
+    $this->getSession()->getPage()->selectFieldOption('offer[0][target_plugin_id]', 'order_item_percentage_off');
     $this->waitForAjaxToFinish();
-    $this->getSession()->getPage()->fillField('offer[0][target_plugin_configuration][commerce_promotion_product_percentage_off][amount]', '10.0');
+    $this->getSession()->getPage()->fillField('offer[0][target_plugin_configuration][order_item_percentage_off][amount]', '10.0');
 
     // Change, assert any values reset.
-    $this->getSession()->getPage()->selectFieldOption('offer[0][target_plugin_id]', 'commerce_promotion_order_percentage_off');
+    $this->getSession()->getPage()->selectFieldOption('offer[0][target_plugin_id]', 'order_percentage_off');
     $this->waitForAjaxToFinish();
-    $this->assertSession()->fieldValueNotEquals('offer[0][target_plugin_configuration][commerce_promotion_order_percentage_off][amount]', '10.0');
-    $this->getSession()->getPage()->fillField('offer[0][target_plugin_configuration][commerce_promotion_order_percentage_off][amount]', '10.0');
+    $this->assertSession()->fieldValueNotEquals('offer[0][target_plugin_configuration][order_percentage_off][amount]', '10.0');
+    $this->getSession()->getPage()->fillField('offer[0][target_plugin_configuration][order_percentage_off][amount]', '10.0');
 
     // Confirm the integrity of the conditions UI.
     foreach (['order', 'product', 'customer'] as $condition_group) {
@@ -68,7 +68,7 @@ class PromotionTest extends CommerceBrowserTestBase {
     $vertical_tab_element->click();
     $this->getSession()->getPage()->checkField('Limit by total price');
     $this->waitForAjaxToFinish();
-    $this->getSession()->getPage()->fillField('conditions[form][order][commerce_promotion_order_total_price][configuration][form][amount][number]', '50.00');
+    $this->getSession()->getPage()->fillField('conditions[form][order][order_total_price][configuration][form][amount][number]', '50.00');
 
     // Confirm that the usage limit widget works properly.
     $this->getSession()->getPage()->hasCheckedField(' Unlimited');
@@ -109,13 +109,13 @@ class PromotionTest extends CommerceBrowserTestBase {
     // Check the integrity of the form.
     $this->assertSession()->fieldExists('name[0][value]');
 
-    $this->getSession()->getPage()->fillField('offer[0][target_plugin_id]', 'commerce_promotion_order_percentage_off');
+    $this->getSession()->getPage()->fillField('offer[0][target_plugin_id]', 'order_percentage_off');
     $this->waitForAjaxToFinish();
 
     $name = $this->randomMachineName(8);
     $edit = [
       'name[0][value]' => $name,
-      'offer[0][target_plugin_configuration][commerce_promotion_order_percentage_off][amount]' => '10.0',
+      'offer[0][target_plugin_configuration][order_percentage_off][amount]' => '10.0',
     ];
 
     // Set an end date.
@@ -140,14 +140,14 @@ class PromotionTest extends CommerceBrowserTestBase {
       'name' => $this->randomMachineName(8),
       'status' => TRUE,
       'offer' => [
-        'target_plugin_id' => 'commerce_promotion_product_percentage_off',
+        'target_plugin_id' => 'order_item_percentage_off',
         'target_plugin_configuration' => [
           'amount' => '0.10',
         ],
       ],
       'conditions' => [
         [
-          'target_plugin_id' => 'commerce_promotion_order_total_price',
+          'target_plugin_id' => 'order_total_price',
           'target_plugin_configuration' => [
             'amount' => [
               'number' => '9.10',
@@ -165,12 +165,12 @@ class PromotionTest extends CommerceBrowserTestBase {
     $this->drupalGet($promotion->toUrl('edit-form'));
     $this->assertSession()->pageTextContains('Restricted');
     $this->assertSession()->checkboxChecked('Limit by total price');
-    $this->assertSession()->fieldValueEquals('conditions[form][order][commerce_promotion_order_total_price][configuration][form][amount][number]', '9.10');
+    $this->assertSession()->fieldValueEquals('conditions[form][order][order_total_price][configuration][form][amount][number]', '9.10');
 
     $new_promotion_name = $this->randomMachineName(8);
     $edit = [
       'name[0][value]' => $new_promotion_name,
-      'offer[0][target_plugin_configuration][commerce_promotion_product_percentage_off][amount]' => '20',
+      'offer[0][target_plugin_configuration][order_item_percentage_off][amount]' => '20',
     ];
     $this->submitForm($edit, 'Save');
 

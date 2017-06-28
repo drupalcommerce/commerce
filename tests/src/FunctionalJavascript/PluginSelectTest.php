@@ -120,12 +120,12 @@ class PluginSelectTest extends CommerceBrowserTestBase {
 
     // Select the other condition.
     $this->drupalGet($entity->toUrl('edit-form'));
-    $this->getSession()->getPage()->fillField('test_conditions[0][target_plugin_id]', 'commerce_promotion_order_total_price');
+    $this->getSession()->getPage()->fillField('test_conditions[0][target_plugin_id]', 'order_total_price');
     $this->waitForAjaxToFinish();
 
     $this->submitForm([
-      'test_conditions[0][target_plugin_configuration][commerce_promotion_order_total_price][operator]' => '<',
-      'test_conditions[0][target_plugin_configuration][commerce_promotion_order_total_price][amount][number]' => '6.67',
+      'test_conditions[0][target_plugin_configuration][order_total_price][operator]' => '<',
+      'test_conditions[0][target_plugin_configuration][order_total_price][amount][number]' => '6.67',
     ], 'Save');
     $this->assertSession()->pageTextContains('entity_test 1 has been updated.');
 
