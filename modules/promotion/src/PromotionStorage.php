@@ -119,10 +119,7 @@ class PromotionStorage extends CommerceContentEntityStorage implements Promotion
   }
 
   /**
-   * Return active promotions that have passed their end date.
-   *
-   * @return \Drupal\commerce_promotion\Entity\PromotionInterface[]
-   *   The expired promotion entities.
+   * {@inheritdoc}
    */
   public function loadExpired() {
     $query = $this->getQuery();
@@ -141,10 +138,7 @@ class PromotionStorage extends CommerceContentEntityStorage implements Promotion
   }
 
   /**
-   * Returns active promotions which have a met their maximum usage.
-   *
-   * @return \Drupal\commerce_promotion\Entity\PromotionInterface[]
-   *   Promotions with maxed usage.
+   * {@inheritdoc}
    */
   public function loadMaxedUsage() {
     $query = $this->getQuery();
