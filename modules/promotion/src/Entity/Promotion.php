@@ -556,8 +556,11 @@ class Promotion extends ContentEntityBase implements PromotionInterface {
       ->setCardinality(BaseFieldDefinition::CARDINALITY_UNLIMITED)
       ->setRequired(FALSE)
       ->setDisplayOptions('form', [
-        'type' => 'commerce_plugin_select',
+        'type' => 'commerce_conditions',
         'weight' => 3,
+        'settings' => [
+          'entity_types' => ['commerce_order', 'commerce_order_item'],
+        ],
       ]);
 
     $fields['coupons'] = BaseFieldDefinition::create('entity_reference')

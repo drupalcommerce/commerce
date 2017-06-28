@@ -2,7 +2,6 @@
 
 namespace Drupal\commerce;
 
-use Drupal\Component\Plugin\CategorizingPluginManagerInterface;
 use Drupal\Component\Plugin\Exception\PluginException;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
@@ -16,7 +15,7 @@ use Drupal\Core\Plugin\DefaultPluginManager;
  * @see \Drupal\commerce\Annotation\CommerceCondition
  * @see plugin_api
  */
-class ConditionManager extends DefaultPluginManager implements CategorizingPluginManagerInterface {
+class ConditionManager extends DefaultPluginManager implements ConditionManagerInterface {
 
   use CategorizingPluginManagerTrait;
 
@@ -64,6 +63,21 @@ class ConditionManager extends DefaultPluginManager implements CategorizingPlugi
     if (!$this->entityTypeManager->getDefinition($entity_type_id)) {
       throw new PluginException(sprintf('The condition "%s" must specify a valid entity type, "%s" given.', $plugin_id, $entity_type_id));
     }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getDefinitionsByEntityTypes(array $entity_types) {
+    $definitions = $this->getDefinitions();
+    if (!empty($entity_types)) {
+      // Remove conditions not matching the specified entity types.
+      $definitions = array_filter($definitions, function ($definition) use ($entity_types) {
+        return in_array($definition['entity_type'], $entity_types);
+      });
+    }
+
+    return $definitions;
   }
 
 }
