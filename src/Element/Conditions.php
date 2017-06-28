@@ -19,7 +19,7 @@ use Drupal\Core\Render\Element\FormElement;
  *   '#entity_types' => ['commerce_order', 'commerce_order_item'],
  *   '#default_value' => [
  *     [
- *       'id' => 'order_total_price',
+ *       'plugin' => 'order_total_price',
  *       'configuration' => [
  *         'operator' => '<',
  *         'amount' => [
@@ -86,7 +86,7 @@ class Conditions extends FormElement {
       throw new \InvalidArgumentException('The commerce_conditions #default_value must be an array.');
     }
 
-    $default_value = array_column($element['#default_value'], 'configuration', 'id');
+    $default_value = array_column($element['#default_value'], 'configuration', 'plugin');
     /** @var \Drupal\commerce\ConditionManagerInterface $plugin_manager */
     $plugin_manager = \Drupal::service('plugin.manager.commerce_condition');
     $definitions = $plugin_manager->getDefinitionsByEntityTypes($element['#entity_types']);
@@ -202,7 +202,7 @@ class Conditions extends FormElement {
         $plugin_value = $form_state->getValue($plugin_element['#parents']);
         if ($plugin_value['enable']) {
           $value[] = [
-            'id' => $plugin_id,
+            'plugin' => $plugin_id,
             'configuration' => $plugin_value['configuration'],
           ];
         }

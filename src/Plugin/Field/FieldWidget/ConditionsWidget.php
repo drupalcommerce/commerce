@@ -149,7 +149,7 @@ class ConditionsWidget extends WidgetBase implements ContainerFactoryPluginInter
     $values = [];
     foreach ($items->getValue() as $value) {
       $values[] = [
-        'id' => $value['target_plugin_id'],
+        'plugin' => $value['target_plugin_id'],
         'configuration' => $value['target_plugin_configuration'],
       ];
     }
@@ -171,14 +171,14 @@ class ConditionsWidget extends WidgetBase implements ContainerFactoryPluginInter
   public function massageFormValues(array $values, array $form, FormStateInterface $form_state) {
     $new_values = [];
     foreach ($values['form'] as $value) {
-      if (!isset($value['id'])) {
+      if (!isset($value['plugin'])) {
         // This method is invoked during validation with incomplete values.
         // The commerce_conditions form element can't set the right values until form submit.
         continue;
       }
 
       $new_values[] = [
-        'target_plugin_id' => $value['id'],
+        'target_plugin_id' => $value['plugin'],
         'target_plugin_configuration' => $value['configuration'],
       ];
     }

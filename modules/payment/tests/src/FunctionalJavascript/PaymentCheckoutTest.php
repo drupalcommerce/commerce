@@ -85,14 +85,38 @@ class PaymentCheckoutTest extends CommerceBrowserTestBase {
     ]);
 
     /** @var \Drupal\commerce_payment\Entity\PaymentGateway $gateway */
+    $skipped_gateway = PaymentGateway::create([
+      'id' => 'onsite_skipped',
+      'label' => 'On-site Skipped',
+      'plugin' => 'example_onsite',
+      'configuration' => [
+        'api_key' => '2342fewfsfs',
+        'payment_method_types' => ['credit_card'],
+      ],
+      'conditions' => [
+        [
+          'plugin' => 'commerce_promotion_order_total_price',
+          'configuration' => [
+            'operator' => '<',
+            'amount' => [
+              'number' => '1.00',
+              'currency_code' => 'USD',
+            ],
+          ],
+        ],
+      ],
+    ]);
+    $skipped_gateway->save();
+
+    /** @var \Drupal\commerce_payment\Entity\PaymentGateway $gateway */
     $gateway = PaymentGateway::create([
       'id' => 'onsite',
       'label' => 'On-site',
       'plugin' => 'example_onsite',
-    ]);
-    $gateway->getPlugin()->setConfiguration([
-      'api_key' => '2342fewfsfs',
-      'payment_method_types' => ['credit_card'],
+      'configuration' => [
+        'api_key' => '2342fewfsfs',
+        'payment_method_types' => ['credit_card'],
+      ],
     ]);
     $gateway->save();
 
@@ -101,10 +125,10 @@ class PaymentCheckoutTest extends CommerceBrowserTestBase {
       'id' => 'offsite',
       'label' => 'Off-site',
       'plugin' => 'example_offsite_redirect',
-    ]);
-    $gateway->getPlugin()->setConfiguration([
-      'redirect_method' => 'post',
-      'payment_method_types' => ['credit_card'],
+      'configuration' => [
+        'redirect_method' => 'post',
+        'payment_method_types' => ['credit_card'],
+      ],
     ]);
     $gateway->save();
 
@@ -113,12 +137,12 @@ class PaymentCheckoutTest extends CommerceBrowserTestBase {
       'id' => 'manual',
       'label' => 'Manual',
       'plugin' => 'manual',
-    ]);
-    $gateway->getPlugin()->setConfiguration([
-      'display_label' => 'Cash on delivery',
-      'instructions' => [
-        'value' => 'Sample payment instructions.',
-        'format' => 'plain_text',
+      'configuration' => [
+        'display_label' => 'Cash on delivery',
+        'instructions' => [
+          'value' => 'Sample payment instructions.',
+          'format' => 'plain_text',
+        ],
       ],
     ]);
     $gateway->save();

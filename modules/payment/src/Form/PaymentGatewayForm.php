@@ -109,6 +109,12 @@ class PaymentGatewayForm extends CommercePluginEntityFormBase {
       '#plugin_id' => $plugin,
       '#default_value' => $plugin_configuration,
     ];
+    $form['conditions'] = [
+      '#type' => 'commerce_conditions',
+      '#title' => $this->t('Conditions'),
+      '#entity_types' => ['commerce_order'],
+      '#default_value' => $gateway->get('conditions'),
+    ];
     $form['status'] = [
       '#type' => 'checkbox',
       '#title' => $this->t('Enabled'),

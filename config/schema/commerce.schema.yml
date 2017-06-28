@@ -12,6 +12,16 @@ commerce_config_entity_bundle:
       sequence:
         type: string
 
+commerce_condition:
+  type: mapping
+  label: 'Condition'
+  mapping:
+    plugin:
+      type: string
+      label: 'Plugin'
+    configuration:
+      type: commerce.commerce_condition.plugin.[%parent.plugin]
+
 commerce.commerce_condition.plugin.*:
   type: commerce_condition_configuration
 

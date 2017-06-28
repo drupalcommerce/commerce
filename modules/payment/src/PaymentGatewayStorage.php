@@ -30,9 +30,14 @@ class PaymentGatewayStorage extends ConfigEntityStorage implements PaymentGatewa
    * {@inheritdoc}
    */
   public function loadMultipleForOrder(OrderInterface $order) {
+    /** @var \Drupal\commerce_payment\Entity\PaymentGatewayInterface[] $payment_gateways */
     $payment_gateways = $this->loadByProperties(['status' => TRUE]);
+    foreach ($payment_gateways as $payment_gateway_id => $payment_gateway) {
+      if (!$payment_gateway->applies($order)) {
+        unset($payment_gateways[$payment_gateway_id]);
+      }
+    }
     uasort($payment_gateways, [$this->entityType->getClass(), 'sort']);
-    // @todo Invoke the attached conditions to determine eligibility.
     // @todo Fire event.
 
     return $payment_gateways;
