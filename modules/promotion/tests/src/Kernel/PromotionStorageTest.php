@@ -252,8 +252,12 @@ class PromotionStorageTest extends CommerceKernelTestBase {
    * Tests that active promotions which have expired are loaded.
    */
   public function testLoadExpired() {
+    $order_type = OrderType::load('default');
+
     $valid_promotion = Promotion::create([
       'name' => 'Valid Promotion',
+      'order_types' => [$order_type],
+      'stores' => [$this->store->id()],
       'status' => TRUE,
       'start_date' => gmdate('Y-m-d', time()),
       'end_date' => gmdate('Y-m-d', time() + 86400),
@@ -262,6 +266,8 @@ class PromotionStorageTest extends CommerceKernelTestBase {
 
     $expired_promotion = Promotion::create([
       'name' => 'Expired Promotion',
+      'order_types' => [$order_type],
+      'stores' => [$this->store->id()],
       'status' => TRUE,
       'start_date' => gmdate('Y-m-d', time() - 172800),
       'end_date' => gmdate('Y-m-d', time() - 86400),
@@ -269,7 +275,7 @@ class PromotionStorageTest extends CommerceKernelTestBase {
     $this->assertEquals(SAVED_NEW, $expired_promotion->save());
 
     $promotions = $this->promotionStorage->loadExpired();
-    $this->assertEquals(count($promotions), 1);
+    $this->assertCount(1, $promotions);
 
     $promotion = reset($promotions);
     $this->assertEquals($expired_promotion->label(), $promotion->label());
@@ -279,8 +285,12 @@ class PromotionStorageTest extends CommerceKernelTestBase {
    * Tests that active promotions which have met their maximum usage are loaded.
    */
   public function testLoadUsed() {
+    $order_type = OrderType::load('default');
+
     $promotion1 = Promotion::create([
       'name' => 'Promotion 1',
+      'order_types' => [$order_type],
+      'stores' => [$this->store->id()],
       'status' => TRUE,
       'usage_limit' => 1,
     ]);
@@ -289,6 +299,8 @@ class PromotionStorageTest extends CommerceKernelTestBase {
 
     $promotion2 = Promotion::create([
       'name' => 'Promotion 2',
+      'order_types' => [$order_type],
+      'stores' => [$this->store->id()],
       'status' => TRUE,
       'usage_limit' => 2,
     ]);
@@ -297,12 +309,14 @@ class PromotionStorageTest extends CommerceKernelTestBase {
 
     $promotion3 = Promotion::create([
       'name' => 'Promotion 3',
+      'order_types' => [$order_type],
+      'stores' => [$this->store->id()],
       'status' => TRUE,
     ]);
     $this->assertEquals(SAVED_NEW, $promotion3->save());
 
     $promotions = $this->promotionStorage->loadMaxedUsage();
-    $this->assertEquals(count($promotions), 1);
+    $this->assertCount(1, $promotions);
 
     $promotion = reset($promotions);
     $this->assertEquals($promotion1->label(), $promotion->label());
