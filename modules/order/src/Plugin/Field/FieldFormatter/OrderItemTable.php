@@ -25,7 +25,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class OrderItemTable extends FormatterBase implements FormatterInterface, ContainerFactoryPluginInterface {
 
   /**
-   * @var EntityTypeManagerInterface
+   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
    */
   protected $entityTypeManager;
 
@@ -46,7 +46,7 @@ class OrderItemTable extends FormatterBase implements FormatterInterface, Contai
    *   The view mode.
    * @param array $third_party_settings
    *   Any third party settings settings.
-   * @param EntityTypeManagerInterface $entity_type_manager
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
    *   Entity type manager service.
    */
   public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, $label, $view_mode, array $third_party_settings, EntityTypeManagerInterface $entity_type_manager) {
@@ -131,7 +131,7 @@ class OrderItemTable extends FormatterBase implements FormatterInterface, Contai
    */
   public function settingsSummary() {
     $view = $this->entityTypeManager->getStorage('view')->load($this->getSetting('view'));
-    return [$this->t('View: @view', array('@view' => $view->label()))];
+    return [$this->t('View: @view', ['@view' => $view->label()])];
   }
 
 }
