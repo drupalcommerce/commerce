@@ -30,7 +30,9 @@ class OrderSummary extends CheckoutPaneBase implements CheckoutPaneInterface {
    */
   public function buildConfigurationSummary() {
     $view_storage = $this->entityTypeManager->getStorage('view');
-    $view = $view_storage->load($this->configuration['view']);
+    if (!$view = $view_storage->load($this->configuration['view'])) {
+      return '';
+    }
     $summary = $this->t('View: @view', ['@view' => $view->label()]);
 
     return $summary;
