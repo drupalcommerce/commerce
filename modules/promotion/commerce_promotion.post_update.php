@@ -102,7 +102,7 @@ function commerce_promotion_post_update_6(&$sandbox = NULL) {
   }
 
   $query = $promotion_storage->getQuery();
-  $query->range($sandbox['current_count'], 1);
+  $query->range($sandbox['current_count'], 25);
   $result = $query->execute();
   if (empty($result)) {
     $sandbox['#finished'] = 1;
@@ -162,7 +162,7 @@ function commerce_promotion_post_update_6(&$sandbox = NULL) {
     }
   }
 
-  $sandbox['current_count'] += 1;
+  $sandbox['current_count'] += 25;
   if ($sandbox['current_count'] >= $sandbox['total_count']) {
     $sandbox['#finished'] = 1;
   }
