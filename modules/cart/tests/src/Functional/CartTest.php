@@ -62,7 +62,8 @@ class CartTest extends OrderBrowserTestBase {
   public function testCartPage() {
     $this->drupalLogin($this->adminUser);
 
-    $this->cartManager->addEntity($this->cart, $this->variation);
+    $order_item = $this->cartManager->addEntity($this->cart, $this->variation);
+    $quantity = $order_item->getQuantity() + 0;
 
     $this->drupalGet('cart');
     // Confirm the presence of the order total summary.
@@ -70,13 +71,13 @@ class CartTest extends OrderBrowserTestBase {
     $this->assertSession()->elementTextContains('css', '.order-total-line', 'Total');
     $this->assertSession()->pageTextContains('$999.00');
     // Confirm the presence and functioning of the Quantity field.
-    $this->assertSession()->fieldValueEquals('edit-edit-quantity-0', 1);
+    $this->assertSession()->fieldValueEquals('edit-edit-quantity-0', $quantity);
     $this->assertSession()->buttonExists('Update cart');
     $values = [
-      'edit_quantity[0]' => 2,
+      'edit_quantity[0]' => $quantity * 2,
     ];
     $this->submitForm($values, t('Update cart'));
-    $this->assertSession()->fieldValueEquals('edit-edit-quantity-0', 2);
+    $this->assertSession()->fieldValueEquals('edit-edit-quantity-0', $quantity * 2);
     $this->assertSession()->elementTextContains('css', '.order-total-line', 'Total');
     $this->assertSession()->pageTextContains('$1,998.00');
 

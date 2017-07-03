@@ -130,7 +130,7 @@ class CartBlock extends BlockBase implements ContainerFactoryPluginInterface {
       $cart_views = $this->getCartViews($carts);
       foreach ($carts as $cart_id => $cart) {
         foreach ($cart->getItems() as $order_item) {
-          $count += (int) $order_item->getQuantity();
+          $count += $order_item->getItemsQuantity();
         }
         $cachable_metadata->addCacheableDependency($cart);
       }

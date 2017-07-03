@@ -9,6 +9,7 @@ dependencies:
       - commerce_cart
       - commerce_product
   module:
+    - commerce
     - commerce_product
 id: commerce_order_item.default.add_to_cart
 targetEntityType: commerce_order_item
@@ -18,7 +19,21 @@ content:
   purchased_entity:
     type: commerce_product_variation_attributes
     weight: 0
-    settings: { }
+    settings: {  }
+    third_party_settings: {  }
+    region: content
+  quantity:
+    type: commerce_number
+    weight: 1
+    region: content
+    settings:
+      placeholder: ''
+      min: '1'
+      max: ''
+      default_value: '1'
+      step: '1'
+      prefix: ''
+      suffix: ''
     third_party_settings: {  }
 hidden:
   created: true

@@ -79,7 +79,7 @@ class OrderItemTest extends CommerceKernelTestBase {
     $this->assertEquals('My order item', $order_item->getTitle());
 
     $this->assertEquals(1, $order_item->getQuantity());
-    $order_item->setQuantity('2');
+    $order_item->setQuantity(2);
     $this->assertEquals(2, $order_item->getQuantity());
 
     $this->assertEquals(NULL, $order_item->getUnitPrice());
