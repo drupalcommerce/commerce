@@ -92,3 +92,14 @@ views.filter.commerce_entity_bundle:
         hide_single_bundle:
           type: boolean
           label: 'Hide if there''s only one bundle.'
+
+field.widget.settings.commerce_number:
+  type: mapping
+  label: 'Number with step display format settings'
+  mapping:
+    placeholder:
+      type: label
+      label: 'Placeholder'
+    step:
+      type: string
+      label: 'Step'
