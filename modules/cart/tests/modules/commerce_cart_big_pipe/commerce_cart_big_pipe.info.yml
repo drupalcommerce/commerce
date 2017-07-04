@@ -1,0 +1,12 @@
+name: Commerce Cart Big Pipe
+type: module
+description: Provides a slow version of AddToCart form for testing Big Pipe streaming
+package: Testing
+core: 8.x
+dependencies:
+  - commerce_store
+  - commerce_product
+  - commerce_cart
+  - big_pipe
+  - big_pipe_test
+  - dynamic_page_cache
