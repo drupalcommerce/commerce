@@ -451,6 +451,48 @@ class PaymentCheckoutTest extends CommerceBrowserTestBase {
   }
 
   /**
+   * Tests checkout with an off-site gateway (GET redirect method) that fails.
+   *
+   * The off-site form throws an exception, simulating an API fail.
+   */
+  public function testFailedCheckoutWithOffsiteRedirectGet() {
+    $payment_gateway = PaymentGateway::load('offsite');
+    $payment_gateway->getPlugin()->setConfiguration([
+      'redirect_method' => 'get',
+      'payment_method_types' => ['credit_card'],
+    ]);
+    $payment_gateway->save();
+
+    $this->drupalGet($this->product->toUrl()->toString());
+    $this->submitForm([], 'Add to cart');
+    $this->drupalGet('checkout/1');
+    $radio_button = $this->getSession()->getPage()->findField('Example');
+    $radio_button->click();
+    $this->waitForAjaxToFinish();
+
+    $this->submitForm([
+      'payment_information[billing_information][address][0][address][given_name]' => 'Johnny',
+      'payment_information[billing_information][address][0][address][family_name]' => 'FAIL',
+      'payment_information[billing_information][address][0][address][address_line1]' => '123 New York Drive',
+      'payment_information[billing_information][address][0][address][locality]' => 'New York City',
+      'payment_information[billing_information][address][0][address][administrative_area]' => 'NY',
+      'payment_information[billing_information][address][0][address][postal_code]' => '10001',
+    ], 'Continue to review');
+    $this->assertSession()->pageTextContains('Payment information');
+    $this->assertSession()->pageTextContains('Example');
+    $this->assertSession()->pageTextContains('Johnny FAIL');
+    $this->assertSession()->pageTextContains('123 New York Drive');
+    $this->submitForm([], 'Pay and complete purchase');
+    $this->assertSession()->pageTextNotContains('Your order number is 1. You can view your order on your account page when logged in.');
+    $this->assertSession()->pageTextContains('We encountered an unexpected error processing your payment. Please try again later.');
+    $this->assertSession()->addressEquals('checkout/1/order_information');
+
+    // Verify a payment was not created.
+    $payment = Payment::load(1);
+    $this->assertNull($payment);
+  }
+
+  /**
    * Tests checkout with a manual gateway.
    */
   public function testCheckoutWithManual() {

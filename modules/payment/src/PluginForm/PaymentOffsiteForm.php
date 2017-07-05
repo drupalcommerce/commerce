@@ -53,7 +53,7 @@ abstract class PaymentOffsiteForm extends PaymentGatewayFormBase {
    * @return array
    *   The redirect form, if $redirect_method is REDIRECT_POST.
    *
-   * @throws NeedsRedirectException
+   * @throws \Drupal\commerce\Response\NeedsRedirectException
    *   The redirect exception, if $redirect_method is REDIRECT_GET.
    */
   protected function buildRedirectForm(array $form, FormStateInterface $form_state, $redirect_url, array $data, $redirect_method = self::REDIRECT_GET) {
