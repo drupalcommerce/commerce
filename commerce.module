@@ -212,4 +212,3 @@ function commerce_module_preuninstall($module) {
     \Drupal::service('commerce.bundle_plugin_installer')->uninstallBundles($entity_type, [$module]);
   }
 }
-

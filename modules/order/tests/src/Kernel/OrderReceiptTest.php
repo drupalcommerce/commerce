@@ -8,7 +8,6 @@ use Drupal\commerce_price\Price;
 use Drupal\commerce_product\Entity\Product;
 use Drupal\commerce_product\Entity\ProductVariation;
 use Drupal\commerce_product\Entity\ProductVariationType;
-use Drupal\commerce_store\Entity\Store;
 use Drupal\Core\Test\AssertMailTrait;
 use Drupal\profile\Entity\Profile;
 use Drupal\Tests\commerce\Kernel\CommerceKernelTestBase;

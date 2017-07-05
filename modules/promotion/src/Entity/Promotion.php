@@ -38,7 +38,7 @@ use Drupal\Core\Field\BaseFieldDefinition;
  *       "delete" = "Drupal\Core\Entity\ContentEntityDeleteForm"
  *     },
  *     "route_provider" = {
- *       "default" = "Drupal\commerce_promotion\PromotionRouteProvider",
+ *       "default" = "Drupal\Core\Entity\Routing\AdminHtmlRouteProvider",
  *       "delete-multiple" = "Drupal\entity\Routing\DeleteMultipleRouteProvider",
  *     },
  *     "translation" = "Drupal\content_translation\ContentTranslationHandler"
@@ -57,7 +57,6 @@ use Drupal\Core\Field\BaseFieldDefinition;
  *   },
  *   links = {
  *     "add-form" = "/promotion/add",
- *     "canonical" = "/promotion/{commerce_promotion}/edit",
  *     "edit-form" = "/promotion/{commerce_promotion}/edit",
  *     "delete-form" = "/promotion/{commerce_promotion}/delete",
  *     "delete-multiple-form" = "/admin/commerce/promotions/delete",
