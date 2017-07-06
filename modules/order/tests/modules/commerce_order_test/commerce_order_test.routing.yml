@@ -1,0 +1,9 @@
+commerce_order_test.profile_select_form:
+  path: '/commerce_order_test/profile_select_form'
+  defaults:
+    _form: '\Drupal\commerce_order_test\Form\ProfileSelectTestForm'
+    _title: 'Profile select test form'
+  requirements:
+    _access: 'TRUE'
+  options:
+    no_cache: TRUE
