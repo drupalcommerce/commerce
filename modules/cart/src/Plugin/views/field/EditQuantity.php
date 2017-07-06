@@ -88,18 +88,27 @@ class EditQuantity extends FieldPluginBase {
 
     $form[$this->options['id']]['#tree'] = TRUE;
     foreach ($this->view->result as $row_index => $row) {
+      /** @var \Drupal\commerce_order\Entity\OrderItemInterface $order_item */
       $order_item = $this->getEntity($row);
+
+      /** @var \Drupal\Core\Entity\Display\EntityFormDisplayInterface $form_display */
+      $form_display = commerce_get_entity_display('commerce_order_item', $order_item->bundle(), 'form');
+      $quantity_component = $form_display->getComponent('quantity');
+
       $quantity = $order_item->getQuantity();
+      if ($quantity_component['settings']['step'] == 1) {
+        $quantity = (int) $quantity;
+      }
 
       $form[$this->options['id']][$row_index] = [
         '#type' => 'number',
         '#title' => $this->t('Quantity'),
         '#title_display' => 'invisible',
-        '#default_value' => round($quantity),
+        '#default_value' => $quantity,
         '#size' => 4,
-        '#min' => 1,
+        '#min' => 0,
         '#max' => 9999,
-        '#step' => 1,
+        '#step' => $quantity_component['settings']['step'],
       ];
     }
     // Replace the form submit button label.
