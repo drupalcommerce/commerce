@@ -4,6 +4,7 @@ namespace Drupal\commerce_payment\PluginForm;
 
 use Drupal\commerce\Response\NeedsRedirectException;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Render\Element;
 use Drupal\Core\Url;
 
 /**
@@ -89,7 +90,7 @@ abstract class PaymentOffsiteForm extends PaymentGatewayFormBase {
   }
 
   /**
-   * Prepares the complete form for a redirect.
+   * Prepares the complete form for a POST redirect.
    *
    * Sets the form #action, adds a class for the JS to target.
    * Workaround for buildConfigurationForm() not receiving $complete_form.
@@ -108,6 +109,11 @@ abstract class PaymentOffsiteForm extends PaymentGatewayFormBase {
     $complete_form['#action'] = $element['#action'];
     $complete_form['#attributes']['class'][] = 'payment-redirect-form';
     unset($element['#action']);
+    // The form actions are hidden by default, but needed in this case.
+    $complete_form['actions']['#access'] = TRUE;
+    foreach (Element::children($complete_form['actions']) as $element_name) {
+      $complete_form['actions'][$element_name]['#access'] = TRUE;
+    }
 
     return $element;
   }

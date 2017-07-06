@@ -144,6 +144,10 @@ class PaymentProcess extends CheckoutPaneBase {
       $complete_form['actions']['next']['#value'] = $this->t('Proceed to @gateway', [
         '@gateway' => $payment_gateway_plugin->getDisplayLabel(),
       ]);
+      // Hide the actions by default, they are not needed by gateways that
+      // embed iframes or redirect via GET. The offsite-payment form can
+      // choose to show them when needed (redirect via POST).
+      $complete_form['actions']['#access'] = FALSE;
 
       return $pane_form;
     }
