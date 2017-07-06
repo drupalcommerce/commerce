@@ -13,3 +13,10 @@ block.settings.commerce_cart:
     dropdown:
       type: boolean
       label: 'Display cart contents in dropdown'
+
+views.field.commerce_order_item_edit_quantity:
+  type: views.field.field
+  mapping:
+    allow_decimal:
+      type: boolean
+      label: 'Allow decimal quantity'

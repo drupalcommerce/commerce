@@ -65,3 +65,14 @@ commerce_order.commerce_order_item_type.*:
     orderType:
       type: string
       label: 'Order type'
+
+field.widget.settings.commerce_quantity:
+  type: mapping
+  label: 'Quantity widget settings'
+  mapping:
+    placeholder:
+      type: label
+      label: 'Placeholder'
+    step:
+      type: string
+      label: 'Step'
