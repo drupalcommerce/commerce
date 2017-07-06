@@ -280,6 +280,29 @@ class Payment extends ContentEntityBase implements PaymentInterface {
         $this->setRefundedAmount($refunded_amount);
       }
     }
+
+    // Add or subtract payments from order.
+    if ($this->isNew()) {
+      $this->getOrder()->addPayment($this->getAmount())->save();
+    }
+    else {
+      $original = $this->values['original'];
+      $net_refund = $this->getRefundedAmount()->subtract($original->getRefundedAmount());
+      $this->getOrder()->subtractPayment($net_refund)->save();
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function preDelete(EntityStorageInterface $storage, array $entities) {
+    parent::preDelete($storage, $entities);
+
+    // Subtract each payment from order.
+    foreach ($entities as $payment) {
+      $net_payment = $payment->getAmount()->subtract($payment->getRefundedAmount());
+      $payment->getOrder()->subtractPayment($net_payment)->save();
+    }
   }
 
   /**
