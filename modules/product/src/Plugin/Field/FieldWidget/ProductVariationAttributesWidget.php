@@ -112,15 +112,17 @@ class ProductVariationAttributesWidget extends ProductVariationWidgetBase implem
     }
 
     // Build the full attribute form.
-    $wrapper_id = Html::getUniqueId('commerce-product-add-to-cart-form');
+    $ids = $form_state->getFormObject()->getFormInstanceIds();
+    $id = end($ids);
+    $wrapper_id = Html::getUniqueId('commerce-product-add-to-cart-form-' . $id);
     $form += [
       '#wrapper_id' => $wrapper_id,
       '#prefix' => '<div id="' . $wrapper_id . '">',
       '#suffix' => '</div>',
     ];
-    $parents = array_merge($element['#field_parents'], [$items->getName(), $delta]);
-    $user_input = (array) NestedArray::getValue($form_state->getUserInput(), $parents);
-    if (!empty($user_input)) {
+    if ($form_state->getTriggeringElement()) {
+      $parents = array_merge($element['#field_parents'], [$items->getName(), $delta]);
+      $user_input = (array) NestedArray::getValue($form_state->getUserInput(), $parents);
       $selected_variation = $this->selectVariationFromUserInput($variations, $user_input);
     }
     else {
@@ -146,6 +148,7 @@ class ProductVariationAttributesWidget extends ProductVariationWidgetBase implem
     ];
     foreach ($this->getAttributeInfo($selected_variation, $variations) as $field_name => $attribute) {
       $element['attributes'][$field_name] = [
+        '#id' => Html::getUniqueId('edit-purchased-entity-0-attributes-' . $field_name . '-' . $id),
         '#type' => $attribute['element_type'],
         '#title' => $attribute['title'],
         '#options' => $attribute['values'],
@@ -176,6 +179,7 @@ class ProductVariationAttributesWidget extends ProductVariationWidgetBase implem
       if (!isset($element['attributes'][$field_name]['#empty_value'])) {
         $element['attributes'][$field_name]['#required'] = TRUE;
       }
+
     }
 
     return $element;
