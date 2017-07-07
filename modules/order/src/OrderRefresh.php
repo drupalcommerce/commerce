@@ -153,13 +153,14 @@ class OrderRefresh implements OrderRefreshInterface {
       $processor->process($order);
     }
 
-    // @todo Evaluate which order items have changed.
     foreach ($order->getItems() as $order_item) {
-      // Remove the order that was set above, to avoid
-      // crashes during the entity save process.
-      $order_item->order_id->entity = NULL;
-      $order_item->setChangedTime($current_time);
-      $order_item->save();
+      if ($order_item->hasTranslationChanges()) {
+        // Remove the order that was set above, to avoid
+        // crashes during the entity save process.
+        $order_item->order_id->entity = NULL;
+        $order_item->setChangedTime($current_time);
+        $order_item->save();
+      }
     }
   }
 
