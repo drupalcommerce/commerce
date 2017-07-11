@@ -27,7 +27,7 @@ interface ManualPaymentGatewayInterface extends PaymentGatewayInterface, HasPaym
   public function createPayment(PaymentInterface $payment, $received = FALSE);
 
   /**
-   * Marks the given payment as received.
+   * Receives the given payment.
    *
    * @param \Drupal\commerce_payment\Entity\PaymentInterface $payment
    *   The payment.

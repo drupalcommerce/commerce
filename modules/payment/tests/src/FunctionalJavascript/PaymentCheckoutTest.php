@@ -276,7 +276,7 @@ class PaymentCheckoutTest extends CommerceBrowserTestBase {
     $payment = Payment::load(1);
     $this->assertNotNull($payment);
     $this->assertEquals($payment->getAmount(), $order->getTotalPrice());
-    $this->assertEquals('capture_completed', $payment->getState()->value);
+    $this->assertEquals('completed', $payment->getState()->value);
   }
 
   /**

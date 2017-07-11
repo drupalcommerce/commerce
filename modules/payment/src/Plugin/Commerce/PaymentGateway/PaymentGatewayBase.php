@@ -10,6 +10,7 @@ use Drupal\commerce_payment\Exception\InvalidRequestException;
 use Drupal\commerce_payment\PaymentMethodTypeManager;
 use Drupal\commerce_payment\PaymentTypeManager;
 use Drupal\commerce_price\Price;
+use Drupal\Component\Datetime\TimeInterface;
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\FormStateInterface;
@@ -56,6 +57,13 @@ abstract class PaymentGatewayBase extends PluginBase implements PaymentGatewayIn
   protected $paymentMethodTypes;
 
   /**
+   * The time.
+   *
+   * @var \Drupal\Component\Datetime\TimeInterface
+   */
+  protected $time;
+
+  /**
    * Constructs a new PaymentGatewayBase object.
    *
    * @param array $configuration
@@ -70,11 +78,14 @@ abstract class PaymentGatewayBase extends PluginBase implements PaymentGatewayIn
    *   The payment type manager.
    * @param \Drupal\commerce_payment\PaymentMethodTypeManager $payment_method_type_manager
    *   The payment method type manager.
+   * @param \Drupal\Component\Datetime\TimeInterface $time
+   *   The time.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityTypeManagerInterface $entity_type_manager, PaymentTypeManager $payment_type_manager, PaymentMethodTypeManager $payment_method_type_manager) {
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityTypeManagerInterface $entity_type_manager, PaymentTypeManager $payment_type_manager, PaymentMethodTypeManager $payment_method_type_manager, TimeInterface $time) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
 
     $this->entityTypeManager = $entity_type_manager;
+    $this->time = $time;
     if (isset($configuration['_entity_id'])) {
       $this->entityId = $configuration['_entity_id'];
       unset($configuration['_entity_id']);
@@ -98,7 +109,8 @@ abstract class PaymentGatewayBase extends PluginBase implements PaymentGatewayIn
       $plugin_definition,
       $container->get('entity_type.manager'),
       $container->get('plugin.manager.commerce_payment_type'),
-      $container->get('plugin.manager.commerce_payment_method_type')
+      $container->get('plugin.manager.commerce_payment_method_type'),
+      $container->get('datetime.time')
     );
   }
 
@@ -339,7 +351,7 @@ abstract class PaymentGatewayBase extends PluginBase implements PaymentGatewayIn
         'title' => $this->t('Refund'),
         'page_title' => $this->t('Refund payment'),
         'plugin_form' => 'refund-payment',
-        'access' => in_array($payment_state, ['capture_completed', 'capture_partially_refunded']),
+        'access' => in_array($payment_state, ['completed', 'partially_refunded']),
       ];
     }
 

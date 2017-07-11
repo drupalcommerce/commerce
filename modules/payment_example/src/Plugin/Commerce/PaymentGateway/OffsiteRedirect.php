@@ -77,10 +77,8 @@ class OffsiteRedirect extends OffsitePaymentGatewayBase {
       'amount' => $order->getTotalPrice(),
       'payment_gateway' => $this->entityId,
       'order_id' => $order->id(),
-      'test' => $this->getMode() == 'test',
       'remote_id' => $request->query->get('txn_id'),
       'remote_state' => $request->query->get('payment_status'),
-      'authorized' => \Drupal::time()->getRequestTime(),
     ]);
     $payment->save();
     drupal_set_message('Payment was processed');

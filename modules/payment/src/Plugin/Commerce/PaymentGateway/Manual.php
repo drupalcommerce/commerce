@@ -104,7 +104,7 @@ class Manual extends PaymentGatewayBase implements ManualPaymentGatewayInterface
       'title' => $this->t('Refund'),
       'page_title' => $this->t('Refund payment'),
       'plugin_form' => 'refund-payment',
-      'access' => in_array($payment_state, ['received', 'partially_refunded']),
+      'access' => in_array($payment_state, ['completed', 'partially_refunded']),
     ];
 
     return $operations;
@@ -116,10 +116,7 @@ class Manual extends PaymentGatewayBase implements ManualPaymentGatewayInterface
   public function createPayment(PaymentInterface $payment, $received = FALSE) {
     $this->assertPaymentState($payment, ['new']);
 
-    $payment->state = $received ? 'received' : 'pending';
-    if ($received) {
-      $payment->setCapturedTime(\Drupal::time()->getRequestTime());
-    }
+    $payment->state = $received ? 'completed' : 'pending';
     $payment->save();
   }
 
@@ -131,9 +128,8 @@ class Manual extends PaymentGatewayBase implements ManualPaymentGatewayInterface
 
     // If not specified, use the entire amount.
     $amount = $amount ?: $payment->getAmount();
-    $payment->state = 'received';
+    $payment->state = 'completed';
     $payment->setAmount($amount);
-    $payment->setCapturedTime(\Drupal::time()->getRequestTime());
     $payment->save();
   }
 
@@ -151,7 +147,7 @@ class Manual extends PaymentGatewayBase implements ManualPaymentGatewayInterface
    * {@inheritdoc}
    */
   public function refundPayment(PaymentInterface $payment, Price $amount = NULL) {
-    $this->assertPaymentState($payment, ['received', 'partially_refunded']);
+    $this->assertPaymentState($payment, ['completed', 'partially_refunded']);
     // If not specified, refund the entire amount.
     $amount = $amount ?: $payment->getAmount();
     $this->assertRefundAmount($payment, $amount);

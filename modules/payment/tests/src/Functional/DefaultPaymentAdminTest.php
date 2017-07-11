@@ -151,12 +151,13 @@ class DefaultPaymentAdminTest extends CommerceBrowserTestBase {
     $this->getSession()->getPage()->pressButton('Continue');
     $this->submitForm(['payment[amount][number]' => '100'], 'Add payment');
     $this->assertSession()->addressEquals($this->paymentUri);
-    $this->assertSession()->pageTextContains('Capture (Completed)');
+    $this->assertSession()->pageTextContains('Completed');
 
     /** @var \Drupal\commerce_payment\Entity\PaymentInterface $payment */
     $payment = Payment::load(1);
     $this->assertEquals($payment->getOrderId(), $this->order->id());
     $this->assertEquals($payment->getAmount()->getNumber(), '100');
+    $this->assertNotEmpty($payment->getCompletedTime());
   }
 
   /**
@@ -179,10 +180,10 @@ class DefaultPaymentAdminTest extends CommerceBrowserTestBase {
     $this->submitForm(['payment[amount][number]' => '10'], 'Capture');
     $this->assertSession()->addressEquals($this->paymentUri);
     $this->assertSession()->pageTextNotContains('Authorization');
-    $this->assertSession()->pageTextContains('Capture (Completed)');
+    $this->assertSession()->pageTextContains('Completed');
 
     $payment = Payment::load($payment->id());
-    $this->assertEquals($payment->getState()->getLabel(), 'Capture (Completed)');
+    $this->assertEquals($payment->getState()->getLabel(), 'Completed');
   }
 
   /**
@@ -199,16 +200,16 @@ class DefaultPaymentAdminTest extends CommerceBrowserTestBase {
     $this->paymentGateway->getPlugin()->createPayment($payment, TRUE);
 
     $this->drupalGet($this->paymentUri);
-    $this->assertSession()->pageTextContains('Capture (Completed)');
+    $this->assertSession()->pageTextContains('Completed');
 
     $this->drupalGet($this->paymentUri . '/' . $payment->id() . '/operation/refund');
     $this->submitForm(['payment[amount][number]' => '10'], 'Refund');
     $this->assertSession()->addressEquals($this->paymentUri);
-    $this->assertSession()->pageTextNotContains('Capture (Completed)');
-    $this->assertSession()->pageTextContains('Capture (Refunded)');
+    $this->assertSession()->pageTextNotContains('Completed');
+    $this->assertSession()->pageTextContains('Refunded');
 
     $payment = Payment::load($payment->id());
-    $this->assertEquals($payment->getState()->getLabel(), 'Capture (Refunded)');
+    $this->assertEquals($payment->getState()->getLabel(), 'Refunded');
   }
 
   /**

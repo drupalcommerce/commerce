@@ -10,6 +10,7 @@ use Drupal\commerce_payment\PaymentMethodTypeManager;
 use Drupal\commerce_payment\PaymentTypeManager;
 use Drupal\commerce_payment\Plugin\Commerce\PaymentGateway\OnsitePaymentGatewayBase;
 use Drupal\commerce_price\Price;
+use Drupal\Component\Datetime\TimeInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\FormStateInterface;
 
@@ -34,8 +35,8 @@ class Onsite extends OnsitePaymentGatewayBase implements OnsiteInterface {
   /**
    * {@inheritdoc}
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityTypeManagerInterface $entity_type_manager, PaymentTypeManager $payment_type_manager, PaymentMethodTypeManager $payment_method_type_manager) {
-    parent::__construct($configuration, $plugin_id, $plugin_definition, $entity_type_manager, $payment_type_manager, $payment_method_type_manager);
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityTypeManagerInterface $entity_type_manager, PaymentTypeManager $payment_type_manager, PaymentMethodTypeManager $payment_method_type_manager, TimeInterface $time) {
+    parent::__construct($configuration, $plugin_id, $plugin_definition, $entity_type_manager, $payment_type_manager, $payment_method_type_manager, $time);
 
     // You can create an instance of the SDK here and assign it to $this->api.
     // Or inject Guzzle when there's no suitable SDK.
@@ -104,13 +105,10 @@ class Onsite extends OnsitePaymentGatewayBase implements OnsiteInterface {
     $payment_method_token = $payment_method->getRemoteId();
     // The remote ID returned by the request.
     $remote_id = '123456';
+    $next_state = $capture ? 'completed' : 'authorization';
 
-    $payment->state = $capture ? 'capture_completed' : 'authorization';
+    $payment->setState($next_state);
     $payment->setRemoteId($remote_id);
-    $payment->setAuthorizedTime(\Drupal::time()->getRequestTime());
-    if ($capture) {
-      $payment->setCapturedTime(\Drupal::time()->getRequestTime());
-    }
     $payment->save();
   }
 
@@ -127,9 +125,8 @@ class Onsite extends OnsitePaymentGatewayBase implements OnsiteInterface {
     $remote_id = $payment->getRemoteId();
     $number = $amount->getNumber();
 
-    $payment->state = 'capture_completed';
+    $payment->setState('completed');
     $payment->setAmount($amount);
-    $payment->setCapturedTime(\Drupal::time()->getRequestTime());
     $payment->save();
   }
 
@@ -142,7 +139,7 @@ class Onsite extends OnsitePaymentGatewayBase implements OnsiteInterface {
     // See \Drupal\commerce_payment\Exception for the available exceptions.
     $remote_id = $payment->getRemoteId();
 
-    $payment->state = 'authorization_voided';
+    $payment->setState('authorization_voided');
     $payment->save();
   }
 
@@ -150,7 +147,7 @@ class Onsite extends OnsitePaymentGatewayBase implements OnsiteInterface {
    * {@inheritdoc}
    */
   public function refundPayment(PaymentInterface $payment, Price $amount = NULL) {
-    $this->assertPaymentState($payment, ['capture_completed', 'capture_partially_refunded']);
+    $this->assertPaymentState($payment, ['completed', 'partially_refunded']);
     // If not specified, refund the entire amount.
     $amount = $amount ?: $payment->getAmount();
     $this->assertRefundAmount($payment, $amount);
@@ -163,10 +160,10 @@ class Onsite extends OnsitePaymentGatewayBase implements OnsiteInterface {
     $old_refunded_amount = $payment->getRefundedAmount();
     $new_refunded_amount = $old_refunded_amount->add($amount);
     if ($new_refunded_amount->lessThan($payment->getAmount())) {
-      $payment->state = 'capture_partially_refunded';
+      $payment->setState('partially_refunded');
     }
     else {
-      $payment->state = 'capture_refunded';
+      $payment->setState('refunded');
     }
 
     $payment->setRefundedAmount($new_refunded_amount);

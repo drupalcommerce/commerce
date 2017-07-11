@@ -11,12 +11,12 @@ payment_default:
       label: 'Authorization (Voided)'
     authorization_expired:
       label: 'Authorization (Expired)'
-    capture_completed:
-      label: 'Capture (Completed)'
-    capture_partially_refunded:
-      label: 'Capture (Partially refunded)'
-    capture_refunded:
-      label: 'Capture (Refunded)'
+    completed:
+      label: 'Completed'
+    partially_refunded:
+      label: 'Partially refunded'
+    refunded:
+      label: 'Refunded'
   transitions:
     # Transitions are required by the state_machine module,
     # but aren't actually used by the payment API.
@@ -35,19 +35,19 @@ payment_default:
     authorize_capture:
       label: 'Authorize and capture payment'
       from: [new]
-      to: capture_completed
+      to: completed
     capture:
       label: 'Capture payment'
       from: [authorization]
-      to: capture_completed
+      to: completed
     partially_refund:
       label: 'Partially refund payment'
-      from: [capture_completed]
-      to: capture_partially_refunded
+      from: [completed]
+      to: partially_refunded
     refund:
       label: 'Refund payment'
-      from: [capture_completed, capture_partially_refunded]
-      to: capture_refunded
+      from: [completed, partially_refunded]
+      to: refunded
 
 payment_manual:
   id: payment_manual
@@ -58,8 +58,8 @@ payment_manual:
       label: 'New'
     pending:
       label: 'Pending'
-    received:
-      label: 'Received'
+    completed:
+      label: 'Completed'
     partially_refunded:
       label: 'Partially refunded'
     refunded:
@@ -74,14 +74,14 @@ payment_manual:
     receive:
       label: 'Receive payment'
       from: [pending]
-      to: received
+      to: completed
     partially_refund:
       label: 'Partially refund payment'
-      from: [received]
+      from: [completed]
       to: partially_refunded
     refund:
       label: 'Refund payment'
-      from: [received, partially_refunded]
+      from: [completed, partially_refunded]
       to: refunded
     void:
       label: 'Void payment'
