@@ -17,6 +17,7 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Plugin\PluginBase;
 use Drupal\Core\Plugin\PluginWithFormsTrait;
+use Drupal\user\UserInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -356,6 +357,55 @@ abstract class PaymentGatewayBase extends PluginBase implements PaymentGatewayIn
     }
 
     return $operations;
+  }
+
+  /**
+   * Gets the remote customer ID for the given user.
+   *
+   * The remote customer ID is specific to a payment gateway instance
+   * in the configured mode. This allows the gateway to skip test customers
+   * after the gateway has been switched to live mode.
+   *
+   * @param \Drupal\user\UserInterface $account
+   *   The user account.
+   *
+   * @return string
+   *   The remote customer ID, or NULL if none found.
+   */
+  protected function getRemoteCustomerId(UserInterface $account) {
+    $remote_id = NULL;
+    if ($account->isAuthenticated()) {
+      /** @var \Drupal\commerce\Plugin\Field\FieldType\RemoteIdFieldItemListInterface $remote_ids */
+      $remote_ids = $account->get('commerce_remote_id');
+      $remote_id = $remote_ids->getByProvider($this->entityId . '|' . $this->getMode());
+      // Gateways used to key customer IDs by module name, migrate that data.
+      if (!$remote_id) {
+        $remote_id = $remote_ids->getByProvider($this->pluginDefinition['provider']);
+        if ($remote_id) {
+          $remote_ids->setByProvider($this->pluginDefinition['provider'], NULL);
+          $remote_ids->setByProvider($this->entityId . '|' . $this->getMode(), $remote_id);
+          $account->save();
+        }
+      }
+    }
+
+    return $remote_id;
+  }
+
+  /**
+   * Sets the remote customer ID for the given user.
+   *
+   * @param \Drupal\user\UserInterface $account
+   *   The user account.
+   * @param string $remote_id
+   *   The remote customer ID.
+   */
+  protected function setRemoteCustomerId(UserInterface $account, $remote_id) {
+    if ($account->isAuthenticated()) {
+      /** @var \Drupal\commerce\Plugin\Field\FieldType\RemoteIdFieldItemListInterface $remote_ids */
+      $remote_ids = $account->get('commerce_remote_id');
+      $remote_ids->setByProvider($this->entityId . '|' . $this->getMode(), $remote_id);
+    }
   }
 
   /**
