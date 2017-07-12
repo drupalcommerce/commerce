@@ -479,10 +479,10 @@ class Order extends ContentEntityBase implements OrderInterface {
       if (!$this->getIpAddress()) {
         $this->setIpAddress(\Drupal::request()->getClientIp());
       }
+    }
 
-      if (!$this->getEmail() && $customer = $this->getCustomer()) {
-        $this->setEmail($customer->getEmail());
-      }
+    if (!$this->getEmail() && $customer = $this->getCustomer()) {
+      $this->setEmail($customer->getEmail());
     }
 
     // Maintain the completed timestamp.
