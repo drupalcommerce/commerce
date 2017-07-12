@@ -2,7 +2,6 @@
 
 namespace Drupal\commerce_order\Plugin\Field\FieldWidget;
 
-use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FieldItemListInterface;
@@ -75,22 +74,16 @@ class BillingProfileWidget extends WidgetBase implements ContainerFactoryPluginI
     $order = $items[$delta]->getEntity();
     $store = $order->getStore();
 
-    if (!$items[$delta]->isEmpty()) {
-      $profile = $items[$delta]->entity;
-    }
-    else {
-      $profile = $this->entityTypeManager->getStorage('profile')->create([
-        'type' => 'customer',
-        'uid' => $order->getCustomerId(),
-      ]);
-    }
-
     $element['#type'] = 'fieldset';
     $element['profile'] = [
       '#type' => 'commerce_profile_select',
-      '#default_value' => $profile,
+      '#title' => $this->t('Select an address'),
+      '#create_title' => t('+ Enter a new address'),
+      '#default_value' => $profile = $items[$delta]->entity,
       '#default_country' => $store->getAddress()->getCountryCode(),
       '#available_countries' => $store->getBillingCountries(),
+      '#profile_type' => 'customer',
+      '#owner_uid' => $order->getCustomerId(),
     ];
     // Workaround for massageFormValues() not getting $element.
     $element['array_parents'] = [
@@ -107,8 +100,7 @@ class BillingProfileWidget extends WidgetBase implements ContainerFactoryPluginI
   public function massageFormValues(array $values, array $form, FormStateInterface $form_state) {
     $new_values = [];
     foreach ($values as $delta => $value) {
-      $element = NestedArray::getValue($form, $value['array_parents']);
-      $new_values[$delta]['entity'] = $element['profile']['#profile'];
+      $new_values[$delta]['entity'] = $value['profile'];
     }
     return $new_values;
   }
