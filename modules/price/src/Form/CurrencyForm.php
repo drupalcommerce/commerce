@@ -55,6 +55,7 @@ class CurrencyForm extends EntityForm {
       '#type' => 'textfield',
       '#title' => $this->t('Name'),
       '#default_value' => $currency->getName(),
+      '#placeholder' => $this->t('Custom Currency Name'),
       '#maxlength' => 255,
       '#required' => TRUE,
     ];
@@ -64,7 +65,7 @@ class CurrencyForm extends EntityForm {
       '#default_value' => $currency->getCurrencyCode(),
       '#element_validate' => ['::validateCurrencyCode'],
       '#pattern' => '[A-Z]{3}',
-      '#placeholder' => 'XXX',
+      '#placeholder' => 'USD',
       '#maxlength' => 3,
       '#size' => 4,
       '#disabled' => !$currency->isNew(),
@@ -87,6 +88,7 @@ class CurrencyForm extends EntityForm {
       '#type' => 'textfield',
       '#title' => $this->t('Symbol'),
       '#default_value' => $currency->getSymbol(),
+      '#placeholder' => '$',
       '#maxlength' => 4,
       '#size' => 4,
       '#required' => TRUE,
@@ -94,7 +96,7 @@ class CurrencyForm extends EntityForm {
     $form['fractionDigits'] = [
       '#type' => 'number',
       '#title' => $this->t('Fraction digits'),
-      '#description' => $this->t('The number of digits after the decimal sign.'),
+      '#description' => $this->t('Decimal places: the number of digits after the decimal sign. ie. 125.00'),
       '#default_value' => $currency->getFractionDigits(),
       '#min' => 0,
       '#required' => TRUE,
