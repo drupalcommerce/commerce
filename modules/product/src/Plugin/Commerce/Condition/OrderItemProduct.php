@@ -75,7 +75,7 @@ class OrderItemProduct extends ConditionBase implements ContainerFactoryPluginIn
   public function buildConfigurationForm(array $form, FormStateInterface $form_state) {
     $form = parent::buildConfigurationForm($form, $form_state);
 
-    $products = [];
+    $products = NULL;
     $product_ids = array_column($this->configuration['products'], 'product_id');
     if (!empty($product_ids)) {
       $products = $this->productStorage->loadMultiple($product_ids);
