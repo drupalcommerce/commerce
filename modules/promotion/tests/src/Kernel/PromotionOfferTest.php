@@ -247,4 +247,115 @@ class PromotionOfferTest extends CommerceKernelTestBase {
     $this->assertEquals(new Price('10.00', 'USD'), $this->order->getTotalPrice());
   }
 
+  /**
+   * Tests product fixed amount off.
+   */
+  public function testProductFixedAmountOff() {
+    $variation = ProductVariation::create([
+      'type' => 'default',
+      'sku' => strtolower($this->randomMachineName()),
+      'price' => [
+        'number' => '10.00',
+        'currency_code' => 'USD',
+      ],
+    ]);
+    $variation->save();
+    $product = Product::create([
+      'type' => 'default',
+      'title' => 'My product',
+      'variations' => [$variation],
+    ]);
+    $product->save();
+
+    $order_item = OrderItem::create([
+      'type' => 'default',
+      'quantity' => '1',
+      'unit_price' => $variation->getPrice(),
+      'purchased_entity' => $variation->id(),
+    ]);
+    $order_item->save();
+    $this->assertEquals($variation->id(), $order_item->getPurchasedEntityId());
+    $this->order->addItem($order_item);
+    $this->order->save();
+    $this->assertCount(1, $this->order->getItems());
+
+    // Starts now, enabled. No end time.
+    $promotion = Promotion::create([
+      'name' => 'Promotion 1',
+      'order_types' => [$this->order->bundle()],
+      'stores' => [$this->store->id()],
+      'status' => TRUE,
+      'offer' => [
+        'target_plugin_id' => 'order_item_fixed_amount_off',
+        'target_plugin_configuration' => [
+          'amount' => [
+            'number' => '15.00',
+            'currency_code' => 'USD',
+          ],
+        ],
+      ],
+    ]);
+    $promotion->save();
+
+    /** @var \Drupal\commerce\Plugin\Field\FieldType\PluginItem $offer_field */
+    $offer_field = $promotion->get('offer')->first();
+    $this->assertEquals('15.00', $offer_field->target_plugin_configuration['amount']['number']);
+
+    $this->container->get('commerce_order.order_refresh')->refresh($this->order);
+    $this->order = $this->reloadEntity($this->order);
+    $this->order->recalculateTotalPrice();
+    /** @var \Drupal\commerce_order\Entity\OrderItemInterface $order_item */
+    $order_item = $this->reloadEntity($order_item);
+
+    $adjustments = $order_item->getAdjustments();
+    $this->assertEquals(1, count($adjustments));
+    /** @var \Drupal\commerce_order\Adjustment $adjustment */
+    $adjustment = reset($adjustments);
+
+    // Adjustments don't affect total order item price, but the order's total.
+    $this->assertEquals(new Price('10.00', 'USD'), $order_item->getTotalPrice());
+
+    // Offer amount larger than the order item price.
+    $this->assertEquals(new Price('-10.00', 'USD'), $adjustment->getAmount());
+    $this->assertEquals(new Price('0.00', 'USD'), $this->order->getTotalPrice());
+
+    // Offer amount smaller than the order item unit price.
+    $variation2 = ProductVariation::create([
+      'type' => 'default',
+      'sku' => strtolower($this->randomMachineName()),
+      'price' => [
+        'number' => '20.00',
+        'currency_code' => 'USD',
+      ],
+    ]);
+    $variation2->save();
+    $product2 = Product::create([
+      'type' => 'default',
+      'title' => 'My product',
+      'variations' => [$variation],
+    ]);
+    $product2->save();
+    $order_item2 = OrderItem::create([
+      'type' => 'default',
+      'quantity' => '2',
+      'unit_price' => $variation2->getPrice(),
+      'purchased_entity' => $variation2->id(),
+    ]);
+    $order_item2->save();
+    $this->order->addItem($order_item2);
+    $this->order->save();
+    $this->container->get('commerce_order.order_refresh')->refresh($this->order);
+    $this->order = $this->reloadEntity($this->order);
+    $this->order->recalculateTotalPrice();
+    /** @var \Drupal\commerce_order\Entity\OrderItemInterface $order_item2 */
+    $order_item2 = $this->reloadEntity($order_item2);
+    $adjustments = $order_item2->getAdjustments();
+    /** @var \Drupal\commerce_order\Adjustment $adjustment */
+    $adjustment = reset($adjustments);
+    // Offer amount larger than the order item price.
+    $this->assertEquals(new Price('40.00', 'USD'), $order_item2->getTotalPrice());
+    $this->assertEquals(new Price('-15.00', 'USD'), $adjustment->getAmount());
+    $this->assertEquals(new Price('10.00', 'USD'), $this->order->getTotalPrice());
+  }
+
 }
