@@ -79,6 +79,7 @@ class PluginSelectWidget extends WidgetBase implements ContainerFactoryPluginInt
     $plugins = array_map(function ($definition) {
       return $definition['label'];
     }, $this->pluginManager->getDefinitions());
+    asort($plugins);
     $target_plugin_id_parents = array_merge($element['#field_parents'], [$items->getName(), $delta, 'target_plugin_id']);
     $target_plugin_id = NestedArray::getValue($form_state->getUserInput(), $target_plugin_id_parents);
     $target_plugin_configuration = [];
