@@ -53,6 +53,9 @@ field.widget.settings.commerce_entity_select:
   type: mapping
   label: 'Entity select widget settings'
   mapping:
+    hide_single_entity:
+      type: boolean
+      label: 'Hide if there''s only one entity'
     autocomplete_threshold:
       type: integer
       label: 'Autocomplete threshold'
