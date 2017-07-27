@@ -25,6 +25,16 @@ commerce.commerce_condition.plugin.order_item_quantity:
       type: integer
       label: 'Quantity'
 
+commerce.commerce_condition.plugin.order_store:
+  type: commerce_condition_configuration
+  mapping:
+    stores:
+      type: sequence
+      label: 'Stores'
+      sequence:
+        type: string
+        label: 'Store'
+
 commerce.commerce_condition.plugin.order_total_price:
   type: commerce_condition_configuration
   mapping:
