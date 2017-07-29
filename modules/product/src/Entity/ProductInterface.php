@@ -32,26 +32,6 @@ interface ProductInterface extends ContentEntityInterface, EntityChangedInterfac
   public function setTitle($title);
 
   /**
-   * Get whether the product is published.
-   *
-   * Unpublished products are only visible to their authors and administrators.
-   *
-   * @return bool
-   *   TRUE if the product is published, FALSE otherwise.
-   */
-  public function isPublished();
-
-  /**
-   * Sets whether the product is published.
-   *
-   * @param bool $published
-   *   Whether the product is published.
-   *
-   * @return $this
-   */
-  public function setPublished($published);
-
-  /**
    * Gets the product creation timestamp.
    *
    * @return int

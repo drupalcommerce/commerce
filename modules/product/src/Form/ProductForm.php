@@ -154,6 +154,16 @@ class ProductForm extends ContentEntityForm {
       ],
       '#weight' => 60,
     ];
+
+    $form['footer'] = [
+      '#type' => 'container',
+      '#weight' => 99,
+      '#attributes' => [
+        'class' => ['node-form-footer']
+      ]
+    ];
+    $form['status']['#group'] = 'footer';
+
     $form['author'] = [
       '#type' => 'details',
       '#title' => t('Authoring information'),

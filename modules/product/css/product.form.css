@@ -10,6 +10,12 @@
   box-sizing: border-box;
 }
 
+.layout-region-product-footer__content {
+    border-top: 1px solid #bebfb9;
+    padding-top: 0.5em;
+    margin-top: 1.5em;
+}
+
 /* Wide screens */
 @media
   screen and (min-width: 780px),
@@ -21,6 +27,10 @@
     width: 65%;
     padding-right: 2em; /* LTR */
     box-sizing: border-box;
+  }
+
+  .layout-region-product-footer__content {
+    margin-top: 0.5em;
   }
 
   [dir="rtl"] .layout-region-product-main,
