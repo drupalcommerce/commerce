@@ -2,7 +2,6 @@
 
 namespace Drupal\commerce_product\Form;
 
-use Drupal\commerce_product\Entity\ProductInterface;
 use Drupal\Core\Datetime\DateFormatterInterface;
 use Drupal\Component\Datetime\TimeInterface;
 use Drupal\Core\Entity\ContentEntityForm;
@@ -159,8 +158,8 @@ class ProductForm extends ContentEntityForm {
       '#type' => 'container',
       '#weight' => 99,
       '#attributes' => [
-        'class' => ['node-form-footer']
-      ]
+        'class' => ['node-form-footer'],
+      ],
     ];
     $form['status']['#group'] = 'footer';
 
