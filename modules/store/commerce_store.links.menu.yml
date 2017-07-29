@@ -1,7 +1,7 @@
 entity.commerce_store.collection:
   title: 'Stores'
   route_name: 'entity.commerce_store.collection'
-  parent: 'commerce.admin_commerce'
+  parent: 'commerce.configuration'
   description: 'Manage your stores.'
 
 entity.commerce_store_type.collection:
