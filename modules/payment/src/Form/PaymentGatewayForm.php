@@ -112,6 +112,7 @@ class PaymentGatewayForm extends CommercePluginEntityFormBase {
     $form['conditions'] = [
       '#type' => 'commerce_conditions',
       '#title' => $this->t('Conditions'),
+      '#parent_entity_type' => 'commerce_payment_gateway',
       '#entity_types' => ['commerce_order'],
       '#default_value' => $gateway->get('conditions'),
     ];
