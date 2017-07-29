@@ -45,6 +45,9 @@ commerce.commerce_condition.plugin.order_total_price:
       type: field.value.commerce_price
       label: 'Amount'
 
+commerce.commerce_condition.plugin.order_type:
+  type: commerce.commerce_condition.plugin.entity_bundle
+
 commerce_order.commerce_order_type.*:
   type: commerce_config_entity_bundle
   label: 'Order type'

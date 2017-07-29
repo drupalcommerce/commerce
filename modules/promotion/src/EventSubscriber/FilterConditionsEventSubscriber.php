@@ -30,6 +30,7 @@ class FilterConditionsEventSubscriber implements EventSubscriberInterface {
     if ($event->getParentEntityTypeId() == 'commerce_promotion') {
       $definitions = $event->getDefinitions();
       unset($definitions['order_store']);
+      unset($definitions['order_type']);
       $event->setDefinitions($definitions);
     }
   }
