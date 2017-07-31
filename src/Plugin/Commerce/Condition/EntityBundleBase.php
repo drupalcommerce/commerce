@@ -72,7 +72,7 @@ abstract class EntityBundleBase extends ConditionBase implements ContainerFactor
     $form['bundles'] = [
       '#type' => 'commerce_entity_select',
       '#title' => $bundle_entity_type->getLabel(),
-      '#default_value' => $this->configuration['values'],
+      '#default_value' => $this->configuration['bundles'],
       '#target_type' => $bundle_entity_type->id(),
       '#hide_single_entity' => FALSE,
       '#autocomplete_threshold' => 10,
