@@ -87,7 +87,7 @@ abstract class PaymentGatewayBase extends PluginBase implements PaymentGatewayIn
 
     $this->entityTypeManager = $entity_type_manager;
     $this->time = $time;
-    if (isset($configuration['_entity_id'])) {
+    if (array_key_exists('_entity_id', $configuration)) {
       $this->entityId = $configuration['_entity_id'];
       unset($configuration['_entity_id']);
     }

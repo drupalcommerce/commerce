@@ -71,7 +71,7 @@ abstract class TaxTypeBase extends PluginBase implements TaxTypeInterface, Conta
 
     $this->entityTypeManager = $entity_type_manager;
     $this->eventDispatcher = $event_dispatcher;
-    if (isset($configuration['_entity_id'])) {
+    if (array_key_exists('_entity_id', $configuration)) {
       $this->entityId = $configuration['_entity_id'];
       unset($configuration['_entity_id']);
     }
