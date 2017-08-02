@@ -1,0 +1,15 @@
+<?php
+
+/**
+ * @file
+ * Test module for Cart + Big Pipe.
+ */
+
+use Drupal\commerce_cart_big_pipe\Form\BigPipeAddToCartForm;
+
+/**
+ * Implements hook_entity_type_build().
+ */
+function commerce_cart_big_pipe_entity_type_build(array &$entity_types) {
+  $entity_types['commerce_order_item']->setFormClass('add_to_cart', BigPipeAddToCartForm::class);
+}

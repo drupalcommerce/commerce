@@ -11,6 +11,7 @@ use Drupal\commerce_price\Resolver\ChainPriceResolverInterface;
 use Drupal\commerce_store\StoreContextInterface;
 use Drupal\Component\Datetime\TimeInterface;
 use Drupal\Core\Entity\ContentEntityForm;
+use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityManagerInterface;
 use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
 use Drupal\Core\Form\FormStateInterface;
@@ -21,7 +22,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 /**
  * Provides the order item add to cart form.
  */
-class AddToCartForm extends ContentEntityForm {
+class AddToCartForm extends ContentEntityForm implements AddToCartFormInterface {
 
   /**
    * The cart manager.
@@ -59,20 +60,18 @@ class AddToCartForm extends ContentEntityForm {
   protected $chainPriceResolver;
 
   /**
-   * The form instance ID.
-   *
-   * Numeric counter used to ensure form ID uniqueness.
-   *
-   * @var int
-   */
-  protected static $formInstanceId = 0;
-
-  /**
    * The current user.
    *
    * @var \Drupal\Core\Session\AccountInterface
    */
   protected $currentUser;
+
+  /**
+   * The form ID.
+   *
+   * @var string
+   */
+  protected $formId;
 
   /**
    * Constructs a new AddToCartForm object.
@@ -105,8 +104,6 @@ class AddToCartForm extends ContentEntityForm {
     $this->storeContext = $store_context;
     $this->chainPriceResolver = $chain_price_resolver;
     $this->currentUser = $current_user;
-
-    self::$formInstanceId++;
   }
 
   /**
@@ -129,6 +126,14 @@ class AddToCartForm extends ContentEntityForm {
   /**
    * {@inheritdoc}
    */
+  public function setEntity(EntityInterface $entity) {
+    $this->entity = $entity;
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function getBaseFormId() {
     return $this->entity->getEntityTypeId() . '_' . $this->operation . '_form';
   }
@@ -137,16 +142,24 @@ class AddToCartForm extends ContentEntityForm {
    * {@inheritdoc}
    */
   public function getFormId() {
-    $form_id = $this->entity->getEntityTypeId();
-    if ($this->entity->getEntityType()->hasKey('bundle')) {
-      $form_id .= '_' . $this->entity->bundle();
+    if (empty($this->formId)) {
+      $this->formId = $this->getBaseFormId();
+      /** @var \Drupal\commerce_order\Entity\OrderItemInterface $order_item */
+      $order_item = $this->entity;
+      if ($purchased_entity = $order_item->getPurchasedEntity()) {
+        $this->formId .= '_' . $purchased_entity->getEntityTypeId() . '_' . $purchased_entity->id();
+      }
     }
-    if ($this->operation != 'default') {
-      $form_id = $form_id . '_' . $this->operation;
-    }
-    $form_id .= '_' . self::$formInstanceId;
 
-    return $form_id . '_form';
+    return $this->formId;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setFormId($form_id) {
+    $this->formId = $form_id;
+    return $this;
   }
 
   /**
@@ -187,14 +200,15 @@ class AddToCartForm extends ContentEntityForm {
     /** @var \Drupal\commerce\PurchasableEntityInterface $purchased_entity */
     $purchased_entity = $order_item->getPurchasedEntity();
 
-    $order_type = $this->orderTypeResolver->resolve($order_item);
-
+    $order_type_id = $this->orderTypeResolver->resolve($order_item);
     $store = $this->selectStore($purchased_entity);
-    $cart = $this->cartProvider->getCart($order_type, $store);
+    $cart = $this->cartProvider->getCart($order_type_id, $store);
     if (!$cart) {
-      $cart = $this->cartProvider->createCart($order_type, $store);
+      $cart = $this->cartProvider->createCart($order_type_id, $store);
     }
     $this->cartManager->addOrderItem($cart, $order_item, $form_state->get(['settings', 'combine']));
+    // Other submit handlers might need the cart ID.
+    $form_state->set('cart_id', $cart->id());
 
     drupal_set_message($this->t('@entity added to @cart-link.', [
       '@entity' => $purchased_entity->label(),

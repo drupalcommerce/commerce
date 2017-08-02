@@ -243,6 +243,15 @@ class ProductVariation extends CommerceContentEntityBase implements ProductVaria
   /**
    * {@inheritdoc}
    */
+  public function getAttributeFieldNames() {
+    $attribute_field_manager = \Drupal::service('commerce_product.attribute_field_manager');
+    $field_map = $attribute_field_manager->getFieldMap($this->bundle());
+    return array_column($field_map, 'field_name');
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function getAttributeValueIds() {
     $attribute_ids = [];
     foreach ($this->getAttributeFieldNames() as $field_name) {
@@ -307,18 +316,6 @@ class ProductVariation extends CommerceContentEntityBase implements ProductVaria
     }
 
     return $attribute_value;
-  }
-
-  /**
-   * Gets the names of the entity's attribute fields.
-   *
-   * @return string[]
-   *   The attribute field names.
-   */
-  protected function getAttributeFieldNames() {
-    $attribute_field_manager = \Drupal::service('commerce_product.attribute_field_manager');
-    $field_map = $attribute_field_manager->getFieldMap($this->bundle());
-    return array_column($field_map, 'field_name');
   }
 
   /**
@@ -437,11 +434,10 @@ class ProductVariation extends CommerceContentEntityBase implements ProductVaria
       ->setDisplayConfigurable('form', TRUE)
       ->setDisplayConfigurable('view', TRUE);
 
-    // The price is not required because it's not guaranteed to be used
-    // for storage (there might be a price per currency, role, country, etc).
     $fields['price'] = BaseFieldDefinition::create('commerce_price')
       ->setLabel(t('Price'))
       ->setDescription(t('The variation price'))
+      ->setRequired(TRUE)
       ->setDisplayOptions('view', [
         'label' => 'above',
         'type' => 'commerce_price_default',

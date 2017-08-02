@@ -196,7 +196,6 @@ function commerce_cart_form_commerce_order_type_form_alter(array &$form, FormSta
     '#options' => $available_form_views,
     '#default_value' => $cart_form_view,
   ];
-
   $form['commerce_cart']['cart_block_view'] = [
     '#type' => 'select',
     '#title' => t('Shopping cart block view'),
@@ -211,9 +210,11 @@ function commerce_cart_form_commerce_order_type_form_alter(array &$form, FormSta
  * Form submission handler for 'commerce_order_type_form'.
  */
 function commerce_cart_order_type_form_submit($form, FormStateInterface $form_state) {
-  $settings = &$form_state->getValue('commerce_cart');
+  /** @var \Drupal\commerce_order\Entity\OrderTypeInterface $order_type */
   $order_type = $form_state->getFormObject()->getEntity();
-  // @todo open follow up and fix cart_form_view, commerce_cart_block saving.
+  $settings = &$form_state->getValue('commerce_cart');
+  $order_type->setThirdPartySetting('commerce_cart', 'cart_form_view', $settings['cart_form_view']);
+  $order_type->setThirdPartySetting('commerce_cart', 'cart_block_view', $settings['cart_block_view']);
   $order_type->save();
 }
 
