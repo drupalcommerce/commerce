@@ -21,6 +21,17 @@ interface PaymentMethodInterface extends ContentEntityInterface, EntityChangedIn
   public function getType();
 
   /**
+   * Gets the payment gateway mode.
+   *
+   * A payment gateway in "live" mode can't manipulate payment methods created
+   * while it was in "test" mode, and vice-versa.
+   *
+   * @return string
+   *   The payment gateway mode.
+   */
+  public function getPaymentGatewayMode();
+
+  /**
    * Gets the payment method remote ID.
    *
    * @return string

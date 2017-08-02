@@ -2,6 +2,7 @@
 
 namespace Drupal\Tests\commerce_promotion\Kernel\Entity;
 
+use Drupal\commerce_order\Entity\OrderItemType;
 use Drupal\commerce_order\Entity\OrderType;
 use Drupal\commerce_promotion\Entity\Coupon;
 use Drupal\commerce_promotion\Entity\Promotion;
@@ -39,7 +40,7 @@ class PromotionTest extends CommerceKernelTestBase {
 
     $this->installEntitySchema('profile');
     $this->installEntitySchema('commerce_order');
-    $this->installEntitySchema('commerce_order_type');
+    $this->installEntitySchema('commerce_order_item');
     $this->installEntitySchema('commerce_promotion');
     $this->installEntitySchema('commerce_promotion_coupon');
     $this->installConfig([
@@ -47,6 +48,12 @@ class PromotionTest extends CommerceKernelTestBase {
       'commerce_order',
       'commerce_promotion',
     ]);
+
+    OrderItemType::create([
+      'id' => 'test',
+      'label' => 'Test',
+      'orderType' => 'default',
+    ])->save();
   }
 
   /**
@@ -69,8 +76,6 @@ class PromotionTest extends CommerceKernelTestBase {
    * @covers ::addCoupon
    * @covers ::removeCoupon
    * @covers ::hasCoupon
-   * @covers ::getCurrentUsage
-   * @covers ::setCurrentUsage
    * @covers ::getUsageLimit
    * @covers ::setUsageLimit
    * @covers ::getStartDate
@@ -130,9 +135,6 @@ class PromotionTest extends CommerceKernelTestBase {
     $this->assertFalse($promotion->hasCoupon($coupon1));
     $promotion->addCoupon($coupon1);
     $this->assertTrue($promotion->hasCoupon($coupon1));
-
-    $promotion->setCurrentUsage(1);
-    $this->assertEquals(1, $promotion->getCurrentUsage());
 
     $promotion->setUsageLimit(10);
     $this->assertEquals(10, $promotion->getUsageLimit());

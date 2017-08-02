@@ -2,7 +2,9 @@
 
 namespace Drupal\commerce_order\Form;
 
+use Drupal\commerce\EntityHelper;
 use Drupal\commerce\Form\CommerceBundleEntityFormBase;
+use Drupal\commerce\PurchasableEntityInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 
@@ -16,18 +18,13 @@ class OrderItemTypeForm extends CommerceBundleEntityFormBase {
     $order_item_type = $this->entity;
     // Prepare the list of purchasable entity types.
     $entity_types = $this->entityTypeManager->getDefinitions();
-    $purchasable_entity_types = array_filter($entity_types, function ($entity_type) {
-      return $entity_type->isSubclassOf('\Drupal\commerce\PurchasableEntityInterface');
+    $purchasable_entity_types = array_filter($entity_types, function (EntityTypeInterface $entity_type) {
+      return $entity_type->entityClassImplements(PurchasableEntityInterface::class);
     });
-    $purchasable_entity_types = array_map(function ($entity_type) {
+    $purchasable_entity_types = array_map(function (EntityTypeInterface $entity_type) {
       return $entity_type->getLabel();
     }, $purchasable_entity_types);
-    // Prepare the list of order types.
-    $order_types = $this->entityTypeManager->getStorage('commerce_order_type')
-      ->loadMultiple();
-    $order_types = array_map(function ($order_type) {
-      return $order_type->label();
-    }, $order_types);
+    $order_types = $this->entityTypeManager->getStorage('commerce_order_type')->loadMultiple();
 
     $form['#tree'] = TRUE;
     $form['label'] = [
@@ -58,7 +55,7 @@ class OrderItemTypeForm extends CommerceBundleEntityFormBase {
       '#type' => 'select',
       '#title' => $this->t('Order type'),
       '#default_value' => $order_item_type->getOrderTypeId(),
-      '#options' => $order_types,
+      '#options' => EntityHelper::extractLabels($order_types),
       '#required' => TRUE,
     ];
     $form = $this->buildTraitForm($form, $form_state);

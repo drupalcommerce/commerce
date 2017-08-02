@@ -4,7 +4,6 @@ namespace Drupal\commerce\Plugin\Field\FieldType;
 
 use Drupal\Core\Field\FieldItemBase;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
-use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\TypedData\DataDefinition;
 use Drupal\Core\TypedData\MapDataDefinition;
 
@@ -60,41 +59,6 @@ class PluginItem extends FieldItemBase implements PluginItemInterface {
   /**
    * {@inheritdoc}
    */
-  public static function defaultFieldSettings() {
-    return [
-      'categories' => [],
-    ] + parent::defaultFieldSettings();
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function fieldSettingsForm(array $form, FormStateInterface $form_state) {
-    $element = [];
-    $element['categories'] = [
-      '#type' => 'select',
-      '#title' => $this->t('Plugin categories'),
-      '#default_value' => $this->getSetting('categories'),
-      '#multiple' => TRUE,
-      '#size' => 5,
-    ];
-
-    $categories = [];
-    foreach ($this->getPluginManager()->getDefinitions() as $definition) {
-      if (!isset($definition['category'])) {
-        continue;
-      }
-      $categories[$definition['category']] = $definition['category'];
-    }
-
-    $element['categories']['#options'] = $categories;
-
-    return $element;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public static function mainPropertyName() {
     return 'target_plugin_id';
   }
@@ -107,22 +71,17 @@ class PluginItem extends FieldItemBase implements PluginItemInterface {
   }
 
   /**
-   * Gets the exectuable plugin's manager.
-   *
-   * @return \Drupal\Core\Executable\ExecutableManagerInterface|\Drupal\Component\Plugin\CategorizingPluginManagerInterface
-   *   The plugin manager.
+   * {@inheritdoc}
    */
-  public function getPluginManager() {
-    return \Drupal::service('plugin.manager.' . $this->getPluginDefinition()['plugin_type']);
+  public function getTargetDefinition() {
+    return $this->getPluginManager()->getDefinition($this->target_plugin_id);
   }
 
   /**
    * {@inheritdoc}
    */
   public function getTargetInstance(array $contexts = []) {
-    $plugin = $this->getPluginManager()
-      ->createInstance($this->target_plugin_id, $this->target_plugin_configuration);
-
+    $plugin = $this->getPluginManager()->createInstance($this->target_plugin_id, $this->target_plugin_configuration);
     // Just because the plugin is context aware, we cannot guarantee the
     // plugin manager sets them. So we apply the context mapping as well.
     if (!empty($contexts)) {
@@ -136,7 +95,10 @@ class PluginItem extends FieldItemBase implements PluginItemInterface {
    * {@inheritdoc}
    */
   public function setValue($values, $notify = TRUE) {
-    if (isset($values['target_plugin_configuration'])) {
+    if (isset($values)) {
+      $values += [
+        'target_plugin_configuration' => [],
+      ];
       // Single serialized values on shared tables for base fields are not
       // always unserialized. https://www.drupal.org/node/2788637
       if (is_string($values['target_plugin_configuration'])) {
@@ -145,6 +107,16 @@ class PluginItem extends FieldItemBase implements PluginItemInterface {
     }
 
     parent::setValue($values, $notify);
+  }
+
+  /**
+   * Gets the plugin manager.
+   *
+   * @return \Drupal\Core\Executable\ExecutableManagerInterface|\Drupal\Component\Plugin\CategorizingPluginManagerInterface
+   *   The plugin manager.
+   */
+  protected function getPluginManager() {
+    return \Drupal::service('plugin.manager.' . $this->getPluginDefinition()['plugin_type']);
   }
 
 }

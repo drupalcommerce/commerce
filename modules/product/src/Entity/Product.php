@@ -15,6 +15,7 @@ use Drupal\Core\Field\BaseFieldDefinition;
  * @ContentEntityType(
  *   id = "commerce_product",
  *   label = @Translation("Product"),
+ *   label_collection = @Translation("Products"),
  *   label_singular = @Translation("product"),
  *   label_plural = @Translation("products"),
  *   label_count = @PluralTranslation(
@@ -289,6 +290,22 @@ class Product extends ContentEntityBase implements ProductInterface {
     }
 
     return $entities;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function preSave(EntityStorageInterface $storage) {
+    parent::preSave($storage);
+
+    foreach (array_keys($this->getTranslationLanguages()) as $langcode) {
+      $translation = $this->getTranslation($langcode);
+
+      // If no owner has been set explicitly, make the anonymous user the owner.
+      if (!$translation->getOwner()) {
+        $translation->setOwnerId(0);
+      }
+    }
   }
 
   /**

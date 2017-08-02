@@ -2,9 +2,10 @@
 
 namespace Drupal\commerce_order\Element;
 
-use Drupal\commerce\Element\CommerceElementBase;
+use Drupal\commerce\Element\CommerceElementTrait;
 use Drupal\Core\Entity\Entity\EntityFormDisplay;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Render\Element\RenderElement;
 use Drupal\profile\Entity\ProfileInterface;
 
 /**
@@ -25,7 +26,9 @@ use Drupal\profile\Entity\ProfileInterface;
  *
  * @RenderElement("commerce_profile_select")
  */
-class ProfileSelect extends CommerceElementBase {
+class ProfileSelect extends RenderElement {
+
+  use CommerceElementTrait;
 
   /**
    * {@inheritdoc}

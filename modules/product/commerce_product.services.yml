@@ -1,11 +1,11 @@
 services:
   commerce_product.attribute_field_manager:
     class: Drupal\commerce_product\ProductAttributeFieldManager
-    arguments: ['@entity_field.manager', '@entity_type.bundle.info', '@entity.query', '@cache.data']
+    arguments: ['@entity_field.manager', '@entity_type.bundle.info', '@entity_type.manager', '@cache.data']
 
   commerce_product.lazy_builders:
     class: Drupal\commerce_product\ProductLazyBuilders
-    arguments: ['@entity_type.manager', '@entity.form_builder']
+    arguments: ['@entity_type.manager', '@form_builder']
 
   commerce_product.variation_field_renderer:
     class: Drupal\commerce_product\ProductVariationFieldRenderer

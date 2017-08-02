@@ -6,7 +6,7 @@ use Drupal\commerce_product\Entity\ProductAttributeInterface;
 use Drupal\Core\Entity\EntityFieldManagerInterface;
 use Drupal\Core\Entity\Display\EntityFormDisplayInterface;
 use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
-use Drupal\Core\Entity\Query\QueryFactory;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\field\Entity\FieldConfig;
@@ -31,11 +31,11 @@ class ProductAttributeFieldManager implements ProductAttributeFieldManagerInterf
   protected $entityTypeBundleInfo;
 
   /**
-   * The entity query factory.
+   * The entity type manager.
    *
-   * @var \Drupal\Core\Entity\Query\QueryFactory
+   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
    */
-  public $queryFactory;
+  public $entityTypeManager;
 
   /**
    * The cache backend.
@@ -65,15 +65,15 @@ class ProductAttributeFieldManager implements ProductAttributeFieldManagerInterf
    *   The entity field manager.
    * @param \Drupal\Core\Entity\EntityTypeBundleInfoInterface $entity_type_bundle_info
    *   The entity type bundle info.
-   * @param \Drupal\Core\Entity\Query\QueryFactory $query_factory
-   *   The entity query factory.
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   *   The entity type manager.
    * @param \Drupal\Core\Cache\CacheBackendInterface $cache
    *   The cache backend.
    */
-  public function __construct(EntityFieldManagerInterface $entity_field_manager, EntityTypeBundleInfoInterface $entity_type_bundle_info, QueryFactory $query_factory, CacheBackendInterface $cache) {
+  public function __construct(EntityFieldManagerInterface $entity_field_manager, EntityTypeBundleInfoInterface $entity_type_bundle_info, EntityTypeManagerInterface $entity_type_manager, CacheBackendInterface $cache) {
     $this->entityFieldManager = $entity_field_manager;
     $this->entityTypeBundleInfo = $entity_type_bundle_info;
-    $this->queryFactory = $query_factory;
+    $this->entityTypeManager = $entity_type_manager;
     $this->cache = $cache;
   }
 
@@ -215,12 +215,13 @@ class ProductAttributeFieldManager implements ProductAttributeFieldManagerInterf
    */
   public function canDeleteField(ProductAttributeInterface $attribute, $variation_type_id) {
     $field_name = $this->buildFieldName($attribute);
-    // Prevent an EntityQuery crash by first confirming the field exists.
     $field = FieldConfig::loadByName('commerce_product_variation', $variation_type_id, $field_name);
     if (!$field) {
-      throw new \InvalidArgumentException(sprintf('Could not find the attribute field "%s" for attribute "%s".', $field_name, $attribute->id()));
+      // The matching field was already deleted, or follows a different naming
+      // pattern, because it wasn't created by this class.
+      return FALSE;
     }
-    $query = $this->queryFactory->get('commerce_product_variation')
+    $query = $this->entityTypeManager->getStorage('commerce_product_variation')->getQuery()
       ->condition('type', $variation_type_id)
       ->exists($field_name)
       ->range(0, 1);

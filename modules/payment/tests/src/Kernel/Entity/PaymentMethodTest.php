@@ -74,6 +74,7 @@ class PaymentMethodTest extends CommerceKernelTestBase {
   /**
    * @covers ::getType
    * @covers ::getPaymentGatewayId
+   * @covers ::getPaymentGatewayMode
    * @covers ::getOwner
    * @covers ::setOwner
    * @covers ::getOwnerId
@@ -105,9 +106,11 @@ class PaymentMethodTest extends CommerceKernelTestBase {
       'type' => 'credit_card',
       'payment_gateway' => 'example',
     ]);
+    $payment_method->save();
 
     $this->assertInstanceOf(CreditCard::class, $payment_method->getType());
     $this->assertEquals('example', $payment_method->getPaymentGatewayId());
+    $this->assertEquals('test', $payment_method->getPaymentGatewayMode());
 
     $payment_method->setOwner($this->user);
     $this->assertEquals($this->user, $payment_method->getOwner());

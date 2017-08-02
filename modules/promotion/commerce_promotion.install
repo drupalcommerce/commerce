@@ -1,0 +1,117 @@
+<?php
+
+/**
+ * @file
+ * Install, update and uninstall functions for the commerce_promotion module.
+ */
+
+use Drupal\Core\Field\BaseFieldDefinition;
+
+/**
+ * Implements hook_schema().
+ */
+function commerce_promotion_schema() {
+  $schema['commerce_promotion_usage'] = [
+    'description' => 'Stores promotion usage.',
+    'fields' => [
+      'usage_id' => [
+        'description' => 'Primary Key: Usage ID.',
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ],
+      'promotion_id' => [
+        'description' => 'The {commerce_promotion}.promotion_id.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+      ],
+      'coupon_id' => [
+        'description' => 'The {commerce_promotion_coupon}.id.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'default' => 0,
+      ],
+      'order_id' => [
+        'description' => 'The {commerce_order}.order_id.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+      ],
+      'mail' => [
+        'description' => 'The customer email.',
+        'type' => 'varchar',
+        'length' => 254,
+        'not null' => FALSE,
+      ],
+    ],
+    'primary key' => ['usage_id'],
+    'indexes' => [
+      'promotion_id' => ['promotion_id'],
+      'coupon_id' => ['coupon_id'],
+    ],
+    'foreign keys' => [
+      'promotion_id' => ['commerce_promotion' => 'promotion_id'],
+      'coupon_id' => ['commerce_promotion_coupon' => 'id'],
+      'order_id' => ['commerce_order' => 'order_id'],
+    ],
+  ];
+
+  return $schema;
+}
+
+/**
+ * Install the `commerce_promotion_usage` table schema.
+ */
+function commerce_promotion_update_8201() {
+  drupal_install_schema('commerce_promotion');
+}
+
+/**
+ * Remove the current_usage field from promotions, add the weight field.
+ */
+function commerce_promotion_update_8202() {
+  $entity_definition_update = \Drupal::entityDefinitionUpdateManager();
+
+  $storage_definition = BaseFieldDefinition::create('integer')
+    ->setName('current_usage')
+    ->setTargetEntityTypeId('commerce_promotion')
+    ->setLabel(t('Current usage'))
+    ->setDescription(t('The number of times the promotion was used.'))
+    ->setDefaultValue(0);
+  $entity_definition_update->uninstallFieldStorageDefinition($storage_definition);
+
+  $storage_definition = BaseFieldDefinition::create('integer')
+    ->setLabel(t('Weight'))
+    ->setDescription(t('The weight of this promotion in relation to others.'))
+    ->setDefaultValue(0)
+    ->setDisplayOptions('view', [
+      'label' => 'hidden',
+      'type' => 'integer',
+      'weight' => 0,
+    ])
+    ->setDisplayOptions('form', [
+      'type' => 'number',
+      'weight' => 4,
+    ]);
+  $entity_definition_update->installFieldStorageDefinition('weight', 'commerce_promotion', 'commerce_promotion', $storage_definition);
+}
+
+/**
+ * Add the usage_limit field to coupons.
+ */
+function commerce_promotion_update_8203() {
+  $entity_definition_update = \Drupal::entityDefinitionUpdateManager();
+
+  $storage_definition = BaseFieldDefinition::create('integer')
+    ->setLabel(t('Usage limit'))
+    ->setDescription(t('The maximum number of times the coupon can be used. 0 for unlimited.'))
+    ->setDefaultValue(0)
+    ->setDisplayOptions('form', [
+      'type' => 'commerce_usage_limit',
+      'weight' => 4,
+    ]);
+  $entity_definition_update->installFieldStorageDefinition('usage_limit', 'commerce_promotion_coupon', 'commerce_promotion', $storage_definition);
+}
