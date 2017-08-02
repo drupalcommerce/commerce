@@ -25,4 +25,12 @@ interface ProductAttributeInterface extends ConfigEntityInterface {
    */
   public function getElementType();
 
+  /**
+   * Gets the attribute customer facing label.
+   *
+   * @return string
+   *   The attribute element label.
+   */
+  public function getElementLabel();
+
 }
