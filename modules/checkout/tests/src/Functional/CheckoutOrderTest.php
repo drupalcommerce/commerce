@@ -55,6 +55,7 @@ class CheckoutOrderTest extends CommerceBrowserTestBase {
     parent::setUp();
 
     $this->placeBlock('commerce_cart');
+    $this->placeBlock('commerce_checkout_progress');
 
     $variation = $this->createEntity('commerce_product_variation', [
       'type' => 'default',
@@ -76,6 +77,8 @@ class CheckoutOrderTest extends CommerceBrowserTestBase {
 
   /**
    * Tests than an order can go through checkout steps.
+   *
+   * @group debug
    */
   public function testGuestOrderCheckout() {
     $this->drupalLogout();
@@ -86,7 +89,10 @@ class CheckoutOrderTest extends CommerceBrowserTestBase {
     $cart_link->click();
     $this->submitForm([], 'Checkout');
     $this->assertSession()->pageTextNotContains('Order Summary');
+
+    $this->assertCheckoutProgressStep('Login');
     $this->submitForm([], 'Continue as Guest');
+    $this->assertCheckoutProgressStep('Order information');
     $this->submitForm([
       'contact_information[email]' => 'guest@example.com',
       'contact_information[email_confirm]' => 'guest@example.com',
@@ -98,6 +104,7 @@ class CheckoutOrderTest extends CommerceBrowserTestBase {
       'billing_information[profile][address][0][address][locality]' => 'Mountain View',
       'billing_information[profile][address][0][address][administrative_area]' => 'CA',
     ], 'Continue to review');
+    $this->assertCheckoutProgressStep('Review');
     $this->assertSession()->pageTextContains('Contact information');
     $this->assertSession()->pageTextContains('Billing information');
     $this->assertSession()->pageTextContains('Order Summary');
@@ -111,8 +118,10 @@ class CheckoutOrderTest extends CommerceBrowserTestBase {
     $cart_link = $this->getSession()->getPage()->findLink('your cart');
     $cart_link->click();
     $this->submitForm([], 'Checkout');
+    $this->assertCheckoutProgressStep('Login');
     $this->assertSession()->pageTextNotContains('Order Summary');
     $this->submitForm([], 'Continue as Guest');
+    $this->assertCheckoutProgressStep('Order information');
     $this->submitForm([
       'contact_information[email]' => 'guest@example.com',
       'contact_information[email_confirm]' => 'guest@example.com',
@@ -127,6 +136,14 @@ class CheckoutOrderTest extends CommerceBrowserTestBase {
     $this->assertSession()->pageTextContains('Contact information');
     $this->assertSession()->pageTextContains('Billing information');
     $this->assertSession()->pageTextContains('Order Summary');
+    $this->assertCheckoutProgressStep('Review');
+
+    // Go back and forth.
+    $this->getSession()->getPage()->clickLink('Go back');
+    $this->assertCheckoutProgressStep('Order information');
+    $this->getSession()->getPage()->pressButton('Continue to review');
+    $this->assertCheckoutProgressStep('Review');
+
     $this->submitForm([], 'Pay and complete purchase');
     $this->assertSession()->pageTextContains('Your order number is 2. You can view your order on your account page when logged in.');
     $this->assertSession()->pageTextContains('0 items');
@@ -215,32 +232,6 @@ class CheckoutOrderTest extends CommerceBrowserTestBase {
   }
 
   /**
-   * Tests the order summary.
-   */
-  public function testOrderSummary() {
-    $this->drupalGet($this->product->toUrl()->toString());
-    $this->submitForm([], 'Add to cart');
-
-    // Test the default settings: ensure the default view is shown.
-    $this->drupalGet('/checkout/1');
-    $this->assertSession()->elementExists('css', '.view-id-commerce_checkout_order_summary');
-
-    // Disable the order summary.
-    $this->drupalGet('/admin/commerce/config/checkout-flows/manage/default');
-    $this->submitForm(['configuration[order_summary_view]' => ''], t('Save'));
-    $this->drupalGet('/checkout/1');
-    $this->assertSession()->elementNotExists('css', '.view-id-commerce_checkout_order_summary');
-
-    // Use a different view for the order summary.
-    $this->drupalGet('/admin/structure/views/view/commerce_checkout_order_summary/duplicate');
-    $this->submitForm(['id' => 'duplicate_of_commerce_checkout_order_summary'], 'Duplicate');
-    $this->drupalGet('/admin/commerce/config/checkout-flows/manage/default');
-    $this->submitForm(['configuration[order_summary_view]' => 'duplicate_of_commerce_checkout_order_summary'], t('Save'));
-    $this->drupalGet('/checkout/1');
-    $this->assertSession()->elementExists('css', '.view-id-duplicate_of_commerce_checkout_order_summary');
-  }
-
-  /**
    * Tests checkout behaviour after a cart update.
    */
   public function testCheckoutFlowOnCartUpdate() {
@@ -295,6 +286,17 @@ class CheckoutOrderTest extends CommerceBrowserTestBase {
     $this->submitForm([], 'Checkout');
     $this->assertSession()->elementContains('css', 'h1.page-title', 'Order information');
     $this->assertSession()->elementNotContains('css', 'h1.page-title', 'Review');
+  }
+
+  /**
+   * Asserts the current step in the checkout progress block.
+   *
+   * @param string $expected
+   *   The expected value.
+   */
+  protected function assertCheckoutProgressStep($expected) {
+    $current_step = $this->getSession()->getPage()->find('css', '.checkout-progress--step__current')->getText();
+    $this->assertEquals($expected, $current_step);
   }
 
 }

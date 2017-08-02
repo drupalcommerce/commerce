@@ -101,14 +101,14 @@ class PromotionOrderProcessorTest extends CommerceKernelTestBase {
       'stores' => [$this->store->id()],
       'status' => TRUE,
       'offer' => [
-        'target_plugin_id' => 'commerce_promotion_order_percentage_off',
+        'target_plugin_id' => 'order_percentage_off',
         'target_plugin_configuration' => [
           'amount' => '0.10',
         ],
       ],
       'conditions' => [
         [
-          'target_plugin_id' => 'commerce_promotion_order_total_price',
+          'target_plugin_id' => 'order_total_price',
           'target_plugin_configuration' => [
             'amount' => [
               'number' => '20.00',
@@ -149,16 +149,15 @@ class PromotionOrderProcessorTest extends CommerceKernelTestBase {
       'name' => 'Promotion (with coupon)',
       'order_types' => [$this->order->bundle()],
       'stores' => [$this->store->id()],
-      'status' => TRUE,
       'offer' => [
-        'target_plugin_id' => 'commerce_promotion_order_percentage_off',
+        'target_plugin_id' => 'order_percentage_off',
         'target_plugin_configuration' => [
           'amount' => '0.10',
         ],
       ],
       'conditions' => [
         [
-          'target_plugin_id' => 'commerce_promotion_order_total_price',
+          'target_plugin_id' => 'order_total_price',
           'target_plugin_configuration' => [
             'amount' => [
               'number' => '20.00',
@@ -167,6 +166,8 @@ class PromotionOrderProcessorTest extends CommerceKernelTestBase {
           ],
         ],
       ],
+      'start_date' => '2017-01-01',
+      'status' => TRUE,
     ]);
     $promotion_with_coupon->save();
 

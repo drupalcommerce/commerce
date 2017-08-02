@@ -3,14 +3,14 @@
 namespace Drupal\commerce_price\Event;
 
 use CommerceGuys\Intl\NumberFormat\NumberFormatEntityInterface;
-use Symfony\Component\EventDispatcher\GenericEvent;
+use Symfony\Component\EventDispatcher\Event;
 
 /**
  * Defines the number format event.
  *
  * @see \Drupal\commerce_price\Event\PriceEvents
  */
-class NumberFormatEvent extends GenericEvent {
+class NumberFormatEvent extends Event {
 
   /**
    * The number format.

@@ -6,6 +6,9 @@ dependencies:
   enforced:
     module:
       - commerce_product
+  module:
+    - commerce_order
+    - commerce_price
 id: commerce_order_item.default.default
 targetEntityType: commerce_order_item
 bundle: default
@@ -19,17 +22,21 @@ content:
       size: 60
       placeholder: ''
     third_party_settings: {  }
+    region: content
   quantity:
-    type: number
+    type: commerce_quantity
     weight: 1
     settings:
       placeholder: ''
+      step: '1'
     third_party_settings: {  }
+    region: content
   unit_price:
     type: commerce_price_default
     weight: 2
     settings: {  }
     third_party_settings: {  }
+    region: content
 hidden:
   created: true
   status: true

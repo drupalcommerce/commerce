@@ -2,6 +2,7 @@
 
 namespace Drupal\Tests\commerce\FunctionalJavascript;
 
+use Drupal\FunctionalJavascriptTests\JSWebAssert;
 use Zumba\Mink\Driver\PhantomJSDriver;
 
 /**
@@ -53,6 +54,39 @@ trait JavascriptTestTrait {
   protected function waitForAjaxToFinish() {
     $condition = "(0 === jQuery.active && 0 === jQuery(':animated').length)";
     $this->assertJsCondition($condition, 10000);
+  }
+
+  /**
+   * {@inheritdoc}
+   *
+   * @return \Drupal\FunctionalJavascriptTests\JSWebAssert
+   *   A new web-assert option for asserting the presence of elements with.
+   */
+  public function assertSession($name = NULL) {
+    return new JSWebAssert($this->getSession($name), $this->baseUrl);
+  }
+
+  /**
+   * Creates a screenshot.
+   *
+   * @param bool $set_background_color
+   *   (optional) By default this method will set the background color to white.
+   *   Set to FALSE to override this behaviour.
+   *
+   * @throws \Behat\Mink\Exception\UnsupportedDriverActionException
+   *   When operation not supported by the driver.
+   * @throws \Behat\Mink\Exception\DriverException
+   *   When the operation cannot be done.
+   */
+  protected function createScreenshot($set_background_color = TRUE) {
+    $jpg_output_filename = $this->htmlOutputClassName . '-' . $this->htmlOutputCounter . '-' . $this->htmlOutputTestId . '.jpg';
+    $session = $this->getSession();
+    if ($set_background_color) {
+      $session->executeScript("document.body.style.backgroundColor = 'white';");
+    }
+    $image = $session->getScreenshot();
+    file_put_contents($this->htmlOutputDirectory . '/' . $jpg_output_filename, $image);
+    $this->htmlOutputCounter++;
   }
 
 }

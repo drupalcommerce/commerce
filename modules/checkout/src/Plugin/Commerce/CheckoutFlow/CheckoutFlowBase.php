@@ -133,12 +133,13 @@ abstract class CheckoutFlowBase extends PluginBase implements CheckoutFlowInterf
       'payment' => [
         'label' => $this->t('Payment'),
         'next_label' => $this->t('Pay and complete purchase'),
-        'has_order_summary' => FALSE,
+        'has_sidebar' => FALSE,
+        'hidden' => TRUE,
       ],
       'complete' => [
         'label' => $this->t('Complete'),
         'next_label' => $this->t('Pay and complete purchase'),
-        'has_order_summary' => FALSE,
+        'has_sidebar' => FALSE,
       ],
     ];
   }
@@ -178,7 +179,6 @@ abstract class CheckoutFlowBase extends PluginBase implements CheckoutFlowInterf
   public function defaultConfiguration() {
     return [
       'display_checkout_progress' => TRUE,
-      'order_summary_view' => 'commerce_checkout_order_summary',
     ];
   }
 
@@ -186,27 +186,11 @@ abstract class CheckoutFlowBase extends PluginBase implements CheckoutFlowInterf
    * {@inheritdoc}
    */
   public function buildConfigurationForm(array $form, FormStateInterface $form_state) {
-    $view_storage = $this->entityTypeManager->getStorage('view');
-    $available_summary_views = [];
-    /** @var \Drupal\views\Entity\View $view */
-    foreach ($view_storage->loadMultiple() as $view) {
-      if (strpos($view->get('tag'), 'commerce_order_summary') !== FALSE) {
-        $available_summary_views[$view->id()] = $view->label();
-      }
-    }
-
     $form['display_checkout_progress'] = [
       '#type' => 'checkbox',
       '#title' => $this->t('Display checkout progress'),
       '#description' => $this->t('Used by the checkout progress block to determine visibility.'),
       '#default_value' => $this->configuration['display_checkout_progress'],
-    ];
-    $form['order_summary_view'] = [
-      '#type' => 'select',
-      '#title' => $this->t('Order summary view'),
-      '#options' => $available_summary_views,
-      '#empty_value' => '',
-      '#default_value' => $this->configuration['order_summary_view'],
     ];
 
     return $form;
@@ -224,7 +208,6 @@ abstract class CheckoutFlowBase extends PluginBase implements CheckoutFlowInterf
     if (!$form_state->getErrors()) {
       $values = $form_state->getValue($form['#parents']);
       $this->configuration['display_checkout_progress'] = $values['display_checkout_progress'];
-      $this->configuration['order_summary_view'] = $values['order_summary_view'];
     }
   }
 
@@ -251,6 +234,11 @@ abstract class CheckoutFlowBase extends PluginBase implements CheckoutFlowInterf
     if (empty($step_id)) {
       throw new \InvalidArgumentException('The $step_id cannot be empty.');
     }
+    if ($form_state->isRebuilding()) {
+      // Ensure a fresh order, in case an ajax submit has modified it.
+      $order_storage = $this->entityTypeManager->getStorage('commerce_order');
+      $this->order = $order_storage->load($this->order->id());
+    }
 
     $steps = $this->getVisibleSteps();
     $form['#tree'] = TRUE;
@@ -258,10 +246,14 @@ abstract class CheckoutFlowBase extends PluginBase implements CheckoutFlowInterf
     $form['#title'] = $steps[$step_id]['label'];
     $form['#theme'] = ['commerce_checkout_form'];
     $form['#attached']['library'][] = 'commerce_checkout/form';
-    if ($steps[$step_id]['has_order_summary']) {
-      if ($order_summary = $this->buildOrderSummary($form, $form_state)) {
-        $form['order_summary'] = $order_summary;
-      }
+    if ($this->hasSidebar($step_id)) {
+      $form['sidebar']['order_summary'] = [
+        '#type' => 'view',
+        '#name' => 'commerce_checkout_order_summary',
+        '#display_id' => 'default',
+        '#arguments' => [$this->order->id()],
+        '#embed' => TRUE,
+      ];
     }
     $form['actions'] = $this->actions($form, $form_state);
 
@@ -295,29 +287,17 @@ abstract class CheckoutFlowBase extends PluginBase implements CheckoutFlowInterf
   }
 
   /**
-   * Builds the order summary for the current checkout step.
+   * Gets whether the given step has a sidebar.
    *
-   * @param array $form
-   *   An associative array containing the structure of the form.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
-   *   The current state of the form.
+   * @param string $step_id
+   *   The step ID.
    *
-   * @return array
-   *   The form structure.
+   * @return bool
+   *   TRUE if the given step has a sidebar, FALSE otherwise.
    */
-  protected function buildOrderSummary(array $form, FormStateInterface $form_state) {
-    $order_summary = [];
-    if (!empty($this->configuration['order_summary_view'])) {
-      $order_summary = [
-        '#type' => 'view',
-        '#name' => $this->configuration['order_summary_view'],
-        '#display_id' => 'default',
-        '#arguments' => [$this->order->id()],
-        '#embed' => TRUE,
-      ];
-    }
-
-    return $order_summary;
+  protected function hasSidebar($step_id) {
+    $steps = $this->getVisibleSteps();
+    return !empty($steps[$step_id]['has_sidebar']);
   }
 
   /**

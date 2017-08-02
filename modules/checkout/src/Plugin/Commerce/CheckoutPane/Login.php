@@ -11,6 +11,7 @@ use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Url;
 use Drupal\Core\Link;
 use Drupal\user\UserAuthInterface;
+use Drupal\user\UserInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 
@@ -195,7 +196,7 @@ class Login extends CheckoutPaneBase implements CheckoutPaneInterface, Container
       '#type' => 'textfield',
       '#title' => $this->t('Username'),
       '#size' => 60,
-      '#maxlength' => USERNAME_MAX_LENGTH,
+      '#maxlength' => UserInterface::USERNAME_MAX_LENGTH,
       '#attributes' => [
         'autocorrect' => 'none',
         'autocapitalize' => 'none',
@@ -259,7 +260,7 @@ class Login extends CheckoutPaneBase implements CheckoutPaneInterface, Container
     $pane_form['register']['name'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Username'),
-      '#maxlength' => USERNAME_MAX_LENGTH,
+      '#maxlength' => UserInterface::USERNAME_MAX_LENGTH,
       '#description' => $this->t("Several special characters are allowed, including space, period (.), hyphen (-), apostrophe ('), underscore (_), and the @ sign."),
       '#required' => FALSE,
       '#attributes' => [

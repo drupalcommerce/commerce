@@ -108,7 +108,7 @@ class StoreTypeTest extends CommerceBrowserTestBase {
 
     // Try to delete the store type.
     $this->drupalGet('admin/commerce/config/store-types/' . $type->id() . '/delete');
-    $this->assertSession()->pageTextContains(t('@type is used by 1 store on your site. You can not remove this store type until you have removed all of the @type stores.', ['@type' => $type->label()]));
+    $this->assertSession()->pageTextContains(t('@type is used by 1 store on your site. You cannot remove this store type until you have removed all of the @type stores.', ['@type' => $type->label()]));
     $this->assertSession()->pageTextNotContains('This action cannot be undone.');
     $this->assertSession()->pageTextNotContains('The store type deletion confirmation form is not available');
 

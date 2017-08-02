@@ -5,8 +5,6 @@ namespace Drupal\Tests\commerce_promotion\Kernel;
 use Drupal\commerce_order\Entity\OrderItem;
 use Drupal\commerce_order\Entity\OrderItemType;
 use Drupal\commerce_order\Entity\Order;
-use Drupal\commerce_product\Entity\Product;
-use Drupal\commerce_product\Entity\ProductVariation;
 use Drupal\commerce_promotion\Entity\Promotion;
 use Drupal\Tests\commerce\Kernel\CommerceKernelTestBase;
 
@@ -16,13 +14,6 @@ use Drupal\Tests\commerce\Kernel\CommerceKernelTestBase;
  * @group commerce
  */
 class PromotionConditionTest extends CommerceKernelTestBase {
-
-  /**
-   * The condition manager.
-   *
-   * @var \Drupal\commerce_promotion\PromotionConditionManager
-   */
-  protected $conditionManager;
 
   /**
    * The test order.
@@ -85,21 +76,9 @@ class PromotionConditionTest extends CommerceKernelTestBase {
   }
 
   /**
-   * Tests the order total condition.
+   * Tests promotions with an order condition.
    */
-  public function testOrderTotal() {
-    // Use addOrderItem so the total is calculated.
-    $order_item = OrderItem::create([
-      'type' => 'test',
-      'quantity' => 2,
-      'unit_price' => [
-        'number' => '20.00',
-        'currency_code' => 'USD',
-      ],
-    ]);
-    $order_item->save();
-    $this->order->addItem($order_item);
-
+  public function testOrderCondition() {
     // Starts now, enabled. No end time.
     $promotion = Promotion::create([
       'name' => 'Promotion 1',
@@ -107,43 +86,16 @@ class PromotionConditionTest extends CommerceKernelTestBase {
       'stores' => [$this->store->id()],
       'status' => TRUE,
       'offer' => [
-        'target_plugin_id' => 'commerce_promotion_order_percentage_off',
+        'target_plugin_id' => 'order_percentage_off',
         'target_plugin_configuration' => [
           'amount' => '0.10',
         ],
       ],
       'conditions' => [
         [
-          'target_plugin_id' => 'commerce_promotion_order_total_price',
+          'target_plugin_id' => 'order_total_price',
           'target_plugin_configuration' => [
-            'amount' => [
-              'number' => '20.00',
-              'currency_code' => 'USD',
-            ],
-          ],
-        ],
-      ],
-    ]);
-    $promotion->save();
-
-    $result = $promotion->applies($this->order);
-    $this->assertTrue($result);
-
-    $promotion = Promotion::create([
-      'name' => 'Promotion 1',
-      'order_types' => [$this->order->bundle()],
-      'stores' => [$this->store->id()],
-      'status' => TRUE,
-      'offer' => [
-        'target_plugin_id' => 'commerce_promotion_order_percentage_off',
-        'target_plugin_configuration' => [
-          'amount' => '0.10',
-        ],
-      ],
-      'conditions' => [
-        [
-          'target_plugin_id' => 'commerce_promotion_order_total_price',
-          'target_plugin_configuration' => [
+            'operator' => '>',
             'amount' => [
               'number' => '50.00',
               'currency_code' => 'USD',
@@ -154,43 +106,30 @@ class PromotionConditionTest extends CommerceKernelTestBase {
     ]);
     $promotion->save();
 
-    $result = $promotion->applies($this->order);
-    $this->assertFalse($result);
-  }
-
-  /**
-   * Tests the specific SKU test condition.
-   */
-  public function testSpecificSkuCondition() {
-    $variation = ProductVariation::create([
-      'type' => 'default',
-      'sku' => 'TEST123',
-      'price' => [
-        'number' => '10.00',
+    $order_item = OrderItem::create([
+      'type' => 'test',
+      'quantity' => 2,
+      'unit_price' => [
+        'number' => '20.00',
         'currency_code' => 'USD',
       ],
     ]);
-    $variation->save();
-    $product = Product::create([
-      'type' => 'default',
-      'title' => 'My product',
-      'variations' => [$variation],
-    ]);
-    $product->save();
-
-    $order_item = OrderItem::create([
-      'type' => 'default',
-      'quantity' => '2',
-      'unit_price' => $variation->getPrice(),
-      'purchased_entity' => $variation->id(),
-    ]);
     $order_item->save();
     $this->order->addItem($order_item);
-    $this->assertEquals($variation->id(), $order_item->getPurchasedEntityId());
-    $this->order->addItem($order_item);
-    $this->order->save();
-    $this->assertCount(1, $this->order->getItems());
+    $result = $promotion->applies($this->order);
+    $this->assertFalse($result);
 
+    $order_item->setQuantity(3);
+    $order_item->save();
+    $this->order->save();
+    $result = $promotion->applies($this->order);
+    $this->assertTrue($result);
+  }
+
+  /**
+   * Tests promotions with an order item condition.
+   */
+  public function testOrderItemCondition() {
     // Starts now, enabled. No end time.
     $promotion = Promotion::create([
       'name' => 'Promotion 1',
@@ -198,47 +137,62 @@ class PromotionConditionTest extends CommerceKernelTestBase {
       'stores' => [$this->store->id()],
       'status' => TRUE,
       'offer' => [
-        'target_plugin_id' => 'commerce_promotion_order_percentage_off',
+        'target_plugin_id' => 'order_percentage_off',
         'target_plugin_configuration' => [
           'amount' => '0.10',
         ],
       ],
       'conditions' => [
         [
-          'target_plugin_id' => 'commerce_promotion_test_variant_sku',
-          'target_plugin_configuration' => [],
-        ],
-      ],
-    ]);
-    $promotion->save();
-
-    $result = $promotion->applies($this->order);
-    $this->assertTrue($result);
-
-    /** @var \Drupal\commerce_promotion\Entity\Promotion $promotion */
-    $promotion = Promotion::create([
-      'name' => 'Promotion 1',
-      'order_types' => [$this->order->bundle()],
-      'stores' => [$this->store->id()],
-      'status' => TRUE,
-      'offer' => [
-        'target_plugin_id' => 'commerce_promotion_order_percentage_off',
-        'target_plugin_configuration' => [
-          'amount' => '0.10',
-        ],
-      ],
-      'conditions' => [
-        [
-          'target_plugin_id' => 'commerce_promotion_order_total_price',
+          'target_plugin_id' => 'order_total_price',
           'target_plugin_configuration' => [
-            'negate' => 1,
+            'operator' => '>',
+            'amount' => [
+              'number' => '10.00',
+              'currency_code' => 'USD',
+            ],
+          ],
+        ],
+        [
+          'target_plugin_id' => 'order_item_quantity',
+          'target_plugin_configuration' => [
+            'operator' => '>',
+            'quantity' => 2,
           ],
         ],
       ],
     ]);
     $promotion->save();
+
+    $order_item = OrderItem::create([
+      'type' => 'test',
+      'quantity' => 2,
+      'unit_price' => [
+        'number' => '20.00',
+        'currency_code' => 'USD',
+      ],
+    ]);
+    $order_item->save();
+    $this->order->addItem($order_item);
+    $this->order->save();
+
     $result = $promotion->applies($this->order);
     $this->assertFalse($result);
+
+    $order_item = OrderItem::create([
+      'type' => 'test',
+      'quantity' => 4,
+      'unit_price' => [
+        'number' => '20.00',
+        'currency_code' => 'USD',
+      ],
+    ]);
+    $order_item->save();
+    $this->order->addItem($order_item);
+    $this->order->save();
+
+    $result = $promotion->applies($this->order);
+    $this->assertTrue($result);
   }
 
 }
