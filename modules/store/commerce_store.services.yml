@@ -14,6 +14,12 @@ services:
     tags:
       - { name: commerce_store.store_resolver, priority: -100 }
 
+  commerce_store.store_country_resolver:
+    class: Drupal\commerce_store\Resolver\StoreCountryResolver
+    arguments: ['@commerce_store.store_context']
+    tags:
+      - { name: commerce.country_resolver, priority: -90 }
+
   cache_context.store:
     class: Drupal\commerce_store\Cache\Context\StoreCacheContext
     arguments: ['@commerce_store.store_context']

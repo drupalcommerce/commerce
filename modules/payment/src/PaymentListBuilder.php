@@ -140,7 +140,7 @@ class PaymentListBuilder extends EntityListBuilder {
     }
 
     $row['label'] = $formatted_amount;
-    $row['remote_id'] = $entity->getRemoteId();
+    $row['remote_id'] = $entity->getRemoteId() ?: $this->t('N/A');
     $row['state'] = $entity->getState()->getLabel();
 
     return $row + parent::buildRow($entity);

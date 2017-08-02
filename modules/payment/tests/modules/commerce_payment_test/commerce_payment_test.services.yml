@@ -1,0 +1,5 @@
+services:
+  commerce_payment_test.filter_payment_gateways_subscriber:
+    class: Drupal\commerce_payment_test\EventSubscriber\FilterPaymentGatewaysSubscriber
+    tags:
+      - { name: event_subscriber }

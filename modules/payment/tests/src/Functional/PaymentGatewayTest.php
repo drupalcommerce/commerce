@@ -43,9 +43,9 @@ class PaymentGatewayTest extends CommerceBrowserTestBase {
     $values = [
       'label' => 'Example',
       'plugin' => 'example_offsite_redirect',
-      'configuration[redirect_method]' => 'post',
-      'configuration[mode]' => 'test',
-      'configuration[details][value]' => $details['value'],
+      'configuration[example_offsite_redirect][redirect_method]' => 'post',
+      'configuration[example_offsite_redirect][mode]' => 'test',
+      'configuration[example_offsite_redirect][details][value]' => $details['value'],
       'status' => '1',
       // Setting the 'id' can fail if focus switches to another field.
       // This is a bug in the machine name JS that can be reproduced manually.
@@ -86,9 +86,9 @@ class PaymentGatewayTest extends CommerceBrowserTestBase {
       'format' => 'plain_text',
     ];
     $values += [
-      'configuration[redirect_method]' => 'get',
-      'configuration[mode]' => 'live',
-      'configuration[details][value]' => $details['value'],
+      'configuration[example_offsite_redirect][redirect_method]' => 'get',
+      'configuration[example_offsite_redirect][mode]' => 'live',
+      'configuration[example_offsite_redirect][details][value]' => $details['value'],
     ];
     $this->submitForm($values, 'Save');
 

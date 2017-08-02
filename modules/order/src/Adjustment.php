@@ -118,6 +118,26 @@ final class Adjustment {
   }
 
   /**
+   * Gets whether the adjustment is positive.
+   *
+   * @return bool
+   *   TRUE if the adjustmnet is positive, FALSE otherwise.
+   */
+  public function isPositive() {
+    return $this->amount->getNumber() >= 0;
+  }
+
+  /**
+   * Gets whether the adjustment is negative.
+   *
+   * @return bool
+   *   TRUE if the adjustment is negative, FALSE otherwise.
+   */
+  public function isNegative() {
+    return $this->amount->getNumber() < 0;
+  }
+
+  /**
    * Gets whether the adjustment is included in the base price.
    *
    * @return bool

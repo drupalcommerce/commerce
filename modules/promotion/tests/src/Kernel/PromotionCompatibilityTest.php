@@ -96,7 +96,7 @@ class PromotionCompatibilityTest extends CommerceKernelTestBase {
       'stores' => [$this->store->id()],
       'status' => TRUE,
       'offer' => [
-        'target_plugin_id' => 'commerce_promotion_order_percentage_off',
+        'target_plugin_id' => 'order_percentage_off',
         'target_plugin_configuration' => [
           'amount' => '0.10',
         ],
@@ -110,7 +110,7 @@ class PromotionCompatibilityTest extends CommerceKernelTestBase {
       'stores' => [$this->store->id()],
       'status' => TRUE,
       'offer' => [
-        'target_plugin_id' => 'commerce_promotion_order_percentage_off',
+        'target_plugin_id' => 'order_percentage_off',
         'target_plugin_configuration' => [
           'amount' => '0.10',
         ],

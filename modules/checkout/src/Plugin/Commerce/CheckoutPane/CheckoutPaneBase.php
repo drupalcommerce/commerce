@@ -3,6 +3,7 @@
 namespace Drupal\commerce_checkout\Plugin\Commerce\CheckoutPane;
 
 use Drupal\commerce_checkout\Plugin\Commerce\CheckoutFlow\CheckoutFlowInterface;
+use Drupal\commerce_order\Entity\OrderInterface;
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\FormStateInterface;
@@ -140,6 +141,14 @@ abstract class CheckoutPaneBase extends PluginBase implements CheckoutPaneInterf
   /**
    * {@inheritdoc}
    */
+  public function setOrder(OrderInterface $order) {
+    $this->order = $order;
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function getId() {
     return $this->pluginId;
   }
@@ -154,8 +163,8 @@ abstract class CheckoutPaneBase extends PluginBase implements CheckoutPaneInterf
   /**
    * {@inheritdoc}
    */
-  public function getAdminLabel() {
-    return $this->pluginDefinition['admin_label'];
+  public function getDisplayLabel() {
+    return $this->pluginDefinition['display_label'];
   }
 
   /**
