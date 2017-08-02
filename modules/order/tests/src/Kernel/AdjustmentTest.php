@@ -110,6 +110,7 @@ class AdjustmentTest extends CommerceKernelTestBase {
     $this->assertEquals('10% off', $adjustment->getLabel());
     $this->assertEquals('-1.00', $adjustment->getAmount()->getNumber());
     $this->assertEquals('USD', $adjustment->getAmount()->getCurrencyCode());
+    $this->assertEquals(NULL, $adjustment->getPercentage());
     $this->assertFalse($adjustment->isPositive());
     $this->assertTrue($adjustment->isNegative());
     $this->assertTrue($adjustment->isIncluded());

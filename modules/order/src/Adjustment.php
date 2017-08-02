@@ -48,6 +48,13 @@ final class Adjustment {
   protected $included = FALSE;
 
   /**
+   * The adjustment percentage.
+   *
+   * @var float
+   */
+  protected $percentage;
+
+  /**
    * Constructs a new Adjustment object.
    *
    * @param array $definition
@@ -75,6 +82,9 @@ final class Adjustment {
       $this->sourceId = $definition['source_id'];
     }
     $this->included = !empty($definition['included']);
+    if (!empty($definition['percentage'])) {
+      $this->percentage = $definition['percentage'];
+    }
   }
 
   /**
@@ -115,6 +125,16 @@ final class Adjustment {
    */
   public function getAmount() {
     return $this->amount;
+  }
+
+  /**
+   * Gets the adjustment percentage.
+   *
+   * @return float|null
+   *   The adjustment percentage or NULL if not available.
+   */
+  public function getPercentage() {
+    return $this->percentage;
   }
 
   /**
