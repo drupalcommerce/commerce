@@ -168,7 +168,7 @@ abstract class LocalTaxTypeBase extends TaxTypeBase implements LocalTaxTypeInter
           'type' => 'tax',
           'label' => $zone->getDisplayLabel(),
           'amount' => $negate ? $tax_amount->multiply('-1') : $tax_amount,
-          'percentage' => $rate_amount * 100,
+          'percentage' => $rate_amount,
           'source_id' => $this->entityId . '|' . $zone->getId() . '|' . $rate->getId(),
           'included' => !$negate && $this->isDisplayInclusive(),
         ]));

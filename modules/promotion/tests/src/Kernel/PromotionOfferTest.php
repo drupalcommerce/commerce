@@ -238,7 +238,7 @@ class PromotionOfferTest extends CommerceKernelTestBase {
     $adjustment = reset($adjustments);
     // Adjustment for 50% of the order item total.
     $this->assertEquals(new Price('-5.00', 'USD'), $adjustment->getAmount());
-    $this->assertEquals('50', $adjustment->getPercentage());
+    $this->assertEquals('0.50', $adjustment->getPercentage());
     // Adjustments don't affect total order item price, but the order's total.
     $this->assertEquals(new Price('20.00', 'USD'), $order_item->getTotalPrice());
 

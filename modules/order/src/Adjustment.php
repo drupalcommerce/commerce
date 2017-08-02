@@ -50,7 +50,7 @@ final class Adjustment {
   /**
    * The adjustment percentage.
    *
-   * @var float
+   * @var string
    */
   protected $percentage;
 
@@ -130,7 +130,7 @@ final class Adjustment {
   /**
    * Gets the adjustment percentage.
    *
-   * @return float|null
+   * @return string|null
    *   The adjustment percentage or NULL if not available.
    */
   public function getPercentage() {

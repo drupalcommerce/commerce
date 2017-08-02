@@ -32,7 +32,7 @@ class OrderPercentageOff extends PercentageOffBase {
       // @todo Change to label from UI when added in #2770731.
       'label' => t('Discount'),
       'amount' => $adjustment_amount->multiply('-1'),
-      'percentage' => $this->getAmount() * 100,
+      'percentage' => $this->getAmount(),
       'source_id' => $promotion->id(),
     ]));
   }
