@@ -307,7 +307,6 @@ abstract class PaymentGatewayBase extends PluginBase implements PaymentGatewayIn
       ];
     }
 
-
     if (count($payment_method_types) > 1) {
       $form['payment_method_types'] = [
         '#type' => 'checkboxes',
