@@ -1,3 +1,15 @@
+commerce.commerce_condition.plugin.order_item_product:
+  type: commerce_condition_configuration
+  mapping:
+    products:
+      type: sequence
+      label: 'Products'
+      sequence:
+        type: mapping
+        mapping:
+          product_id:
+            type: integer
+
 commerce_product.commerce_product_type.*:
   type: commerce_config_entity_bundle
   label: 'Product type'

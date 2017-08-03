@@ -3,6 +3,7 @@
 namespace Drupal\Tests\commerce_log\Kernel;
 
 use Drupal\commerce_order\Entity\Order;
+use Drupal\commerce_order\Entity\OrderInterface;
 use Drupal\commerce_order\Entity\OrderType;
 use Drupal\commerce_price\Price;
 use Drupal\commerce_product\Entity\Product;
@@ -10,6 +11,7 @@ use Drupal\commerce_product\Entity\ProductVariation;
 use Drupal\commerce_product\Entity\ProductVariationType;
 use Drupal\profile\Entity\Profile;
 use Drupal\Tests\commerce\Kernel\CommerceKernelTestBase;
+use Drupal\user\Entity\User;
 
 /**
  * Tests integration with order events.
@@ -183,6 +185,27 @@ class OrderIntegrationTest extends CommerceKernelTestBase {
     $this->render($build);
 
     $this->assertText('The order was fulfilled.');
+  }
+
+  /**
+   * Tests that an order assignment log is generated.
+   */
+  public function testOrderAssignedLog() {
+    // Reassignment is currently only done on user login.
+    $this->order->setCustomer(User::getAnonymousUser());
+    $this->order->setRefreshState(OrderInterface::REFRESH_SKIP);
+    $this->order->save();
+    $new_user = $this->createUser();
+
+    $order_assignment = $this->container->get('commerce_order.order_assignment');
+    $order_assignment->assign($this->order, $new_user);
+
+    $logs = $this->logStorage->loadByEntity($this->order);
+    $this->assertEquals(1, count($logs));
+    $log = reset($logs);
+    $build = $this->logViewBuilder->view($log);
+    $this->render($build);
+    $this->assertText("The order was assigned to {$new_user->getDisplayName()}.");
   }
 
 }

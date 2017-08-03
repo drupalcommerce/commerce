@@ -58,6 +58,7 @@ class OrderItemTest extends CommerceKernelTestBase {
    * @covers ::setQuantity
    * @covers ::getUnitPrice
    * @covers ::setUnitPrice
+   * @covers ::isUnitPriceOverridden
    * @covers ::getAdjustments
    * @covers ::setAdjustments
    * @covers ::addAdjustment
@@ -83,9 +84,11 @@ class OrderItemTest extends CommerceKernelTestBase {
     $this->assertEquals(2, $order_item->getQuantity());
 
     $this->assertEquals(NULL, $order_item->getUnitPrice());
+    $this->assertFalse($order_item->isUnitPriceOverridden());
     $unit_price = new Price('9.99', 'USD');
-    $order_item->setUnitPrice($unit_price);
+    $order_item->setUnitPrice($unit_price, TRUE);
     $this->assertEquals($unit_price, $order_item->getUnitPrice());
+    $this->assertTrue($order_item->isUnitPriceOverridden());
 
     $order_item->setQuantity('1');
     $adjustments = [];

@@ -8,7 +8,7 @@ use Drupal\commerce_price\Price;
 /**
  * Defines the interface for gateways which support authorizing payments.
  */
-interface SupportsAuthorizationsInterface {
+interface SupportsAuthorizationsInterface extends SupportsVoidsInterface {
 
   /**
    * Captures the give authorized payment.
@@ -24,18 +24,5 @@ interface SupportsAuthorizationsInterface {
    *   Thrown when the transaction fails for any reason.
    */
   public function capturePayment(PaymentInterface $payment, Price $amount = NULL);
-
-  /**
-   * Voids the given payment.
-   *
-   * Only payments in the 'authorization' state can be voided.
-   *
-   * @param \Drupal\commerce_payment\Entity\PaymentInterface $payment
-   *   The payment to void.
-   *
-   * @throws \Drupal\commerce_payment\Exception\PaymentGatewayException
-   *   Thrown when the transaction fails for any reason.
-   */
-  public function voidPayment(PaymentInterface $payment);
 
 }

@@ -134,6 +134,7 @@ abstract class CheckoutFlowBase extends PluginBase implements CheckoutFlowInterf
         'label' => $this->t('Payment'),
         'next_label' => $this->t('Pay and complete purchase'),
         'has_sidebar' => FALSE,
+        'hidden' => TRUE,
       ],
       'complete' => [
         'label' => $this->t('Complete'),
@@ -233,6 +234,11 @@ abstract class CheckoutFlowBase extends PluginBase implements CheckoutFlowInterf
     if (empty($step_id)) {
       throw new \InvalidArgumentException('The $step_id cannot be empty.');
     }
+    if ($form_state->isRebuilding()) {
+      // Ensure a fresh order, in case an ajax submit has modified it.
+      $order_storage = $this->entityTypeManager->getStorage('commerce_order');
+      $this->order = $order_storage->load($this->order->id());
+    }
 
     $steps = $this->getVisibleSteps();
     $form['#tree'] = TRUE;
@@ -293,7 +299,7 @@ abstract class CheckoutFlowBase extends PluginBase implements CheckoutFlowInterf
    */
   protected function hasSidebar($step_id) {
     $steps = $this->getVisibleSteps();
-    return $steps[$step_id]['has_sidebar'];
+    return !empty($steps[$step_id]['has_sidebar']);
   }
 
   /**

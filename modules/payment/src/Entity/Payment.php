@@ -4,6 +4,7 @@ namespace Drupal\commerce_payment\Entity;
 
 use Drupal\commerce_price\Price;
 use Drupal\Core\Entity\ContentEntityBase;
+use Drupal\Core\Entity\EntityMalformedException;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
@@ -14,6 +15,7 @@ use Drupal\Core\Field\BaseFieldDefinition;
  * @ContentEntityType(
  *   id = "commerce_payment",
  *   label = @Translation("Payment"),
+ *   label_collection = @Translation("Payments"),
  *   label_singular = @Translation("payment"),
  *   label_plural = @Translation("payments"),
  *   label_count = @PluralTranslation(
@@ -90,6 +92,13 @@ class Payment extends ContentEntityBase implements PaymentInterface {
    */
   public function getPaymentGatewayId() {
     return $this->get('payment_gateway')->target_id;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getPaymentGatewayMode() {
+    return $this->get('payment_gateway_mode')->value;
   }
 
   /**
@@ -204,15 +213,8 @@ class Payment extends ContentEntityBase implements PaymentInterface {
   /**
    * {@inheritdoc}
    */
-  public function isTest() {
-    return $this->get('test')->value;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function setTest($test) {
-    $this->set('test', $test);
+  public function setState($state_id) {
+    $this->set('state', $state_id);
     return $this;
   }
 
@@ -234,30 +236,38 @@ class Payment extends ContentEntityBase implements PaymentInterface {
   /**
    * {@inheritdoc}
    */
-  public function getAuthorizationExpiresTime() {
-    return $this->get('authorization_expires')->value;
+  public function isExpired() {
+    $expires = $this->getExpiresTime();
+    return $expires > 0 && $expires <= \Drupal::time()->getRequestTime();
   }
 
   /**
    * {@inheritdoc}
    */
-  public function setAuthorizationExpiresTime($timestamp) {
-    $this->set('authorization_expires', $timestamp);
+  public function getExpiresTime() {
+    return $this->get('expires')->value;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setExpiresTime($timestamp) {
+    $this->set('expires', $timestamp);
     return $this;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function getCapturedTime() {
-    return $this->get('captured')->value;
+  public function getCompletedTime() {
+    return $this->get('completed')->value;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function setCapturedTime($timestamp) {
-    $this->set('captured', $timestamp);
+  public function setCompletedTime($timestamp) {
+    $this->set('completed', $timestamp);
     return $this;
   }
 
@@ -267,11 +277,32 @@ class Payment extends ContentEntityBase implements PaymentInterface {
   public function preSave(EntityStorageInterface $storage) {
     parent::preSave($storage);
 
+    $payment_gateway = $this->getPaymentGateway();
+    if (!$payment_gateway) {
+      throw new EntityMalformedException(sprintf('Required payment field "payment_gateway" is empty.'));
+    }
+    // Populate the payment_gateway_mode automatically.
+    if ($this->get('payment_gateway_mode')->isEmpty()) {
+      $this->set('payment_gateway_mode', $payment_gateway->getPlugin()->getMode());
+    }
     // Initialize the refunded amount.
     $refunded_amount = $this->getRefundedAmount();
     if (!$refunded_amount) {
       $refunded_amount = new Price('0', $this->getAmount()->getCurrencyCode());
       $this->setRefundedAmount($refunded_amount);
+    }
+    // Maintain the authorized completed timestamps.
+    $state = $this->getState()->value;
+    $original_state = isset($this->original) ? $this->original->getState()->value : '';
+    if ($state == 'authorized' && $original_state != 'authorized') {
+      if (empty($this->getAuthorizedTime())) {
+        $this->setAuthorizedTime(\Drupal::time()->getRequestTime());
+      }
+    }
+    if ($state == 'completed' && $original_state != 'completed') {
+      if (empty($this->getCompletedTime())) {
+        $this->setCompletedTime(\Drupal::time()->getRequestTime());
+      }
     }
   }
 
@@ -286,6 +317,11 @@ class Payment extends ContentEntityBase implements PaymentInterface {
       ->setDescription(t('The payment gateway.'))
       ->setRequired(TRUE)
       ->setSetting('target_type', 'commerce_payment_gateway');
+
+    $fields['payment_gateway_mode'] = BaseFieldDefinition::create('string')
+      ->setLabel(t('Payment gateway mode'))
+      ->setDescription(t('The payment gateway mode.'))
+      ->setRequired(TRUE);
 
     $fields['payment_method'] = BaseFieldDefinition::create('entity_reference')
       ->setLabel(t('Payment method'))
@@ -335,20 +371,28 @@ class Payment extends ContentEntityBase implements PaymentInterface {
       ->setDisplayConfigurable('view', TRUE)
       ->setSetting('workflow_callback', ['\Drupal\commerce_payment\Entity\Payment', 'getWorkflowId']);
 
-    $fields['test'] = BaseFieldDefinition::create('boolean')
-      ->setLabel(t('Test'))
-      ->setDescription(t('Whether this is a test payment.'));
-
     $fields['authorized'] = BaseFieldDefinition::create('timestamp')
       ->setLabel(t('Authorized'))
       ->setDescription(t('The time when the payment was authorized.'))
       ->setDisplayConfigurable('view', TRUE);
 
-    $fields['authorization_expires'] = BaseFieldDefinition::create('timestamp')
-      ->setLabel(t('Authorization expires'))
-      ->setDescription(t('The time when the payment authorization expires.'))
+    $fields['expires'] = BaseFieldDefinition::create('timestamp')
+      ->setLabel(t('Expires'))
+      ->setDescription(t('The time when the payment expires. 0 for never.'))
+      ->setDisplayConfigurable('view', TRUE)
+      ->setDefaultValue(0);
+
+    $fields['completed'] = BaseFieldDefinition::create('timestamp')
+      ->setLabel(t('Completed'))
+      ->setDescription(t('The time when the payment was completed.'))
       ->setDisplayConfigurable('view', TRUE);
 
+    // These fields have been replaced by payment_gateway_mode and completed.
+    // They have been temporarily kept for commerce_payment_post_update_2().
+    // They are no longer used and will be removed in Commerce 2.0.
+    $fields['test'] = BaseFieldDefinition::create('boolean')
+      ->setLabel(t('Test'))
+      ->setDescription(t('Whether this is a test payment.'));
     $fields['captured'] = BaseFieldDefinition::create('timestamp')
       ->setLabel(t('Captured'))
       ->setDescription(t('The time when the payment was captured.'))

@@ -1,7 +1,0 @@
-entity.commerce_promotion.collection:
-  path: '/admin/commerce/promotions'
-  defaults:
-    _entity_list: 'commerce_promotion'
-    _title: 'Promotions'
-  requirements:
-    _permission: 'administer commerce_promotion'

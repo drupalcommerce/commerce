@@ -4,6 +4,7 @@ namespace Drupal\commerce\Config;
 
 use Drupal\Component\Utility\Crypt;
 use Drupal\Core\Config\ConfigFactoryInterface;
+use Drupal\Core\Config\Entity\ConfigEntityInterface;
 use Drupal\Core\Config\ExtensionInstallStorage;
 use Drupal\Core\Config\InstallStorage;
 use Drupal\Core\Config\StorageInterface;
@@ -77,7 +78,7 @@ class ConfigUpdater implements ConfigUpdaterInterface {
     $this->configFactory = $config_factory;
 
     foreach ($this->entityTypeManager->getDefinitions() as $entity_type => $definition) {
-      if ($definition->isSubclassOf('Drupal\Core\Config\Entity\ConfigEntityInterface')) {
+      if ($definition->entityClassImplements(ConfigEntityInterface::class)) {
         /** @var \Drupal\Core\Config\Entity\ConfigEntityTypeInterface $definition */
         $prefix = $definition->getConfigPrefix();
         $this->typesByPrefix[$prefix] = $entity_type;

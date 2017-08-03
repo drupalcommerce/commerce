@@ -120,10 +120,18 @@ class OrderItem extends ContentEntityBase implements OrderItemInterface {
   /**
    * {@inheritdoc}
    */
-  public function setUnitPrice(Price $unit_price) {
+  public function setUnitPrice(Price $unit_price, $override = FALSE) {
     $this->set('unit_price', $unit_price);
+    $this->set('overridden_unit_price', $override);
     $this->recalculateTotalPrice();
     return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function isUnitPriceOverridden() {
+    return $this->get('overridden_unit_price')->value;
   }
 
   /**
@@ -261,9 +269,10 @@ class OrderItem extends ContentEntityBase implements OrderItemInterface {
       ->setDescription(t('The number of purchased units.'))
       ->setReadOnly(TRUE)
       ->setSetting('unsigned', TRUE)
+      ->setSetting('min', 0)
       ->setDefaultValue(1)
       ->setDisplayOptions('form', [
-        'type' => 'number',
+        'type' => 'commerce_quantity',
         'weight' => 1,
       ])
       ->setDisplayConfigurable('form', TRUE)
@@ -274,11 +283,19 @@ class OrderItem extends ContentEntityBase implements OrderItemInterface {
       ->setDescription(t('The price of a single unit.'))
       ->setRequired(TRUE)
       ->setDisplayOptions('form', [
-        'type' => 'commerce_price_default',
+        'type' => 'commerce_unit_price',
         'weight' => 2,
+        'settings' => [
+          'require_confirmation' => TRUE,
+        ],
       ])
       ->setDisplayConfigurable('form', TRUE)
       ->setDisplayConfigurable('view', TRUE);
+
+    $fields['overridden_unit_price'] = BaseFieldDefinition::create('boolean')
+      ->setLabel(t('Overridden unit price'))
+      ->setDescription(t('Whether the unit price is overridden.'))
+      ->setDefaultValue(FALSE);
 
     $fields['adjustments'] = BaseFieldDefinition::create('commerce_adjustment')
       ->setLabel(t('Adjustments'))
@@ -350,6 +367,16 @@ class OrderItem extends ContentEntityBase implements OrderItemInterface {
       ]);
       $fields['title']->setDisplayConfigurable('form', TRUE);
       $fields['title']->setDisplayConfigurable('view', TRUE);
+
+      // The unit price is always an override when there's no purchased entity.
+      $fields['unit_price'] = clone $base_field_definitions['unit_price'];
+      $fields['unit_price']->setDisplayOptions('form', [
+        'type' => 'commerce_unit_price',
+        'weight' => 2,
+        'settings' => [
+          'require_confirmation' => FALSE,
+        ],
+      ]);
     }
 
     return $fields;

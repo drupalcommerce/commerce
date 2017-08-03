@@ -87,7 +87,8 @@ class CurrencyForm extends EntityForm {
       '#type' => 'textfield',
       '#title' => $this->t('Symbol'),
       '#default_value' => $currency->getSymbol(),
-      '#maxlength' => 255,
+      '#maxlength' => 4,
+      '#size' => 4,
       '#required' => TRUE,
     ];
     $form['fractionDigits'] = [
