@@ -89,3 +89,11 @@ field.widget.settings.commerce_quantity:
     step:
       type: string
       label: 'Step'
+
+field.widget.settings.commerce_unit_price:
+  type: mapping
+  label: 'Unit price widget settings'
+  mapping:
+    require_confirmation:
+      type: boolean
+      label: 'Require confirmation before overriding the unit price'
