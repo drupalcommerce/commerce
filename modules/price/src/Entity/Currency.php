@@ -43,10 +43,10 @@ use Drupal\Core\Config\Entity\ConfigEntityBase;
  *     "fractionDigits"
  *   },
  *   links = {
- *     "add-form" = "/admin/commerce/config/currency/add",
- *     "edit-form" = "/admin/commerce/config/currency/{commerce_currency}",
- *     "delete-form" = "/admin/commerce/config/currency/{commerce_currency}/delete",
- *     "collection" = "/admin/commerce/config/currency"
+ *     "add-form" = "/admin/commerce/config/currencies/add",
+ *     "edit-form" = "/admin/commerce/config/currencies/{commerce_currency}",
+ *     "delete-form" = "/admin/commerce/config/currencies/{commerce_currency}/delete",
+ *     "collection" = "/admin/commerce/config/currencies"
  *   }
  * )
  */
