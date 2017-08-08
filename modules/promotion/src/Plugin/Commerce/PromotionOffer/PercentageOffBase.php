@@ -14,17 +14,17 @@ abstract class PercentageOffBase extends PromotionOfferBase {
    */
   public function defaultConfiguration() {
     return [
-      'amount' => 0,
+      'amount' => '0',
     ] + parent::defaultConfiguration();
   }
 
   /**
-   * Gets the percentage amount.
+   * Gets the percentage.
    *
    * @return string
-   *   The amount.
+   *   The percentage.
    */
-  public function getAmount() {
+  public function getPercentage() {
     return (string) $this->configuration['amount'];
   }
 

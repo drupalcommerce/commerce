@@ -153,6 +153,7 @@ class CustomTest extends CommerceKernelTestBase {
     $this->assertEquals('tax', $adjustment->getType());
     $this->assertEquals(t('VAT'), $adjustment->getLabel());
     $this->assertEquals(new Price('2.07', 'USD'), $adjustment->getAmount());
+    $this->assertEquals('0.2', $adjustment->getPercentage());
     $this->assertEquals('serbian_vat|default|standard', $adjustment->getSourceId());
     $this->assertTrue($adjustment->isIncluded());
     $order_items = $order->getItems();
@@ -165,6 +166,7 @@ class CustomTest extends CommerceKernelTestBase {
     $adjustments = $order->collectAdjustments();
     $adjustment = reset($adjustments);
     $this->assertEquals(new Price('1.72', 'USD'), $adjustment->getAmount());
+    $this->assertEquals('0.2', $adjustment->getPercentage());
     $this->assertTrue($adjustment->isIncluded());
     $order_items = $order->getItems();
     $order_item = reset($order_items);
@@ -179,6 +181,7 @@ class CustomTest extends CommerceKernelTestBase {
     $adjustments = $order->collectAdjustments();
     $adjustment = reset($adjustments);
     $this->assertEquals(new Price('1.72', 'USD'), $adjustment->getAmount());
+    $this->assertEquals('0.2', $adjustment->getPercentage());
     $this->assertFalse($adjustment->isIncluded());
     $order_items = $order->getItems();
     $order_item = reset($order_items);
@@ -216,6 +219,7 @@ class CustomTest extends CommerceKernelTestBase {
     $adjustments = $order->collectAdjustments();
     $adjustment = reset($adjustments);
     $this->assertEquals(new Price('-1.72', 'USD'), $adjustment->getAmount());
+    $this->assertEquals('0.2', $adjustment->getPercentage());
     $this->assertFalse($adjustment->isIncluded());
     $order_items = $order->getItems();
     $order_item = reset($order_items);
@@ -229,6 +233,7 @@ class CustomTest extends CommerceKernelTestBase {
     $adjustments = $order->collectAdjustments();
     $adjustment = reset($adjustments);
     $this->assertEquals(new Price('0.94', 'USD'), $adjustment->getAmount());
+    $this->assertEquals('0.1', $adjustment->getPercentage());
     $this->assertTrue($adjustment->isIncluded());
     $order_items = $order->getItems();
     $order_item = reset($order_items);
@@ -241,6 +246,7 @@ class CustomTest extends CommerceKernelTestBase {
     $adjustments = $order->collectAdjustments();
     $adjustment = reset($adjustments);
     $this->assertEquals(new Price('0.94', 'USD'), $adjustment->getAmount());
+    $this->assertEquals('0.1', $adjustment->getPercentage());
     $this->assertTrue($adjustment->isIncluded());
   }
 
