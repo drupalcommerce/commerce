@@ -6,6 +6,7 @@ use CommerceGuys\Addressing\Address;
 use Drupal\commerce_order\Adjustment;
 use Drupal\commerce_order\Entity\OrderInterface;
 use Drupal\commerce_order\Entity\OrderItemInterface;
+use Drupal\commerce_price\Calculator;
 use Drupal\commerce_price\RounderInterface;
 use Drupal\commerce_store\Entity\StoreInterface;
 use Drupal\commerce_tax\TaxZone;
@@ -146,10 +147,10 @@ abstract class LocalTaxTypeBase extends TaxTypeBase implements LocalTaxTypeInter
       foreach ($rates as $zone_id => $rate) {
         $zone = $zones[$zone_id];
         $unit_price = $order_item->getUnitPrice();
-        $rate_amount = $rate->getAmount()->getAmount();
-        $tax_amount = $unit_price->multiply($rate_amount);
+        $percentage = $rate->getPercentage()->getNumber();
+        $tax_amount = $unit_price->multiply($percentage);
         if ($prices_include_tax) {
-          $divisor = (string) (1 + $rate_amount);
+          $divisor = Calculator::add('1', $percentage);
           $tax_amount = $tax_amount->divide($divisor);
         }
         if ($this->shouldRound()) {
@@ -168,7 +169,7 @@ abstract class LocalTaxTypeBase extends TaxTypeBase implements LocalTaxTypeInter
           'type' => 'tax',
           'label' => $zone->getDisplayLabel(),
           'amount' => $negate ? $tax_amount->multiply('-1') : $tax_amount,
-          'percentage' => $rate_amount,
+          'percentage' => $percentage,
           'source_id' => $this->entityId . '|' . $zone->getId() . '|' . $rate->getId(),
           'included' => !$negate && $this->isDisplayInclusive(),
         ]));
@@ -311,7 +312,7 @@ abstract class LocalTaxTypeBase extends TaxTypeBase implements LocalTaxTypeInter
       '#type' => 'table',
       '#header' => [
         $this->t('Tax rate'),
-        ['data' => $this->t('Amount'), 'colspan' => 2],
+        ['data' => $this->t('Percentage'), 'colspan' => 2],
       ],
       '#input' => FALSE,
     ];
@@ -329,17 +330,17 @@ abstract class LocalTaxTypeBase extends TaxTypeBase implements LocalTaxTypeInter
         ];
       }
       foreach ($zone->getRates() as $rate) {
-        $formatted_amounts = array_map(function ($amount) {
-          /** @var \Drupal\commerce_tax\TaxRateAmount $amount */
-          return $amount->toString();
-        }, $rate->getAmounts());
+        $formatted_percentages = array_map(function ($percentage) {
+          /** @var \Drupal\commerce_tax\TaxRatePercentage $percentage */
+          return $percentage->toString();
+        }, $rate->getPercentages());
 
         $element['table'][] = [
           'rate' => [
             '#markup' => $rate->getLabel(),
           ],
-          'amounts' => [
-            '#markup' => implode('<br>', $formatted_amounts),
+          'percentages' => [
+            '#markup' => implode('<br>', $formatted_percentages),
           ],
         ];
       }

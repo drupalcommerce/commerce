@@ -75,12 +75,12 @@ class CustomTest extends CommerceKernelTestBase {
         [
           'id' => 'standard',
           'label' => 'Standard',
-          'amount' => '0.2',
+          'percentage' => '0.2',
         ],
         [
           'id' => 'reduced',
           'label' => 'Reduced',
-          'amount' => '0.1',
+          'percentage' => '0.1',
         ],
       ],
       'territories' => [
@@ -106,11 +106,11 @@ class CustomTest extends CommerceKernelTestBase {
     $this->assertCount(2, $rates);
     $this->assertEquals('standard', $rates[0]->getId());
     $this->assertEquals('Standard', $rates[0]->getLabel());
-    $this->assertEquals('0.2', $rates[0]->getAmount()->getAmount());
+    $this->assertEquals('0.2', $rates[0]->getPercentage()->getNumber());
     $this->assertTrue($rates[0]->isDefault());
     $this->assertEquals('reduced', $rates[1]->getId());
     $this->assertEquals('Reduced', $rates[1]->getLabel());
-    $this->assertEquals('0.1', $rates[1]->getAmount()->getAmount());
+    $this->assertEquals('0.1', $rates[1]->getPercentage()->getNumber());
     $this->assertFalse($rates[1]->isDefault());
   }
 
