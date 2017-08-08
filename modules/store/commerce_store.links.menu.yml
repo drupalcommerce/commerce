@@ -7,5 +7,5 @@ entity.commerce_store.collection:
 entity.commerce_store_type.collection:
   title: 'Store types'
   route_name: 'entity.commerce_store_type.collection'
-  parent: 'commerce.configuration'
-  description: 'Manage your store types.'
+  parent: 'commerce.store_configuration'
+  description: 'Manage fields, form and display settings for your stores.'
