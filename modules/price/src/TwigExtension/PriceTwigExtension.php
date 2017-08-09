@@ -39,19 +39,20 @@ class PriceTwigExtension extends \Twig_Extension {
    * @throws \InvalidArgumentException
    */
   public static function formatPrice($price) {
-    if ($price instanceof Price) {
-      $price = $price->toArray();
-    }
-
     if (is_array($price) && isset($price['currency_code']) && isset($price['number'])) {
-      $number_formatter = \Drupal::service('commerce_price.number_formatter_factory')->createInstance();
-      $currency_storage = \Drupal::entityTypeManager()->getStorage('commerce_currency');
-      $currency = $currency_storage->load($price['currency_code']);
-      return $number_formatter->formatCurrency($price['number'], $currency);
+      $price = new Price($price['number'], $price['currency_code']);
     }
-    else {
+    elseif (!$price instanceof Price) {
       throw new \InvalidArgumentException('The "commerce_price_format" filter must be given a price object or an array with "number" and "currency_code" keys.');
     }
+
+    /** @var \Drupal\commerce_price\Rounder $rounder */
+    $rounder = \Drupal::service('commerce_price.rounder');
+    $price = $rounder->round($price);
+    $number_formatter = \Drupal::service('commerce_price.number_formatter_factory')->createInstance();
+    $currency_storage = \Drupal::entityTypeManager()->getStorage('commerce_currency');
+    $currency = $currency_storage->load($price->getCurrencyCode());
+    return $number_formatter->formatCurrency($price->getNumber(), $currency);
   }
 
 }
