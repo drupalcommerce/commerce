@@ -1,4 +1,9 @@
 services:
+  commerce_store.create_store_command:
+    class: Drupal\commerce_store\Command\CreateStoreCommand
+    tags:
+      - { name: drupal.command }
+
   commerce_store.store_context:
     class: Drupal\commerce_store\StoreContext
     arguments: ['@request_stack', '@commerce_store.chain_store_resolver']
