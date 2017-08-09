@@ -224,11 +224,13 @@ class AddToCartForm extends ContentEntityForm implements AddToCartFormInterface 
     $entity = parent::buildEntity($form, $form_state);
     // Now that the purchased entity is set, populate the title and price.
     $purchased_entity = $entity->getPurchasedEntity();
-    $store = $this->selectStore($purchased_entity);
-    $context = new Context($this->currentUser, $store);
-    $resolved_price = $this->chainPriceResolver->resolve($purchased_entity, $entity->getQuantity(), $context);
     $entity->setTitle($purchased_entity->getOrderItemTitle());
-    $entity->setUnitPrice($resolved_price);
+    if (!$entity->isUnitPriceOverridden()) {
+      $store = $this->selectStore($purchased_entity);
+      $context = new Context($this->currentUser, $store);
+      $resolved_price = $this->chainPriceResolver->resolve($purchased_entity, $entity->getQuantity(), $context);
+      $entity->setUnitPrice($resolved_price);
+    }
 
     return $entity;
   }
