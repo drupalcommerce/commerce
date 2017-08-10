@@ -149,7 +149,7 @@ class PriceCalculatedFormatter extends PriceDefaultFormatter implements Containe
    */
   public static function isApplicable(FieldDefinitionInterface $field_definition) {
     $entity_type = \Drupal::entityTypeManager()->getDefinition($field_definition->getTargetEntityTypeId());
-    return $entity_type->isSubclassOf(PurchasableEntityInterface::class);
+    return $entity_type->entityClassImplements(PurchasableEntityInterface::class);
   }
 
 }

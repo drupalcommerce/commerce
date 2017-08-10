@@ -1,5 +1,5 @@
 entity.commerce_currency.import:
-  path: '/admin/commerce/config/currency/import'
+  path: '/admin/commerce/config/currencies/import'
   defaults:
     _form: '\Drupal\commerce_price\Form\CurrencyImportForm'
     _title: 'Import currencies'

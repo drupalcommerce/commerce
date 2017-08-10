@@ -60,4 +60,4 @@ commerce_tax.commerce_tax_type.plugin.custom:
       type: sequence
       label: 'Territories'
       sequence:
-        type: zone_territory
+        type: address_zone_territory

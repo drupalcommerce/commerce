@@ -138,4 +138,30 @@ class OrderIntegrationTest extends CommerceKernelTestBase {
     $this->assertEquals('us_vat|default|standard', $adjustment->getSourceId());
   }
 
+  /**
+   * Tests the conversion of negative adjustments.
+   */
+  public function testNegativeAdjustmentConversion() {
+    $profile = Profile::create([
+      'type' => 'customer',
+      'address' => [
+        'country_code' => 'RS',
+      ],
+    ]);
+    $profile->save();
+    $order_item = OrderItem::create([
+      'type' => 'test',
+      'quantity' => '1',
+      'unit_price' => new Price('12.00', 'USD'),
+    ]);
+    $order_item->save();
+    $this->order->addItem($order_item);
+    $this->order->setBillingProfile($profile);
+    $this->order->save();
+    $this->assertCount(0, $this->order->collectAdjustments());
+    $order_items = $this->order->getItems();
+    $order_item = reset($order_items);
+    $this->assertEquals(new Price('10.00', 'USD'), $order_item->getUnitPrice());
+  }
+
 }

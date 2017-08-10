@@ -94,7 +94,6 @@ class PromotionStorage extends CommerceContentEntityStorage implements Promotion
     // Only load promotions without coupons. Promotions with coupons are loaded
     // coupon-first in a different process.
     $query->notExists('coupons');
-    $query->sort('weight', 'ASC');
     $result = $query->execute();
     if (empty($result)) {
       return [];
@@ -113,6 +112,8 @@ class PromotionStorage extends CommerceContentEntityStorage implements Promotion
         unset($promotions[$promotion_id]);
       }
     }
+    // Sort the remaining promotions.
+    uasort($promotions, [$this->entityType->getClass(), 'sort']);
 
     return $promotions;
   }

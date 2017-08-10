@@ -139,8 +139,10 @@ class OrderRefresh implements OrderRefreshInterface {
       $purchased_entity = $order_item->getPurchasedEntity();
       if ($purchased_entity) {
         $order_item->setTitle($purchased_entity->getOrderItemTitle());
-        $unit_price = $this->chainPriceResolver->resolve($purchased_entity, $order_item->getQuantity(), $context);
-        $order_item->setUnitPrice($unit_price);
+        if (!$order_item->isUnitPriceOverridden()) {
+          $unit_price = $this->chainPriceResolver->resolve($purchased_entity, $order_item->getQuantity(), $context);
+          $order_item->setUnitPrice($unit_price);
+        }
       }
       // If the order refresh is running during order preSave(),
       // $order_item->getOrder() will point to the original order (or
@@ -153,13 +155,14 @@ class OrderRefresh implements OrderRefreshInterface {
       $processor->process($order);
     }
 
-    // @todo Evaluate which order items have changed.
     foreach ($order->getItems() as $order_item) {
-      // Remove the order that was set above, to avoid
-      // crashes during the entity save process.
-      $order_item->order_id->entity = NULL;
-      $order_item->setChangedTime($current_time);
-      $order_item->save();
+      if ($order_item->hasTranslationChanges()) {
+        // Remove the order that was set above, to avoid
+        // crashes during the entity save process.
+        $order_item->order_id->entity = NULL;
+        $order_item->setChangedTime($current_time);
+        $order_item->save();
+      }
     }
   }
 

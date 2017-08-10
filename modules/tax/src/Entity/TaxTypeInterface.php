@@ -38,4 +38,22 @@ interface TaxTypeInterface extends ConfigEntityInterface, EntityWithPluginCollec
    */
   public function setPluginId($plugin_id);
 
+  /**
+   * Gets the tax type plugin configuration.
+   *
+   * @return string
+   *   The tax type plugin configuration.
+   */
+  public function getPluginConfiguration();
+
+  /**
+   * Sets the tax type plugin configuration.
+   *
+   * @param array $configuration
+   *   The tax type plugin configuration.
+   *
+   * @return $this
+   */
+  public function setPluginConfiguration(array $configuration);
+
 }
