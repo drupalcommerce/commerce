@@ -9,14 +9,17 @@ use Drupal\views\Plugin\views\argument_default\ArgumentDefaultPluginBase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * Default argument plugin for the active store.
+ * Default argument plugin for the current store.
+ *
+ * Note: The plugin ID is 'active_store' instead of 'current_store' for
+ *       backwards-compatibility reasons.
  *
  * @ViewsArgumentDefault(
  *   id = "active_store",
- *   title = @Translation("Store ID from active store")
+ *   title = @Translation("Store ID from the current store")
  * )
  */
-class ActiveStore extends ArgumentDefaultPluginBase implements CacheableDependencyInterface {
+class CurrentStore extends ArgumentDefaultPluginBase implements CacheableDependencyInterface {
 
   /**
    * The current store.
@@ -26,7 +29,7 @@ class ActiveStore extends ArgumentDefaultPluginBase implements CacheableDependen
   protected $currentStore;
 
   /**
-   * Constructs a PluginBase object.
+   * Constructs a new CurrentStore object.
    *
    * @param array $configuration
    *   A configuration array containing information about the plugin instance.
