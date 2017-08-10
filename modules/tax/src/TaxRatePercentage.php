@@ -2,6 +2,8 @@
 
 namespace Drupal\commerce_tax;
 
+use Drupal\commerce_price\Calculator;
+use Drupal\commerce_price\Price;
 use Drupal\Core\Datetime\DrupalDateTime;
 
 /**
@@ -106,6 +108,26 @@ class TaxRatePercentage {
    */
   public function getEndDate() {
     return $this->endDate;
+  }
+
+  /**
+   * Calculates the tax amount for the given price.
+   *
+   * @param \Drupal\commerce_price\Price $price
+   *   The price.
+   * @param bool $included
+   *   Whether tax is already included in the price.
+   *
+   * @return \Drupal\commerce_price\Price
+   *   The unrounded tax amount.
+   */
+  public function calculateTaxAmount(Price $price, $included = FALSE) {
+    $tax_amount = $price->multiply($this->number);
+    if ($included) {
+      $divisor = Calculator::add('1', $this->number);
+      $tax_amount = $tax_amount->divide($divisor);
+    }
+    return $tax_amount;
   }
 
 }

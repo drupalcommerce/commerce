@@ -6,7 +6,6 @@ use CommerceGuys\Addressing\Address;
 use Drupal\commerce_order\Adjustment;
 use Drupal\commerce_order\Entity\OrderInterface;
 use Drupal\commerce_order\Entity\OrderItemInterface;
-use Drupal\commerce_price\Calculator;
 use Drupal\commerce_price\RounderInterface;
 use Drupal\commerce_store\Entity\StoreInterface;
 use Drupal\commerce_tax\TaxZone;
@@ -147,12 +146,8 @@ abstract class LocalTaxTypeBase extends TaxTypeBase implements LocalTaxTypeInter
       foreach ($rates as $zone_id => $rate) {
         $zone = $zones[$zone_id];
         $unit_price = $order_item->getUnitPrice();
-        $percentage = $rate->getPercentage()->getNumber();
-        $tax_amount = $unit_price->multiply($percentage);
-        if ($prices_include_tax) {
-          $divisor = Calculator::add('1', $percentage);
-          $tax_amount = $tax_amount->divide($divisor);
-        }
+        $percentage = $rate->getPercentage();
+        $tax_amount = $percentage->calculateTaxAmount($unit_price, $prices_include_tax);
         if ($this->shouldRound()) {
           $tax_amount = $this->rounder->round($tax_amount);
         }
@@ -169,7 +164,7 @@ abstract class LocalTaxTypeBase extends TaxTypeBase implements LocalTaxTypeInter
           'type' => 'tax',
           'label' => $zone->getDisplayLabel(),
           'amount' => $negate ? $tax_amount->multiply('-1') : $tax_amount,
-          'percentage' => $percentage,
+          'percentage' => $percentage->getNumber(),
           'source_id' => $this->entityId . '|' . $zone->getId() . '|' . $rate->getId(),
           'included' => !$negate && $this->isDisplayInclusive(),
         ]));

@@ -2,6 +2,7 @@
 
 namespace Drupal\Tests\commerce_tax\Kernel;
 
+use Drupal\commerce_price\Price;
 use Drupal\commerce_tax\TaxRatePercentage;
 use Drupal\Core\Datetime\DrupalDateTime;
 use Drupal\Tests\commerce\Kernel\CommerceKernelTestBase;
@@ -58,6 +59,23 @@ class TaxRatePercentageTest extends CommerceKernelTestBase {
     $definition['end_date'] = '2012-12-31';
     $percentage = new TaxRatePercentage($definition);
     $this->assertEquals(new DrupalDateTime($definition['end_date']), $percentage->getEndDate());
+  }
+
+  /**
+   * @covers ::calculateTaxAmount
+   */
+  public function testCalculation() {
+    $definition = [
+      'number' => '0.20',
+      'start_date' => '2012-01-01',
+    ];
+    $percentage = new TaxRatePercentage($definition);
+
+    $tax_amount = $percentage->calculateTaxAmount(new Price('12', 'USD'), FALSE);
+    $this->assertEquals(new Price('2.4', 'USD'), $tax_amount);
+
+    $tax_amount = $percentage->calculateTaxAmount(new Price('12', 'USD'), TRUE);
+    $this->assertEquals(new Price('2', 'USD'), $tax_amount);
   }
 
 }
