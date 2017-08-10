@@ -91,7 +91,7 @@ class Custom extends LocalTaxTypeBase {
 
     foreach ($this->configuration['rates'] as &$rate) {
       if (isset($rate['amount'])) {
-        // The 'amount' property was renamed to 'percentage' in 2.0-rc2.
+        // The 'amount' key was renamed to 'percentage' in 2.0-rc2.
         $rate['percentage'] = $rate['amount'];
         unset($rate['amount']);
       }
