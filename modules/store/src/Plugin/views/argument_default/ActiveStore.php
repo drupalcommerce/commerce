@@ -2,7 +2,7 @@
 
 namespace Drupal\commerce_store\Plugin\views\argument_default;
 
-use Drupal\commerce_store\StoreContextInterface;
+use Drupal\commerce_store\CurrentStoreInterface;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\CacheableDependencyInterface;
 use Drupal\views\Plugin\views\argument_default\ArgumentDefaultPluginBase;
@@ -19,11 +19,11 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class ActiveStore extends ArgumentDefaultPluginBase implements CacheableDependencyInterface {
 
   /**
-   * The store context.
+   * The current store.
    *
-   * @var \Drupal\commerce_store\StoreContextInterface
+   * @var \Drupal\commerce_store\CurrentStoreInterface
    */
-  protected $storeContext;
+  protected $currentStore;
 
   /**
    * Constructs a PluginBase object.
@@ -34,12 +34,13 @@ class ActiveStore extends ArgumentDefaultPluginBase implements CacheableDependen
    *   The plugin_id for the plugin instance.
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
-   * @param \Drupal\commerce_store\StoreContextInterface $store_context
-   *   The store context.
+   * @param \Drupal\commerce_store\CurrentStoreInterface $current_store
+   *   The current store.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, StoreContextInterface $store_context) {
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, CurrentStoreInterface $current_store) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
-    $this->storeContext = $store_context;
+
+    $this->currentStore = $current_store;
   }
 
   /**
@@ -50,7 +51,7 @@ class ActiveStore extends ArgumentDefaultPluginBase implements CacheableDependen
       $configuration,
       $plugin_id,
       $plugin_definition,
-      $container->get('commerce_store.store_context')
+      $container->get('commerce_store.current_store')
     );
   }
 
@@ -58,7 +59,7 @@ class ActiveStore extends ArgumentDefaultPluginBase implements CacheableDependen
    * {@inheritdoc}
    */
   public function getArgument() {
-    return $this->storeContext->getStore()->id();
+    return $this->currentStore->getStore()->id();
   }
 
   /**
@@ -79,7 +80,7 @@ class ActiveStore extends ArgumentDefaultPluginBase implements CacheableDependen
    * {@inheritdoc}
    */
   public function getCacheTags() {
-    return $this->storeContext->getStore()->getCacheTags();
+    return $this->currentStore->getStore()->getCacheTags();
   }
 
 }

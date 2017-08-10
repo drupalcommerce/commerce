@@ -6,7 +6,7 @@ use Drupal\commerce_store\Resolver\ChainStoreResolverInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
- * Holds a reference to the active store, resolved on demand.
+ * Holds a reference to the current store, resolved on demand.
  *
  * The ChainStoreResolver runs the registered store resolvers one by one until
  * one of them returns the store.
@@ -19,7 +19,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
  * @see \Drupal\commerce_store\Resolver\ChainStoreResolver
  * @see \Drupal\commerce_store\Resolver\DefaultStoreResolver
  */
-class StoreContext implements StoreContextInterface {
+class CurrentStore implements CurrentStoreInterface {
 
   /**
    * The request stack.
@@ -43,7 +43,7 @@ class StoreContext implements StoreContextInterface {
   protected $stores;
 
   /**
-   * Constructs a new StoreContext object.
+   * Constructs a new CurrentStore object.
    *
    * @param \Symfony\Component\HttpFoundation\RequestStack $request_stack
    *   The request stack.
