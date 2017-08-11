@@ -176,6 +176,16 @@ class Promotion extends ContentEntityBase implements PromotionInterface {
   /**
    * {@inheritdoc}
    */
+  public function setOffer($target_plugin_id, array $target_plugin_configuration) {
+    $offer['target_plugin_id'] = $target_plugin_id;
+    $offer['target_plugin_configuration'] = $target_plugin_configuration;
+    $this->set('offer', $offer);
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function getConditions() {
     $conditions = [];
     foreach ($this->get('conditions') as $field_item) {
@@ -723,3 +733,4 @@ class Promotion extends ContentEntityBase implements PromotionInterface {
   }
 
 }
+

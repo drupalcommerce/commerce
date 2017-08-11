@@ -96,6 +96,17 @@ interface PromotionInterface extends ContentEntityInterface, EntityStoresInterfa
   public function getOffer();
 
   /**
+   * Sets the offer.
+   *
+   * @param string $target_plugin_id
+   *    The offer plugin id.
+   * @param array $target_plugin_configuration
+   *    The configuarion array for this offer plugin.
+   * @return $this
+   */
+  public function setOffer($target_plugin_id,array $target_plugin_configuration);
+
+  /**
    * Gets the conditions.
    *
    * @return \Drupal\commerce\Plugin\Commerce\Condition\ConditionInterface[]
@@ -317,3 +328,4 @@ interface PromotionInterface extends ContentEntityInterface, EntityStoresInterfa
   public function apply(OrderInterface $order);
 
 }
+
