@@ -5,6 +5,7 @@ namespace Drupal\commerce_cart\Plugin\views\field;
 use Drupal\commerce_cart\CartManagerInterface;
 use Drupal\commerce_order\Entity\Order;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\views\Plugin\views\field\FieldPluginBase;
 use Drupal\views\Plugin\views\field\UncacheableFieldHandlerTrait;
 use Drupal\views\ResultRow;
@@ -27,6 +28,13 @@ class EmptyCartButton extends FieldPluginBase {
   protected $cartManager;
 
   /**
+   * The order storage.
+   *
+   * @var \Drupal\Core\Entity\EntityStorageInterface
+   */
+  protected $orderStorage;
+
+  /**
    * Constructs a new EmptyCartButton object.
    *
    * @param array $configuration
@@ -37,11 +45,14 @@ class EmptyCartButton extends FieldPluginBase {
    *   The plugin implementation definition.
    * @param \Drupal\commerce_cart\CartManagerInterface $cart_manager
    *   The cart manager.
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   *   The entity type manager.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, CartManagerInterface $cart_manager) {
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, CartManagerInterface $cart_manager, EntityTypeManagerInterface $entity_type_manager) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
 
     $this->cartManager = $cart_manager;
+    $this->orderStorage = $entity_type_manager->getStorage('commerce_order');
   }
 
   /**
@@ -52,7 +63,8 @@ class EmptyCartButton extends FieldPluginBase {
       $configuration,
       $plugin_id,
       $plugin_definition,
-      $container->get('commerce_cart.cart_manager')
+      $container->get('commerce_cart.cart_manager'),
+      $container->get('entity_type.manager')
     );
   }
 
@@ -108,7 +120,7 @@ class EmptyCartButton extends FieldPluginBase {
     $triggering_element = $form_state->getTriggeringElement();
     if (!empty($triggering_element['#empty_cart_button'])) {
       /** @var \Drupal\commerce_order\Entity\OrderInterface $cart */
-      $cart = Order::load($this->view->argument['order_id']->getValue());
+      $cart = $this->orderStorage->load($this->view->argument['order_id']->getValue());
       $this->cartManager->emptyCart($cart);
 
       drupal_set_message($this->t('All items have been removed from your cart.'));
