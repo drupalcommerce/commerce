@@ -2,7 +2,12 @@
  * @file
  * Default styles for the order total summary.
  */
-
+.form-item-customer-type {
+  padding-right: 16px;
+}
+.container-inline .form-item-customer-type label::after{
+  content: '';
+}
 .order-total-line {
   padding: 0 10px;
 }

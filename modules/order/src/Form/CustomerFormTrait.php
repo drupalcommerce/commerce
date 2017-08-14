@@ -30,7 +30,7 @@ trait CustomerFormTrait {
   public function buildCustomerForm(array $form, FormStateInterface $form_state, OrderInterface $order = NULL) {
     $selected_customer_type = $form_state->getValue(['customer_type'], 'existing');
     $wrapper_id = Html::getUniqueId('customer-fieldset-wrapper');
-
+    $form['#attached']['library'][] = 'commerce_order/total_summary';
     $form['customer'] = [
       '#type' => 'fieldset',
       '#title' => t('Customer'),
