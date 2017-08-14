@@ -1,0 +1,27 @@
+{#
+/**
+ * See commerce-order-receipt.html.twig for examples.
+ *
+ * Available variables:
+ * - order_entity: Order entity
+ * - items: The order items
+ * - totals: Result from commerce_order.order_total_summary service
+ * - checkout_flow_step: The current checkout flow step.
+ */
+#}
+{% block order_items %}
+  <table>
+    <tbody>
+    {% for order_item in order_entity.getItems %}
+      <tr>
+        <td>{{ order_item.getQuantity|number_format }}&nbsp;x</td>
+        <td>{{- order_item.label -}}</td>
+        <td>{{- order_item.getTotalPrice|commerce_price_format -}}</td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+{% endblock %}
+{% block totals %}
+  {{ totals }}
+{% endblock %}
