@@ -106,6 +106,7 @@ class TaxType extends ConfigEntityBase implements TaxTypeInterface {
    */
   public function setPluginId($plugin_id) {
     $this->plugin = $plugin_id;
+    $this->configuration = [];
     $this->pluginCollection = NULL;
     return $this;
   }
@@ -133,6 +134,22 @@ class TaxType extends ConfigEntityBase implements TaxTypeInterface {
     return [
       'configuration' => $this->getPluginCollection(),
     ];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function set($property_name, $value) {
+    // Invoke the setters to clear related properties.
+    if ($property_name == 'plugin') {
+      $this->setPluginId($value);
+    }
+    elseif ($property_name == 'configuration') {
+      $this->setPluginConfiguration($value);
+    }
+    else {
+      return parent::set($property_name, $value);
+    }
   }
 
   /**

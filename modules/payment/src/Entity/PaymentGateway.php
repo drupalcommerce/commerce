@@ -143,6 +143,7 @@ class PaymentGateway extends ConfigEntityBase implements PaymentGatewayInterface
    */
   public function setPluginId($plugin_id) {
     $this->plugin = $plugin_id;
+    $this->configuration = [];
     $this->pluginCollection = NULL;
     return $this;
   }
@@ -200,6 +201,22 @@ class PaymentGateway extends ConfigEntityBase implements PaymentGatewayInterface
     $order_conditions = new ConditionGroup($order_conditions, 'AND');
 
     return $order_conditions->evaluate($order);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function set($property_name, $value) {
+    // Invoke the setters to clear related properties.
+    if ($property_name == 'plugin') {
+      $this->setPluginId($value);
+    }
+    elseif ($property_name == 'configuration') {
+      $this->setPluginConfiguration($value);
+    }
+    else {
+      return parent::set($property_name, $value);
+    }
   }
 
   /**

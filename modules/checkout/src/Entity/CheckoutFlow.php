@@ -106,6 +106,7 @@ class CheckoutFlow extends ConfigEntityBase implements CheckoutFlowInterface {
    */
   public function setPluginId($plugin_id) {
     $this->plugin = $plugin_id;
+    $this->configuration = [];
     $this->pluginCollection = NULL;
     return $this;
   }
@@ -117,6 +118,19 @@ class CheckoutFlow extends ConfigEntityBase implements CheckoutFlowInterface {
     return [
       'configuration' => $this->getPluginCollection(),
     ];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function set($property_name, $value) {
+    // Invoke the setter to clear related properties.
+    if ($property_name == 'plugin') {
+      $this->setPluginId($value);
+    }
+    else {
+      return parent::set($property_name, $value);
+    }
   }
 
   /**

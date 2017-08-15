@@ -319,6 +319,7 @@ abstract class PaymentGatewayBase extends PluginBase implements PaymentGatewayIn
       $values = $form_state->getValue($form['#parents']);
       $values['payment_method_types'] = array_filter($values['payment_method_types']);
 
+      $this->configuration = [];
       $this->configuration['display_label'] = $values['display_label'];
       $this->configuration['mode'] = $values['mode'];
       $this->configuration['payment_method_types'] = array_keys($values['payment_method_types']);
