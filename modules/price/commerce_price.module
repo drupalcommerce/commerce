@@ -26,7 +26,9 @@ function commerce_price_theme() {
  * Implements hook_ENTITY_TYPE_insert() for 'configurable_language'.
  */
 function commerce_price_configurable_language_insert(ConfigurableLanguage $language) {
-  // Allow the importer to import any found translations for the new language.
-  $importer = \Drupal::service('commerce_price.currency_importer');
-  $importer->importTranslations([$language->getId()]);
+  if (!\Drupal::isConfigSyncing()) {
+    // Import currency translations for the new language.
+    $importer = \Drupal::service('commerce_price.currency_importer');
+    $importer->importTranslations([$language->getId()]);
+  }
 }
