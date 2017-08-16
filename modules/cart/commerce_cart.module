@@ -240,6 +240,11 @@ function commerce_cart_views_data_alter(array &$data) {
     'help' => t('Adds a button for removing the order item.'),
     'id' => 'commerce_order_item_remove_button',
   ];
+  $data['commerce_order_item']['empty_cart_button']['field'] = [
+    'title' => t('Empty cart button'),
+    'help' => t('Adds a button for emptying the cart.'),
+    'id' => 'commerce_order_item_empty_cart_button',
+  ];
 }
 
 /**
