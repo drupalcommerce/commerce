@@ -3,7 +3,6 @@
 namespace Drupal\commerce_cart\Plugin\views\field;
 
 use Drupal\commerce_cart\CartManagerInterface;
-use Drupal\commerce_order\Entity\Order;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\views\Plugin\views\field\FieldPluginBase;
