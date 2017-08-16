@@ -188,6 +188,21 @@ class Promotion extends ContentEntityBase implements PromotionInterface {
   /**
    * {@inheritdoc}
    */
+  public function getConditionOperator() {
+    return $this->get('condition_operator')->value;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setConditionOperator($condition_operator) {
+    $this->set('condition_operator', $condition_operator);
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function getCouponIds() {
     $coupon_ids = [];
     foreach ($this->get('coupons') as $field_item) {
@@ -421,8 +436,8 @@ class Promotion extends ContentEntityBase implements PromotionInterface {
       /** @var \Drupal\commerce\Plugin\Commerce\Condition\ConditionInterface $condition */
       return $condition->getEntityTypeId() == 'commerce_order_item';
     });
-    $order_conditions = new ConditionGroup($order_conditions, 'AND');
-    $order_item_conditions = new ConditionGroup($order_item_conditions, 'AND');
+    $order_conditions = new ConditionGroup($order_conditions, $this->getConditionOperator());
+    $order_item_conditions = new ConditionGroup($order_item_conditions, $this->getConditionOperator());
 
     if (!$order_conditions->evaluate($order)) {
       return FALSE;
@@ -580,6 +595,21 @@ class Promotion extends ContentEntityBase implements PromotionInterface {
         ],
       ]);
 
+    $fields['condition_operator'] = BaseFieldDefinition::create('list_string')
+      ->setLabel(t('Condition operator'))
+      ->setDescription(t('The condition operator.'))
+      ->setRequired(TRUE)
+      ->setSetting('allowed_values', [
+        'AND' => t('All conditions must pass'),
+        'OR' => t('Only one condition must pass'),
+      ])
+      ->setDisplayOptions('form', [
+        'type' => 'options_buttons',
+        'weight' => 4,
+      ])
+      ->setDisplayConfigurable('form', TRUE)
+      ->setDefaultValue('AND');
+
     $fields['coupons'] = BaseFieldDefinition::create('entity_reference')
       ->setLabel(t('Coupons'))
       ->setDescription(t('Coupons which allow promotion to be redeemed.'))
@@ -590,7 +620,7 @@ class Promotion extends ContentEntityBase implements PromotionInterface {
       ->setTranslatable(TRUE)
       ->setDisplayOptions('form', [
         'type' => 'inline_entity_form_complex',
-        'weight' => 3,
+        'weight' => 10,
         'settings' => [
           'override_labels' => TRUE,
           'label_singular' => 'coupon',

@@ -69,6 +69,8 @@ class PromotionTest extends CommerceKernelTestBase {
    * @covers ::setStores
    * @covers ::setStoreIds
    * @covers ::getStoreIds
+   * @covers ::getConditionOperator
+   * @covers ::setConditionOperator
    * @covers ::getCouponIds
    * @covers ::getCoupons
    * @covers ::setCoupons
@@ -109,6 +111,10 @@ class PromotionTest extends CommerceKernelTestBase {
 
     $promotion->setStoreIds([$this->store->id()]);
     $this->assertEquals([$this->store->id()], $promotion->getStoreIds());
+
+    $this->assertEquals('AND', $promotion->getConditionOperator());
+    $promotion->setConditionOperator('OR');
+    $this->assertEquals('OR', $promotion->getConditionOperator());
 
     $coupon1 = Coupon::create([
       'code' => $this->randomMachineName(),

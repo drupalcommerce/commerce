@@ -84,6 +84,24 @@ interface PaymentGatewayInterface extends ConfigEntityInterface, EntityWithPlugi
   public function getConditions();
 
   /**
+   * Gets the payment gateway condition operator.
+   *
+   * @return string
+   *   The condition operator. Possible values: AND, OR.
+   */
+  public function getConditionOperator();
+
+  /**
+   * Sets the payment gateway condition operator.
+   *
+   * @param string $condition_operator
+   *   The condition operator.
+   *
+   * @return $this
+   */
+  public function setConditionOperator($condition_operator);
+
+  /**
    * Checks whether the payment gateway applies to the given order.
    *
    * Ensures that the conditions pass.

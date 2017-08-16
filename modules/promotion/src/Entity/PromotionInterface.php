@@ -104,6 +104,24 @@ interface PromotionInterface extends ContentEntityInterface, EntityStoresInterfa
   public function getConditions();
 
   /**
+   * Gets the condition operator.
+   *
+   * @return string
+   *   The condition operator. Possible values: AND, OR.
+   */
+  public function getConditionOperator();
+
+  /**
+   * Sets the condition operator.
+   *
+   * @param string $condition_operator
+   *   The condition operator.
+   *
+   * @return $this
+   */
+  public function setConditionOperator($condition_operator);
+
+  /**
    * Gets the coupon IDs.
    *
    * @return int[]

@@ -170,3 +170,66 @@ function commerce_promotion_post_update_6(&$sandbox = NULL) {
     $sandbox['#finished'] = ($sandbox['total_count'] - $sandbox['current_count']) / $sandbox['total_count'];
   }
 }
+
+/**
+ * Add the condition_operator field to promotions.
+ */
+function commerce_promotion_post_update_7() {
+  $storage_definition = BaseFieldDefinition::create('list_string')
+    ->setLabel(t('Condition operator'))
+    ->setDescription(t('The condition operator.'))
+    ->setRequired(TRUE)
+    ->setSetting('allowed_values', [
+      'AND' => t('All conditions must pass'),
+      'OR' => t('Only one condition must pass'),
+    ])
+    ->setDisplayOptions('form', [
+      'type' => 'options_buttons',
+      'weight' => 4,
+    ])
+    ->setDisplayConfigurable('form', TRUE)
+    ->setDefaultValue('AND');
+
+  $entity_definition_update = \Drupal::entityDefinitionUpdateManager();
+  $entity_definition_update->installFieldStorageDefinition('condition_operator', 'commerce_promotion', 'commerce_promotion', $storage_definition);
+}
+
+/**
+ * Re-save promotions to populate the condition operator field.
+ */
+function commerce_promotion_post_update_8(&$sandbox = NULL) {
+  $promotion_storage = \Drupal::entityTypeManager()->getStorage('commerce_promotion');
+  if (!isset($sandbox['current_count'])) {
+    $query = $promotion_storage->getQuery();
+    $sandbox['total_count'] = $query->count()->execute();
+    $sandbox['current_count'] = 0;
+
+    if (empty($sandbox['total_count'])) {
+      $sandbox['#finished'] = 1;
+      return;
+    }
+  }
+
+  $query = $promotion_storage->getQuery();
+  $query->range($sandbox['current_count'], 25);
+  $result = $query->execute();
+  if (empty($result)) {
+    $sandbox['#finished'] = 1;
+    return;
+  }
+
+  /** @var \Drupal\commerce_promotion\Entity\PromotionInterface[] $promotions */
+  $promotions = $promotion_storage->loadMultiple($result);
+  foreach ($promotions as $promotion) {
+    $promotion->setConditionOperator('AND');
+    $promotion->save();
+  }
+
+  $sandbox['current_count'] += 25;
+  if ($sandbox['current_count'] >= $sandbox['total_count']) {
+    $sandbox['#finished'] = 1;
+  }
+  else {
+    $sandbox['#finished'] = ($sandbox['total_count'] - $sandbox['current_count']) / $sandbox['total_count'];
+  }
+}

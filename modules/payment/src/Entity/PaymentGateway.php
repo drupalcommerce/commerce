@@ -49,6 +49,7 @@ use Drupal\Core\Config\Entity\ConfigEntityBase;
  *     "plugin",
  *     "configuration",
  *     "conditions",
+ *     "conditionOperator",
  *   },
  *   links = {
  *     "add-form" = "/admin/commerce/config/payment-gateways/add",
@@ -101,6 +102,13 @@ class PaymentGateway extends ConfigEntityBase implements PaymentGatewayInterface
    * @var array
    */
   protected $conditions = [];
+
+  /**
+   * The condition operator.
+   *
+   * @var string
+   */
+  protected $conditionOperator = 'AND';
 
   /**
    * The plugin collection that holds the payment gateway plugin.
@@ -188,6 +196,21 @@ class PaymentGateway extends ConfigEntityBase implements PaymentGatewayInterface
   /**
    * {@inheritdoc}
    */
+  public function getConditionOperator() {
+    return $this->conditionOperator;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setConditionOperator($condition_operator) {
+    $this->conditionOperator = $condition_operator;
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function applies(OrderInterface $order) {
     $conditions = $this->getConditions();
     if (!$conditions) {
@@ -198,7 +221,7 @@ class PaymentGateway extends ConfigEntityBase implements PaymentGatewayInterface
       /** @var \Drupal\commerce\Plugin\Commerce\Condition\ConditionInterface $condition */
       return $condition->getEntityTypeId() == 'commerce_order';
     });
-    $order_conditions = new ConditionGroup($order_conditions, 'AND');
+    $order_conditions = new ConditionGroup($order_conditions, $this->getConditionOperator());
 
     return $order_conditions->evaluate($order);
   }
