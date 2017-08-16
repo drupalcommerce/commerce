@@ -6,6 +6,7 @@ use Drupal\commerce_order\Entity\OrderInterface;
 use Drupal\commerce_store\Entity\EntityStoresInterface;
 use Drupal\Core\Datetime\DrupalDateTime;
 use Drupal\Core\Entity\ContentEntityInterface;
+use Drupal\commerce_promotion\Plugin\Commerce\PromotionOffer\PromotionOfferInterface;
 
 /**
  * Defines the interface for promotions.
@@ -98,13 +99,12 @@ interface PromotionInterface extends ContentEntityInterface, EntityStoresInterfa
   /**
    * Sets the offer.
    *
-   * @param string $target_plugin_id
-   *    The offer plugin id.
-   * @param array $target_plugin_configuration
-   *    The configuarion array for this offer plugin.
+   * @param \Drupal\commerce_promotion\Plugin\Commerce\PromotionOffer\PromotionOfferInterface $offer_plugin
+   *    The offer plugin.
+   *
    * @return $this
    */
-  public function setOffer($target_plugin_id,array $target_plugin_configuration);
+  public function setOffer(PromotionOfferInterface $offer_plugin);
 
   /**
    * Gets the conditions.
