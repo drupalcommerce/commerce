@@ -3,8 +3,6 @@
 namespace Drupal\Tests\commerce_cart\Functional;
 
 use Drupal\Tests\commerce_order\Functional\OrderBrowserTestBase;
-use Drupal\user\Entity\Role;
-use Drupal\user\RoleInterface;
 
 /**
  * Tests the cart page with the empty cart button enabled.
