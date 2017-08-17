@@ -69,7 +69,7 @@ class EmptyCartButtonTest extends OrderBrowserTestBase {
     $this->cartManager->addEntity($this->cart, $this->variation);
     $this->cartManager->addEntity($this->cart, $second_variation);
 
-    $this->drupalGet('test-empty-cart-button-form/1');
+    $this->drupalGet('test-empty-cart-button-form/' . $this->cart->id());
     // Confirm there are multiple products by looking for their prices.
     $this->assertSession()->pageTextContains('$999.00');
     $this->assertSession()->pageTextContains('$222.00');
