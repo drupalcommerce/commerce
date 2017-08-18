@@ -6,6 +6,7 @@ use Drupal\commerce_order\Entity\OrderInterface;
 use Drupal\commerce_store\Entity\EntityStoresInterface;
 use Drupal\Core\Datetime\DrupalDateTime;
 use Drupal\Core\Entity\ContentEntityInterface;
+use Drupal\commerce_promotion\Plugin\Commerce\PromotionOffer\PromotionOfferInterface;
 
 /**
  * Defines the interface for promotions.
@@ -94,6 +95,16 @@ interface PromotionInterface extends ContentEntityInterface, EntityStoresInterfa
    *   The offer, or NULL if not yet available.
    */
   public function getOffer();
+
+  /**
+   * Sets the offer.
+   *
+   * @param \Drupal\commerce_promotion\Plugin\Commerce\PromotionOffer\PromotionOfferInterface $offer_plugin
+   *    The offer plugin.
+   *
+   * @return $this
+   */
+  public function setOffer(PromotionOfferInterface $offer_plugin);
 
   /**
    * Gets the conditions.
@@ -335,3 +346,4 @@ interface PromotionInterface extends ContentEntityInterface, EntityStoresInterfa
   public function apply(OrderInterface $order);
 
 }
+

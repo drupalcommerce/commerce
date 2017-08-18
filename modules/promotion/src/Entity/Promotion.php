@@ -4,6 +4,7 @@ namespace Drupal\commerce_promotion\Entity;
 
 use Drupal\commerce\ConditionGroup;
 use Drupal\commerce_order\Entity\OrderInterface;
+use Drupal\commerce_promotion\Plugin\Commerce\PromotionOffer\PromotionOfferInterface;
 use Drupal\Core\Datetime\DrupalDateTime;
 use Drupal\Core\Entity\ContentEntityBase;
 use Drupal\Core\Entity\EntityStorageInterface;
@@ -171,6 +172,16 @@ class Promotion extends ContentEntityBase implements PromotionInterface {
     if (!$this->get('offer')->isEmpty()) {
       return $this->get('offer')->first()->getTargetInstance();
     }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setOffer(PromotionOfferInterface $offer_plugin) {
+    $offer['target_plugin_id'] = $offer_plugin->getPluginId();
+    $offer['target_plugin_configuration'] = $offer_plugin->getConfiguration();
+    $this->set('offer', $offer);
+    return $this;
   }
 
   /**
@@ -753,3 +764,4 @@ class Promotion extends ContentEntityBase implements PromotionInterface {
   }
 
 }
+
