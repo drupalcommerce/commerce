@@ -2,6 +2,7 @@
 
 namespace Drupal\commerce_promotion;
 
+use Drupal\commerce_promotion\Entity\PromotionInterface;
 use Drupal\Core\Entity\ContentEntityStorageInterface;
 
 /**
@@ -19,5 +20,16 @@ interface CouponStorageInterface extends ContentEntityStorageInterface {
    *   The coupon.
    */
   public function loadByCode($code);
+
+  /**
+   * Loads all coupons for the given promotion.
+   *
+   * @param \Drupal\commerce_promotion\Entity\PromotionInterface $promotion
+   *   The promotion.
+   *
+   * @return \Drupal\commerce_promotion\Entity\CouponInterface[]
+   *   The coupons.
+   */
+  public function loadMultipleByPromotion(PromotionInterface $promotion);
 
 }
