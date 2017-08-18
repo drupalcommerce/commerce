@@ -12,8 +12,7 @@
         "drupal/inline_entity_form": "~1.0",
         "drupal/profile": "~1.0",
         "drupal/state_machine": "~1.0",
-        "commerceguys/intl": "~0.7",
-        "ext-bcmath": "*"
+        "commerceguys/intl": "~0.7"
     },
     "minimum-stability": "dev"
 }
