@@ -391,7 +391,7 @@ class Product extends ContentEntityBase implements ProductInterface {
         'weight' => 30,
       ])
       ->setDisplayConfigurable('form', TRUE)
-      ->setCustomStorage(TRUE);
+      ->setComputed(TRUE);
 
     $fields['status'] = BaseFieldDefinition::create('boolean')
       ->setLabel(t('Published'))
