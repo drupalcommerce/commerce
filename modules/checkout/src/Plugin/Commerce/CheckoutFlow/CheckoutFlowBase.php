@@ -244,11 +244,9 @@ abstract class CheckoutFlowBase extends PluginBase implements CheckoutFlowInterf
 
     // Ensure checkout flows have the correct cacheability metadata so they can
     // be cached properly.
-    // @note commented out for testing test.
-    // $cacheable_metadata = CacheableMetadata::createFromRenderArray($form);
-    // $cacheable_metadata->addCacheableDependency($this->order);
-    // $cacheable_metadata->applyTo($form);
-
+    $cacheable_metadata = CacheableMetadata::createFromRenderArray($form);
+    $cacheable_metadata->addCacheableDependency($this->order);
+    $cacheable_metadata->applyTo($form);
 
     $steps = $this->getVisibleSteps();
     $form['#tree'] = TRUE;
