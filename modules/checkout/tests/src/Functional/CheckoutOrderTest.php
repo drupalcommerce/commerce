@@ -79,8 +79,6 @@ class CheckoutOrderTest extends CommerceBrowserTestBase {
    * Tests checkout flow cache metadata.
    *
    * @link https://www.drupal.org/node/2903935
-   *
-   * @group debug
    */
   public function testCacheMetadata() {
     $this->drupalLogout();
@@ -97,16 +95,23 @@ class CheckoutOrderTest extends CommerceBrowserTestBase {
     /** @var \Drupal\commerce_order\Entity\OrderInterface $order */
     $order = $this->container->get('entity_type.manager')->getStorage('commerce_order')->load(1);
 
-    // We're on a form, so no Page Cache
+    // Load the checkout flow as well.
+    /** @var \Drupal\commerce_checkout\Entity\CheckoutFlowInterface $checkout_flow */
+    $checkout_flow = $this->container->get('entity_type.manager')->getStorage('commerce_checkout_flow')->load('default');
+
+    // We're on a form, so no Page Cache.
     $this->assertSession()->responseHeaderEquals('X-Drupal-Cache', NULL);
-    // Dynamic page cache should be present, and a MISS
+    // Dynamic page cache should be present, and a MISS.
     $this->assertSession()->responseHeaderEquals('X-Drupal-Dynamic-Cache', 'MISS');
 
-    // Assert cache tags bubbled
+    // Assert cache tags bubbled.
     $cache_tags_header = $this->getSession()->getResponseHeader('X-Drupal-Cache-Tags');
     $this->assertTrue(strpos($cache_tags_header, 'commerce_order:' . $order->id()) !== FALSE);
     foreach ($order->getItems() as $item) {
       $this->assertTrue(strpos($cache_tags_header, 'commerce_order_item:' . $item->id()) !== FALSE);
+    }
+    foreach ($checkout_flow->getCacheTags() as $cache_tag) {
+      $this->assertTrue(strpos($cache_tags_header, $cache_tag) !== FALSE);
     }
 
     $this->getSession()->reload();
@@ -115,6 +120,14 @@ class CheckoutOrderTest extends CommerceBrowserTestBase {
     // Refresh order. Saving order should bust cache.
     $this->container->get('commerce_order.order_refresh')->refresh($order);
     $order->save();
+
+    $this->getSession()->reload();
+    $this->assertSession()->responseHeaderEquals('X-Drupal-Dynamic-Cache', 'MISS');
+    $this->getSession()->reload();
+    $this->assertSession()->responseHeaderEquals('X-Drupal-Dynamic-Cache', 'HIT');
+
+    // Verify modifying the checkout flow's configuration entity busted cache.
+    $checkout_flow->save();
 
     $this->getSession()->reload();
     $this->assertSession()->responseHeaderEquals('X-Drupal-Dynamic-Cache', 'MISS');
