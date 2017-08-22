@@ -4,6 +4,7 @@ namespace Drupal\commerce_checkout\Plugin\Commerce\CheckoutFlow;
 
 use Drupal\commerce\Response\NeedsRedirectException;
 use Drupal\Component\Utility\NestedArray;
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Link;
@@ -240,6 +241,13 @@ abstract class CheckoutFlowBase extends PluginBase implements CheckoutFlowInterf
       $order_storage = $this->entityTypeManager->getStorage('commerce_order');
       $this->order = $order_storage->load($this->order->id());
     }
+
+    // Ensure checkout flows have the correct cacheability metadata so they can
+    // be cached properly.
+    $cacheable_metadata = CacheableMetadata::createFromRenderArray($form);
+    $cacheable_metadata->addCacheableDependency($this->order);
+    $cacheable_metadata->applyTo($form);
+
 
     $steps = $this->getVisibleSteps();
     $form['#tree'] = TRUE;
