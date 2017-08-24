@@ -36,7 +36,7 @@ class OrderEmailAddress extends ConditionBase {
 
     $form['email'] = [
       '#type' => 'email',
-      '#default_value' => $this->configuration['mail'],//'im a default value!',
+      '#default_value' => $this->configuration['mail'],
       '#required' => TRUE,
     ];
     return $form;
