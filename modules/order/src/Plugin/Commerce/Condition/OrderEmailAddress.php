@@ -36,7 +36,7 @@ class OrderEmailAddress extends ConditionBase {
 
     $form['email'] = [
       '#type' => 'email',
-      '#default_value' => $this->configuration['mail'],
+      '#default_value' => $this->configuration['mail'], 
       '#required' => TRUE,
     ];
     return $form;
@@ -61,11 +61,10 @@ class OrderEmailAddress extends ConditionBase {
     /** @var \Drupal\commerce_order\Entity\OrderInterface $order */
     $order = $entity;
 
-    if($this->configuration['mail'] == $order->getEmail() ) {
-        return true;
+    if ($this->configuration['mail'] == $order->getEmail()) {
+        return TRUE;
     }
-
-    return false; 
+    return FALSE; 
   }
 
 }
