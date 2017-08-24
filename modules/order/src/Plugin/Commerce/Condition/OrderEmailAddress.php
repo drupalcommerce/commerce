@@ -62,7 +62,7 @@ class OrderEmailAddress extends ConditionBase {
     $order = $entity;
 
     if ($this->configuration['mail'] == $order->getEmail()) {
-    return TRUE;
+      return TRUE;
     }
     return FALSE;
   }
