@@ -60,10 +60,8 @@ class OrderEmailAddress extends ConditionBase {
     $this->assertEntity($entity);
     /** @var \Drupal\commerce_order\Entity\OrderInterface $order */
     $order = $entity;
-    $customer = $order->getCustomer();
-    $roles = $customer ? $customer->getEmail() : ['anonymous'];
-    
-    if($this->configuration['mail'] == $customer->getEmail() ) {
+
+    if($this->configuration['mail'] == $order->getEmail() ) {
         return true;
     }
 
