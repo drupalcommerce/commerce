@@ -34,6 +34,9 @@ function commerce_checkout_theme() {
     'commerce_checkout_form__with_sidebar' => [
       'base hook' => 'commerce_checkout_form',
     ],
+    'commerce_checkout_registration' => [
+      'render element' => 'form',
+    ],
   ];
 
   return $theme;
