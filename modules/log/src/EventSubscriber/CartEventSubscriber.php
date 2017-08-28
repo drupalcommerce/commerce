@@ -48,7 +48,7 @@ class CartEventSubscriber implements EventSubscriberInterface {
     $cart = $event->getCart();
     $purchased_entity = $event->getOrderItem()->getPurchasedEntity();
     $this->logStorage->generate($cart, 'cart_entity_added', [
-      'purchased_entity_label' => $purchased_entity->label(),
+      'purchased_entity_label' => $purchased_entity ? $purchased_entity->label() : NULL,
     ])->save();
   }
 
@@ -60,9 +60,9 @@ class CartEventSubscriber implements EventSubscriberInterface {
    */
   public function onCartOrderItemRemove(CartOrderItemRemoveEvent $event) {
     $cart = $event->getCart();
-    $order_item = $event->getOrderItem();
+    $purchased_entity = $event->getOrderItem()->getPurchasedEntity();
     $this->logStorage->generate($cart, 'cart_item_removed', [
-      'purchased_entity_label' => $order_item->getPurchasedEntity()->label(),
+      'purchased_entity_label' => $purchased_entity ? $purchased_entity->label() : NULL,
     ])->save();
   }
 
