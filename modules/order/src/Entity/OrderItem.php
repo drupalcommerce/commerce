@@ -67,6 +67,13 @@ class OrderItem extends ContentEntityBase implements OrderItemInterface {
   /**
    * {@inheritdoc}
    */
+  public function hasPurchasedEntity() {
+    return !$this->get('purchased_entity')->isEmpty();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function getPurchasedEntity() {
     return $this->get('purchased_entity')->entity;
   }

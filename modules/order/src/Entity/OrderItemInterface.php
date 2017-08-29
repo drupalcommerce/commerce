@@ -29,6 +29,14 @@ interface OrderItemInterface extends ContentEntityInterface, EntityAdjustableInt
   public function getOrderId();
 
   /**
+   * Gets whether the order item has a purchased entity.
+   *
+   * @return bool
+   *   TRUE if the order item has a purchased entity, FALSE otherwise.
+   */
+  public function hasPurchasedEntity();
+
+  /**
    * Gets the purchased entity.
    *
    * @return \Drupal\commerce\PurchasableEntityInterface|null

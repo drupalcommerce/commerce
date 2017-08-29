@@ -34,6 +34,12 @@ function commerce_checkout_theme() {
     'commerce_checkout_form__with_sidebar' => [
       'base hook' => 'commerce_checkout_form',
     ],
+    'commerce_checkout_order_summary' => [
+      'variables' => [
+        'order_entity' => NULL,
+        'checkout_step' => '',
+      ],
+    ],
   ];
 
   return $theme;
@@ -52,6 +58,21 @@ function commerce_checkout_theme_suggestions_commerce_checkout_form(array $varia
   }
 
   return $suggestions;
+}
+
+/**
+ * Implements hook_preprocess_HOOK().
+ */
+function commerce_checkout_preprocess_commerce_checkout_order_summary(&$variables) {
+  /** @var \Drupal\commerce_order\Entity\OrderInterface $order */
+  $order = $variables['order_entity'];
+  /** @var \Drupal\commerce_order\OrderTotalSummaryInterface $order_total_summary */
+  $order_total_summary = \Drupal::service('commerce_order.order_total_summary');
+  $variables['totals'] = $order_total_summary->buildTotals($order);
+  $variables['rendered_totals'] = [
+    '#theme' => 'commerce_order_total_summary',
+    '#totals' => $variables['totals'],
+  ];
 }
 
 /**
