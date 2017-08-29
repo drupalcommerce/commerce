@@ -22,7 +22,7 @@ class PriceTwigExtension extends \Twig_Extension {
    * @inheritdoc
    */
   public function getName() {
-    return 'commerce_price.twig_extenstion';
+    return 'commerce_price.twig_extension';
   }
 
   /**
