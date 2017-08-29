@@ -115,11 +115,12 @@ function commerce_order_theme_suggestions_commerce_order(array $variables) {
  * Implements hook_theme_suggestions_commerce_order_receipt().
  */
 function commerce_order_theme_suggestions_commerce_order_receipt(array $variables) {
+  $suggestions = [];
   if (isset($variables['order_entity'])) {
     $order = $variables['order_entity'];
-    $original = $variables['theme_hook_original'];
-    $variables['theme_hook_suggestions'][] = $original . '__' . $order->bundle();
+    $suggestions[] = $variables['theme_hook_original'] . '__' . $order->bundle();
   }
+  return $suggestions;
 }
 
 /**
