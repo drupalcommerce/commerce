@@ -2,9 +2,6 @@ services:
   plugin.manager.commerce_promotion_offer:
     class: Drupal\commerce_promotion\PromotionOfferManager
     arguments: ['@container.namespaces', '@cache.discovery', '@module_handler', '@entity_type.manager']
-  plugin.manager.commerce_promotion_condition:
-    class: Drupal\commerce_promotion\PromotionConditionManager
-    arguments: ['@container.namespaces', '@cache.discovery', '@module_handler', '@entity_type.manager']
 
   commerce_promotion.promotion_order_processor:
     class: Drupal\commerce_promotion\PromotionOrderProcessor
@@ -17,6 +14,11 @@ services:
     arguments: ['@database']
     tags:
       - { name: backend_overridable }
+
+  commerce_promotion.filter_conditions_subscriber:
+    class: Drupal\commerce_promotion\EventSubscriber\FilterConditionsEventSubscriber
+    tags:
+      - { name: event_subscriber }
 
   commerce_promotion.order_subscriber:
     class: Drupal\commerce_promotion\EventSubscriber\OrderEventSubscriber

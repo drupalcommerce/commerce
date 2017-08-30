@@ -1,0 +1,21 @@
+<?php
+
+/**
+ * @file
+ * Install, update and uninstall functions for the Product module.
+ */
+
+/**
+ * Change the path field to computed.
+ */
+function commerce_product_update_8201() {
+  $entity_definition_update_manager = \Drupal::entityDefinitionUpdateManager();
+  if ($entity_definition_update_manager->getEntityType('commerce_product')) {
+    // Computed field definitions are not tracked by the entity definition
+    // update manager, so remove them.
+    $storage_definition = $entity_definition_update_manager->getFieldStorageDefinition('path', 'commerce_product');
+    if ($storage_definition) {
+      $entity_definition_update_manager->uninstallFieldStorageDefinition($storage_definition);
+    }
+  }
+}

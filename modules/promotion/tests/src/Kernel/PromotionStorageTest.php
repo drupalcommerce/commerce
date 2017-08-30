@@ -177,7 +177,7 @@ class PromotionStorageTest extends CommerceKernelTestBase {
       'status' => TRUE,
       'weight' => 4,
     ]);
-    $this->assertEquals(SAVED_NEW, $promotion1->save());
+    $promotion1->save();
     $promotion2 = Promotion::create([
       'name' => 'Promotion 2',
       'order_types' => [$order_type],
@@ -185,7 +185,7 @@ class PromotionStorageTest extends CommerceKernelTestBase {
       'status' => TRUE,
       'weight' => 2,
     ]);
-    $this->assertEquals(SAVED_NEW, $promotion2->save());
+    $promotion2->save();
     $promotion3 = Promotion::create([
       'name' => 'Promotion 3',
       'order_types' => [$order_type],
@@ -193,18 +193,16 @@ class PromotionStorageTest extends CommerceKernelTestBase {
       'status' => TRUE,
       'weight' => -10,
     ]);
-    $this->assertEquals(SAVED_NEW, $promotion3->save());
+    $promotion3->save();
     $promotion4 = Promotion::create([
       'name' => 'Promotion 4',
       'order_types' => [$order_type],
       'stores' => [$this->store->id()],
       'status' => TRUE,
-      'weight' => 1,
     ]);
-    $this->assertEquals(SAVED_NEW, $promotion4->save());
+    $promotion4->save();
 
     $promotions = $this->promotionStorage->loadAvailable($order_type, $this->store);
-
     $promotion = array_shift($promotions);
     $this->assertEquals($promotion3->label(), $promotion->label());
     $promotion = array_shift($promotions);

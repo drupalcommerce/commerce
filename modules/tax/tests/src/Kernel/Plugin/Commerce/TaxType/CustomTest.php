@@ -75,12 +75,12 @@ class CustomTest extends CommerceKernelTestBase {
         [
           'id' => 'standard',
           'label' => 'Standard',
-          'amount' => '0.2',
+          'percentage' => '0.2',
         ],
         [
           'id' => 'reduced',
           'label' => 'Reduced',
-          'amount' => '0.1',
+          'percentage' => '0.1',
         ],
       ],
       'territories' => [
@@ -91,13 +91,11 @@ class CustomTest extends CommerceKernelTestBase {
   }
 
   /**
-   * @covers ::getDisplayLabel
    * @covers ::isDisplayInclusive
    * @covers ::shouldRound
    * @covers ::getZones
    */
   public function testGetters() {
-    $this->assertEquals(t('VAT'), $this->plugin->getDisplayLabel());
     $this->assertTrue($this->plugin->isDisplayInclusive());
     $this->assertTrue($this->plugin->shouldRound());
 
@@ -108,11 +106,11 @@ class CustomTest extends CommerceKernelTestBase {
     $this->assertCount(2, $rates);
     $this->assertEquals('standard', $rates[0]->getId());
     $this->assertEquals('Standard', $rates[0]->getLabel());
-    $this->assertEquals('0.2', $rates[0]->getAmount()->getAmount());
+    $this->assertEquals('0.2', $rates[0]->getPercentage()->getNumber());
     $this->assertTrue($rates[0]->isDefault());
     $this->assertEquals('reduced', $rates[1]->getId());
     $this->assertEquals('Reduced', $rates[1]->getLabel());
-    $this->assertEquals('0.1', $rates[1]->getAmount()->getAmount());
+    $this->assertEquals('0.1', $rates[1]->getPercentage()->getNumber());
     $this->assertFalse($rates[1]->isDefault());
   }
 
@@ -153,8 +151,9 @@ class CustomTest extends CommerceKernelTestBase {
     $adjustments = $order->collectAdjustments();
     $adjustment = reset($adjustments);
     $this->assertEquals('tax', $adjustment->getType());
-    $this->assertEquals($this->plugin->getDisplayLabel(), $adjustment->getLabel());
+    $this->assertEquals(t('VAT'), $adjustment->getLabel());
     $this->assertEquals(new Price('2.07', 'USD'), $adjustment->getAmount());
+    $this->assertEquals('0.2', $adjustment->getPercentage());
     $this->assertEquals('serbian_vat|default|standard', $adjustment->getSourceId());
     $this->assertTrue($adjustment->isIncluded());
     $order_items = $order->getItems();
@@ -167,6 +166,7 @@ class CustomTest extends CommerceKernelTestBase {
     $adjustments = $order->collectAdjustments();
     $adjustment = reset($adjustments);
     $this->assertEquals(new Price('1.72', 'USD'), $adjustment->getAmount());
+    $this->assertEquals('0.2', $adjustment->getPercentage());
     $this->assertTrue($adjustment->isIncluded());
     $order_items = $order->getItems();
     $order_item = reset($order_items);
@@ -181,10 +181,73 @@ class CustomTest extends CommerceKernelTestBase {
     $adjustments = $order->collectAdjustments();
     $adjustment = reset($adjustments);
     $this->assertEquals(new Price('1.72', 'USD'), $adjustment->getAmount());
+    $this->assertEquals('0.2', $adjustment->getPercentage());
     $this->assertFalse($adjustment->isIncluded());
     $order_items = $order->getItems();
     $order_item = reset($order_items);
     $this->assertEquals(new Price('8.61', 'USD'), $order_item->getUnitPrice());
+  }
+
+  /**
+   * @covers ::apply
+   */
+  public function testTaxExemptPrices() {
+    $configuration = [
+      '_entity_id' => 'japanese_vat',
+      'display_inclusive' => TRUE,
+      'display_label' => 'vat',
+      'round' => TRUE,
+      'rates' => [
+        [
+          'id' => 'standard',
+          'label' => 'Standard',
+          'amount' => '0.1',
+        ],
+      ],
+      'territories' => [
+        ['country_code' => 'JP'],
+      ],
+    ];
+    $second_plugin = Custom::create($this->container, $configuration, 'custom', ['label' => 'Custom']);
+
+    // Serbian store and Japanese customer, tax-inclusive prices.
+    // No tax applies, the price must be reduced using a negative adjustment.
+    $order = $this->buildOrder('JP', 'RS', ['JP'], TRUE);
+    $this->assertTrue($this->plugin->applies($order));
+    $this->plugin->apply($order);
+    $this->assertCount(1, $order->collectAdjustments());
+    $adjustments = $order->collectAdjustments();
+    $adjustment = reset($adjustments);
+    $this->assertEquals(new Price('-1.72', 'USD'), $adjustment->getAmount());
+    $this->assertEquals('0.2', $adjustment->getPercentage());
+    $this->assertFalse($adjustment->isIncluded());
+    $order_items = $order->getItems();
+    $order_item = reset($order_items);
+    $this->assertEquals(new Price('10.33', 'USD'), $order_item->getUnitPrice());
+
+    // Applying the Japanese tax should replace the negative adjustment.
+    // The price should stay the same in RS and JP regardless of which
+    // tax is included.
+    $second_plugin->apply($order);
+    $this->assertCount(1, $order->collectAdjustments());
+    $adjustments = $order->collectAdjustments();
+    $adjustment = reset($adjustments);
+    $this->assertEquals(new Price('0.94', 'USD'), $adjustment->getAmount());
+    $this->assertEquals('0.1', $adjustment->getPercentage());
+    $this->assertTrue($adjustment->isIncluded());
+    $order_items = $order->getItems();
+    $order_item = reset($order_items);
+    $this->assertEquals(new Price('10.33', 'USD'), $order_item->getUnitPrice());
+
+    // No negative adjustment should be added if there's an existing positive
+    // tax, so re-applying the Serbian tax should make no difference.
+    $this->plugin->apply($order);
+    $this->assertCount(1, $order->collectAdjustments());
+    $adjustments = $order->collectAdjustments();
+    $adjustment = reset($adjustments);
+    $this->assertEquals(new Price('0.94', 'USD'), $adjustment->getAmount());
+    $this->assertEquals('0.1', $adjustment->getPercentage());
+    $this->assertTrue($adjustment->isIncluded());
   }
 
   /**
@@ -226,6 +289,7 @@ class CustomTest extends CommerceKernelTestBase {
       'billing_profile' => $customer_profile,
       'order_items' => [$order_item],
     ]);
+    $order->setRefreshState(Order::REFRESH_SKIP);
     $order->save();
 
     return $order;

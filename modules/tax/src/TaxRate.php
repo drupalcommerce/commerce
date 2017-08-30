@@ -24,11 +24,11 @@ class TaxRate {
   protected $label;
 
   /**
-   * The amounts.
+   * The percentages.
    *
-   * @var \Drupal\commerce_tax\TaxRateAmount[]
+   * @var \Drupal\commerce_tax\TaxRatePercentage[]
    */
-  protected $amounts;
+  protected $percentages;
 
   /**
    * Whether the tax rate is the default for its tax type.
@@ -44,19 +44,19 @@ class TaxRate {
    *   The definition.
    */
   public function __construct(array $definition) {
-    foreach (['id', 'label', 'amounts'] as $required_property) {
+    foreach (['id', 'label', 'percentages'] as $required_property) {
       if (empty($definition[$required_property])) {
         throw new \InvalidArgumentException(sprintf('Missing required property "%s".', $required_property));
       }
     }
-    if (!is_array($definition['amounts'])) {
-      throw new \InvalidArgumentException(sprintf('The property "amounts" must be an array.'));
+    if (!is_array($definition['percentages'])) {
+      throw new \InvalidArgumentException(sprintf('The property "percentages" must be an array.'));
     }
 
     $this->id = $definition['id'];
     $this->label = $definition['label'];
-    foreach ($definition['amounts'] as $amount_definition) {
-      $this->amounts[] = new TaxRateAmount($amount_definition);
+    foreach ($definition['percentages'] as $percentage_definition) {
+      $this->percentages[] = new TaxRatePercentage($percentage_definition);
     }
     $this->default = !empty($definition['default']);
   }
@@ -84,36 +84,36 @@ class TaxRate {
   }
 
   /**
-   * Gets the amounts.
+   * Gets the percentages.
    *
-   * @return \Drupal\commerce_tax\TaxRateAmount[]
-   *   The amounts.
+   * @return \Drupal\commerce_tax\TaxRatePercentage[]
+   *   The percentages.
    */
-  public function getAmounts() {
-    return $this->amounts;
+  public function getPercentages() {
+    return $this->percentages;
   }
 
   /**
-   * Gets the amount valid for the given date.
+   * Gets the percentage valid for the given date.
    *
    * @param \Drupal\Core\Datetime\DrupalDateTime $date
    *   The date.
    *
-   * @return \Drupal\commerce_tax\TaxRateAmount|null
-   *   The amount, or NULL if none found.
+   * @return \Drupal\commerce_tax\TaxRatePercentage|null
+   *   The percentage, or NULL if none found.
    */
-  public function getAmount(DrupalDateTime $date = NULL) {
+  public function getPercentage(DrupalDateTime $date = NULL) {
     // Default to the current date.
     $date = $date ?: new DrupalDateTime();
-    // Amount start/end dates don't include the time, so discard the time
-    // portion of the given date to make the matching precise.
+    // Percentage start/end dates don't include the time, so discard the
+    // time portion of the given date to make the matching precise.
     $date->setTime(0, 0);
-    foreach ($this->amounts as $amount) {
-      $start_date = $amount->getStartDate();
-      $end_date = $amount->getEndDate();
-      // Match the date against the amount start/end dates.
+    foreach ($this->percentages as $percentage) {
+      $start_date = $percentage->getStartDate();
+      $end_date = $percentage->getEndDate();
+      // Match the date against the percentage start/end dates.
       if (($start_date <= $date) && (!$end_date || $end_date > $date)) {
-        return $amount;
+        return $percentage;
       }
     }
     return NULL;

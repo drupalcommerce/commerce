@@ -72,6 +72,21 @@ class Coupon extends ContentEntityBase implements CouponInterface {
   /**
    * {@inheritdoc}
    */
+  public function getUsageLimit() {
+    return $this->get('usage_limit')->value;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setUsageLimit($usage_limit) {
+    $this->set('usage_limit', $usage_limit);
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function isEnabled() {
     return (bool) $this->getEntityKey('status');
   }
@@ -93,6 +108,13 @@ class Coupon extends ContentEntityBase implements CouponInterface {
     }
     if (!$this->getPromotion()->available($order)) {
       return FALSE;
+    }
+    if ($usage_limit = $this->getUsageLimit()) {
+      /** @var \Drupal\commerce_promotion\PromotionUsageInterface $usage */
+      $usage = \Drupal::service('commerce_promotion.usage');
+      if ($usage_limit <= $usage->getUsage($this->getPromotion(), $this)) {
+        return FALSE;
+      }
     }
 
     return TRUE;
@@ -132,6 +154,15 @@ class Coupon extends ContentEntityBase implements CouponInterface {
       ])
       ->setDisplayConfigurable('form', TRUE)
       ->setDisplayConfigurable('view', TRUE);
+
+    $fields['usage_limit'] = BaseFieldDefinition::create('integer')
+      ->setLabel(t('Usage limit'))
+      ->setDescription(t('The maximum number of times the coupon can be used. 0 for unlimited.'))
+      ->setDefaultValue(0)
+      ->setDisplayOptions('form', [
+        'type' => 'commerce_usage_limit',
+        'weight' => 4,
+      ]);
 
     $fields['status'] = BaseFieldDefinition::create('boolean')
       ->setLabel(t('Status'))

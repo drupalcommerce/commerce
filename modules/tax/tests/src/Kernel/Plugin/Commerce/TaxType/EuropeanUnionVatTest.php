@@ -101,7 +101,7 @@ class EuropeanUnionVatTest extends CommerceKernelTestBase {
     $adjustments = $order->collectAdjustments();
     $adjustment = reset($adjustments);
     $this->assertCount(1, $adjustments);
-    $this->assertEqual('european_union_vat|fr|standard', $adjustment->getSourceId());
+    $this->assertEquals('european_union_vat|fr|standard', $adjustment->getSourceId());
 
     // German customer, French store registered for German VAT, physical product.
     $order = $this->buildOrder('DE', 'FR', ['DE']);
@@ -110,7 +110,7 @@ class EuropeanUnionVatTest extends CommerceKernelTestBase {
     $adjustments = $order->collectAdjustments();
     $adjustment = reset($adjustments);
     $this->assertCount(1, $adjustments);
-    $this->assertEqual('european_union_vat|de|standard', $adjustment->getSourceId());
+    $this->assertEquals('european_union_vat|de|standard', $adjustment->getSourceId());
 
     // German customer, French store, digital product before Jan 1st 2015.
     $order = $this->buildOrder('DE', 'FR', [], TRUE);
@@ -121,7 +121,7 @@ class EuropeanUnionVatTest extends CommerceKernelTestBase {
     $adjustments = $order->collectAdjustments();
     $adjustment = reset($adjustments);
     $this->assertCount(1, $adjustments);
-    $this->assertEqual('european_union_vat|fr|standard', $adjustment->getSourceId());
+    $this->assertEquals('european_union_vat|fr|standard', $adjustment->getSourceId());
 
     // German customer, French store, digital product.
     $order = $this->buildOrder('DE', 'FR', [], TRUE);
@@ -130,7 +130,7 @@ class EuropeanUnionVatTest extends CommerceKernelTestBase {
     $adjustments = $order->collectAdjustments();
     $adjustment = reset($adjustments);
     $this->assertCount(1, $adjustments);
-    $this->assertEqual('european_union_vat|de|standard', $adjustment->getSourceId());
+    $this->assertEquals('european_union_vat|de|standard', $adjustment->getSourceId());
 
     // German customer, US store registered in FR, digital product.
     $order = $this->buildOrder('DE', 'US', ['FR'], TRUE);
@@ -139,7 +139,7 @@ class EuropeanUnionVatTest extends CommerceKernelTestBase {
     $adjustments = $order->collectAdjustments();
     $adjustment = reset($adjustments);
     $this->assertCount(1, $adjustments);
-    $this->assertEqual('european_union_vat|de|standard', $adjustment->getSourceId());
+    $this->assertEquals('european_union_vat|de|standard', $adjustment->getSourceId());
 
     // German customer with VAT number, US store registered in FR, digital product.
     // @todo

@@ -33,6 +33,7 @@ class TaxZoneTest extends CommerceKernelTestBase {
     $definition = [
       'id' => 'test',
       'label' => 'Test',
+      'display_label' => 'VAT',
       'territories' => 'WRONG',
     ];
     $zone = new TaxZone($definition);
@@ -47,6 +48,7 @@ class TaxZoneTest extends CommerceKernelTestBase {
     $definition = [
       'id' => 'test',
       'label' => 'Test',
+      'display_label' => 'VAT',
       'territories' => [
         ['country_code' => 'RS'],
       ],
@@ -59,6 +61,7 @@ class TaxZoneTest extends CommerceKernelTestBase {
    * @covers ::__construct
    * @covers ::getId
    * @covers ::getLabel
+   * @covers ::getDisplayLabel
    * @covers ::getTerritories
    * @covers ::getRates
    * @covers ::match
@@ -68,6 +71,7 @@ class TaxZoneTest extends CommerceKernelTestBase {
     $definition = [
       'id' => 'ie',
       'label' => 'Ireland',
+      'display_label' => 'VAT',
       'territories' => [
         ['country_code' => 'IE'],
       ],
@@ -75,8 +79,8 @@ class TaxZoneTest extends CommerceKernelTestBase {
         [
           'id' => 'standard',
           'label' => 'Standard',
-          'amounts' => [
-            ['amount' => '0.23', 'start_date' => '2012-01-01'],
+          'percentages' => [
+            ['number' => '0.23', 'start_date' => '2012-01-01'],
           ],
           'default' => TRUE,
         ],
@@ -86,6 +90,7 @@ class TaxZoneTest extends CommerceKernelTestBase {
 
     $this->assertEquals($definition['id'], $zone->getId());
     $this->assertEquals($definition['label'], $zone->getLabel());
+    $this->assertEquals($definition['display_label'], $zone->getDisplayLabel());
     $this->assertCount(1, $zone->getTerritories());
     $this->assertEquals($definition['territories'][0]['country_code'], $zone->getTerritories()[0]->getCountryCode());
     $this->assertCount(1, $zone->getRates());

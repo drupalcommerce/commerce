@@ -1,4 +1,0 @@
-tax:
-  label: Tax
-  has_ui: true
-  weight: 50

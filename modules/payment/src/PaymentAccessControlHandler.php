@@ -23,7 +23,9 @@ class PaymentAccessControlHandler extends EntityAccessControlHandler {
       ->andIf(AccessResult::allowedIf($entity->getOrder()->access('view', $account, TRUE)))
       ->addCacheableDependency($entity);
     if ($operation == 'delete') {
-      $access = $access->andIf(AccessResult::allowedIf($entity->isTest()));
+      // @todo Add a payment gateway method for this check,
+      // to allow a differently named test mode.
+      $access = $access->andIf(AccessResult::allowedIf($entity->getPaymentGatewayMode() == 'test'));
     }
     elseif (!in_array($operation, ['view', 'view label', 'delete'])) {
       $payment_gateway_plugin = $entity->getPaymentGateway()->getPlugin();

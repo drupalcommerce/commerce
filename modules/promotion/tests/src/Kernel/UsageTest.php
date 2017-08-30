@@ -165,7 +165,7 @@ class UsageTest extends CommerceKernelTestBase {
       'order_types' => [$this->order->bundle()],
       'stores' => [$this->store->id()],
       'offer' => [
-        'target_plugin_id' => 'commerce_promotion_order_percentage_off',
+        'target_plugin_id' => 'order_percentage_off',
         'target_plugin_configuration' => [
           'amount' => '0.10',
         ],
@@ -211,7 +211,7 @@ class UsageTest extends CommerceKernelTestBase {
       'order_types' => [$this->order->bundle()],
       'stores' => [$this->store->id()],
       'offer' => [
-        'target_plugin_id' => 'commerce_promotion_order_percentage_off',
+        'target_plugin_id' => 'order_percentage_off',
         'target_plugin_configuration' => [
           'amount' => '0.10',
         ],

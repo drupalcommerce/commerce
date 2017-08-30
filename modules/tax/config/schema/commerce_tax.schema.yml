@@ -53,11 +53,11 @@ commerce_tax.commerce_tax_type.plugin.custom:
           label:
             type: label
             label: 'Label'
-          amount:
+          percentage:
             type: string
-            label: 'Amount'
+            label: 'Percentage'
     territories:
       type: sequence
       label: 'Territories'
       sequence:
-        type: zone_territory
+        type: address_zone_territory
