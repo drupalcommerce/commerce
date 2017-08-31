@@ -98,7 +98,7 @@ class PromotionListBuilder extends EntityListBuilder implements FormInterface {
     // Sort the entities using the entity class's sort() method.
     uasort($entities, [$this->entityType->getClass(), 'sort']);
     // Load the usage counts for each promotion.
-    $this->usageCounts = $this->usage->getUsageMultiple($entities);
+    $this->usageCounts = $this->usage->loadMultiple($entities);
 
     return $entities;
   }

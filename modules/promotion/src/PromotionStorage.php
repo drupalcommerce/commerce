@@ -105,7 +105,7 @@ class PromotionStorage extends CommerceContentEntityStorage implements Promotion
       /** @var \Drupal\commerce_promotion\Entity\PromotionInterface $promotion */
       return !empty($promotion->getUsageLimit());
     });
-    $usages = $this->usage->getUsageMultiple($promotions_with_usage_limits);
+    $usages = $this->usage->loadMultiple($promotions_with_usage_limits);
     foreach ($promotions_with_usage_limits as $promotion_id => $promotion) {
       /** @var \Drupal\commerce_promotion\Entity\PromotionInterface $promotion */
       if ($promotion->getUsageLimit() <= $usages[$promotion_id]) {

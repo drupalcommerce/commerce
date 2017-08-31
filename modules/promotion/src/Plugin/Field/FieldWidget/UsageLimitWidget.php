@@ -78,10 +78,10 @@ class UsageLimitWidget extends WidgetBase implements ContainerFactoryPluginInter
     $entity = $items[$delta]->getEntity();
     if (!$entity->isNew()) {
       if ($entity instanceof PromotionInterface) {
-        $usage = $this->usage->getUsage($entity);
+        $usage = $this->usage->load($entity);
       }
       elseif ($entity instanceof CouponInterface) {
-        $usage = $this->usage->getUsage($entity->getPromotion(), $entity);
+        $usage = $this->usage->loadByCoupon($entity);
       }
     }
     $formatted_usage = $this->formatPlural($usage, '1 use', '@count uses');

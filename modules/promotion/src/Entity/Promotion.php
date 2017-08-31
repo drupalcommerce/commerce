@@ -407,7 +407,7 @@ class Promotion extends ContentEntityBase implements PromotionInterface {
     if ($usage_limit = $this->getUsageLimit()) {
       /** @var \Drupal\commerce_promotion\PromotionUsageInterface $usage */
       $usage = \Drupal::service('commerce_promotion.usage');
-      if ($usage_limit <= $usage->getUsage($this)) {
+      if ($usage_limit <= $usage->load($this)) {
         return FALSE;
       }
     }
@@ -520,7 +520,7 @@ class Promotion extends ContentEntityBase implements PromotionInterface {
     $coupon_storage->delete($coupons);
     /** @var \Drupal\commerce_promotion\PromotionUsageInterface $usage */
     $usage = \Drupal::service('commerce_promotion.usage');
-    $usage->deleteUsage($entities);
+    $usage->delete($entities);
   }
 
   /**

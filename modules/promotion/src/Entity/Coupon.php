@@ -3,6 +3,7 @@
 namespace Drupal\commerce_promotion\Entity;
 
 use Drupal\commerce_order\Entity\OrderInterface;
+use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Entity\ContentEntityBase;
 use Drupal\Core\Entity\EntityTypeInterface;
@@ -112,12 +113,22 @@ class Coupon extends ContentEntityBase implements CouponInterface {
     if ($usage_limit = $this->getUsageLimit()) {
       /** @var \Drupal\commerce_promotion\PromotionUsageInterface $usage */
       $usage = \Drupal::service('commerce_promotion.usage');
-      if ($usage_limit <= $usage->getUsage($this->getPromotion(), $this)) {
+      if ($usage_limit <= $usage->loadByCoupon($this)) {
         return FALSE;
       }
     }
 
     return TRUE;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function postDelete(EntityStorageInterface $storage, array $entities) {
+    // Delete the related usage.
+    /** @var \Drupal\commerce_promotion\PromotionUsageInterface $usage */
+    $usage = \Drupal::service('commerce_promotion.usage');
+    $usage->deleteByCoupon($entities);
   }
 
   /**
