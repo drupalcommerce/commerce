@@ -547,6 +547,9 @@ abstract class CheckoutFlowWithPanesBase extends CheckoutFlowBase implements Che
         '#parents' => [$pane_id],
         '#type' => $pane->getWrapperElement(),
         '#title' => $pane->getDisplayLabel(),
+        '#attributes' => [
+          'class' => ['checkout-pane', 'checkout-pane-' . str_replace('_', '-', $pane_id)],
+        ],
       ];
       $form[$pane_id] = $pane->buildPaneForm($form[$pane_id], $form_state, $form);
     }
@@ -560,6 +563,9 @@ abstract class CheckoutFlowWithPanesBase extends CheckoutFlowBase implements Che
           '#parents' => ['sidebar', $pane_id],
           '#type' => $pane->getWrapperElement(),
           '#title' => $pane->getDisplayLabel(),
+          '#attributes' => [
+            'class' => ['checkout-pane', 'checkout-pane-' . str_replace('_', '-', $pane_id)],
+          ],
         ];
         $form['sidebar'][$pane_id] = $pane->buildPaneForm($form['sidebar'][$pane_id], $form_state, $form);
       }
