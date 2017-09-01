@@ -19,6 +19,6 @@ interface PaymentStorageInterface extends ContentEntityStorageInterface {
    * @return \Drupal\commerce_payment\Entity\PaymentInterface[]
    *   The payments.
    */
-  public function loadMultipleForOrder(OrderInterface $order);
+  public function loadMultipleByOrder(OrderInterface $order);
 
 }

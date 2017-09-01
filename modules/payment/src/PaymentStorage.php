@@ -14,7 +14,7 @@ class PaymentStorage extends CommerceContentEntityStorage implements PaymentStor
   /**
    * {@inheritdoc}
    */
-  public function loadMultipleForOrder(OrderInterface $order) {
+  public function loadMultipleByOrder(OrderInterface $order) {
     $query = $this->getQuery()
       ->condition('order_id', $order->id())
       ->sort('payment_id');
