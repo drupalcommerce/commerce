@@ -98,7 +98,7 @@ class OrderSummary extends CheckoutPaneBase implements CheckoutPaneInterface {
    * {@inheritdoc}
    */
   public function buildPaneForm(array $pane_form, FormStateInterface $form_state, array &$complete_form) {
-    if ($this->configuration['view'] && FALSE) {
+    if ($this->configuration['view']) {
       $pane_form['summary'] = [
         '#type' => 'view',
         '#name' => $this->configuration['view'],
