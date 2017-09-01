@@ -4,6 +4,8 @@ namespace Drupal\commerce_price\Plugin\Field\FieldFormatter;
 
 use Drupal\commerce\Context;
 use Drupal\commerce\PurchasableEntityInterface;
+use Drupal\commerce_order\PurchasableEntityPriceCalculator;
+use Drupal\commerce_order\PurchasableEntityPriceCalculatorInterface;
 use Drupal\commerce_price\NumberFormatterFactoryInterface;
 use Drupal\commerce_price\Resolver\ChainPriceResolverInterface;
 use Drupal\commerce_store\CurrentStoreInterface;
@@ -26,15 +28,17 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *     "commerce_price"
  *   }
  * )
+ *
+ * @todo How are we going to handle plugin ID name change?
  */
 class PriceCalculatedFormatter extends PriceDefaultFormatter implements ContainerFactoryPluginInterface {
 
   /**
-   * The chain price resolver.
+   * The price calculator.
    *
-   * @var \Drupal\commerce_price\Resolver\ChainPriceResolverInterface
+   * @var \Drupal\commerce_order\PurchasableEntityPriceCalculatorInterface
    */
-  protected $chainPriceResolver;
+  protected $priceCalculator;
 
   /**
    * The currency storage.
@@ -78,17 +82,17 @@ class PriceCalculatedFormatter extends PriceDefaultFormatter implements Containe
    *   The entity type manager.
    * @param \Drupal\commerce_price\NumberFormatterFactoryInterface $number_formatter_factory
    *   The number formatter factory.
-   * @param \Drupal\commerce_price\Resolver\ChainPriceResolverInterface $chain_price_resolver
+   * @param \Drupal\commerce_order\PurchasableEntityPriceCalculatorInterface $purchasable_entity_price_calculator
    *   The chain price resolver.
    * @param \Drupal\commerce_store\CurrentStoreInterface $current_store
    *   The current store.
    * @param \Drupal\Core\Session\AccountInterface $current_user
    *   The current user.
    */
-  public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, $label, $view_mode, array $third_party_settings, EntityTypeManagerInterface $entity_type_manager, NumberFormatterFactoryInterface $number_formatter_factory, ChainPriceResolverInterface $chain_price_resolver, CurrentStoreInterface $current_store, AccountInterface $current_user) {
+  public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, $label, $view_mode, array $third_party_settings, EntityTypeManagerInterface $entity_type_manager, NumberFormatterFactoryInterface $number_formatter_factory, PurchasableEntityPriceCalculatorInterface $purchasable_entity_price_calculator, CurrentStoreInterface $current_store, AccountInterface $current_user) {
     parent::__construct($plugin_id, $plugin_definition, $field_definition, $settings, $label, $view_mode, $third_party_settings, $entity_type_manager, $number_formatter_factory);
 
-    $this->chainPriceResolver = $chain_price_resolver;
+    $this->priceCalculator = $purchasable_entity_price_calculator;
     $this->currentStore = $current_store;
     $this->currencyStorage = $entity_type_manager->getStorage('commerce_currency');
     $this->currentUser = $current_user;
@@ -118,15 +122,14 @@ class PriceCalculatedFormatter extends PriceDefaultFormatter implements Containe
    * {@inheritdoc}
    */
   public function viewElements(FieldItemListInterface $items, $langcode) {
-    $context = new Context($this->currentUser, $this->currentStore->getStore());
     $elements = [];
     /** @var \Drupal\commerce_price\Plugin\Field\FieldType\PriceItem $item */
     foreach ($items as $delta => $item) {
       /** @var \Drupal\commerce\PurchasableEntityInterface $purchasable_entity */
       $purchasable_entity = $items->getEntity();
-      $resolved_price = $this->chainPriceResolver->resolve($purchasable_entity, 1, $context);
-      $number = $resolved_price->getNumber();
-      $currency = $this->currencyStorage->load($resolved_price->getCurrencyCode());
+      $calculated_price = $this->priceCalculator->calculate($purchasable_entity, 1, $this->getAdjustmentTypes());
+      $number = $calculated_price->getNumber();
+      $currency = $this->currencyStorage->load($calculated_price->getCurrencyCode());
 
       $elements[$delta] = [
         '#markup' => $this->numberFormatter->formatCurrency($number, $currency),
@@ -149,6 +152,16 @@ class PriceCalculatedFormatter extends PriceDefaultFormatter implements Containe
   public static function isApplicable(FieldDefinitionInterface $field_definition) {
     $entity_type = \Drupal::entityTypeManager()->getDefinition($field_definition->getTargetEntityTypeId());
     return $entity_type->entityClassImplements(PurchasableEntityInterface::class);
+  }
+
+  /**
+   * @todo make a setting and etc.
+   *
+   * @return array
+   */
+  protected function getAdjustmentTypes() {
+    $adjustment_types = \Drupal::getContainer()->get('plugin.manager.commerce_adjustment_type')->getDefinitions();
+    return array_keys($adjustment_types);
   }
 
 }
