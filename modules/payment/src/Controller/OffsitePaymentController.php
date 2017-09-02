@@ -7,6 +7,7 @@ use Drupal\commerce_order\Entity\OrderInterface;
 use Drupal\commerce_payment\Entity\PaymentGatewayInterface;
 use Drupal\commerce_payment\Exception\PaymentGatewayException;
 use Drupal\commerce_payment\Plugin\Commerce\PaymentGateway\OffsitePaymentGatewayInterface;
+use Drupal\commerce_payment\Plugin\Commerce\PaymentGateway\OffsitePaymentNotificationInterface;
 use Drupal\Core\Access\AccessException;
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -120,7 +121,7 @@ class OffsitePaymentController implements ContainerInjectionInterface {
    */
   public function notifyPage(PaymentGatewayInterface $commerce_payment_gateway, Request $request) {
     $payment_gateway_plugin = $commerce_payment_gateway->getPlugin();
-    if (!$payment_gateway_plugin instanceof OffsitePaymentGatewayInterface) {
+    if (!$payment_gateway_plugin instanceof OffsitePaymentNotificationInterface) {
       throw new AccessException('Invalid payment gateway provided.');
     }
 
