@@ -126,7 +126,7 @@ abstract class CheckoutFlowBase extends PluginBase implements CheckoutFlowInterf
    */
   public function redirectToStep($step_id) {
     $this->order->set('checkout_step', $step_id);
-    if ($step_id == 'complete') {
+    if ($step_id == $this->configuration['place_order_step']) {
       $transition = $this->order->getState()->getWorkflow()->getTransition('place');
       $this->order->getState()->applyTransition($transition);
     }
@@ -193,6 +193,7 @@ abstract class CheckoutFlowBase extends PluginBase implements CheckoutFlowInterf
   public function defaultConfiguration() {
     return [
       'display_checkout_progress' => TRUE,
+      'place_order_step' => 'complete',
     ];
   }
 
@@ -205,6 +206,19 @@ abstract class CheckoutFlowBase extends PluginBase implements CheckoutFlowInterf
       '#title' => $this->t('Display checkout progress'),
       '#description' => $this->t('Used by the checkout progress block to determine visibility.'),
       '#default_value' => $this->configuration['display_checkout_progress'],
+    ];
+
+    $steps = $this->getSteps();
+    $step_options = [
+      'payment' => $steps['payment']['label'],
+      'complete' => $steps['complete']['label'],
+    ];
+    $form['place_order_step'] = [
+      '#type' => 'select',
+      '#title' => $this->t('Place order step'),
+      '#options' => $step_options,
+      '#default_value' => $this->configuration['place_order_step'],
+      '#description' => $this->t('Chooses a step on which the order will be placed.'),
     ];
 
     return $form;
@@ -223,6 +237,7 @@ abstract class CheckoutFlowBase extends PluginBase implements CheckoutFlowInterf
       $values = $form_state->getValue($form['#parents']);
       $this->configuration = [];
       $this->configuration['display_checkout_progress'] = $values['display_checkout_progress'];
+      $this->configuration['place_order_step'] = $values['place_order_step'];
     }
   }
 
@@ -296,7 +311,7 @@ abstract class CheckoutFlowBase extends PluginBase implements CheckoutFlowInterf
         'step' => $next_step_id,
       ]);
 
-      if ($next_step_id == 'complete') {
+      if ($next_step_id == $this->configuration['place_order_step']) {
         // Place the order.
         $transition = $this->order->getState()->getWorkflow()->getTransition('place');
         $this->order->getState()->applyTransition($transition);
