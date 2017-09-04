@@ -7,6 +7,7 @@
 
 use Drupal\Core\Entity\Entity\EntityFormDisplay;
 use Drupal\field\Entity\FieldStorageConfig;
+use Drupal\Core\Field\BaseFieldDefinition;
 
 /**
  * Revert Order views to fix broken Price fields.
@@ -210,4 +211,19 @@ function commerce_order_post_update_8() {
   $field = FieldStorageConfig::loadByName('profile', 'address');
   $field->setLocked(FALSE);
   $field->save();
+}
+
+/**
+ * Add 'total_paid' field to 'commerce_order' entities.
+ */
+function commerce_order_post_update_add_field_total_paid() {
+  $storage_definition = BaseFieldDefinition::create('commerce_price')
+    ->setLabel(t('Total paid'))
+    ->setDescription(t('The total amount paid on the order.'))
+    ->setReadOnly(TRUE)
+    ->setDisplayConfigurable('form', FALSE)
+    ->setDisplayConfigurable('view', TRUE);
+  \Drupal::entityDefinitionUpdateManager()
+    ->installFieldStorageDefinition('total_paid', 'commerce_order', 'commerce_order', $storage_definition);
+  return t('The order total paid field was created.');
 }
