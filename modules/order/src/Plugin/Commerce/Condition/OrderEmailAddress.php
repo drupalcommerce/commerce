@@ -35,7 +35,7 @@ class OrderEmailAddress extends ConditionBase {
     $form = parent::buildConfigurationForm($form, $form_state);
 
     $form['mail'] = [
-      '#type' => 'mail',
+      '#type' => 'email',
       '#default_value' => $this->configuration['mail'],
       '#required' => TRUE,
     ];
