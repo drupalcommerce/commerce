@@ -24,7 +24,7 @@ use Symfony\Component\HttpFoundation\Request;
  * the payment at the payment provider, they will be redirected back to the
  * cancel url.
  */
-interface OffsitePaymentGatewayInterface extends PaymentGatewayInterface, OffsitePaymentNotificationInterface {
+interface OffsitePaymentGatewayInterface extends PaymentGatewayInterface, SupportsNotificationsInterface {
 
   /**
    * Gets the URL to the "notify" page.

@@ -7,7 +7,7 @@ use Symfony\Component\HttpFoundation\Request;
 /**
  * Defines the interface for gateways which receive payment notifications.
  */
-interface OffsitePaymentNotificationInterface {
+interface SupportsNotificationsInterface {
 
   /**
    * Processes the "notify" request.
