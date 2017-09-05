@@ -34,8 +34,8 @@ class OrderEmailAddress extends ConditionBase {
   public function buildConfigurationForm(array $form, FormStateInterface $form_state) {
     $form = parent::buildConfigurationForm($form, $form_state);
 
-    $form['email'] = [
-      '#type' => 'email',
+    $form['mail'] = [
+      '#type' => 'mail',
       '#default_value' => $this->configuration['mail'],
       '#required' => TRUE,
     ];
@@ -49,22 +49,18 @@ class OrderEmailAddress extends ConditionBase {
     parent::submitConfigurationForm($form, $form_state);
 
     $values = $form_state->getValue($form['#parents']);
-    $this->configuration['mail'] = $values['email'];
+    $this->configuration['mail'] = $values['mail'];
   }
 
   /**
    * {@inheritdoc}
    */
   public function evaluate(EntityInterface $entity) {
-
     $this->assertEntity($entity);
     /** @var \Drupal\commerce_order\Entity\OrderInterface $order */
     $order = $entity;
 
-    if ($this->configuration['mail'] == $order->getEmail()) {
-      return TRUE;
-    }
-    return FALSE;
+    return $this->configuration['mail'] == $order->getEmail();
   }
 
 }
