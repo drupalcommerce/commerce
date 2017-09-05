@@ -57,6 +57,7 @@ class OrderItemTest extends CommerceKernelTestBase {
    * @covers ::getQuantity
    * @covers ::setQuantity
    * @covers ::getUnitPrice
+   * @covers ::getAdjustedUnitPrice
    * @covers ::setUnitPrice
    * @covers ::isUnitPriceOverridden
    * @covers ::getAdjustedUnitPrice
@@ -69,6 +70,7 @@ class OrderItemTest extends CommerceKernelTestBase {
    * @covers ::getAdjustedTotalPrice
    * @covers ::getData
    * @covers ::setData
+   * @covers ::getAdjustedTotalPrice
    * @covers ::getCreatedTime
    * @covers ::setCreatedTime
    */
