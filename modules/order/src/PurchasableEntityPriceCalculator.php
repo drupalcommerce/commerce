@@ -93,7 +93,7 @@ class PurchasableEntityPriceCalculator implements PurchasableEntityPriceCalculat
     $order = $this->orderStorage->create([
       'type' => $order_type_id,
       'store_id' => $store->id(),
-      'uid' => $this->currentUser->getAccount(),
+      'uid' => $this->currentUser->id(),
     ]);
     $order->addItem($order_item);
 
