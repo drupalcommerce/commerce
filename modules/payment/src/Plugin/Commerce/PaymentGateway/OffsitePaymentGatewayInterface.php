@@ -24,7 +24,7 @@ use Symfony\Component\HttpFoundation\Request;
  * the payment at the payment provider, they will be redirected back to the
  * cancel url.
  */
-interface OffsitePaymentGatewayInterface extends PaymentGatewayInterface {
+interface OffsitePaymentGatewayInterface extends PaymentGatewayInterface, SupportsNotificationsInterface {
 
   /**
    * Gets the URL to the "notify" page.
@@ -62,22 +62,5 @@ interface OffsitePaymentGatewayInterface extends PaymentGatewayInterface {
    *   The request.
    */
   public function onCancel(OrderInterface $order, Request $request);
-
-  /**
-   * Processes the "notify" request.
-   *
-   * Note:
-   * This method can't throw exceptions on failure because some payment
-   * providers expect an error response to be returned in that case.
-   * Therefore, the method can log the error itself and then choose which
-   * response to return.
-   *
-   * @param \Symfony\Component\HttpFoundation\Request $request
-   *   The request.
-   *
-   * @return \Symfony\Component\HttpFoundation\Response|null
-   *   The response, or NULL to return an empty HTTP 200 response.
-   */
-  public function onNotify(Request $request);
 
 }
