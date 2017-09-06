@@ -5,6 +5,7 @@ namespace Drupal\commerce_log\EventSubscriber;
 use Drupal\commerce_cart\Event\CartEntityAddEvent;
 use Drupal\commerce_cart\Event\CartEvents;
 use Drupal\commerce_cart\Event\CartOrderItemRemoveEvent;
+use Drupal\commerce_cart\Event\CartOrderItemUpdateEvent;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -34,6 +35,7 @@ class CartEventSubscriber implements EventSubscriberInterface {
     $events = [
       CartEvents::CART_ENTITY_ADD => ['onCartEntityAdd', -100],
       CartEvents::CART_ORDER_ITEM_REMOVE => ['onCartOrderItemRemove', -100],
+      CartEvents::CART_ORDER_ITEM_UPDATE => ['onCartOrderItemUpdate', -100],
     ];
     return $events;
   }
@@ -63,6 +65,23 @@ class CartEventSubscriber implements EventSubscriberInterface {
     $order_item = $event->getOrderItem();
     $this->logStorage->generate($cart, 'cart_item_removed', [
       'purchased_entity_label' => $order_item->getPurchasedEntity()->label(),
+    ])->save();
+  }
+
+  /**
+   * Creates a log when a quantity is updated.
+   *
+   * @param \Drupal\commerce_cart\Event\CartOrderItemUpdateEvent $event
+   *   The transition event.
+   */
+  public function onCartOrderItemUpdate(CartOrderItemUpdateEvent $event) {
+    $cart = $event->getCart();
+    $order_item = $event->getOrderItem();
+    $original_order_item = $event->getOriginalOrderItem();
+    $this->logStorage->generate($cart, 'cart_item_quantity_changed', [
+      'purchased_entity_label' => $order_item->getPurchasedEntity()->label(),
+      'original_quantity' => $original_order_item->getQuantity(),
+      'quantity' => $order_item->getQuantity(),
     ])->save();
   }
 

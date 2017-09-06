@@ -6,6 +6,10 @@ cart_item_removed:
   category: commerce_cart
   label: 'Removed from cart'
   template: '<p><em>{{ purchased_entity_label }}</em> removed from the cart.</p>'
+cart_item_quantity_changed:
+  category: commerce_cart
+  label: 'Quantity changed from cart'
+  template: '<p>Quantity of <em>{{ purchased_entity_label }}</em> changed in the cart from {{ original_quantity }} to {{ quantity }}.</p>'
 
 order_placed:
   category: commerce_order

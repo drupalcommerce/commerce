@@ -137,6 +137,24 @@ class CartIntegrationTest extends CommerceKernelTestBase {
   }
 
   /**
+   * Tests that a log is generated when a quantity changed for an order item.
+   */
+  public function testQuantityChangedFromCart() {
+    $this->enableCommerceCart();
+    $cart = $this->cartProvider->createCart('default', $this->store, $this->createUser());
+    $order_item = $this->cartManager->addEntity($cart, $this->variation);
+    $order_item->setQuantity(2);
+    $this->cartManager->updateOrderItem($cart, $order_item);
+
+    $logs = $this->logStorage->loadByEntity($cart);
+    $log = end($logs);
+    $build = $this->logViewBuilder->view($log);
+    $this->render($build);
+
+    $this->assertText("Quantity of {$this->variation->label()} changed in the cart from 1.0 to 2.");
+  }
+
+  /**
    * Enables commerce_cart for tests.
    *
    * Due to issues with hook_entity_bundle_create, we need to run this here
