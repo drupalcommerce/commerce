@@ -4,19 +4,17 @@ namespace Drupal\commerce_payment\Controller;
 
 use Drupal\commerce_checkout\CheckoutOrderManagerInterface;
 use Drupal\commerce_order\Entity\OrderInterface;
-use Drupal\commerce_payment\Entity\PaymentGatewayInterface;
 use Drupal\commerce_payment\Exception\PaymentGatewayException;
 use Drupal\commerce_payment\Plugin\Commerce\PaymentGateway\OffsitePaymentGatewayInterface;
 use Drupal\Core\Access\AccessException;
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 
 /**
- * Provides endpoints for off-site payments.
+ * Provides checkout endpoints for off-site payments.
  */
-class OffsitePaymentController implements ContainerInjectionInterface {
+class PaymentCheckoutController implements ContainerInjectionInterface {
 
   /**
    * The checkout order manager.
@@ -26,7 +24,7 @@ class OffsitePaymentController implements ContainerInjectionInterface {
   protected $checkoutOrderManager;
 
   /**
-   * Constructs a new CheckoutController object.
+   * Constructs a new PaymentCheckoutController object.
    *
    * @param \Drupal\commerce_checkout\CheckoutOrderManagerInterface $checkout_order_manager
    *   The checkout order manager.
@@ -54,7 +52,7 @@ class OffsitePaymentController implements ContainerInjectionInterface {
    * @param \Symfony\Component\HttpFoundation\Request $request
    *   The request.
    */
-  public function returnCheckoutPage(OrderInterface $commerce_order, Request $request) {
+  public function returnPage(OrderInterface $commerce_order, Request $request) {
     /** @var \Drupal\commerce_payment\Entity\PaymentGatewayInterface $payment_gateway */
     $payment_gateway = $commerce_order->get('payment_gateway')->entity;
     $payment_gateway_plugin = $payment_gateway->getPlugin();
@@ -88,7 +86,7 @@ class OffsitePaymentController implements ContainerInjectionInterface {
    * @param \Symfony\Component\HttpFoundation\Request $request
    *   The request.
    */
-  public function cancelCheckoutPage(OrderInterface $commerce_order, Request $request) {
+  public function cancelPage(OrderInterface $commerce_order, Request $request) {
     /** @var \Drupal\commerce_payment\Entity\PaymentGatewayInterface $payment_gateway */
     $payment_gateway = $commerce_order->get('payment_gateway')->entity;
     $payment_gateway_plugin = $payment_gateway->getPlugin();
@@ -103,33 +101,6 @@ class OffsitePaymentController implements ContainerInjectionInterface {
     $step_id = $this->checkoutOrderManager->getCheckoutStepId($commerce_order);
     $previous_step_id = $checkout_flow_plugin->getPreviousStepId($step_id);
     $checkout_flow_plugin->redirectToStep($previous_step_id);
-  }
-
-  /**
-   * Provides the "notify" page.
-   *
-   * Called the "IPN" or "status" page by some payment providers.
-   *
-   * @param \Drupal\commerce_payment\Entity\PaymentGatewayInterface $commerce_payment_gateway
-   *   The payment gateway.
-   * @param \Symfony\Component\HttpFoundation\Request $request
-   *   The request.
-   *
-   * @return \Symfony\Component\HttpFoundation\Response
-   *   The response.
-   */
-  public function notifyPage(PaymentGatewayInterface $commerce_payment_gateway, Request $request) {
-    $payment_gateway_plugin = $commerce_payment_gateway->getPlugin();
-    if (!$payment_gateway_plugin instanceof OffsitePaymentGatewayInterface) {
-      throw new AccessException('Invalid payment gateway provided.');
-    }
-
-    $response = $payment_gateway_plugin->onNotify($request);
-    if (!$response) {
-      $response = new Response('', 200);
-    }
-
-    return $response;
   }
 
 }
