@@ -1,12 +1,13 @@
 <?php
 
-namespace Drupal\commerce_price\Plugin\Field\FieldFormatter;
+namespace Drupal\commerce_order\Plugin\Field\FieldFormatter;
 
 use Drupal\commerce\Context;
 use Drupal\commerce\PurchasableEntityInterface;
 use Drupal\commerce_order\PurchasableEntityPriceCalculator;
 use Drupal\commerce_order\PurchasableEntityPriceCalculatorInterface;
 use Drupal\commerce_price\NumberFormatterFactoryInterface;
+use Drupal\commerce_price\Plugin\Field\FieldFormatter\PriceDefaultFormatter;
 use Drupal\commerce_price\Resolver\ChainPriceResolverInterface;
 use Drupal\commerce_store\CurrentStoreInterface;
 use Drupal\Core\Cache\Cache;
@@ -112,7 +113,7 @@ class PriceCalculatedFormatter extends PriceDefaultFormatter implements Containe
       $configuration['third_party_settings'],
       $container->get('entity_type.manager'),
       $container->get('commerce_price.number_formatter_factory'),
-      $container->get('commerce_price.chain_price_resolver'),
+      $container->get('commerce_order.purchasable_entity_price_calculator'),
       $container->get('commerce_store.current_store'),
       $container->get('current_user')
     );
