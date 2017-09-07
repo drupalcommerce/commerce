@@ -1,11 +1,11 @@
-entity.commerce_currency.add_form:
-  route_name: entity.commerce_currency.add_form
+entity.commerce_currency.import:
+  route_name: entity.commerce_currency.import
   title: 'Add currency'
   appears_on:
     - entity.commerce_currency.collection
 
-entity.commerce_currency.import:
-  route_name: entity.commerce_currency.import
-  title: 'Import currencies'
+entity.commerce_currency.add_form:
+  route_name: entity.commerce_currency.add_form
+  title: 'Add custom currency'
   appears_on:
     - entity.commerce_currency.collection
