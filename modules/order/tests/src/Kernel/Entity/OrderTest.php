@@ -296,7 +296,7 @@ class OrderTest extends CommerceKernelTestBase {
       'order_id' => $order->id(),
       'amount' => new Price('25.00', 'USD'),
       'payment_gateway' => 'example',
-      'state' => 'capture_completed',
+      'state' => 'completed',
     ]);
     $payment->save();
     $order = Order::load($order->id());
@@ -311,7 +311,7 @@ class OrderTest extends CommerceKernelTestBase {
       'order_id' => $order->id(),
       'amount' => new Price('27.00', 'USD'),
       'payment_gateway' => 'example',
-      'state' => 'capture_completed',
+      'state' => 'completed',
     ]);
     $payment2->save();
     $order = Order::load($order->id());
