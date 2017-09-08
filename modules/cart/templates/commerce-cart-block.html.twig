@@ -5,26 +5,11 @@
       <span class="cart-block--summary__count">{{ count_text }}</span>
     </a>
   </div>
-  {% if (content or cart_items) %}
+  {% if (content) %}
   <div class="cart-block--contents">
     <div class="cart-block--contents__inner">
       <div class="cart-block--contents__items">
-        {% if content %}
           {{ content }}
-        {% endif %}
-        {% if cart_items %}
-        <table>
-          <tbody>
-          {% for cart_item in cart_items %}
-            <tr>
-              <td>{{ cart_item.getQuantity|number_format }} x</td>
-              <td>{{ cart_item.label }}</td>
-              <td>{{ cart_item.getTotalPrice|commerce_price_format }}</td>
-            </tr>
-          {% endfor %}
-          </tbody>
-        </table>
-        {% endif %}
       </div>
       <div class="cart-block--contents__links">
         {{ links }}

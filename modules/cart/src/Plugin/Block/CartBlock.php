@@ -98,7 +98,7 @@ class CartBlock extends BlockBase implements ContainerFactoryPluginInterface {
       '#type' => 'checkbox',
       '#title' => $this->t('Use a View to display the cart block contents'),
       '#description' => $this->t('Overrides the cart block contents with the output of a View.'),
-      '#default_value' => !empty($this->configuration['use_view']),
+      '#default_value' => !empty($this->configuration['view']),
     ];
 
     $view_storage = $this->entityTypeManager->getStorage('view');
@@ -131,8 +131,10 @@ class CartBlock extends BlockBase implements ContainerFactoryPluginInterface {
    */
   public function blockSubmit($form, FormStateInterface $form_state) {
     $this->configuration['dropdown'] = $form_state->getValue('commerce_cart_dropdown');
-    $this->configuration['use_view'] = $form_state->getValue('use_view');
-    $this->configuration['view'] = $form_state->getValue('view');
+    $this->configuration['view'] = NULL;
+    if ($form_state->getValue('use_view')) {
+      $this->configuration['view'] = $form_state->getValue('view');
+    }
   }
 
   /**
@@ -156,16 +158,15 @@ class CartBlock extends BlockBase implements ContainerFactoryPluginInterface {
     });
 
     $count = 0;
-    $cart_views = [];
-    $cart_items = [];
+    $content = [];
     if (!empty($carts)) {
-      if($this->configuration['use_view']) {
-        $cart_views = $this->getCartViews($carts);
+      if ($this->configuration['view']) {
+        $content = $this->getCartViews($carts);
+      }
+      else {
+        $content = $this->getCartTables($carts);
       }
       foreach ($carts as $cart_id => $cart) {
-        if(!$this->configuration['use_view']) {
-          $cart_items = array_merge($cart_items, $cart->getItems());
-        }
         foreach ($cart->getItems() as $order_item) {
           $count += (int) $order_item->getQuantity();
         }
@@ -193,8 +194,7 @@ class CartBlock extends BlockBase implements ContainerFactoryPluginInterface {
       '#count' => $count,
       '#count_text' => $this->formatPlural($count, '@count item', '@count items'),
       '#url' => Url::fromRoute('commerce_cart.page')->toString(),
-      '#content' => $cart_views,
-      '#cart_items' => $cart_items,
+      '#content' => $content,
       '#links' => $links,
       '#cache' => [
         'contexts' => ['cart'],
@@ -239,6 +239,29 @@ class CartBlock extends BlockBase implements ContainerFactoryPluginInterface {
       }
     }
     return $cart_views;
+  }
+
+  /**
+   * Creates a render array for each cart.
+   *
+   * @param \Drupal\commerce_order\Entity\OrderInterface[] $carts
+   *   The cart orders.
+   *
+   * @return array
+   *   An array of render arrays.
+   */
+  protected function getCartTables(array $carts) {
+    $cart_tables = [];
+    if ($this->configuration['dropdown']) {
+      foreach ($carts as $cart_id => $cart) {
+        $cart_tables[$cart_id] = [
+          '#theme' => 'commerce_cart_order_items_table',
+          '#order_entity' => $cart,
+        ];
+      }
+    }
+
+    return $cart_tables;
   }
 
   /**
