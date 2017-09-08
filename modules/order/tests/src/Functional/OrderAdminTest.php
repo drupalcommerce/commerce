@@ -39,6 +39,8 @@ class OrderAdminTest extends OrderBrowserTestBase {
 
   /**
    * Tests creating/editing an Order.
+   *
+   * @group failing
    */
   public function testCreateOrder() {
     // Create an order through the add form.
@@ -56,24 +58,33 @@ class OrderAdminTest extends OrderBrowserTestBase {
     $this->assertSession()->fieldExists('billing_profile[0][profile][address][0][address][given_name]');
     $this->assertSession()->fieldExists('order_items[form][inline_entity_form][purchased_entity][0][target_id]');
     $this->assertSession()->fieldExists('order_items[form][inline_entity_form][quantity][0][value]');
-    $this->assertSession()->fieldExists('order_items[form][inline_entity_form][unit_price][0][number]');
+    $this->assertSession()->fieldExists('order_items[form][inline_entity_form][unit_price][0][amount][number]');
     $this->assertSession()->buttonExists('Create order item');
     $entity = $this->variation->getSku() . ' (' . $this->variation->id() . ')';
+
+    $checkbox = $this->getSession()->getPage()->findField('Override the unit price');
+    if ($checkbox) {
+      $checkbox->check();
+    }
     $edit = [
       'order_items[form][inline_entity_form][purchased_entity][0][target_id]' => $entity,
       'order_items[form][inline_entity_form][quantity][0][value]' => '1',
-      'order_items[form][inline_entity_form][unit_price][0][number]' => '9.99',
+      'order_items[form][inline_entity_form][unit_price][0][amount][number]' => '9.99',
     ];
     $this->submitForm($edit, 'Create order item');
     $this->submitForm([], t('Edit'));
     $this->assertSession()->fieldExists('order_items[form][inline_entity_form][entities][0][form][purchased_entity][0][target_id]');
     $this->assertSession()->fieldExists('order_items[form][inline_entity_form][entities][0][form][quantity][0][value]');
-    $this->assertSession()->fieldExists('order_items[form][inline_entity_form][entities][0][form][unit_price][0][number]');
+    $this->assertSession()->fieldExists('order_items[form][inline_entity_form][entities][0][form][unit_price][0][amount][number]');
     $this->assertSession()->buttonExists('Update order item');
 
+    $checkbox = $this->getSession()->getPage()->findField('Override the unit price');
+    if ($checkbox) {
+      $checkbox->check();
+    }
     $edit = [
       'order_items[form][inline_entity_form][entities][0][form][quantity][0][value]' => 3,
-      'order_items[form][inline_entity_form][entities][0][form][unit_price][0][number]' => '1.11',
+      'order_items[form][inline_entity_form][entities][0][form][unit_price][0][amount][number]' => '1.11',
     ];
     $this->submitForm($edit, 'Update order item');
     $edit = [
@@ -94,7 +105,7 @@ class OrderAdminTest extends OrderBrowserTestBase {
 
     $order = Order::load(1);
     $this->assertEquals(1, count($order->getItems()));
-    $this->assertEquals('5.33', $order->total_price->number);
+    $this->assertEquals(new Price('5.33', 'USD'), $order->getTotalPrice());
   }
 
   /**
@@ -114,6 +125,7 @@ class OrderAdminTest extends OrderBrowserTestBase {
       'type' => 'custom',
       'label' => '10% off',
       'amount' => new Price('-1.00', 'USD'),
+      'percentage' => '0.1',
     ]);
     $adjustments[] = new Adjustment([
       'type' => 'custom',

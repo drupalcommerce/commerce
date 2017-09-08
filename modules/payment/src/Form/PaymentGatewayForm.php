@@ -57,9 +57,7 @@ class PaymentGatewayForm extends CommercePluginEntityFormBase {
     $form = parent::form($form, $form_state);
     /** @var \Drupal\commerce_payment\Entity\PaymentGatewayInterface $gateway */
     $gateway = $this->entity;
-    $plugins = array_map(function ($definition) {
-      return $definition['label'];
-    }, $this->pluginManager->getDefinitions());
+    $plugins = array_column($this->pluginManager->getDefinitions(), 'label', 'id');
     asort($plugins);
 
     // Use the first available plugin as the default value.
@@ -70,6 +68,8 @@ class PaymentGatewayForm extends CommercePluginEntityFormBase {
     }
     // The form state will have a plugin value if #ajax was used.
     $plugin = $form_state->getValue('plugin', $gateway->getPluginId());
+    // Pass the plugin configuration only if the plugin hasn't been changed via #ajax.
+    $plugin_configuration = $gateway->getPluginId() == $plugin ? $gateway->getPluginConfiguration() : [];
 
     $wrapper_id = Html::getUniqueId('shipping-method-form');
     $form['#tree'] = TRUE;
@@ -104,12 +104,35 @@ class PaymentGatewayForm extends CommercePluginEntityFormBase {
       ],
     ];
     $form['configuration'] = [
-      '#parents' => ['configuration'],
+      '#type' => 'commerce_plugin_configuration',
+      '#plugin_type' => 'commerce_payment_gateway',
+      '#plugin_id' => $plugin,
+      '#default_value' => $plugin_configuration,
     ];
-    $form['configuration'] = $gateway->getPlugin()->buildConfigurationForm($form['configuration'], $form_state);
+    $form['conditions'] = [
+      '#type' => 'commerce_conditions',
+      '#title' => $this->t('Conditions'),
+      '#parent_entity_type' => 'commerce_payment_gateway',
+      '#entity_types' => ['commerce_order'],
+      '#default_value' => $gateway->get('conditions'),
+    ];
+    $form['conditionOperator'] = [
+      '#type' => 'radios',
+      '#title' => $this->t('Condition operator'),
+      '#title_display' => 'invisible',
+      '#options' => [
+        'AND' => $this->t('All conditions must pass'),
+        'OR' => $this->t('Only one condition must pass'),
+      ],
+      '#default_value' => $gateway->getConditionOperator(),
+    ];
     $form['status'] = [
-      '#type' => 'checkbox',
-      '#title' => $this->t('Enabled'),
+      '#type' => 'radios',
+      '#title' => $this->t('Status'),
+      '#options' => [
+        FALSE => $this->t('Disabled'),
+        TRUE  => $this->t('Enabled'),
+      ],
       '#default_value' => $gateway->status(),
     ];
 
@@ -126,23 +149,12 @@ class PaymentGatewayForm extends CommercePluginEntityFormBase {
   /**
    * {@inheritdoc}
    */
-  public function validateForm(array &$form, FormStateInterface $form_state) {
-    parent::validateForm($form, $form_state);
-
-    /** @var \Drupal\commerce_payment\Entity\PaymentGatewayInterface $gateway */
-    $gateway = $this->entity;
-    $gateway->getPlugin()->validateConfigurationForm($form['configuration'], $form_state);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function submitForm(array &$form, FormStateInterface $form_state) {
     parent::submitForm($form, $form_state);
 
     /** @var \Drupal\commerce_payment\Entity\PaymentGatewayInterface $gateway */
     $gateway = $this->entity;
-    $gateway->getPlugin()->submitConfigurationForm($form['configuration'], $form_state);
+    $gateway->setPluginConfiguration($form_state->getValue(['configuration']));
   }
 
   /**

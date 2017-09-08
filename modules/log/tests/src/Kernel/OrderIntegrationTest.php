@@ -3,6 +3,7 @@
 namespace Drupal\Tests\commerce_log\Kernel;
 
 use Drupal\commerce_order\Entity\Order;
+use Drupal\commerce_order\Entity\OrderInterface;
 use Drupal\commerce_order\Entity\OrderType;
 use Drupal\commerce_price\Price;
 use Drupal\commerce_product\Entity\Product;
@@ -10,6 +11,7 @@ use Drupal\commerce_product\Entity\ProductVariation;
 use Drupal\commerce_product\Entity\ProductVariationType;
 use Drupal\profile\Entity\Profile;
 use Drupal\Tests\commerce\Kernel\CommerceKernelTestBase;
+use Drupal\user\Entity\User;
 
 /**
  * Tests integration with order events.
@@ -52,7 +54,6 @@ class OrderIntegrationTest extends CommerceKernelTestBase {
     'commerce_log',
     'commerce_product',
     'commerce_order',
-    'commerce_test',
   ];
 
   /**
@@ -104,26 +105,22 @@ class OrderIntegrationTest extends CommerceKernelTestBase {
     $profile->save();
     $profile = $this->reloadEntity($profile);
 
-    /** @var \Drupal\commerce_order\Entity\Order $order */
+    /** @var \Drupal\commerce_order\OrderItemStorageInterface $order_item_storage */
+    $order_item_storage = $this->container->get('entity_type.manager')->getStorage('commerce_order_item');
+
+    $order_item1 = $order_item_storage->createFromPurchasableEntity($variation1);
+    $order_item1->save();
     $order = Order::create([
       'type' => 'default',
+      'store_id' => $this->store->id(),
       'state' => 'draft',
       'mail' => $user->getEmail(),
       'uid' => $user->id(),
       'ip_address' => '127.0.0.1',
       'order_number' => '6',
       'billing_profile' => $profile,
-      'store_id' => $this->store->id(),
+      'order_items' => [$order_item1],
     ]);
-    $order->save();
-
-    /** @var \Drupal\commerce_order\OrderItemStorageInterface $order_item_storage */
-    $order_item_storage = $this->container->get('entity_type.manager')->getStorage('commerce_order_item');
-
-    // Add order item.
-    $order_item1 = $order_item_storage->createFromPurchasableEntity($variation1);
-    $order_item1->save();
-    $order->addItem($order_item1);
     $order->save();
     $this->order = $this->reloadEntity($order);
   }
@@ -188,6 +185,27 @@ class OrderIntegrationTest extends CommerceKernelTestBase {
     $this->render($build);
 
     $this->assertText('The order was fulfilled.');
+  }
+
+  /**
+   * Tests that an order assignment log is generated.
+   */
+  public function testOrderAssignedLog() {
+    // Reassignment is currently only done on user login.
+    $this->order->setCustomer(User::getAnonymousUser());
+    $this->order->setRefreshState(OrderInterface::REFRESH_SKIP);
+    $this->order->save();
+    $new_user = $this->createUser();
+
+    $order_assignment = $this->container->get('commerce_order.order_assignment');
+    $order_assignment->assign($this->order, $new_user);
+
+    $logs = $this->logStorage->loadByEntity($this->order);
+    $this->assertEquals(1, count($logs));
+    $log = reset($logs);
+    $build = $this->logViewBuilder->view($log);
+    $this->render($build);
+    $this->assertText("The order was assigned to {$new_user->getDisplayName()}.");
   }
 
 }

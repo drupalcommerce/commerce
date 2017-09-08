@@ -54,7 +54,9 @@ class CheckoutFlowPluginCollection extends DefaultSingleLazyPluginCollection {
       throw new PluginException("The checkout flow '{$this->entityId}' did not specify a plugin.");
     }
 
-    parent::initializePlugin($instance_id);
+    $configuration = ['_entity_id' => $this->entityId] + $this->configuration;
+    $plugin = $this->manager->createInstance($instance_id, $configuration);
+    $this->set($instance_id, $plugin);
   }
 
 }

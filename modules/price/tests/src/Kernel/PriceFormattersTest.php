@@ -58,9 +58,7 @@ class PriceFormattersTest extends CommerceKernelTestBase {
     $this->installEntitySchema('commerce_product_attribute');
     $this->installEntitySchema('commerce_product_attribute_value');
     $this->installEntitySchema('commerce_product_variation');
-    $this->installEntitySchema('commerce_product_variation_type');
     $this->installEntitySchema('commerce_product');
-    $this->installEntitySchema('commerce_product_type');
     $this->installConfig(['commerce_product']);
 
     $this->productVariationDefaultDisplay = commerce_get_entity_display('commerce_product_variation', 'default', 'view');

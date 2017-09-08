@@ -65,6 +65,29 @@ class EditQuantity extends FieldPluginBase {
   /**
    * {@inheritdoc}
    */
+  protected function defineOptions() {
+    $options = parent::defineOptions();
+    $options['allow_decimal'] = ['default' => FALSE];
+
+    return $options;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function buildOptionsForm(&$form, FormStateInterface $form_state) {
+    parent::buildOptionsForm($form, $form_state);
+
+    $form['allow_decimal'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Allow decimal quantities'),
+      '#default_value' => $this->options['allow_decimal'],
+    ];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function getValue(ResultRow $row, $field = NULL) {
     return '<!--form-item-' . $this->options['id'] . '--' . $row->index . '-->';
   }
@@ -88,18 +111,28 @@ class EditQuantity extends FieldPluginBase {
 
     $form[$this->options['id']]['#tree'] = TRUE;
     foreach ($this->view->result as $row_index => $row) {
+      /** @var \Drupal\commerce_order\Entity\OrderItemInterface $order_item */
       $order_item = $this->getEntity($row);
-      $quantity = $order_item->getQuantity();
+      if ($this->options['allow_decimal']) {
+        $form_display = commerce_get_entity_display('commerce_order_item', $order_item->bundle(), 'form');
+        $quantity_component = $form_display->getComponent('quantity');
+        $step = $quantity_component['settings']['step'];
+        $precision = $step >= '1' ? 0 : strlen($step) - 2;
+      }
+      else {
+        $step = 1;
+        $precision = 0;
+      }
 
       $form[$this->options['id']][$row_index] = [
         '#type' => 'number',
         '#title' => $this->t('Quantity'),
         '#title_display' => 'invisible',
-        '#default_value' => round($quantity),
+        '#default_value' => round($order_item->getQuantity(), $precision),
         '#size' => 4,
-        '#min' => 1,
+        '#min' => 0,
         '#max' => 9999,
-        '#step' => 1,
+        '#step' => $step,
       ];
     }
     // Replace the form submit button label.

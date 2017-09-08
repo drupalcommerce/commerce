@@ -2,6 +2,7 @@
 
 namespace Drupal\commerce_product\Form;
 
+use Drupal\commerce\EntityHelper;
 use Drupal\commerce_product\ProductAttributeFieldManagerInterface;
 use Drupal\Component\Utility\Html;
 use Drupal\Core\Entity\BundleEntityFormBase;
@@ -149,9 +150,7 @@ class ProductAttributeForm extends BundleEntityFormBase {
     $user_input = $form_state->getUserInput();
     // Reorder the values by name, if requested.
     if ($form_state->get('reset_alphabetical')) {
-      $value_names = array_map(function ($value) {
-        return $value->label();
-      }, $values);
+      $value_names = EntityHelper::extractLabels($values);
       asort($value_names);
       foreach (array_keys($value_names) as $weight => $id) {
         $values[$id]->setWeight($weight);

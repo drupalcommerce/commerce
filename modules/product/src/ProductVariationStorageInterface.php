@@ -3,14 +3,26 @@
 namespace Drupal\commerce_product;
 
 use Drupal\commerce_product\Entity\ProductInterface;
+use Drupal\Core\Entity\ContentEntityStorageInterface;
 
 /**
  * Defines the interface for product variation storage.
  */
-interface ProductVariationStorageInterface {
+interface ProductVariationStorageInterface extends ContentEntityStorageInterface {
 
   /**
-   * Loads the variation from context.
+   * Loads the product variation for the given SKU.
+   *
+   * @param string $sku
+   *   The SKU.
+   *
+   * @return \Drupal\commerce_product\Entity\ProductVariationInterface|null
+   *   The product variation, or NULL if not found.
+   */
+  public function loadBySku($sku);
+
+  /**
+   * Loads the product variation from context.
    *
    * Uses the variation specified in the URL (?v=) if it's active and
    * belongs to the current product.
@@ -27,7 +39,7 @@ interface ProductVariationStorageInterface {
   public function loadFromContext(ProductInterface $product);
 
   /**
-   * Loads the enabled variations for the given product.
+   * Loads the enabled product variations for the given product.
    *
    * Enabled variations are active variations that have been filtered through
    * the FILTER_VARIATIONS event.
@@ -36,7 +48,7 @@ interface ProductVariationStorageInterface {
    *   The product.
    *
    * @return \Drupal\commerce_product\Entity\ProductVariationInterface[]
-   *   The enabled variations.
+   *   The enabled product variations.
    */
   public function loadEnabled(ProductInterface $product);
 

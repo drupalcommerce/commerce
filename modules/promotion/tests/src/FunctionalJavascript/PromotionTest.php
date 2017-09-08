@@ -20,7 +20,12 @@ class PromotionTest extends CommerceBrowserTestBase {
    *
    * @var array
    */
-  public static $modules = ['block', 'commerce_promotion'];
+  public static $modules = [
+    'block',
+    'path',
+    'commerce_product',
+    'commerce_promotion',
+  ];
 
   /**
    * {@inheritdoc}
@@ -41,29 +46,56 @@ class PromotionTest extends CommerceBrowserTestBase {
 
     // Check the integrity of the form.
     $this->assertSession()->fieldExists('name[0][value]');
-
-    $this->getSession()->getPage()->fillField('offer[0][target_plugin_id]', 'commerce_promotion_product_percentage_off');
-    $this->getSession()->wait(2000, "jQuery('.ajax-progress').length === 0");
-
     $name = $this->randomMachineName(8);
-    $edit = [
-      'name[0][value]' => $name,
-      'offer[0][target_plugin_configuration][amount]' => '10.0',
-    ];
+    $this->getSession()->getPage()->fillField('name[0][value]', $name);
+    $this->getSession()->getPage()->selectFieldOption('offer[0][target_plugin_id]', 'order_item_percentage_off');
+    $this->waitForAjaxToFinish();
+    $this->getSession()->getPage()->fillField('offer[0][target_plugin_configuration][order_item_percentage_off][percentage]', '10.0');
 
-    $this->getSession()->getPage()->fillField('conditions[0][target_plugin_id]', 'commerce_promotion_order_total_price');
-    $this->getSession()->wait(2000, "jQuery('.ajax-progress').length === 0");
+    // Change, assert any values reset.
+    $this->getSession()->getPage()->selectFieldOption('offer[0][target_plugin_id]', 'order_percentage_off');
+    $this->waitForAjaxToFinish();
+    $this->assertSession()->fieldValueNotEquals('offer[0][target_plugin_configuration][order_percentage_off][percentage]', '10.0');
+    $this->getSession()->getPage()->fillField('offer[0][target_plugin_configuration][order_percentage_off][percentage]', '10.0');
 
-    $edit['conditions[0][target_plugin_configuration][amount][number]'] = '50.00';
+    // Confirm the integrity of the conditions UI.
+    foreach (['order', 'product', 'customer'] as $condition_group) {
+      $tab_matches = $this->xpath('//a[@href="#edit-conditions-form-' . $condition_group . '"]');
+      $this->assertNotEmpty($tab_matches);
+    }
+    $vertical_tab_elements = $this->xpath('//a[@href="#edit-conditions-form-order"]');
+    $vertical_tab_element = reset($vertical_tab_elements);
+    $vertical_tab_element->click();
+    $this->getSession()->getPage()->checkField('Limit by total price');
+    $this->waitForAjaxToFinish();
+    $this->getSession()->getPage()->fillField('conditions[form][order][order_total_price][configuration][form][amount][number]', '50.00');
 
-    $this->submitForm($edit, t('Save'));
+    // Confirm that the usage limit widget works properly.
+    $this->getSession()->getPage()->hasCheckedField(' Unlimited');
+    $usage_limit_xpath = '//input[@type="number" and @name="usage_limit[0][usage_limit]"]';
+    $this->assertFalse($this->getSession()->getDriver()->isVisible($usage_limit_xpath));
+    $this->getSession()->getPage()->checkField('Limited number of uses');
+    $this->assertTrue($this->getSession()->getDriver()->isVisible($usage_limit_xpath));
+    $this->getSession()->getPage()->fillField('usage_limit[0][usage_limit]', '99');
+
+    $this->submitForm([], t('Save'));
     $this->assertSession()->pageTextContains("Saved the $name promotion.");
     $promotion_count = $this->getSession()->getPage()->find('xpath', '//table/tbody/tr/td[text()="' . $name . '"]');
     $this->assertEquals(count($promotion_count), 1, 'promotions exists in the table.');
 
+    $promotion = Promotion::load(1);
     /** @var \Drupal\commerce\Plugin\Field\FieldType\PluginItem $offer_field */
-    $offer_field = Promotion::load(1)->get('offer')->first();
-    $this->assertEquals('0.10', $offer_field->target_plugin_configuration['amount']);
+    $offer_field = $promotion->get('offer')->first();
+    $this->assertEquals('0.10', $offer_field->target_plugin_configuration['percentage']);
+
+    /** @var \Drupal\commerce\Plugin\Field\FieldType\PluginItem $condition_field */
+    $condition_field = $promotion->get('conditions')->first();
+    $this->assertEquals('50.00', $condition_field->target_plugin_configuration['amount']['number']);
+
+    $this->assertEquals('99', $promotion->getUsageLimit());
+    $this->drupalGet($promotion->toUrl('edit-form'));
+    $this->getSession()->getPage()->hasCheckedField('Limited number of uses');
+    $this->assertTrue($this->getSession()->getDriver()->isVisible($usage_limit_xpath));
   }
 
   /**
@@ -77,23 +109,18 @@ class PromotionTest extends CommerceBrowserTestBase {
     // Check the integrity of the form.
     $this->assertSession()->fieldExists('name[0][value]');
 
-    $this->getSession()->getPage()->fillField('offer[0][target_plugin_id]', 'commerce_promotion_product_percentage_off');
-    $this->getSession()->wait(2000, "jQuery('.ajax-progress').length === 0");
+    $this->getSession()->getPage()->fillField('offer[0][target_plugin_id]', 'order_percentage_off');
+    $this->waitForAjaxToFinish();
 
     $name = $this->randomMachineName(8);
     $edit = [
       'name[0][value]' => $name,
-      'offer[0][target_plugin_configuration][amount]' => '10.0',
+      'offer[0][target_plugin_configuration][order_percentage_off][percentage]' => '10.0',
     ];
-
-    $this->getSession()->getPage()->fillField('conditions[0][target_plugin_id]', 'commerce_promotion_order_total_price');
-    $this->getSession()->wait(2000, "jQuery('.ajax-progress').length === 0");
-
-    $edit['conditions[0][target_plugin_configuration][amount][number]'] = '50.00';
 
     // Set an end date.
     $this->getSession()->getPage()->checkField('end_date[0][has_value]');
-    $edit['end_date[0][value][date]'] = date("Y") + 1 . '-01-01';
+    $edit['end_date[0][container][value][date]'] = date("Y") + 1 . '-01-01';
 
     $this->submitForm($edit, t('Save'));
     $this->assertSession()->pageTextContains("Saved the $name promotion.");
@@ -102,7 +129,7 @@ class PromotionTest extends CommerceBrowserTestBase {
 
     /** @var \Drupal\commerce\Plugin\Field\FieldType\PluginItem $offer_field */
     $offer_field = Promotion::load(1)->get('offer')->first();
-    $this->assertEquals('0.10', $offer_field->target_plugin_configuration['amount']);
+    $this->assertEquals('0.10', $offer_field->target_plugin_configuration['percentage']);
   }
 
   /**
@@ -113,22 +140,37 @@ class PromotionTest extends CommerceBrowserTestBase {
       'name' => $this->randomMachineName(8),
       'status' => TRUE,
       'offer' => [
-        'target_plugin_id' => 'commerce_promotion_product_percentage_off',
+        'target_plugin_id' => 'order_item_percentage_off',
         'target_plugin_configuration' => [
-          'amount' => '0.10',
+          'percentage' => '0.10',
+        ],
+      ],
+      'conditions' => [
+        [
+          'target_plugin_id' => 'order_total_price',
+          'target_plugin_configuration' => [
+            'amount' => [
+              'number' => '9.10',
+              'currency_code' => 'USD',
+            ],
+          ],
         ],
       ],
     ]);
 
     /** @var \Drupal\commerce\Plugin\Field\FieldType\PluginItem $offer_field */
     $offer_field = $promotion->get('offer')->first();
-    $this->assertEquals('0.10', $offer_field->target_plugin_configuration['amount']);
+    $this->assertEquals('0.10', $offer_field->target_plugin_configuration['percentage']);
 
     $this->drupalGet($promotion->toUrl('edit-form'));
+    $this->assertSession()->pageTextContains('Restricted');
+    $this->assertSession()->checkboxChecked('Limit by total price');
+    $this->assertSession()->fieldValueEquals('conditions[form][order][order_total_price][configuration][form][amount][number]', '9.10');
+
     $new_promotion_name = $this->randomMachineName(8);
     $edit = [
       'name[0][value]' => $new_promotion_name,
-      'offer[0][target_plugin_configuration][amount]' => '20',
+      'offer[0][target_plugin_configuration][order_item_percentage_off][percentage]' => '20',
     ];
     $this->submitForm($edit, 'Save');
 
@@ -138,7 +180,7 @@ class PromotionTest extends CommerceBrowserTestBase {
 
     /** @var \Drupal\commerce\Plugin\Field\FieldType\PluginItem $offer_field */
     $offer_field = $promotion_changed->get('offer')->first();
-    $this->assertEquals('0.20', $offer_field->target_plugin_configuration['amount']);
+    $this->assertEquals('0.20', $offer_field->target_plugin_configuration['percentage']);
   }
 
   /**

@@ -6,6 +6,7 @@ core: 8.x
 dependencies:
   - commerce:commerce_order
   - entity_reference_revisions
+  - filter
   - user
 config_devel:
   install:

@@ -1,5 +1,11 @@
+commerce_payment.configuration:
+  title: 'Payment'
+  route_name: 'commerce_payment.configuration'
+  parent: 'commerce.configuration'
+  weight: -10
+
 entity.commerce_payment_gateway.collection:
   title: 'Payment gateways'
   route_name: 'entity.commerce_payment_gateway.collection'
-  parent: 'commerce.configuration'
-  description: 'Manage your payment gateways.'
+  parent: 'commerce_payment.configuration'
+  description: 'Configure the gateways you take payment through.'

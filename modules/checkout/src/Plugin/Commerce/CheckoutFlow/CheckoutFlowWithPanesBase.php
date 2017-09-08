@@ -81,7 +81,7 @@ abstract class CheckoutFlowWithPanesBase extends CheckoutFlowBase implements Che
   /**
    * {@inheritdoc}
    */
-  public function getPanes($step_id = NULL) {
+  public function getPanes() {
     if (empty($this->panes)) {
       foreach ($this->paneManager->getDefinitions() as $pane_id => $pane_definition) {
         $pane_configuration = $this->getPaneConfiguration($pane_id);
@@ -98,13 +98,18 @@ abstract class CheckoutFlowWithPanesBase extends CheckoutFlowBase implements Che
       }, $this->panes);
     }
 
-    $panes = $this->panes;
-    if ($step_id) {
-      $panes = array_filter($panes, function ($pane) use ($step_id) {
-        /** @var \Drupal\commerce_checkout\Plugin\Commerce\CheckoutPane\CheckoutPaneInterface $pane */
-        return $pane->getStepId() == $step_id;
-      });
-    }
+    return $this->panes;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getVisiblePanes($step_id) {
+    $panes = $this->getPanes();
+    $panes = array_filter($panes, function ($pane) use ($step_id) {
+      /** @var \Drupal\commerce_checkout\Plugin\Commerce\CheckoutPane\CheckoutPaneInterface $pane */
+      return ($pane->getStepId() == $step_id) && $pane->isVisible();
+    });
 
     return $panes;
   }
@@ -125,15 +130,7 @@ abstract class CheckoutFlowWithPanesBase extends CheckoutFlowBase implements Che
       $steps = $this->getSteps();
       foreach ($steps as $step_id => $step) {
         // A step is visible if it has at least one visible pane.
-        $is_visible = FALSE;
-        foreach ($this->getPanes($step_id) as $pane) {
-          if ($pane->isVisible()) {
-            $is_visible = TRUE;
-            break;
-          }
-        }
-
-        if (!$is_visible) {
+        if (empty($this->getVisiblePanes($step_id))) {
           unset($steps[$step_id]);
         }
       }
@@ -201,6 +198,10 @@ abstract class CheckoutFlowWithPanesBase extends CheckoutFlowBase implements Che
         'message' => $this->t('No pane is displayed.'),
       ];
     }
+    $regions['_sidebar'] = [
+      'title' => $this->t('Sidebar'),
+      'message' => $this->t('No pane is displayed.'),
+    ];
     $regions['_disabled'] = [
       'title' => $this->t('Disabled', [], ['context' => 'Plural']),
       'message' => $this->t('No pane is disabled.'),
@@ -308,7 +309,7 @@ abstract class CheckoutFlowWithPanesBase extends CheckoutFlowBase implements Che
    */
   protected function buildPaneRow(CheckoutPaneInterface $pane, array &$form, FormStateInterface $form_state) {
     $pane_id = $pane->getPluginId();
-    $label = $pane->getAdminLabel();
+    $label = $pane->getLabel();
     $region_titles = array_map(function ($region) {
       return $region['title'];
     }, $this->getTableRegions());
@@ -532,16 +533,41 @@ abstract class CheckoutFlowWithPanesBase extends CheckoutFlowBase implements Che
    */
   public function buildForm(array $form, FormStateInterface $form_state, $step_id = NULL) {
     $form = parent::buildForm($form, $form_state, $step_id);
+    if ($form_state->isRebuilding()) {
+      // The order reference on the panes might be outdated due to
+      // the form cache, so update the order manually once the
+      // parent class reloads it.
+      foreach ($this->panes as $pane_id => $pane) {
+        $this->panes[$pane_id] = $pane->setOrder($this->order);
+      }
+    }
 
-    $panes = $this->getPanes($step_id);
-    foreach ($panes as $pane_id => $pane) {
-      if ($pane->isVisible()) {
-        $form[$pane_id] = [
-          '#parents' => [$pane_id],
+    foreach ($this->getVisiblePanes($step_id) as $pane_id => $pane) {
+      $form[$pane_id] = [
+        '#parents' => [$pane_id],
+        '#type' => $pane->getWrapperElement(),
+        '#title' => $pane->getDisplayLabel(),
+        '#attributes' => [
+          'class' => ['checkout-pane', 'checkout-pane-' . str_replace('_', '-', $pane_id)],
+        ],
+      ];
+      $form[$pane_id] = $pane->buildPaneForm($form[$pane_id], $form_state, $form);
+    }
+    if ($this->hasSidebar($step_id)) {
+      // The base class adds a hardcoded order summary view to the sidebar.
+      // Remove it, there's a pane for that.
+      unset($form['sidebar']);
+
+      foreach ($this->getVisiblePanes('_sidebar') as $pane_id => $pane) {
+        $form['sidebar'][$pane_id] = [
+          '#parents' => ['sidebar', $pane_id],
           '#type' => $pane->getWrapperElement(),
-          '#title' => $pane->getLabel(),
+          '#title' => $pane->getDisplayLabel(),
+          '#attributes' => [
+            'class' => ['checkout-pane', 'checkout-pane-' . str_replace('_', '-', $pane_id)],
+          ],
         ];
-        $form[$pane_id] = $pane->buildPaneForm($form[$pane_id], $form_state, $form);
+        $form['sidebar'][$pane_id] = $pane->buildPaneForm($form['sidebar'][$pane_id], $form_state, $form);
       }
     }
 
@@ -554,10 +580,12 @@ abstract class CheckoutFlowWithPanesBase extends CheckoutFlowBase implements Che
   public function validateForm(array &$form, FormStateInterface $form_state) {
     parent::validateForm($form, $form_state);
 
-    $panes = $this->getPanes($form['#step_id']);
-    foreach ($panes as $pane_id => $pane) {
-      if ($pane->isVisible()) {
-        $pane->validatePaneForm($form[$pane_id], $form_state, $form);
+    foreach ($this->getVisiblePanes($form['#step_id']) as $pane_id => $pane) {
+      $pane->validatePaneForm($form[$pane_id], $form_state, $form);
+    }
+    if ($this->hasSidebar($form['#step_id'])) {
+      foreach ($this->getVisiblePanes('_sidebar') as $pane_id => $pane) {
+        $pane->validatePaneForm($form['sidebar'][$pane_id], $form_state, $form);
       }
     }
   }
@@ -566,10 +594,12 @@ abstract class CheckoutFlowWithPanesBase extends CheckoutFlowBase implements Che
    * {@inheritdoc}
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
-    $panes = $this->getPanes($form['#step_id']);
-    foreach ($panes as $pane_id => $pane) {
-      if ($pane->isVisible()) {
-        $pane->submitPaneForm($form[$pane_id], $form_state, $form);
+    foreach ($this->getVisiblePanes($form['#step_id']) as $pane_id => $pane) {
+      $pane->submitPaneForm($form[$pane_id], $form_state, $form);
+    }
+    if ($this->hasSidebar($form['#step_id'])) {
+      foreach ($this->getVisiblePanes('_sidebar') as $pane_id => $pane) {
+        $pane->submitPaneForm($form['sidebar'][$pane_id], $form_state, $form);
       }
     }
 

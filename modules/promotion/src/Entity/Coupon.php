@@ -2,6 +2,8 @@
 
 namespace Drupal\commerce_promotion\Entity;
 
+use Drupal\commerce_order\Entity\OrderInterface;
+use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Entity\ContentEntityBase;
 use Drupal\Core\Entity\EntityTypeInterface;
@@ -71,16 +73,62 @@ class Coupon extends ContentEntityBase implements CouponInterface {
   /**
    * {@inheritdoc}
    */
-  public function isActive() {
+  public function getUsageLimit() {
+    return $this->get('usage_limit')->value;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setUsageLimit($usage_limit) {
+    $this->set('usage_limit', $usage_limit);
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function isEnabled() {
     return (bool) $this->getEntityKey('status');
   }
 
   /**
    * {@inheritdoc}
    */
-  public function setActive($active) {
-    $this->set('status', (bool) $active);
+  public function setEnabled($enabled) {
+    $this->set('status', (bool) $enabled);
     return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function available(OrderInterface $order) {
+    if (!$this->isEnabled()) {
+      return FALSE;
+    }
+    if (!$this->getPromotion()->available($order)) {
+      return FALSE;
+    }
+    if ($usage_limit = $this->getUsageLimit()) {
+      /** @var \Drupal\commerce_promotion\PromotionUsageInterface $usage */
+      $usage = \Drupal::service('commerce_promotion.usage');
+      if ($usage_limit <= $usage->loadByCoupon($this)) {
+        return FALSE;
+      }
+    }
+
+    return TRUE;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function postDelete(EntityStorageInterface $storage, array $entities) {
+    // Delete the related usage.
+    /** @var \Drupal\commerce_promotion\PromotionUsageInterface $usage */
+    $usage = \Drupal::service('commerce_promotion.usage');
+    $usage->deleteByCoupon($entities);
   }
 
   /**
@@ -99,7 +147,7 @@ class Coupon extends ContentEntityBase implements CouponInterface {
 
     $fields['code'] = BaseFieldDefinition::create('string')
       ->setLabel(t('Coupon code'))
-      ->setDescription(t('The Coupon entity code.'))
+      ->setDescription(t('The unique, machine-readable identifier for a coupon.'))
       ->addConstraint('CouponCode')
       ->setSettings([
         'max_length' => 50,
@@ -118,15 +166,28 @@ class Coupon extends ContentEntityBase implements CouponInterface {
       ->setDisplayConfigurable('form', TRUE)
       ->setDisplayConfigurable('view', TRUE);
 
-    $fields['status'] = BaseFieldDefinition::create('boolean')
-      ->setLabel(t('Active status'))
-      ->setDescription(t('A boolean indicating whether the Coupon is active.'))
-      ->setDefaultValue(TRUE)
+    $fields['usage_limit'] = BaseFieldDefinition::create('integer')
+      ->setLabel(t('Usage limit'))
+      ->setDescription(t('The maximum number of times the coupon can be used. 0 for unlimited.'))
+      ->setDefaultValue(0)
       ->setDisplayOptions('form', [
-        'type' => 'boolean_checkbox',
-        'weight' => 99,
+        'type' => 'commerce_usage_limit',
+        'weight' => 4,
+      ]);
+
+    $fields['status'] = BaseFieldDefinition::create('boolean')
+      ->setLabel(t('Status'))
+      ->setDescription(t('Whether the coupon is enabled.'))
+      ->setDefaultValue(TRUE)
+      ->setRequired(TRUE)
+      ->setSettings([
+        'on_label' => t('Enabled'),
+        'off_label' => t('Disabled'),
       ])
-      ->setDisplayConfigurable('form', TRUE);
+      ->setDisplayOptions('form', [
+        'type' => 'options_buttons',
+        'weight' => 0,
+      ]);
 
     return $fields;
   }

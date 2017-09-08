@@ -13,7 +13,7 @@ class CouponStorage extends CommerceContentEntityStorage implements CouponStorag
    * {@inheritdoc}
    */
   public function loadByCode($code) {
-    $coupons = $this->loadByProperties(['code' => $code]);
+    $coupons = $this->loadByProperties(['code' => $code, 'status' => TRUE]);
 
     return reset($coupons);
   }

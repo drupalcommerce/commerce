@@ -2,6 +2,8 @@
 
 namespace Drupal\commerce_payment\Entity;
 
+use Drupal\commerce\ConditionGroup;
+use Drupal\commerce_order\Entity\OrderInterface;
 use Drupal\commerce_payment\PaymentGatewayPluginCollection;
 use Drupal\Core\Config\Entity\ConfigEntityBase;
 
@@ -11,6 +13,7 @@ use Drupal\Core\Config\Entity\ConfigEntityBase;
  * @ConfigEntityType(
  *   id = "commerce_payment_gateway",
  *   label = @Translation("Payment gateway"),
+ *   label_collection = @Translation("Payment gateways"),
  *   label_singular = @Translation("payment gateway"),
  *   label_plural = @Translation("payment gateways"),
  *   label_count = @PluralTranslation(
@@ -45,6 +48,8 @@ use Drupal\Core\Config\Entity\ConfigEntityBase;
  *     "status",
  *     "plugin",
  *     "configuration",
+ *     "conditions",
+ *     "conditionOperator",
  *   },
  *   links = {
  *     "add-form" = "/admin/commerce/config/payment-gateways/add",
@@ -92,6 +97,20 @@ class PaymentGateway extends ConfigEntityBase implements PaymentGatewayInterface
   protected $configuration = [];
 
   /**
+   * The conditions.
+   *
+   * @var array
+   */
+  protected $conditions = [];
+
+  /**
+   * The condition operator.
+   *
+   * @var string
+   */
+  protected $conditionOperator = 'AND';
+
+  /**
    * The plugin collection that holds the payment gateway plugin.
    *
    * @var \Drupal\commerce_payment\PaymentGatewayPluginCollection
@@ -132,6 +151,23 @@ class PaymentGateway extends ConfigEntityBase implements PaymentGatewayInterface
    */
   public function setPluginId($plugin_id) {
     $this->plugin = $plugin_id;
+    $this->configuration = [];
+    $this->pluginCollection = NULL;
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getPluginConfiguration() {
+    return $this->configuration;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setPluginConfiguration(array $configuration) {
+    $this->configuration = $configuration;
     $this->pluginCollection = NULL;
     return $this;
   }
@@ -143,6 +179,67 @@ class PaymentGateway extends ConfigEntityBase implements PaymentGatewayInterface
     return [
       'configuration' => $this->getPluginCollection(),
     ];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getConditions() {
+    $plugin_manager = \Drupal::service('plugin.manager.commerce_condition');
+    $conditions = [];
+    foreach ($this->conditions as $condition) {
+      $conditions[] = $plugin_manager->createInstance($condition['plugin'], $condition['configuration']);
+    }
+    return $conditions;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getConditionOperator() {
+    return $this->conditionOperator;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setConditionOperator($condition_operator) {
+    $this->conditionOperator = $condition_operator;
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function applies(OrderInterface $order) {
+    $conditions = $this->getConditions();
+    if (!$conditions) {
+      // Payment gateways without conditions always apply.
+      return TRUE;
+    }
+    $order_conditions = array_filter($conditions, function ($condition) {
+      /** @var \Drupal\commerce\Plugin\Commerce\Condition\ConditionInterface $condition */
+      return $condition->getEntityTypeId() == 'commerce_order';
+    });
+    $order_conditions = new ConditionGroup($order_conditions, $this->getConditionOperator());
+
+    return $order_conditions->evaluate($order);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function set($property_name, $value) {
+    // Invoke the setters to clear related properties.
+    if ($property_name == 'plugin') {
+      $this->setPluginId($value);
+    }
+    elseif ($property_name == 'configuration') {
+      $this->setPluginConfiguration($value);
+    }
+    else {
+      return parent::set($property_name, $value);
+    }
   }
 
   /**

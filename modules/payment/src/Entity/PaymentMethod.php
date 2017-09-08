@@ -4,6 +4,8 @@ namespace Drupal\commerce_payment\Entity;
 
 use Drupal\Core\Entity\ContentEntityBase;
 use Drupal\Core\Entity\EntityChangedTrait;
+use Drupal\Core\Entity\EntityMalformedException;
+use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\user\UserInterface;
@@ -15,6 +17,7 @@ use Drupal\profile\Entity\ProfileInterface;
  * @ContentEntityType(
  *   id = "commerce_payment_method",
  *   label = @Translation("Payment method"),
+ *   label_collection = @Translation("Payment methods"),
  *   label_singular = @Translation("payment method"),
  *   label_plural = @Translation("payment methods"),
  *   label_count = @PluralTranslation(
@@ -91,6 +94,13 @@ class PaymentMethod extends ContentEntityBase implements PaymentMethodInterface 
    */
   public function getPaymentGatewayId() {
     return $this->get('payment_gateway')->target_id;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getPaymentGatewayMode() {
+    return $this->get('payment_gateway_mode')->value;
   }
 
   /**
@@ -188,7 +198,7 @@ class PaymentMethod extends ContentEntityBase implements PaymentMethodInterface 
    */
   public function isExpired() {
     $expires = $this->getExpiresTime();
-    return $expires > 0 && $expires <= REQUEST_TIME;
+    return $expires > 0 && $expires <= \Drupal::time()->getRequestTime();
   }
 
   /**
@@ -224,6 +234,22 @@ class PaymentMethod extends ContentEntityBase implements PaymentMethodInterface 
   /**
    * {@inheritdoc}
    */
+  public function preSave(EntityStorageInterface $storage) {
+    parent::preSave($storage);
+
+    $payment_gateway = $this->getPaymentGateway();
+    if (!$payment_gateway) {
+      throw new EntityMalformedException(sprintf('Required payment method field "payment_gateway" is empty.'));
+    }
+    // Populate the payment_gateway_mode automatically.
+    if ($this->get('payment_gateway_mode')->isEmpty()) {
+      $this->set('payment_gateway_mode', $payment_gateway->getPlugin()->getMode());
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public static function baseFieldDefinitions(EntityTypeInterface $entity_type) {
     $fields = parent::baseFieldDefinitions($entity_type);
 
@@ -232,6 +258,11 @@ class PaymentMethod extends ContentEntityBase implements PaymentMethodInterface 
       ->setDescription(t('The payment gateway.'))
       ->setRequired(TRUE)
       ->setSetting('target_type', 'commerce_payment_gateway');
+
+    $fields['payment_gateway_mode'] = BaseFieldDefinition::create('string')
+      ->setLabel(t('Payment gateway mode'))
+      ->setDescription(t('The payment gateway mode.'))
+      ->setRequired(TRUE);
 
     $fields['uid'] = BaseFieldDefinition::create('entity_reference')
       ->setLabel(t('Owner'))

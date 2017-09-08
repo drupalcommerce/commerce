@@ -50,15 +50,20 @@ services:
     class: Drupal\commerce\Config\ConfigUpdater
     arguments: ['@entity_type.manager', '@config.storage', '@config.factory']
 
-  commerce.time:
-    class: Drupal\commerce\Time
-    arguments: ['@request_stack']
+  commerce.twig_extension:
+    class: Drupal\commerce\TwigExtension\CommerceTwigExtension
+    tags:
+      - { name: twig.extension }
 
   cache_context.country:
     class: Drupal\commerce\Cache\Context\CountryCacheContext
     arguments: ['@commerce.current_country']
     tags:
       - { name: cache.context}
+
+  plugin.manager.commerce_condition:
+    class: Drupal\commerce\ConditionManager
+    arguments: ['@container.namespaces', '@cache.discovery', '@module_handler', '@entity_type.manager', '@event_dispatcher']
 
   plugin.manager.commerce_entity_trait:
     class: Drupal\commerce\EntityTraitManager

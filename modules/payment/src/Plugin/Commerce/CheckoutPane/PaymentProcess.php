@@ -2,10 +2,11 @@
 
 namespace Drupal\commerce_payment\Plugin\Commerce\CheckoutPane;
 
+use Drupal\commerce\Response\NeedsRedirectException;
 use Drupal\commerce_checkout\Plugin\Commerce\CheckoutPane\CheckoutPaneBase;
-use Drupal\commerce_order\Entity\OrderInterface;
 use Drupal\commerce_payment\Exception\DeclineException;
 use Drupal\commerce_payment\Exception\PaymentGatewayException;
+use Drupal\commerce_payment\Plugin\Commerce\PaymentGateway\ManualPaymentGatewayInterface;
 use Drupal\commerce_payment\Plugin\Commerce\PaymentGateway\OffsitePaymentGatewayInterface;
 use Drupal\commerce_payment\Plugin\Commerce\PaymentGateway\OnsitePaymentGatewayInterface;
 use Drupal\Core\Form\FormStateInterface;
@@ -101,6 +102,7 @@ class PaymentProcess extends CheckoutPaneBase {
     $payment_gateway_plugin = $payment_gateway->getPlugin();
 
     $payment_storage = $this->entityTypeManager->getStorage('commerce_payment');
+    /** @var \Drupal\commerce_payment\Entity\PaymentInterface $payment */
     $payment = $payment_storage->create([
       'state' => 'new',
       'amount' => $this->order->getTotalPrice(),
@@ -132,16 +134,34 @@ class PaymentProcess extends CheckoutPaneBase {
         '#type' => 'commerce_payment_gateway_form',
         '#operation' => 'offsite-payment',
         '#default_value' => $payment,
-        '#return_url' => $this->buildReturnUrl($this->order),
-        '#cancel_url' => $this->buildCancelUrl($this->order),
+        '#return_url' => $this->buildReturnUrl(),
+        '#cancel_url' => $this->buildCancelUrl(),
+        '#exception_url' => $this->buildPaymentInformationStepUrl(),
+        '#exception_message' => $this->t('We encountered an unexpected error processing your payment. Please try again later.'),
         '#capture' => $this->configuration['capture'],
       ];
 
       $complete_form['actions']['next']['#value'] = $this->t('Proceed to @gateway', [
         '@gateway' => $payment_gateway_plugin->getDisplayLabel(),
       ]);
+      // Hide the actions by default, they are not needed by gateways that
+      // embed iframes or redirect via GET. The offsite-payment form can
+      // choose to show them when needed (redirect via POST).
+      $complete_form['actions']['#access'] = FALSE;
 
       return $pane_form;
+    }
+    elseif ($payment_gateway_plugin instanceof ManualPaymentGatewayInterface) {
+      try {
+        $payment_gateway_plugin->createPayment($payment);
+        $this->checkoutFlow->redirectToStep($next_step_id);
+      }
+      catch (PaymentGatewayException $e) {
+        \Drupal::logger('commerce_payment')->error($e->getMessage());
+        $message = $this->t('We encountered an unexpected error processing your payment. Please try again later.');
+        drupal_set_message($message, 'error');
+        $this->redirectToPreviousStep();
+      }
     }
     else {
       $this->checkoutFlow->redirectToStep($next_step_id);
@@ -151,15 +171,12 @@ class PaymentProcess extends CheckoutPaneBase {
   /**
    * Builds the URL to the "return" page.
    *
-   * @param \Drupal\commerce_order\Entity\OrderInterface $order
-   *   The order.
-   *
    * @return string
-   *   The "return" page url.
+   *   The "return" page URL.
    */
-  protected function buildReturnUrl(OrderInterface $order) {
+  protected function buildReturnUrl() {
     return Url::fromRoute('commerce_payment.checkout.return', [
-      'commerce_order' => $order->id(),
+      'commerce_order' => $this->order->id(),
       'step' => 'payment',
     ], ['absolute' => TRUE])->toString();
   }
@@ -167,28 +184,36 @@ class PaymentProcess extends CheckoutPaneBase {
   /**
    * Builds the URL to the "cancel" page.
    *
-   * @param \Drupal\commerce_order\Entity\OrderInterface $order
-   *   The order.
+   * @return string
+   *   The "cancel" page URL.
+   */
+  protected function buildCancelUrl() {
+    return Url::fromRoute('commerce_payment.checkout.cancel', [
+      'commerce_order' => $this->order->id(),
+      'step' => 'payment',
+    ], ['absolute' => TRUE])->toString();
+  }
+
+  /**
+   * Builds the URL to the payment information checkout step.
    *
    * @return string
-   *   The "cancel" page url.
+   *   The URL to the payment information checkout step.
    */
-  protected function buildCancelUrl(OrderInterface $order) {
-    return Url::fromRoute('commerce_payment.checkout.cancel', [
-      'commerce_order' => $order->id(),
-      'step' => 'payment',
+  protected function buildPaymentInformationStepUrl() {
+    return Url::fromRoute('commerce_checkout.form', [
+      'commerce_order' => $this->order->id(),
+      'step' => $this->checkoutFlow->getPane('payment_information')->getStepId(),
     ], ['absolute' => TRUE])->toString();
   }
 
   /**
    * Redirects to a previous checkout step on error.
    *
-   * @throws \Drupal\Core\Form\EnforcedResponseException
+   * @throws \Drupal\commerce\Response\NeedsRedirectException
    */
   protected function redirectToPreviousStep() {
-    $payment_info_pane = $this->checkoutFlow->getPane('payment_information');
-    $previous_step_id = $payment_info_pane->getStepId();
-    $this->checkoutFlow->redirectToStep($previous_step_id);
+    throw new NeedsRedirectException($this->buildPaymentInformationStepUrl());
   }
 
 }

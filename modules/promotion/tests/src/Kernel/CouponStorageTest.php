@@ -66,6 +66,16 @@ class CouponStorageTest extends CommerceKernelTestBase {
 
     $coupon_loaded = $this->couponStorage->loadByCode($coupon_code);
     $this->assertEquals($coupon->id(), $coupon_loaded->id());
+
+    $coupon_code = $this->randomMachineName();
+    $coupon = Coupon::create([
+      'code' => $coupon_code,
+      'status' => FALSE,
+    ]);
+    $coupon->save();
+
+    $coupon_loaded = $this->couponStorage->loadByCode($coupon_code);
+    $this->assertEmpty($coupon_loaded);
   }
 
 }

@@ -52,10 +52,8 @@ class PluginItemDeriver extends DeriverBase implements ContainerDeriverInterface
    */
   public function getDerivativeDefinitions($base_plugin_definition) {
     $plugin_types = [
-      'condition' => $this->t('Conditions'),
-      'action' => $this->t('Action'),
+      'commerce_condition' => $this->t('Condition'),
       'commerce_promotion_offer' => $this->t('Promotion offer'),
-      'commerce_promotion_condition' => $this->t('Promotion condition'),
     ];
     // Core has no way to list plugin types, so each referenceable plugin
     // type needs to register itself via the event.

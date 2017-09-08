@@ -212,36 +212,3 @@ function commerce_module_preuninstall($module) {
     \Drupal::service('commerce.bundle_plugin_installer')->uninstallBundles($entity_type, [$module]);
   }
 }
-
-/**
- * Implements hook_action_info_alter().
- *
- * @todo: Core uses CategorizingPluginManagerTrait but does not implement.
- */
-function commerce_action_info_alter(array &$definitions) {
-  foreach ($definitions as &$definition) {
-    // Ensure that every plugin has a category.
-    if (empty($definition['category'])) {
-      // Default to the human readable module name if the provider is a module;
-      // otherwise the provider machine name is used.
-      $definition['category'] = \Drupal::moduleHandler()->getName($definition['provider']);
-    }
-  }
-}
-
-/**
- * Implements hook_condition_info_alter().
- *
- * @todo: Core uses CategorizingPluginManagerTrait but does not implement.
- */
-function commerce_condition_info_alter(array &$definitions) {
-  foreach ($definitions as &$definition) {
-    // Ensure that every plugin has a category.
-    if (empty($definition['category'])) {
-      // Default to the human readable module name if the provider is a module;
-      // otherwise the provider machine name is used.
-      $definition['category'] = \Drupal::moduleHandler()
-        ->getName($definition['provider']);
-    }
-  }
-}

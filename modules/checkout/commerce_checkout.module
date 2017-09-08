@@ -5,10 +5,12 @@
  * Provides configurable checkout flows.
  */
 
+use Drupal\commerce\EntityHelper;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\Element;
+use Drupal\views\Form\ViewsForm;
 
 /**
  * Implements hook_theme().
@@ -20,11 +22,23 @@ function commerce_checkout_theme() {
         'steps' => [],
       ],
     ],
+    'commerce_checkout_completion_message' => [
+      'variables' => [
+        'order_entity' => NULL,
+        'payment_instructions' => NULL,
+      ],
+    ],
     'commerce_checkout_form' => [
       'render element' => 'form',
     ],
-    'commerce_checkout_form__with_summary' => [
+    'commerce_checkout_form__with_sidebar' => [
       'base hook' => 'commerce_checkout_form',
+    ],
+    'commerce_checkout_order_summary' => [
+      'variables' => [
+        'order_entity' => NULL,
+        'checkout_step' => '',
+      ],
     ],
   ];
 
@@ -38,12 +52,27 @@ function commerce_checkout_theme_suggestions_commerce_checkout_form(array $varia
   $original = $variables['theme_hook_original'];
   $suggestions = [];
   $suggestions[] = $original;
-  // If the checkout form has an order summary, suggest the enhanced layout.
-  if (isset($variables['form']['order_summary']) && Element::isVisibleElement($variables['form']['order_summary'])) {
-    $suggestions[] = $original . '__with_summary';
+  // If the checkout form has a sidebar, suggest the enhanced layout.
+  if (isset($variables['form']['sidebar']) && Element::isVisibleElement($variables['form']['sidebar'])) {
+    $suggestions[] = $original . '__with_sidebar';
   }
 
   return $suggestions;
+}
+
+/**
+ * Implements hook_preprocess_HOOK().
+ */
+function commerce_checkout_preprocess_commerce_checkout_order_summary(&$variables) {
+  /** @var \Drupal\commerce_order\Entity\OrderInterface $order */
+  $order = $variables['order_entity'];
+  /** @var \Drupal\commerce_order\OrderTotalSummaryInterface $order_total_summary */
+  $order_total_summary = \Drupal::service('commerce_order.order_total_summary');
+  $variables['totals'] = $order_total_summary->buildTotals($order);
+  $variables['rendered_totals'] = [
+    '#theme' => 'commerce_order_total_summary',
+    '#totals' => $variables['totals'],
+  ];
 }
 
 /**
@@ -85,9 +114,6 @@ function commerce_checkout_form_commerce_order_type_form_alter(array &$form, For
   $order_type = $form_state->getFormObject()->getEntity();
   $storage = \Drupal::entityTypeManager()->getStorage('commerce_checkout_flow');
   $checkout_flows = $storage->loadMultiple();
-  $checkout_flows = array_map(function ($checkout_flow) {
-    return $checkout_flow->label();
-  }, $checkout_flows);
 
   $form['commerce_checkout'] = [
     '#type' => 'details',
@@ -99,7 +125,7 @@ function commerce_checkout_form_commerce_order_type_form_alter(array &$form, For
   $form['commerce_checkout']['checkout_flow'] = [
     '#type' => 'select',
     '#title' => t('Checkout flow'),
-    '#options' => $checkout_flows,
+    '#options' => EntityHelper::extractLabels($checkout_flows),
     '#default_value' => $order_type->getThirdPartySetting('commerce_checkout', 'checkout_flow', 'default'),
     '#required' => TRUE,
   ];
@@ -121,10 +147,11 @@ function commerce_checkout_order_type_form_submit($form, FormStateInterface $for
  * Implements hook_form_alter().
  */
 function commerce_checkout_form_alter(&$form, FormStateInterface $form_state, $form_id) {
-  if (strpos($form_id, 'views_form_commerce_cart_form_') === 0) {
-    // Only add the Checkout button if the cart form view has order items.
+  if ($form_state->getFormObject() instanceof ViewsForm) {
+    /** @var \Drupal\views\ViewExecutable $view */
     $view = reset($form_state->getBuildInfo()['args']);
-    if (!empty($view->result)) {
+    // Only add the Checkout button if the cart form view has order items.
+    if ($view->storage->get('tag') == 'commerce_cart_form' && !empty($view->result)) {
       $form['actions']['checkout'] = [
         '#type' => 'submit',
         '#value' => t('Checkout'),

@@ -2,6 +2,7 @@
 
 namespace Drupal\Tests\commerce\Functional;
 
+use Drupal\commerce\EntityHelper;
 use Drupal\commerce_product\Entity\Product;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\Core\Entity\Entity\EntityFormDisplay;
@@ -93,9 +94,7 @@ class EntitySelectWidgetTest extends CommerceBrowserTestBase {
 
     // Create another store. The widget should now be a set of checkboxes.
     $this->createStores(1);
-    $store_ids = array_map(function ($store) {
-      return $store->id();
-    }, $this->stores);
+    $store_ids = EntityHelper::extractIds($this->stores);
     $this->drupalGet($form_url);
     $this->assertNotNull($this->getSession()->getPage()->find('xpath', '//input[@type="checkbox" and starts-with(@name,"stores")]'));
     $this->assertSession()->checkboxNotChecked('edit-stores-target-id-value-1');

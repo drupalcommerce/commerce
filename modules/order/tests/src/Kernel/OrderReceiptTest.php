@@ -8,7 +8,6 @@ use Drupal\commerce_price\Price;
 use Drupal\commerce_product\Entity\Product;
 use Drupal\commerce_product\Entity\ProductVariation;
 use Drupal\commerce_product\Entity\ProductVariationType;
-use Drupal\commerce_store\Entity\Store;
 use Drupal\Core\Test\AssertMailTrait;
 use Drupal\profile\Entity\Profile;
 use Drupal\Tests\commerce\Kernel\CommerceKernelTestBase;
@@ -41,7 +40,6 @@ class OrderReceiptTest extends CommerceKernelTestBase {
     'state_machine',
     'commerce_product',
     'commerce_order',
-    'commerce_test',
   ];
 
   /**
@@ -85,7 +83,10 @@ class OrderReceiptTest extends CommerceKernelTestBase {
     $profile->save();
     $profile = $this->reloadEntity($profile);
 
-    /** @var \Drupal\commerce_order\Entity\Order $order */
+    /** @var \Drupal\commerce_order\OrderItemStorageInterface $order_item_storage */
+    $order_item_storage = $this->container->get('entity_type.manager')->getStorage('commerce_order_item');
+    $order_item1 = $order_item_storage->createFromPurchasableEntity($variation1);
+    $order_item1->save();
     $order = Order::create([
       'type' => 'default',
       'state' => 'draft',
@@ -95,16 +96,8 @@ class OrderReceiptTest extends CommerceKernelTestBase {
       'order_number' => '6',
       'billing_profile' => $profile,
       'store_id' => $this->store->id(),
+      'order_items' => [$order_item1],
     ]);
-    $order->save();
-
-    /** @var \Drupal\commerce_order\OrderItemStorageInterface $order_item_storage */
-    $order_item_storage = $this->container->get('entity_type.manager')->getStorage('commerce_order_item');
-
-    // Add order item.
-    $order_item1 = $order_item_storage->createFromPurchasableEntity($variation1);
-    $order_item1->save();
-    $order->addItem($order_item1);
     $order->save();
     $this->order = $this->reloadEntity($order);
   }

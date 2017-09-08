@@ -2,15 +2,19 @@
 
 namespace Drupal\commerce_promotion\Entity;
 
+use Drupal\commerce_order\Entity\OrderInterface;
 use Drupal\commerce_store\Entity\EntityStoresInterface;
 use Drupal\Core\Datetime\DrupalDateTime;
 use Drupal\Core\Entity\ContentEntityInterface;
-use Drupal\Core\Entity\EntityInterface;
+use Drupal\commerce_promotion\Plugin\Commerce\PromotionOffer\PromotionOfferInterface;
 
 /**
  * Defines the interface for promotions.
  */
 interface PromotionInterface extends ContentEntityInterface, EntityStoresInterface {
+
+  const COMPATIBLE_ANY = 'any';
+  const COMPATIBLE_NONE = 'none';
 
   /**
    * Gets the promotion name.
@@ -85,6 +89,50 @@ interface PromotionInterface extends ContentEntityInterface, EntityStoresInterfa
   public function setOrderTypeIds(array $order_type_ids);
 
   /**
+   * Gets the offer.
+   *
+   * @return \Drupal\commerce_promotion\Plugin\Commerce\PromotionOffer\PromotionOfferInterface|null
+   *   The offer, or NULL if not yet available.
+   */
+  public function getOffer();
+
+  /**
+   * Sets the offer.
+   *
+   * @param \Drupal\commerce_promotion\Plugin\Commerce\PromotionOffer\PromotionOfferInterface $offer
+   *   The offer.
+   *
+   * @return $this
+   */
+  public function setOffer(PromotionOfferInterface $offer);
+
+  /**
+   * Gets the conditions.
+   *
+   * @return \Drupal\commerce\Plugin\Commerce\Condition\ConditionInterface[]
+   *   The conditions.
+   */
+  public function getConditions();
+
+  /**
+   * Gets the condition operator.
+   *
+   * @return string
+   *   The condition operator. Possible values: AND, OR.
+   */
+  public function getConditionOperator();
+
+  /**
+   * Sets the condition operator.
+   *
+   * @param string $condition_operator
+   *   The condition operator.
+   *
+   * @return $this
+   */
+  public function setConditionOperator($condition_operator);
+
+  /**
    * Gets the coupon IDs.
    *
    * @return int[]
@@ -150,26 +198,6 @@ interface PromotionInterface extends ContentEntityInterface, EntityStoresInterfa
   public function hasCoupon(CouponInterface $coupon);
 
   /**
-   * Gets the promotion current usage.
-   *
-   * Represents the number of times the promotion was used.
-   *
-   * @return int
-   *   The promotion current usage.
-   */
-  public function getCurrentUsage();
-
-  /**
-   * Sets the promotion current usage.
-   *
-   * @param int $current_usage
-   *   The promotion current usage.
-   *
-   * @return $this
-   */
-  public function setCurrentUsage($current_usage);
-
-  /**
    * Gets the promotion usage limit.
    *
    * Represents the maximum number of times the promotion can be used.
@@ -224,7 +252,25 @@ interface PromotionInterface extends ContentEntityInterface, EntityStoresInterfa
    *
    * @return $this
    */
-  public function setEndDate(DrupalDateTime $end_date);
+  public function setEndDate(DrupalDateTime $end_date = NULL);
+
+  /**
+   * Gets the promotion compatibility.
+   *
+   * @return string
+   *   The compatibility.
+   */
+  public function getCompatibility();
+
+  /**
+   * Sets the promotion compatibility.
+   *
+   * @param string $compatibility
+   *   The compatibility.
+   *
+   * @return $this
+   */
+  public function setCompatibility($compatibility);
 
   /**
    * Get whether the promotion is enabled.
@@ -245,22 +291,58 @@ interface PromotionInterface extends ContentEntityInterface, EntityStoresInterfa
   public function setEnabled($enabled);
 
   /**
-   * Checks whether the promotion entity can be applied.
+   * Gets the weight.
    *
-   * @param \Drupal\Core\Entity\EntityInterface $entity
-   *   The entity.
-   *
-   * @return bool
-   *   TRUE if promotion can be applied, or false if conditions failed.
+   * @return int
+   *   The weight.
    */
-  public function applies(EntityInterface $entity);
+  public function getWeight();
 
   /**
-   * Apply the promotion to an entity.
+   * Sets the weight.
    *
-   * @param \Drupal\Core\Entity\EntityInterface $entity
-   *   The entity.
+   * @param int $weight
+   *   The weight.
+   *
+   * @return $this
    */
-  public function apply(EntityInterface $entity);
+  public function setWeight($weight);
+
+  /**
+   * Checks whether the promotion is available for the given order.
+   *
+   * Ensures that the order type and store match the promotion's,
+   * that the promotion is enabled, the current date matches the
+   * start and end dates, and the usage limits are respected.
+   *
+   * @param \Drupal\commerce_order\Entity\OrderInterface $order
+   *   The order.
+   *
+   * @return bool
+   *   TRUE if promotion is available, FALSE otherwise.
+   */
+  public function available(OrderInterface $order);
+
+  /**
+   * Checks whether the promotion can be applied to the given order.
+   *
+   * Ensures that the promotion is compatible with other
+   * promotions on the order, and that the conditions pass.
+   *
+   * @param \Drupal\commerce_order\Entity\OrderInterface $order
+   *   The order.
+   *
+   * @return bool
+   *   TRUE if promotion can be applied, FALSE otherwise.
+   */
+  public function applies(OrderInterface $order);
+
+  /**
+   * Applies the promotion to the given order.
+   *
+   * @param \Drupal\commerce_order\Entity\OrderInterface $order
+   *   The order.
+   */
+  public function apply(OrderInterface $order);
 
 }

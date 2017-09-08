@@ -57,9 +57,7 @@ class ProductVariationFieldRendererTest extends CommerceKernelTestBase {
     parent::setUp();
 
     $this->installEntitySchema('commerce_product_variation');
-    $this->installEntitySchema('commerce_product_variation_type');
     $this->installEntitySchema('commerce_product');
-    $this->installEntitySchema('commerce_product_type');
     $this->installConfig(['commerce_product']);
 
     $this->variationFieldRenderer = $this->container->get('commerce_product.variation_field_renderer');

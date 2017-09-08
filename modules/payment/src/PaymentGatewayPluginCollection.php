@@ -54,7 +54,7 @@ class PaymentGatewayPluginCollection extends DefaultSingleLazyPluginCollection {
       throw new PluginException("The payment gateway '{$this->entityId}' did not specify a plugin.");
     }
 
-    $configuration = $this->configuration + ['_entity_id' => $this->entityId];
+    $configuration = ['_entity_id' => $this->entityId] + $this->configuration;
     $plugin = $this->manager->createInstance($instance_id, $configuration);
     $this->set($instance_id, $plugin);
   }
