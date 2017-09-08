@@ -2,7 +2,6 @@
 
 namespace Drupal\payment_events_test;
 
-
 use Drupal\commerce_payment\Event\PaymentEvent;
 use Drupal\commerce_payment\Event\PaymentEvents;
 use Drupal\Core\State\StateInterface;
@@ -32,7 +31,7 @@ class EventSubscriber implements EventSubscriberInterface {
    *
    * @param \Drupal\commerce_payment\Event\PaymentEvent $event
    *   The payment event.
-   * @param $name
+   * @param string $name
    *   The name of the event.
    */
   public function paymentEvent(PaymentEvent $event, $name) {
