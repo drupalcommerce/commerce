@@ -2,6 +2,8 @@
 
 namespace Drupal\commerce_checkout\Plugin\Commerce\CheckoutPane;
 
+use Drupal\commerce_checkout\Plugin\Commerce\CheckoutFlow\CheckoutFlowInterface;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\FormStateInterface;
 
 /**
@@ -23,7 +25,7 @@ class CompletionMessage extends CheckoutPaneBase {
   /**
    * {@inheritdoc}
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, \Drupal\commerce_checkout\Plugin\Commerce\CheckoutFlow\CheckoutFlowInterface $checkout_flow, \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager) {
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, CheckoutFlowInterface $checkout_flow, EntityTypeManagerInterface $entity_type_manager) {
     parent::__construct($configuration, $plugin_id, $plugin_definition, $checkout_flow, $entity_type_manager);
     $this->completionMessags = new CompletionMessages();
   }

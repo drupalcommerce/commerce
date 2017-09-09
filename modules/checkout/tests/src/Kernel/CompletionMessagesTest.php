@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: robharings
- * Date: 09/09/2017
- * Time: 13:31
- */
 
 namespace Drupal\Tests\commerce_checkout\Kernel;
 
@@ -15,19 +9,27 @@ use Drupal\Tests\commerce\Kernel\CommerceKernelTestBase;
  * Tests the completion messages class.
  *
  * @covers \Drupal\commerce_checkout\Plugin\Commerce\CheckoutPane\CompletionMessages
+ *
+ * @group commerce
  */
 class CompletionMessagesTest extends CommerceKernelTestBase {
 
   /**
-   * @var CompletionMessages
+   * @var \Drupal\commerce_checkout\Plugin\Commerce\CheckoutPane\CompletionMessages
    */
   private $completionMessages;
 
+  /**
+   * {@inheritdoc}
+   */
   public function setUp() {
     parent::setUp();
     $this->completionMessages = new CompletionMessages();
   }
 
+  /**
+   * Tests add message method.
+   */
   public function testAddMessage() {
     $this->completionMessages->addMessage(t('Message 1'));
     $this->completionMessages->addMessage(t('Message 2'));
@@ -35,6 +37,9 @@ class CompletionMessagesTest extends CommerceKernelTestBase {
     $this->assertCount(2, $this->completionMessages);
   }
 
+  /**
+   * Tests the messages iterator.
+   */
   public function testMessagesIterator() {
     $this->completionMessages->addMessage(t('Message 1'));
     $this->completionMessages->addMessage(t('Message 2'));
