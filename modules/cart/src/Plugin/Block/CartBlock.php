@@ -3,6 +3,7 @@
 namespace Drupal\commerce_cart\Plugin\Block;
 
 use Drupal\commerce_cart\CartProviderInterface;
+use Drupal\commerce_order\Entity\OrderInterface;
 use Drupal\Core\Block\BlockBase;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\CacheableMetadata;
@@ -178,9 +179,9 @@ class CartBlock extends BlockBase implements ContainerFactoryPluginInterface {
   /**
    * Gets the cart views for each cart.
    *
-   * @param string
+   * @param string $cart_id
    *   The cart ID.
-   * @param string
+   * @param string $view_name
    *   The view name.
    *
    * @return array
@@ -208,7 +209,7 @@ class CartBlock extends BlockBase implements ContainerFactoryPluginInterface {
    * @return array
    *   A render array.
    */
-  protected function getCartTable($cart) {
+  protected function getCartTable(OrderInterface $cart) {
     $cart_table = [
       '#theme' => 'commerce_cart_order_items_table',
       '#order_entity' => $cart,
