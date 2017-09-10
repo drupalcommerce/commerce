@@ -94,35 +94,6 @@ class CartBlock extends BlockBase implements ContainerFactoryPluginInterface {
       ],
     ];
 
-    $form['use_view'] = [
-      '#type' => 'checkbox',
-      '#title' => $this->t('Use a View to display the cart block contents'),
-      '#description' => $this->t('Overrides the cart block contents with the output of a View.'),
-      '#default_value' => !empty($this->configuration['view']),
-    ];
-
-    $view_storage = $this->entityTypeManager->getStorage('view');
-    $available_cart_block_views = [];
-    /** @var \Drupal\views\Entity\View $view */
-    foreach ($view_storage->loadMultiple() as $view) {
-      if (strpos($view->get('tag'), 'commerce_cart_block') !== FALSE) {
-        $available_cart_block_views[$view->id()] = $view->label();
-      }
-    }
-
-    $form['view'] = [
-      '#type' => 'select',
-      '#title' => $this->t('View'),
-      '#options' => $available_cart_block_views,
-      '#default_value' => $this->configuration['view'],
-      '#required' => TRUE,
-      '#states' => [
-        'visible' => [
-          ':input[name="settings[use_view]"]' => ['checked' => TRUE],
-        ],
-      ],
-    ];
-
     return $form;
   }
 
@@ -131,10 +102,6 @@ class CartBlock extends BlockBase implements ContainerFactoryPluginInterface {
    */
   public function blockSubmit($form, FormStateInterface $form_state) {
     $this->configuration['dropdown'] = $form_state->getValue('commerce_cart_dropdown');
-    $this->configuration['view'] = NULL;
-    if ($form_state->getValue('use_view')) {
-      $this->configuration['view'] = $form_state->getValue('view');
-    }
   }
 
   /**
@@ -160,13 +127,19 @@ class CartBlock extends BlockBase implements ContainerFactoryPluginInterface {
     $count = 0;
     $content = [];
     if (!empty($carts)) {
-      if ($this->configuration['view']) {
-        $content = $this->getCartViews($carts);
-      }
-      else {
-        $content = $this->getCartTables($carts);
-      }
+      $order_type_storage = $this->entityTypeManager->getStorage('commerce_order_type');
       foreach ($carts as $cart_id => $cart) {
+        if ($this->configuration['dropdown']) {
+          $order_type = $cart->bundle();
+          $order_type_entity = $order_type_storage->load($order_type);
+          $view_name = $order_type_entity->getThirdPartySetting('commerce_cart', 'cart_block_view', 'commerce_cart_block');
+          if ($view_name) {
+            $content[$cart_id] = $this->getCartView($cart_id, $view_name);
+          }
+          else {
+            $content[$cart_id] = $this->getCartTable($cart);
+          }
+        }
         foreach ($cart->getItems() as $order_item) {
           $count += (int) $order_item->getQuantity();
         }
@@ -205,63 +178,43 @@ class CartBlock extends BlockBase implements ContainerFactoryPluginInterface {
   /**
    * Gets the cart views for each cart.
    *
-   * @param \Drupal\commerce_order\Entity\OrderInterface[] $carts
-   *   The cart orders.
+   * @param string
+   *   The cart ID.
+   * @param string
+   *   The view name.
    *
    * @return array
-   *   An array of view ids keyed by cart order ID.
+   *   A view render array.
    */
-  protected function getCartViews(array $carts) {
-    $cart_views = [];
-    if ($this->configuration['dropdown']) {
-      $order_type_ids = array_map(function ($cart) {
-        return $cart->bundle();
-      }, $carts);
-      $order_type_storage = $this->entityTypeManager->getStorage('commerce_order_type');
-      $order_types = $order_type_storage->loadMultiple(array_unique($order_type_ids));
+  protected function getCartView($cart_id, $view_name) {
+    $cart_view = [
+      '#prefix' => '<div class="cart cart-block">',
+      '#suffix' => '</div>',
+      '#type' => 'view',
+      '#name' => $view_name,
+      '#arguments' => [$cart_id],
+      '#embed' => TRUE,
+    ];
 
-      $available_views = [];
-      foreach ($order_type_ids as $cart_id => $order_type_id) {
-        /** @var \Drupal\commerce_order\Entity\OrderTypeInterface $order_type */
-        $order_type = $order_types[$order_type_id];
-        $available_views[$cart_id] = $order_type->getThirdPartySetting('commerce_cart', 'cart_block_view', 'commerce_cart_block');
-      }
-
-      foreach ($carts as $cart_id => $cart) {
-        $cart_views[] = [
-          '#prefix' => '<div class="cart cart-block">',
-          '#suffix' => '</div>',
-          '#type' => 'view',
-          '#name' => $available_views[$cart_id],
-          '#arguments' => [$cart_id],
-          '#embed' => TRUE,
-        ];
-      }
-    }
-    return $cart_views;
+    return $cart_view;
   }
 
   /**
-   * Creates a render array for each cart.
+   * Creates a render array for a cart.
    *
-   * @param \Drupal\commerce_order\Entity\OrderInterface[] $carts
+   * @param \Drupal\commerce_order\Entity\OrderInterface $cart
    *   The cart orders.
    *
    * @return array
-   *   An array of render arrays.
+   *   A render array.
    */
-  protected function getCartTables(array $carts) {
-    $cart_tables = [];
-    if ($this->configuration['dropdown']) {
-      foreach ($carts as $cart_id => $cart) {
-        $cart_tables[$cart_id] = [
-          '#theme' => 'commerce_cart_order_items_table',
-          '#order_entity' => $cart,
-        ];
-      }
-    }
+  protected function getCartTable($cart) {
+    $cart_table = [
+      '#theme' => 'commerce_cart_order_items_table',
+      '#order_entity' => $cart,
+    ];
 
-    return $cart_tables;
+    return $cart_table;
   }
 
   /**
