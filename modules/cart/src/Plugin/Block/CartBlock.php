@@ -128,12 +128,15 @@ class CartBlock extends BlockBase implements ContainerFactoryPluginInterface {
     $count = 0;
     $content = [];
     if (!empty($carts)) {
+      $order_type_ids = array_map(function ($cart) {
+        return $cart->bundle();
+      }, $carts);
       $order_type_storage = $this->entityTypeManager->getStorage('commerce_order_type');
+      $order_types = $order_type_storage->loadMultiple(array_unique($order_type_ids));
       foreach ($carts as $cart_id => $cart) {
         if ($this->configuration['dropdown']) {
           $order_type = $cart->bundle();
-          $order_type_entity = $order_type_storage->load($order_type);
-          $view_name = $order_type_entity->getThirdPartySetting('commerce_cart', 'cart_block_view', 'commerce_cart_block');
+          $view_name = $order_types[$order_type]->getThirdPartySetting('commerce_cart', 'cart_block_view', 'commerce_cart_block');
           if ($view_name) {
             $content[$cart_id] = $this->getCartView($cart_id, $view_name);
           }

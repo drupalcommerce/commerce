@@ -31,7 +31,6 @@ function commerce_cart_theme($existing, $type, $theme, $path) {
         'count' => NULL,
         'count_text' => '',
         'content' => NULL,
-        'cart_items' => NULL,
         'url' => NULL,
         'links' => [],
       ],
