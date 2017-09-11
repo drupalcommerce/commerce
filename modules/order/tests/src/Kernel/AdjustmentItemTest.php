@@ -27,6 +27,9 @@ class AdjustmentItemTest extends CommerceKernelTestBase {
    * {@inheritdoc}
    */
   public static $modules = [
+    'entity_reference_revisions',
+    'profile',
+    'state_machine',
     'commerce_order',
   ];
 
