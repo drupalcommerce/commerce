@@ -291,7 +291,8 @@ class Payment extends ContentEntityBase implements PaymentInterface {
       $refunded_amount = new Price('0', $this->getAmount()->getCurrencyCode());
       $this->setRefundedAmount($refunded_amount);
     }
-    // Maintain the authorized completed timestamps.
+    // Maintain the authorized completed timestamps while also maintaining the
+    // order balance.
     $state = $this->getState()->value;
     $original_state = isset($this->original) ? $this->original->getState()->value : '';
     if ($state == 'authorized' && $original_state != 'authorized') {
@@ -300,16 +301,12 @@ class Payment extends ContentEntityBase implements PaymentInterface {
       }
     }
     if ($state == 'completed' && $original_state != 'completed') {
+      $this->getOrder()->addPayment($this->getAmount())->save();
       if (empty($this->getCompletedTime())) {
         $this->setCompletedTime(\Drupal::time()->getRequestTime());
       }
-    }
-
-    // Add or subtract payments from order.
-    if ($this->isNew()) {
-      $this->getOrder()->addPayment($this->getAmount())->save();
-    }
-    else {
+    } else if (in_array($state, ['partially_refunded', 'refunded']) &&
+        in_array($original_state, ['completed', 'partially_refunded'])) {
       $original = $this->values['original'];
       $net_refund = $this->getRefundedAmount()->subtract($original->getRefundedAmount());
       $this->getOrder()->subtractPayment($net_refund)->save();

@@ -294,7 +294,7 @@ class OrderTest extends CommerceKernelTestBase {
     $order->save();
     $this->assertEquals(new Price('27.00', 'USD'), $order->getBalance());
 
-    // Test that deleted payments update the order total paid and balance.
+    // Test that payments only substract total when setting to completed.
     $order->save();
     $payment = Payment::create([
       'order_id' => $order->id(),
@@ -303,8 +303,15 @@ class OrderTest extends CommerceKernelTestBase {
     ]);
     $payment->save();
     $order = Order::load($order->id());
+    $this->assertEquals(new Price('0.00', 'USD'), $order->getTotalPaid());
+
+    $payment->setState('completed');
+    $payment->save();
+    $order = Order::load($order->id());
     $this->assertEquals(new Price('25.00', 'USD'), $order->getTotalPaid());
     $this->assertEquals(new Price('2.00', 'USD'), $order->getBalance());
+
+    // Test that deleted payments update the order total paid and balance.
     $payment->delete();
     $order = Order::load($order->id());
     $this->assertEquals(new Price('0.00', 'USD'), $order->getTotalPaid());
