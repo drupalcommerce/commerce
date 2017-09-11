@@ -102,7 +102,7 @@ class EntitySelectWidgetTest extends CommerceBrowserTestBase {
     // Check store 1.
     $edit['stores[target_id][value][' . $store_ids[0] . ']'] = $store_ids[0];
     $edit['stores[target_id][value][' . $store_ids[1] . ']'] = FALSE;
-    $this->submitForm($edit, t('Save and keep published'));
+    $this->submitForm($edit, t('Save'));
     $this->assertSession()->statusCodeEquals(200);
     \Drupal::entityTypeManager()->getStorage('commerce_product')->resetCache();
     $this->product = Product::load($this->product->id());
@@ -130,7 +130,7 @@ class EntitySelectWidgetTest extends CommerceBrowserTestBase {
     // Reference both stores 1 and 2.
     $edit = [];
     $edit['stores[target_id][value]'] = $store_labels[0] . ', ' . $store_labels[1];
-    $this->submitForm($edit, t('Save and keep published'));
+    $this->submitForm($edit, t('Save'));
     $this->assertSession()->statusCodeEquals(200);
     \Drupal::entityTypeManager()->getStorage('commerce_product')->resetCache();
     $this->product = Product::load($this->product->id());
