@@ -313,7 +313,8 @@ class Payment extends ContentEntityBase implements PaymentInterface {
     if ($this->isNew()) {
       $this->getOrder()->addPayment($this->getAmount())->save();
     }
-    else {
+    elseif (in_array($state, ['partially_refunded', 'refunded']) &&
+        in_array($original_state, ['completed', 'partially_refunded'])) {
       $original = $this->values['original'];
       $net_refund = $this->getRefundedAmount()->subtract($original->getRefundedAmount());
       $this->getOrder()->subtractPayment($net_refund)->save();
