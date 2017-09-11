@@ -114,7 +114,7 @@ class ProductForm extends ContentEntityForm {
         '#value' => $product->isPublished() ? $this->t('Published') : $this->t('Not published'),
         '#access' => !$product->isNew(),
         '#attributes' => [
-          'class' => 'entity-meta__title',
+          'class' => ['entity-meta__title'],
         ],
       ],
       'changed' => [
