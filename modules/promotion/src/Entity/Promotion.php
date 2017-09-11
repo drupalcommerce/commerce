@@ -545,13 +545,13 @@ class Promotion extends ContentEntityBase implements PromotionInterface {
       ->setDisplayConfigurable('view', TRUE)
       ->setDisplayConfigurable('form', TRUE);
 
-    $fields['description'] = BaseFieldDefinition::create('string_long')
+    $fields['description'] = BaseFieldDefinition::create('text_long')
       ->setLabel(t('Description'))
       ->setDescription(t('Additional information about the promotion to show to the customer'))
       ->setTranslatable(TRUE)
       ->setDefaultValue('')
       ->setDisplayOptions('form', [
-        'type' => 'string_textarea',
+        'type' => 'text_textarea',
         'weight' => 1,
         'settings' => [
           'rows' => 3,
