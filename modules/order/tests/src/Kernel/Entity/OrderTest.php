@@ -307,7 +307,7 @@ class OrderTest extends CommerceKernelTestBase {
     $order = Order::load($order->id());
     $this->assertEquals(new Price('7.00', 'USD'), $order->getBalance());
 
-    // Test that deleted payments update the order total paid and balance.
+    // Test that payments only substract total when setting to completed.
     $order->save();
     $payment3 = Payment::create([
       'order_id' => $order->id(),
@@ -474,8 +474,7 @@ class OrderTest extends CommerceKernelTestBase {
     $this->assertEquals($eur_order_item->getTotalPrice(), $order->getTotalPrice());
 
     // Adding a second order item with a different currency should fail.
-    $currency_mismatch = FALSE;
-    try {
+    $currency_mismatch = FALSE; try {
       $order->addItem($usd_order_item);
     }
     catch (CurrencyMismatchException $e) {
