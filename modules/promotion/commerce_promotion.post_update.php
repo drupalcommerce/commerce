@@ -241,46 +241,49 @@ function commerce_promotion_post_update_9() {
   // To update the field schema we need to have no field data in the storage,
   // thus we retrieve it, delete it from storage, and write it back to the
   // storage after updating the schema.
-  /** @var \Drupal\commerce_promotion\PromotionStorageInterface $promotion_storage */
-  $promotion_storage = \Drupal::service('entity_type.manager')->getStorage('commerce_promotion');
-  /** @var \Drupal\commerce_promotion\Entity\PromotionInterface[] $promotions */
-  $promotions = $promotion_storage->loadMultiple();
-  $descriptions = [];
-  foreach ($promotions as $promotion) {
-    $descriptions[$promotion->id()] = $promotion->getDescription();
-    $promotion->setDescription(null);
-    $promotion->save();
-  }
-
-  // Update definitions and schema.
-  $entity_definition_manager = \Drupal::entityDefinitionUpdateManager();
-  /** @var Drupal\Core\Field\BaseFieldDefinition $storage_definition */
-  $storage_definition = $entity_definition_manager->getFieldStorageDefinition('description', 'commerce_promotion');
-  $entity_definition_manager->uninstallFieldStorageDefinition($storage_definition);
-
-  $storage_definition = BaseFieldDefinition::create('text_long')
-    ->setLabel(t('Description'))
-    ->setDescription(t('Additional information about the promotion to show to the customer'))
-    ->setTranslatable(TRUE)
-    ->setDefaultValue('')
-    ->setDisplayOptions('form', [
-      'type' => 'text_textarea',
-      'weight' => 1,
-      'settings' => [
-        'rows' => 3,
-      ],
-    ])
-    ->setDisplayConfigurable('view', TRUE)
-    ->setDisplayConfigurable('form', TRUE);
-  $entity_definition_manager->installFieldStorageDefinition('description', 'commerce_promotion', 'commerce_promotion', $storage_definition);
-
-  // Restore entity data in the new schema.
   $database = \Drupal::database();
-  foreach ($descriptions as $promotion_id => $description) {
-    $database->update('commerce_promotion_field_data')
-      ->fields(['description__value' => $description])
-      ->condition('promotion_id', $promotion_id)
-      ->execute();
-  }
 
+  // Check update is needed.
+  if ($database->schema()->fieldExists('commerce_promotion_field_data', 'description')) {
+    // Retrieve existing field data.
+    $descriptions = $database->select('commerce_promotion_field_data', 'cp')
+      ->fields('cp', ['promotion_id', 'description'])
+      ->execute()
+      ->fetchAllKeyed();
+
+    // Remove data from the storage.
+    $database->update('commerce_promotion_field_data')
+      ->fields(['description' => NULL])
+      ->execute();
+
+    // Update definitions and schema.
+    $entity_definition_manager = \Drupal::entityDefinitionUpdateManager();
+    /** @var Drupal\Core\Field\BaseFieldDefinition $storage_definition */
+    $storage_definition = $entity_definition_manager->getFieldStorageDefinition('description', 'commerce_promotion');
+    $entity_definition_manager->uninstallFieldStorageDefinition($storage_definition);
+
+    $storage_definition = BaseFieldDefinition::create('text_long')
+      ->setLabel(t('Description'))
+      ->setDescription(t('Additional information about the promotion to show to the customer'))
+      ->setTranslatable(TRUE)
+      ->setDefaultValue('')
+      ->setDisplayOptions('form', [
+        'type' => 'text_textarea',
+        'weight' => 1,
+        'settings' => [
+          'rows' => 3,
+        ],
+      ])
+      ->setDisplayConfigurable('view', TRUE)
+      ->setDisplayConfigurable('form', TRUE);
+    $entity_definition_manager->installFieldStorageDefinition('description', 'commerce_promotion', 'commerce_promotion', $storage_definition);
+
+    // Restore entity data in the new schema.
+    foreach ($descriptions as $promotion_id => $description) {
+      $database->update('commerce_promotion_field_data')
+        ->fields(['description__value' => $description])
+        ->condition('promotion_id', $promotion_id)
+        ->execute();
+    }
+  }
 }
