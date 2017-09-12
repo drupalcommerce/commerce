@@ -241,18 +241,16 @@ function commerce_promotion_post_update_9() {
   // To update the field schema we need to have no field data in the storage,
   // thus we retrieve it, delete it from storage, and write it back to the
   // storage after updating the schema.
-  $database = \Drupal::database();
-
-  // Retrieve existing field data.
-  $descriptions = $database->select('commerce_promotion_field_data', 'cp')
-    ->fields('cp', ['promotion_id', 'description'])
-    ->execute()
-    ->fetchAllKeyed();
-
-  // Remove data from the storage.
-  $database->update('commerce_promotion_field_data')
-    ->fields(['description' => NULL])
-    ->execute();
+  /** @var \Drupal\commerce_promotion\PromotionStorageInterface $promotion_storage */
+  $promotion_storage = \Drupal::service('entity_type.manager')->getStorage('commerce_promotion');
+  /** @var \Drupal\commerce_promotion\Entity\PromotionInterface[] $promotions */
+  $promotions = $promotion_storage->loadMultiple();
+  $descriptions = [];
+  foreach ($promotions as $promotion) {
+    $descriptions[$promotion->id()] = $promotion->getDescription();
+    $promotion->setDescription(null);
+    $promotion->save();
+  }
 
   // Update definitions and schema.
   $entity_definition_manager = \Drupal::entityDefinitionUpdateManager();
@@ -277,6 +275,7 @@ function commerce_promotion_post_update_9() {
   $entity_definition_manager->installFieldStorageDefinition('description', 'commerce_promotion', 'commerce_promotion', $storage_definition);
 
   // Restore entity data in the new schema.
+  $database = \Drupal::database();
   foreach ($descriptions as $promotion_id => $description) {
     $database->update('commerce_promotion_field_data')
       ->fields(['description__value' => $description])
@@ -285,4 +284,3 @@ function commerce_promotion_post_update_9() {
   }
 
 }
-
