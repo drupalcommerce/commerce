@@ -11,6 +11,7 @@ use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Render\Element;
+use Drupal\Core\Url;
 
 /**
  * Implements hook_commerce_checkout_pane_info_alter().
@@ -38,6 +39,23 @@ function commerce_payment_entity_base_field_info(EntityTypeInterface $entity_typ
       ->setSetting('target_type', 'commerce_payment_method');
 
     return $fields;
+  }
+}
+
+/**
+ * Implements hook_entity_operation().
+ */
+function commerce_payment_entity_operation(EntityInterface $entity) {
+  if ($entity->getEntityTypeId() === 'commerce_order') {
+    $operations = [];
+    $operations['payments'] = [
+      'title' => t('Payments'),
+      'url' => Url::fromRoute('entity.commerce_payment.collection', [
+        'commerce_order' => $entity->id(),
+      ]),
+      'weight' => 50,
+    ];
+    return $operations;
   }
 }
 

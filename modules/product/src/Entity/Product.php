@@ -2,12 +2,13 @@
 
 namespace Drupal\commerce_product\Entity;
 
-use Drupal\user\UserInterface;
+use Drupal\Core\Entity\EntityPublishedTrait;
 use Drupal\Core\Entity\ContentEntityBase;
 use Drupal\Core\Entity\EntityChangedTrait;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
+use Drupal\user\UserInterface;
 
 /**
  * Defines the product entity class.
@@ -55,7 +56,7 @@ use Drupal\Core\Field\BaseFieldDefinition;
  *     "label" = "title",
  *     "langcode" = "langcode",
  *     "uuid" = "uuid",
- *     "status" = "status",
+ *     "published" = "status",
  *   },
  *   links = {
  *     "canonical" = "/product/{commerce_product}",
@@ -73,6 +74,7 @@ use Drupal\Core\Field\BaseFieldDefinition;
 class Product extends ContentEntityBase implements ProductInterface {
 
   use EntityChangedTrait;
+  use EntityPublishedTrait;
 
   /**
    * {@inheritdoc}
@@ -86,21 +88,6 @@ class Product extends ContentEntityBase implements ProductInterface {
    */
   public function setTitle($title) {
     $this->set('title', $title);
-    return $this;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function isPublished() {
-    return (bool) $this->getEntityKey('status');
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function setPublished($published) {
-    $this->set('status', (bool) $published);
     return $this;
   }
 
@@ -347,6 +334,7 @@ class Product extends ContentEntityBase implements ProductInterface {
    */
   public static function baseFieldDefinitions(EntityTypeInterface $entity_type) {
     $fields = parent::baseFieldDefinitions($entity_type);
+    $fields += static::publishedBaseFieldDefinitions($entity_type);
 
     $fields['uid'] = BaseFieldDefinition::create('entity_reference')
       ->setLabel(t('Author'))
@@ -393,11 +381,14 @@ class Product extends ContentEntityBase implements ProductInterface {
       ->setDisplayConfigurable('form', TRUE)
       ->setComputed(TRUE);
 
-    $fields['status'] = BaseFieldDefinition::create('boolean')
-      ->setLabel(t('Published'))
-      ->setDescription(t('Whether the product is published.'))
-      ->setDefaultValue(TRUE)
-      ->setTranslatable(TRUE)
+    $fields['status']
+      ->setDisplayOptions('form', [
+        'type' => 'boolean_checkbox',
+        'settings' => [
+          'display_label' => TRUE,
+        ],
+        'weight' => 90,
+      ])
       ->setDisplayConfigurable('form', TRUE);
 
     $fields['created'] = BaseFieldDefinition::create('created')
