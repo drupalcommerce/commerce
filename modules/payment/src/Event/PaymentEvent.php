@@ -35,7 +35,7 @@ class PaymentEvent extends Event {
    * @return \Drupal\commerce_payment\Entity\PaymentInterface
    *   Gets the payment.
    */
-  public function getOrder() {
+  public function getEntity() {
     return $this->payment;
   }
 
