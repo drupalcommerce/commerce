@@ -4,6 +4,7 @@ namespace Drupal\commerce_promotion;
 
 use Drupal\commerce_order\Entity\OrderInterface;
 use Drupal\commerce_order\OrderProcessorInterface;
+use Drupal\commerce_promotion\Entity\Promotion;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 
 /**
@@ -42,25 +43,35 @@ class PromotionOrderProcessor implements OrderProcessorInterface {
    * {@inheritdoc}
    */
   public function process(OrderInterface $order) {
+    // Collect all promotions.
+    $promotions = [
+      Promotion::COMPATIBLE_ANY => [],
+      Promotion::COMPATIBLE_NONE => [],
+    ];
     $order_type = $this->orderTypeStorage->load($order->bundle());
     /** @var \Drupal\commerce_promotion\Entity\CouponInterface[] $coupons */
     $coupons = $order->get('coupons')->referencedEntities();
     foreach ($coupons as $index => $coupon) {
-      $promotion = $coupon->getPromotion();
-      if ($coupon->available($order) && $promotion->applies($order)) {
-        $promotion->apply($order);
+      if ($coupon->available($order)) {
+        $promotion = $coupon->getPromotion();
+        $promotions[$promotion->getCompatibility()][$promotion->id()] = $promotion;
       }
       else {
         // The promotion is no longer available (end date, usage, etc).
         $order->get('coupons')->removeItem($index);
       }
     }
+    // Non-coupon promotions
+    foreach ($this->promotionStorage->loadAvailable($order_type, $order->getStore()) as $promotion) {
+      $promotions[$promotion->getCompatibility()][$promotion->id()] = $promotion;
+    }
 
-    // Non-coupon promotions are loaded and applied separately.
-    $promotions = $this->promotionStorage->loadAvailable($order_type, $order->getStore());
-    foreach ($promotions as $promotion) {
-      if ($promotion->applies($order)) {
-        $promotion->apply($order);
+    // Apply promotions. COMPATIBLE_NONE should be last.
+    foreach ($promotions as $compatibility => $collection) {
+      foreach ($collection as $promotion) {
+        if ($promotion->applies($order)) {
+          $promotion->apply($order);
+        }
       }
     }
   }
