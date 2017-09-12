@@ -70,6 +70,15 @@ final class PaymentEvents {
   const PAYMENT_DELETE = 'commerce_payment.commerce_payment.delete';
 
   /**
+   * Name of the event fired after paying an order in full.
+   *
+   * @Event
+   *
+   * @see \Drupal\commerce_payment\Event\PaymentEvent
+   */
+  const PAYMENT_ORDER_PAID_IN_FULL = 'commerce_payment.order_paid_in_full';
+
+  /**
    * Name of the event fired when payment gateways are loaded for an order.
    *
    * @Event
