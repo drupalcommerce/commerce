@@ -68,7 +68,6 @@ class PaymentStorage extends CommerceContentEntityStorage implements PaymentStor
    *
    * @param \Drupal\commerce_payment\Entity\PaymentInterface $payment
    *   The payment.
-   *
    * @param string $event_id
    *   The event identifier defined in
    *   \Drupal\commerce_payment\Event\PaymentEvents.
