@@ -37,6 +37,7 @@ class EventSubscriber implements EventSubscriberInterface {
   public function paymentEvent(PaymentEvent $event, $name) {
     $this->state->set('payment_events_test.event', [
       'event_name' => $name,
+      'event_entity' => $event->getEntity(),
     ]);
   }
 
