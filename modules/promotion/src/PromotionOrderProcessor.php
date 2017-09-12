@@ -61,7 +61,7 @@ class PromotionOrderProcessor implements OrderProcessorInterface {
         $order->get('coupons')->removeItem($index);
       }
     }
-    // Non-coupon promotions
+    // Non-coupon promotions.
     foreach ($this->promotionStorage->loadAvailable($order_type, $order->getStore()) as $promotion) {
       $promotions[$promotion->getCompatibility()][$promotion->id()] = $promotion;
     }
