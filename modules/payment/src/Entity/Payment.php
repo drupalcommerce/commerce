@@ -48,7 +48,6 @@ use Drupal\Core\Field\BaseFieldDefinition;
  *   links = {
  *     "collection" = "/admin/commerce/orders/{commerce_order}/payments",
  *     "edit-form" = "/admin/commerce/orders/{commerce_order}/payments/commerce_payment/edit",
- *     "operation-form" = "/admin/commerce/orders/{commerce_order}/payments/{commerce_payment}/operation/{operation}",
  *     "delete-form" = "/admin/commerce/orders/{commerce_order}/payments/{commerce_payment}/delete",
  *   },
  * )
