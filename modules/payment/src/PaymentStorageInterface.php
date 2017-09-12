@@ -11,6 +11,17 @@ use Drupal\Core\Entity\ContentEntityStorageInterface;
 interface PaymentStorageInterface extends ContentEntityStorageInterface {
 
   /**
+   * Loads the payment for the given remote ID.
+   *
+   * @param string $remote_id
+   *   The remote ID.
+   *
+   * @return \Drupal\commerce_payment\Entity\PaymentInterface|null
+   *   The payment, or NULL if none found.
+   */
+  public function loadByRemoteId($remote_id);
+
+  /**
    * Loads all payments for the given order.
    *
    * @param \Drupal\commerce_order\Entity\OrderInterface $order
