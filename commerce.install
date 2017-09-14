@@ -5,6 +5,8 @@
  * Contains install and update functions for Commerce.
  */
 
+use Drupal\commerce\CommerceContentEntityStorageSchema;
+
 /**
  * Implements hook_requirements().
  */
@@ -20,4 +22,19 @@ function commerce_requirements($phase) {
   }
 
   return $requirements;
+}
+
+
+/**
+ * Regenerates schema for entities implementing new indexes.
+ */
+function commerce_update_8001() {
+  $entity_type_manager = \Drupal::entityTypeManager();
+  $definition_update_manager = \Drupal::entityDefinitionUpdateManager();
+  foreach ($entity_type_manager->getDefinitions() as $entity_type) {
+    $storage_schema_handler = $entity_type->getHandlerClass('storage_schema');
+    if ($storage_schema_handler == CommerceContentEntityStorageSchema::class) {
+      $definition_update_manager->updateEntityType($entity_type);
+    }
+  }
 }

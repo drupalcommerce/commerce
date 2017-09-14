@@ -23,6 +23,7 @@ use Drupal\Core\Entity\EntityTypeInterface;
  *   handlers = {
  *     "list_builder" = "Drupal\commerce_promotion\CouponListBuilder",
  *     "storage" = "Drupal\commerce_promotion\CouponStorage",
+ *     "storage_schema" = "Drupal\commerce\CommerceContentEntityStorageSchema",
  *     "access" = "Drupal\commerce_promotion\CouponAccessControlHandler",
  *     "views_data" = "Drupal\views\EntityViewsData",
  *     "form" = {
@@ -36,6 +37,9 @@ use Drupal\Core\Entity\EntityTypeInterface;
  *   },
  *   base_table = "commerce_promotion_coupon",
  *   admin_permission = "administer commerce_promotion",
+ *   field_indexes = {
+ *     "code" = {"code"}
+ *   },
  *   entity_keys = {
  *     "id" = "id",
  *     "label" = "code",
