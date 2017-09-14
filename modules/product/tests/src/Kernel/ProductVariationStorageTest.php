@@ -44,30 +44,6 @@ class ProductVariationStorageTest extends CommerceKernelTestBase {
   }
 
   /**
-   * Tests loading variations by SKU.
-   */
-  public function testLoadBySku() {
-    $sku = strtolower($this->randomMachineName());
-    $variation = ProductVariation::create([
-      'type' => 'default',
-      'sku' => $sku,
-      'title' => $this->randomString(),
-    ]);
-    $variation->save();
-    $product = Product::create([
-      'type' => 'default',
-      'variations' => [$variation],
-    ]);
-    $product->save();
-
-    $result = $this->variationStorage->loadBySku('FAKE');
-    $this->assertNull($result);
-
-    $result = $this->variationStorage->loadBySku($sku);
-    $this->assertEquals($result->id(), $variation->id());
-  }
-
-  /**
    * Tests loadEnabled() function.
    */
   public function testLoadEnabled() {

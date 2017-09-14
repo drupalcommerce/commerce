@@ -4,10 +4,8 @@ namespace Drupal\Tests\commerce_promotion\Kernel\Entity;
 
 use Drupal\commerce_order\Entity\OrderItemType;
 use Drupal\commerce_order\Entity\OrderType;
-use Drupal\commerce_price\RounderInterface;
 use Drupal\commerce_promotion\Entity\Coupon;
 use Drupal\commerce_promotion\Entity\Promotion;
-use Drupal\commerce_promotion\Plugin\Commerce\PromotionOffer\OrderPercentageOff;
 use Drupal\Core\Datetime\DrupalDateTime;
 use Drupal\Tests\commerce\Kernel\CommerceKernelTestBase;
 
@@ -71,10 +69,6 @@ class PromotionTest extends CommerceKernelTestBase {
    * @covers ::setStores
    * @covers ::setStoreIds
    * @covers ::getStoreIds
-   * @covers ::getOffer
-   * @covers ::setOffer
-   * @covers ::getConditionOperator
-   * @covers ::setConditionOperator
    * @covers ::getCouponIds
    * @covers ::getCoupons
    * @covers ::setCoupons
@@ -115,16 +109,6 @@ class PromotionTest extends CommerceKernelTestBase {
 
     $promotion->setStoreIds([$this->store->id()]);
     $this->assertEquals([$this->store->id()], $promotion->getStoreIds());
-
-    $rounder = $this->prophesize(RounderInterface::class)->reveal();
-    $offer = new OrderPercentageOff(['percentage' => '0.5'], 'order_percentage_off', [], $rounder);
-    $promotion->setOffer($offer);
-    $this->assertEquals($offer->getPluginId(), $promotion->getOffer()->getPluginId());
-    $this->assertEquals($offer->getConfiguration(), $promotion->getOffer()->getConfiguration());
-
-    $this->assertEquals('AND', $promotion->getConditionOperator());
-    $promotion->setConditionOperator('OR');
-    $this->assertEquals('OR', $promotion->getConditionOperator());
 
     $coupon1 = Coupon::create([
       'code' => $this->randomMachineName(),

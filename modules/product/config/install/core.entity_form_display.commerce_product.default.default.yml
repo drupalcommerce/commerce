@@ -24,42 +24,24 @@ content:
       summary_rows: 3
       placeholder: ''
     third_party_settings: {  }
-    region: content
   created:
     type: datetime_timestamp
-    weight: 5
-    settings: {  }
-    third_party_settings: {  }
-    region: content
-  langcode:
-    type: language_select
-    weight: 3
-    region: content
+    weight: 6
     settings: {  }
     third_party_settings: {  }
   path:
     type: path
-    weight: 7
+    weight: 4
     settings: {  }
-    third_party_settings: {  }
-    region: content
-  status:
-    type: boolean_checkbox
-    weight: 8
-    region: content
-    settings:
-      display_label: true
     third_party_settings: {  }
   stores:
     type: commerce_entity_select
     weight: 0
     settings:
-      hide_single_entity: true
       autocomplete_threshold: 7
       autocomplete_size: 60
       autocomplete_placeholder: ''
     third_party_settings: {  }
-    region: content
   title:
     type: string_textfield
     weight: 1
@@ -67,19 +49,17 @@ content:
       size: 60
       placeholder: ''
     third_party_settings: {  }
-    region: content
   uid:
     type: entity_reference_autocomplete
-    weight: 4
+    weight: 5
     settings:
       match_operator: CONTAINS
       size: 60
       placeholder: ''
     third_party_settings: {  }
-    region: content
   variations:
     type: inline_entity_form_complex
-    weight: 6
+    weight: 3
     settings:
       match_operator: CONTAINS
       override_labels: false
@@ -87,7 +67,6 @@ content:
       label_plural: ''
       allow_new: true
       allow_existing: false
-      form_mode: default
     third_party_settings: {  }
-    region: content
-hidden: {  }
+hidden:
+  status: true

@@ -27,7 +27,7 @@ class PriceDefaultWidget extends WidgetBase {
     if (!$items[$delta]->isEmpty()) {
       $element['#default_value'] = $items[$delta]->toPrice()->toArray();
     }
-    $element['#available_currencies'] = array_filter($this->getFieldSetting('available_currencies'));
+    $element['#available_currencies'] = $this->getFieldSetting('available_currencies');
 
     return $element;
   }

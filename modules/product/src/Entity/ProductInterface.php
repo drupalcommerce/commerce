@@ -5,13 +5,12 @@ namespace Drupal\commerce_product\Entity;
 use Drupal\commerce_store\Entity\EntityStoresInterface;
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\EntityChangedInterface;
-use Drupal\Core\Entity\EntityPublishedInterface;
 use Drupal\user\EntityOwnerInterface;
 
 /**
  * Defines the interface for products.
  */
-interface ProductInterface extends ContentEntityInterface, EntityChangedInterface, EntityOwnerInterface, EntityPublishedInterface, EntityStoresInterface {
+interface ProductInterface extends ContentEntityInterface, EntityChangedInterface, EntityOwnerInterface, EntityStoresInterface {
 
   /**
    * Gets the product title.
@@ -30,6 +29,26 @@ interface ProductInterface extends ContentEntityInterface, EntityChangedInterfac
    * @return $this
    */
   public function setTitle($title);
+
+  /**
+   * Get whether the product is published.
+   *
+   * Unpublished products are only visible to their authors and administrators.
+   *
+   * @return bool
+   *   TRUE if the product is published, FALSE otherwise.
+   */
+  public function isPublished();
+
+  /**
+   * Sets whether the product is published.
+   *
+   * @param bool $published
+   *   Whether the product is published.
+   *
+   * @return $this
+   */
+  public function setPublished($published);
 
   /**
    * Gets the product creation timestamp.

@@ -58,15 +58,12 @@ class OrderItemTest extends CommerceKernelTestBase {
    * @covers ::setQuantity
    * @covers ::getUnitPrice
    * @covers ::setUnitPrice
-   * @covers ::isUnitPriceOverridden
-   * @covers ::getAdjustedUnitPrice
    * @covers ::getAdjustments
    * @covers ::setAdjustments
    * @covers ::addAdjustment
    * @covers ::removeAdjustment
    * @covers ::recalculateTotalPrice
    * @covers ::getTotalPrice
-   * @covers ::getAdjustedTotalPrice
    * @covers ::getData
    * @covers ::setData
    * @covers ::getCreatedTime
@@ -86,18 +83,16 @@ class OrderItemTest extends CommerceKernelTestBase {
     $this->assertEquals(2, $order_item->getQuantity());
 
     $this->assertEquals(NULL, $order_item->getUnitPrice());
-    $this->assertFalse($order_item->isUnitPriceOverridden());
     $unit_price = new Price('9.99', 'USD');
-    $order_item->setUnitPrice($unit_price, TRUE);
+    $order_item->setUnitPrice($unit_price);
     $this->assertEquals($unit_price, $order_item->getUnitPrice());
-    $this->assertTrue($order_item->isUnitPriceOverridden());
 
+    $order_item->setQuantity('1');
     $adjustments = [];
     $adjustments[] = new Adjustment([
       'type' => 'custom',
       'label' => '10% off',
       'amount' => new Price('-1.00', 'USD'),
-      'percentage' => '0.1',
     ]);
     $adjustments[] = new Adjustment([
       'type' => 'custom',
@@ -110,12 +105,8 @@ class OrderItemTest extends CommerceKernelTestBase {
     $this->assertEquals($adjustments, $order_item->getAdjustments());
     $order_item->removeAdjustment($adjustments[0]);
     $this->assertEquals([$adjustments[1]], $order_item->getAdjustments());
-    $this->assertEquals(new Price('11.99', 'USD'), $order_item->getAdjustedUnitPrice());
-    $this->assertEquals(new Price('23.98', 'USD'), $order_item->getAdjustedTotalPrice());
     $order_item->setAdjustments($adjustments);
     $this->assertEquals($adjustments, $order_item->getAdjustments());
-    $this->assertEquals(new Price('10.99', 'USD'), $order_item->getAdjustedUnitPrice());
-    $this->assertEquals(new Price('21.98', 'USD'), $order_item->getAdjustedTotalPrice());
 
     $this->assertEquals('default', $order_item->getData('test', 'default'));
     $order_item->setData('test', 'value');

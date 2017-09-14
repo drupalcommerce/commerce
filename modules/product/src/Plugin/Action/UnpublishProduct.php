@@ -21,7 +21,7 @@ class UnpublishProduct extends ActionBase {
    */
   public function execute($entity = NULL) {
     /** @var \Drupal\commerce_product\Entity\ProductInterface $entity */
-    $entity->setUnpublished();
+    $entity->setPublished(FALSE);
     $entity->save();
   }
 

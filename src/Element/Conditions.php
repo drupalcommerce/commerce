@@ -16,7 +16,6 @@ use Drupal\Core\Render\Element\FormElement;
  * $form['conditions'] = [
  *   '#type' => 'commerce_conditions',
  *   '#title' => 'Conditions',
- *   '#parent_entity_type' => 'commerce_promotion',
  *   '#entity_types' => ['commerce_order', 'commerce_order_item'],
  *   '#default_value' => [
  *     [
@@ -47,7 +46,6 @@ class Conditions extends FormElement {
     return [
       '#input' => TRUE,
       '#tree' => TRUE,
-      '#parent_entity_type' => NULL,
       '#entity_types' => [],
       '#default_value' => [],
       '#title' => '',
@@ -81,27 +79,17 @@ class Conditions extends FormElement {
    *   The processed element.
    *
    * @throws \InvalidArgumentException
-   *   Thrown for missing or malformed #parent_entity_type, #entity_types,
-   *   #default_value properties.
+   *   Thrown for malformed #default_value properties.
    */
   public static function processConditions(array &$element, FormStateInterface $form_state, array &$complete_form) {
-    if (empty($element['#parent_entity_type'])) {
-      throw new \InvalidArgumentException('The commerce_conditions element requires the #parent_entity_type property.');
-    }
-    if (empty($element['#entity_types'])) {
-      throw new \InvalidArgumentException('The commerce_conditions element requires the #entity_types property.');
-    }
-    if (!is_array($element['#entity_types'])) {
-      throw new \InvalidArgumentException('The commerce_conditions #entity_types property must be an array.');
-    }
     if (!is_array($element['#default_value'])) {
-      throw new \InvalidArgumentException('The commerce_conditions #default_value property must be an array.');
+      throw new \InvalidArgumentException('The commerce_conditions #default_value must be an array.');
     }
 
     $default_value = array_column($element['#default_value'], 'configuration', 'plugin');
     /** @var \Drupal\commerce\ConditionManagerInterface $plugin_manager */
     $plugin_manager = \Drupal::service('plugin.manager.commerce_condition');
-    $definitions = $plugin_manager->getFilteredDefinitions($element['#parent_entity_type'], $element['#entity_types']);
+    $definitions = $plugin_manager->getDefinitionsByEntityTypes($element['#entity_types']);
     $grouped_definitions = [];
     foreach ($definitions as $plugin_id => $definition) {
       $category = (string) $definition['category'];

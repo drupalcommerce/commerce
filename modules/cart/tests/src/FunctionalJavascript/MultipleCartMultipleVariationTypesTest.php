@@ -48,7 +48,7 @@ class MultipleCartMultipleVariationTypesTest extends CartBrowserTestBase {
   protected function setUp() {
     parent::setUp();
     // Unpublish parent test product.
-    $this->variation->getProduct()->setUnpublished();
+    $this->variation->getProduct()->setPublished(FALSE);
     $this->variation->getProduct()->save();
 
     // Create three variation types.
@@ -83,16 +83,12 @@ class MultipleCartMultipleVariationTypesTest extends CartBrowserTestBase {
       $this->sizeAttributes[$key] = $this->createAttributeValue($size_attribute->id(), $value);
     }
 
-    // The error seems to occur when the variation with one attribute is first.
-    // So replace the title sort with a product_id one. Otherwise if the first
-    // product has both attributes, all seems to be fine.
+    // The error seems to occur when variation with one attribute is first.
+    // So remove title sort. Otherwise if first product has both attributes,
+    // all seems to be fine.
     $view = View::load('test_multiple_cart_forms');
     $display =& $view->getDisplay('default');
-    $display['display_options']['sorts']['product_id'] = $display['display_options']['sorts']['title'];
-    $display['display_options']['sorts']['product_id']['id'] = 'product_id';
-    $display['display_options']['sorts']['product_id']['field'] = 'product_id';
-    $display['display_options']['sorts']['product_id']['entity_field'] = 'product_id';
-    unset($display['display_options']['sorts']['title']);
+    $display['display_options']['sorts'] = [];
     $view->save();
 
     // Create products.

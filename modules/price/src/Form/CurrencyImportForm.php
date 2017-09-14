@@ -56,7 +56,8 @@ class CurrencyImportForm extends FormBase {
     else {
       $form['currency_codes'] = [
         '#type' => 'select',
-        '#title' => $this->t('Available currencies'),
+        '#title' => $this->t('Currencies'),
+        '#required' => TRUE,
         '#options' => $currencies,
         '#multiple' => TRUE,
         '#size' => 10,
@@ -66,7 +67,7 @@ class CurrencyImportForm extends FormBase {
         '#type' => 'submit',
         '#button_type' => 'primary',
         '#name' => 'import',
-        '#value' => $this->t('Add'),
+        '#value' => $this->t('Import'),
         '#submit' => ['::submitForm'],
       ];
     }

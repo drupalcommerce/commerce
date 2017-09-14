@@ -43,7 +43,7 @@ class MultipleCartMultipleVariationTypesTest extends CartBrowserTestBase {
   protected function setUp() {
     parent::setUp();
     // Unpublish parent test product.
-    $this->variation->getProduct()->setUnpublished();
+    $this->variation->getProduct()->setPublished(FALSE);
     $this->variation->getProduct()->save();
 
     // Create three variation types.

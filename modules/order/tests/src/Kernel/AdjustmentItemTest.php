@@ -27,9 +27,6 @@ class AdjustmentItemTest extends CommerceKernelTestBase {
    * {@inheritdoc}
    */
   public static $modules = [
-    'entity_reference_revisions',
-    'profile',
-    'state_machine',
     'commerce_order',
   ];
 
@@ -71,7 +68,6 @@ class AdjustmentItemTest extends CommerceKernelTestBase {
       'type' => 'custom',
       'label' => '10% off',
       'amount' => new Price('-1.00', 'USD'),
-      'percentage' => '0.1',
       'source_id' => '1',
     ]));
 

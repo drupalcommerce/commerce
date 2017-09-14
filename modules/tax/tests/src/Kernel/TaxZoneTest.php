@@ -79,8 +79,8 @@ class TaxZoneTest extends CommerceKernelTestBase {
         [
           'id' => 'standard',
           'label' => 'Standard',
-          'percentages' => [
-            ['number' => '0.23', 'start_date' => '2012-01-01'],
+          'amounts' => [
+            ['amount' => '0.23', 'start_date' => '2012-01-01'],
           ],
           'default' => TRUE,
         ],

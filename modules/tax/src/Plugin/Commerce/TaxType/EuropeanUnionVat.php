@@ -128,23 +128,23 @@ class EuropeanUnionVat extends LocalTaxTypeBase {
         [
           'id' => 'standard',
           'label' => $labels['standard'],
-          'percentages' => [
-            ['number' => '0.2', 'start_date' => '1995-01-01'],
+          'amounts' => [
+            ['amount' => '0.2', 'start_date' => '1995-01-01'],
           ],
           'default' => TRUE,
         ],
         [
           'id' => 'intermediate',
           'label' => $labels['intermediate'],
-          'percentages' => [
-            ['number' => '0.13', 'start_date' => '2016-01-01'],
+          'amounts' => [
+            ['amount' => '0.13', 'start_date' => '2016-01-01'],
           ],
         ],
         [
           'id' => 'reduced',
           'label' => $labels['reduced'],
-          'percentages' => [
-            ['number' => '0.1', 'start_date' => '1995-01-01'],
+          'amounts' => [
+            ['amount' => '0.1', 'start_date' => '1995-01-01'],
           ],
         ],
       ],
@@ -160,30 +160,30 @@ class EuropeanUnionVat extends LocalTaxTypeBase {
         [
           'id' => 'standard',
           'label' => $labels['standard'],
-          'percentages' => [
-            ['number' => '0.21', 'start_date' => '1996-01-01'],
+          'amounts' => [
+            ['amount' => '0.21', 'start_date' => '1996-01-01'],
           ],
           'default' => TRUE,
         ],
         [
           'id' => 'intermediate',
           'label' => $labels['intermediate'],
-          'percentages' => [
-            ['number' => '0.12', 'start_date' => '1992-04-01'],
+          'amounts' => [
+            ['amount' => '0.12', 'start_date' => '1992-04-01'],
           ],
         ],
         [
           'id' => 'reduced',
           'label' => $labels['reduced'],
-          'percentages' => [
-            ['number' => '0.06', 'start_date' => '1971-01-01'],
+          'amounts' => [
+            ['amount' => '0.06', 'start_date' => '1971-01-01'],
           ],
         ],
         [
           'id' => 'zero',
           'label' => $labels['zero'],
-          'percentages' => [
-            ['number' => '0', 'start_date' => '1971-01-01'],
+          'amounts' => [
+            ['amount' => '0', 'start_date' => '1971-01-01'],
           ],
         ],
       ],
@@ -199,16 +199,16 @@ class EuropeanUnionVat extends LocalTaxTypeBase {
         [
           'id' => 'standard',
           'label' => $labels['standard'],
-          'percentages' => [
-            ['number' => '0.2', 'start_date' => '2007-01-01'],
+          'amounts' => [
+            ['amount' => '0.2', 'start_date' => '2007-01-01'],
           ],
           'default' => TRUE,
         ],
         [
           'id' => 'reduced',
           'label' => $labels['reduced'],
-          'percentages' => [
-            ['number' => '0.09', 'start_date' => '2011-04-01'],
+          'amounts' => [
+            ['amount' => '0.09', 'start_date' => '2011-04-01'],
           ],
         ],
       ],
@@ -224,23 +224,23 @@ class EuropeanUnionVat extends LocalTaxTypeBase {
         [
           'id' => 'standard',
           'label' => $labels['standard'],
-          'percentages' => [
-            ['number' => '0.19', 'start_date' => '2014-01-13'],
+          'amounts' => [
+            ['amount' => '0.19', 'start_date' => '2014-01-13'],
           ],
           'default' => TRUE,
         ],
         [
           'id' => 'intermediate',
           'label' => $labels['intermediate'],
-          'percentages' => [
-            ['number' => '0.09', 'start_date' => '2014-01-13'],
+          'amounts' => [
+            ['amount' => '0.09', 'start_date' => '2014-01-13'],
           ],
         ],
         [
           'id' => 'reduced',
           'label' => $labels['reduced'],
-          'percentages' => [
-            ['number' => '0.05', 'start_date' => '2004-05-01'],
+          'amounts' => [
+            ['amount' => '0.05', 'start_date' => '2004-05-01'],
           ],
         ],
       ],
@@ -256,30 +256,30 @@ class EuropeanUnionVat extends LocalTaxTypeBase {
         [
           'id' => 'standard',
           'label' => $labels['standard'],
-          'percentages' => [
-            ['number' => '0.21', 'start_date' => '2013-01-01'],
+          'amounts' => [
+            ['amount' => '0.21', 'start_date' => '2013-01-01'],
           ],
           'default' => TRUE,
         ],
         [
           'id' => 'reduced',
           'label' => $labels['reduced'],
-          'percentages' => [
-            ['number' => '0.15', 'start_date' => '2013-01-01'],
+          'amounts' => [
+            ['amount' => '0.15', 'start_date' => '2013-01-01'],
           ],
         ],
         [
           'id' => 'super_reduced',
           'label' => $labels['super_reduced'],
-          'percentages' => [
-            ['number' => '0.1', 'start_date' => '2015-01-01'],
+          'amounts' => [
+            ['amount' => '0.1', 'start_date' => '2015-01-01'],
           ],
         ],
         [
           'id' => 'zero',
           'label' => $labels['zero'],
-          'percentages' => [
-            ['number' => '0', 'start_date' => '2004-05-01'],
+          'amounts' => [
+            ['amount' => '0', 'start_date' => '2004-05-01'],
           ],
         ],
       ],
@@ -298,16 +298,16 @@ class EuropeanUnionVat extends LocalTaxTypeBase {
         [
           'id' => 'standard',
           'label' => $labels['standard'],
-          'percentages' => [
-            ['number' => '0.19', 'start_date' => '2007-01-01'],
+          'amounts' => [
+            ['amount' => '0.19', 'start_date' => '2007-01-01'],
           ],
           'default' => TRUE,
         ],
         [
           'id' => 'reduced',
           'label' => $labels['reduced'],
-          'percentages' => [
-            ['number' => '0.07', 'start_date' => '1983-07-01'],
+          'amounts' => [
+            ['amount' => '0.07', 'start_date' => '1983-07-01'],
           ],
         ],
       ],
@@ -323,16 +323,16 @@ class EuropeanUnionVat extends LocalTaxTypeBase {
         [
           'id' => 'standard',
           'label' => $labels['standard'],
-          'percentages' => [
-            ['number' => '0.25', 'start_date' => '1992-01-01'],
+          'amounts' => [
+            ['amount' => '0.25', 'start_date' => '1992-01-01'],
           ],
           'default' => TRUE,
         ],
         [
           'id' => 'zero',
           'label' => $labels['zero'],
-          'percentages' => [
-            ['number' => '0', 'start_date' => '1973-01-01'],
+          'amounts' => [
+            ['amount' => '0', 'start_date' => '1973-01-01'],
           ],
         ],
       ],
@@ -348,16 +348,16 @@ class EuropeanUnionVat extends LocalTaxTypeBase {
         [
           'id' => 'standard',
           'label' => $labels['standard'],
-          'percentages' => [
-            ['number' => '0.2', 'start_date' => '2009-07-01'],
+          'amounts' => [
+            ['amount' => '0.2', 'start_date' => '2009-07-01'],
           ],
           'default' => TRUE,
         ],
         [
           'id' => 'reduced',
           'label' => $labels['reduced'],
-          'percentages' => [
-            ['number' => '0.09', 'start_date' => '2009-01-01'],
+          'amounts' => [
+            ['amount' => '0.09', 'start_date' => '2009-01-01'],
           ],
         ],
       ],
@@ -374,23 +374,23 @@ class EuropeanUnionVat extends LocalTaxTypeBase {
         [
           'id' => 'standard',
           'label' => $labels['standard'],
-          'percentages' => [
-            ['number' => '0.21', 'start_date' => '2012-09-01'],
+          'amounts' => [
+            ['amount' => '0.21', 'start_date' => '2012-09-01'],
           ],
           'default' => TRUE,
         ],
         [
           'id' => 'reduced',
           'label' => $labels['reduced'],
-          'percentages' => [
-            ['number' => '0.1', 'start_date' => '2012-09-01'],
+          'amounts' => [
+            ['amount' => '0.1', 'start_date' => '2012-09-01'],
           ],
         ],
         [
           'id' => 'super_reduced',
           'label' => $labels['super_reduced'],
-          'percentages' => [
-            ['number' => '0.04', 'start_date' => '1995-01-01'],
+          'amounts' => [
+            ['amount' => '0.04', 'start_date' => '1995-01-01'],
           ],
         ],
       ],
@@ -407,23 +407,23 @@ class EuropeanUnionVat extends LocalTaxTypeBase {
         [
           'id' => 'standard',
           'label' => $labels['standard'],
-          'percentages' => [
-            ['number' => '0.24', 'start_date' => '2013-01-01'],
+          'amounts' => [
+            ['amount' => '0.24', 'start_date' => '2013-01-01'],
           ],
           'default' => TRUE,
         ],
         [
           'id' => 'intermediate',
           'label' => $labels['intermediate'],
-          'percentages' => [
-            ['number' => '0.14', 'start_date' => '2013-01-01'],
+          'amounts' => [
+            ['amount' => '0.14', 'start_date' => '2013-01-01'],
           ],
         ],
         [
           'id' => 'reduced',
           'label' => $labels['reduced'],
-          'percentages' => [
-            ['number' => '0.1', 'start_date' => '2013-01-01'],
+          'amounts' => [
+            ['amount' => '0.1', 'start_date' => '2013-01-01'],
           ],
         ],
       ],
@@ -441,30 +441,30 @@ class EuropeanUnionVat extends LocalTaxTypeBase {
         [
           'id' => 'standard',
           'label' => $labels['standard'],
-          'percentages' => [
-            ['number' => '0.2', 'start_date' => '2014-01-01'],
+          'amounts' => [
+            ['amount' => '0.2', 'start_date' => '2014-01-01'],
           ],
           'default' => TRUE,
         ],
         [
           'id' => 'intermediate',
           'label' => $labels['intermediate'],
-          'percentages' => [
-            ['number' => '0.1', 'start_date' => '2014-01-01'],
+          'amounts' => [
+            ['amount' => '0.1', 'start_date' => '2014-01-01'],
           ],
         ],
         [
           'id' => 'reduced',
           'label' => $labels['reduced'],
-          'percentages' => [
-            ['number' => '0.055', 'start_date' => '1982-07-01'],
+          'amounts' => [
+            ['amount' => '0.055', 'start_date' => '1982-07-01'],
           ],
         ],
         [
           'id' => 'super_reduced',
           'label' => $labels['super_reduced'],
-          'percentages' => [
-            ['number' => '0.021', 'start_date' => '1986-07-01'],
+          'amounts' => [
+            ['amount' => '0.021', 'start_date' => '1986-07-01'],
           ],
         ],
       ],
@@ -481,30 +481,30 @@ class EuropeanUnionVat extends LocalTaxTypeBase {
         [
           'id' => 'standard',
           'label' => $labels['standard'],
-          'percentages' => [
-            ['number' => '0.2', 'start_date' => '2014-01-01'],
+          'amounts' => [
+            ['amount' => '0.2', 'start_date' => '2014-01-01'],
           ],
           'default' => TRUE,
         ],
         [
           'id' => 'special',
           'label' => $labels['special'],
-          'percentages' => [
-            ['number' => '0.1', 'start_date' => '2014-01-01'],
+          'amounts' => [
+            ['amount' => '0.1', 'start_date' => '2014-01-01'],
           ],
         ],
         [
           'id' => 'reduced',
           'label' => $labels['reduced'],
-          'percentages' => [
-            ['number' => '0.021', 'start_date' => '1997-09-01'],
+          'amounts' => [
+            ['amount' => '0.021', 'start_date' => '1997-09-01'],
           ],
         ],
         [
           'id' => 'super_reduced',
           'label' => $labels['super_reduced'],
-          'percentages' => [
-            ['number' => '0.009', 'start_date' => '1972-04-01'],
+          'amounts' => [
+            ['amount' => '0.009', 'start_date' => '1972-04-01'],
           ],
         ],
       ],
@@ -521,23 +521,23 @@ class EuropeanUnionVat extends LocalTaxTypeBase {
         [
           'id' => 'standard',
           'label' => $labels['standard'],
-          'percentages' => [
-            ['number' => '0.2', 'start_date' => '2011-01-04'],
+          'amounts' => [
+            ['amount' => '0.2', 'start_date' => '2011-01-04'],
           ],
           'default' => TRUE,
         ],
         [
           'id' => 'reduced',
           'label' => $labels['reduced'],
-          'percentages' => [
-            ['number' => '0.05', 'start_date' => '1997-09-01'],
+          'amounts' => [
+            ['amount' => '0.05', 'start_date' => '1997-09-01'],
           ],
         ],
         [
           'id' => 'zero',
           'label' => $labels['zero'],
-          'percentages' => [
-            ['number' => '0', 'start_date' => '1973-01-01'],
+          'amounts' => [
+            ['amount' => '0', 'start_date' => '1973-01-01'],
           ],
         ],
       ],
@@ -554,24 +554,24 @@ class EuropeanUnionVat extends LocalTaxTypeBase {
         [
           'id' => 'standard',
           'label' => $labels['standard'],
-          'percentages' => [
-            ['number' => '0.23', 'start_date' => '2010-07-01', 'end_date' => '2015-05-31'],
-            ['number' => '0.24', 'start_date' => '2016-06-01'],
+          'amounts' => [
+            ['amount' => '0.23', 'start_date' => '2010-07-01', 'end_date' => '2015-05-31'],
+            ['amount' => '0.24', 'start_date' => '2016-06-01'],
           ],
           'default' => TRUE,
         ],
         [
           'id' => 'intermediate',
           'label' => $labels['intermediate'],
-          'percentages' => [
-            ['number' => '0.13', 'start_date' => '2011-01-01'],
+          'amounts' => [
+            ['amount' => '0.13', 'start_date' => '2011-01-01'],
           ],
         ],
         [
           'id' => 'reduced',
           'label' => $labels['reduced'],
-          'percentages' => [
-            ['number' => '0.06', 'start_date' => '2015-07-01'],
+          'amounts' => [
+            ['amount' => '0.06', 'start_date' => '2015-07-01'],
           ],
         ],
       ],
@@ -587,30 +587,30 @@ class EuropeanUnionVat extends LocalTaxTypeBase {
         [
           'id' => 'standard',
           'label' => $labels['standard'],
-          'percentages' => [
-            ['number' => '0.25', 'start_date' => '2013-07-01'],
+          'amounts' => [
+            ['amount' => '0.25', 'start_date' => '2013-07-01'],
           ],
           'default' => TRUE,
         ],
         [
           'id' => 'reduced',
           'label' => $labels['reduced'],
-          'percentages' => [
-            ['number' => '0.13', 'start_date' => '2014-01-01'],
+          'amounts' => [
+            ['amount' => '0.13', 'start_date' => '2014-01-01'],
           ],
         ],
         [
           'id' => 'super_reduced',
           'label' => $labels['super_reduced'],
-          'percentages' => [
-            ['number' => '0.05', 'start_date' => '2014-01-01'],
+          'amounts' => [
+            ['amount' => '0.05', 'start_date' => '2014-01-01'],
           ],
         ],
         [
           'id' => 'zero',
           'label' => $labels['zero'],
-          'percentages' => [
-            ['number' => '0', 'start_date' => '2013-07-01'],
+          'amounts' => [
+            ['amount' => '0', 'start_date' => '2013-07-01'],
           ],
         ],
       ],
@@ -626,23 +626,23 @@ class EuropeanUnionVat extends LocalTaxTypeBase {
         [
           'id' => 'standard',
           'label' => $labels['standard'],
-          'percentages' => [
-            ['number' => '0.27', 'start_date' => '2012-01-01'],
+          'amounts' => [
+            ['amount' => '0.27', 'start_date' => '2012-01-01'],
           ],
           'default' => TRUE,
         ],
         [
           'id' => 'intermediate',
           'label' => $labels['intermediate'],
-          'percentages' => [
-            ['number' => '0.18', 'start_date' => '2009-07-01'],
+          'amounts' => [
+            ['amount' => '0.18', 'start_date' => '2009-07-01'],
           ],
         ],
         [
           'id' => 'reduced',
           'label' => $labels['reduced'],
-          'percentages' => [
-            ['number' => '0.05', 'start_date' => '2004-05-01'],
+          'amounts' => [
+            ['amount' => '0.05', 'start_date' => '2004-05-01'],
           ],
         ],
       ],
@@ -658,37 +658,37 @@ class EuropeanUnionVat extends LocalTaxTypeBase {
         [
           'id' => 'standard',
           'label' => $labels['standard'],
-          'percentages' => [
-            ['number' => '0.23', 'start_date' => '2012-01-01'],
+          'amounts' => [
+            ['amount' => '0.23', 'start_date' => '2012-01-01'],
           ],
           'default' => TRUE,
         ],
         [
           'id' => 'reduced',
           'label' => $labels['reduced'],
-          'percentages' => [
-            ['number' => '0.135', 'start_date' => '2003-01-01'],
+          'amounts' => [
+            ['amount' => '0.135', 'start_date' => '2003-01-01'],
           ],
         ],
         [
           'id' => 'second_reduced',
           'label' => $labels['second_reduced'],
-          'percentages' => [
-            ['number' => '0.09', 'start_date' => '2011-07-01'],
+          'amounts' => [
+            ['amount' => '0.09', 'start_date' => '2011-07-01'],
           ],
         ],
         [
           'id' => 'super_reduced',
           'label' => $labels['super_reduced'],
-          'percentages' => [
-            ['number' => '0.048', 'start_date' => '2005-01-01'],
+          'amounts' => [
+            ['amount' => '0.048', 'start_date' => '2005-01-01'],
           ],
         ],
         [
           'id' => 'zero',
           'label' => $labels['zero'],
-          'percentages' => [
-            ['number' => '0', 'start_date' => '1972-04-01'],
+          'amounts' => [
+            ['amount' => '0', 'start_date' => '1972-04-01'],
           ],
         ],
       ],
@@ -705,23 +705,23 @@ class EuropeanUnionVat extends LocalTaxTypeBase {
         [
           'id' => 'standard',
           'label' => $labels['standard'],
-          'percentages' => [
-            ['number' => '0.22', 'start_date' => '2013-10-01'],
+          'amounts' => [
+            ['amount' => '0.22', 'start_date' => '2013-10-01'],
           ],
           'default' => TRUE,
         ],
         [
           'id' => 'reduced',
           'label' => $labels['reduced'],
-          'percentages' => [
-            ['number' => '0.1', 'start_date' => '1995-02-24'],
+          'amounts' => [
+            ['amount' => '0.1', 'start_date' => '1995-02-24'],
           ],
         ],
         [
           'id' => 'super_reduced',
           'label' => $labels['super_reduced'],
-          'percentages' => [
-            ['number' => '0.04', 'start_date' => '1989-01-01'],
+          'amounts' => [
+            ['amount' => '0.04', 'start_date' => '1989-01-01'],
           ],
         ],
       ],
@@ -737,23 +737,23 @@ class EuropeanUnionVat extends LocalTaxTypeBase {
         [
           'id' => 'standard',
           'label' => $labels['standard'],
-          'percentages' => [
-            ['number' => '0.21', 'start_date' => '2009-09-01'],
+          'amounts' => [
+            ['amount' => '0.21', 'start_date' => '2009-09-01'],
           ],
           'default' => TRUE,
         ],
         [
           'id' => 'intermediate',
           'label' => $labels['intermediate'],
-          'percentages' => [
-            ['number' => '0.09', 'start_date' => '2004-05-01'],
+          'amounts' => [
+            ['amount' => '0.09', 'start_date' => '2004-05-01'],
           ],
         ],
         [
           'id' => 'reduced',
           'label' => $labels['reduced'],
-          'percentages' => [
-            ['number' => '0.05', 'start_date' => '2004-05-01'],
+          'amounts' => [
+            ['amount' => '0.05', 'start_date' => '2004-05-01'],
           ],
         ],
       ],
@@ -769,30 +769,30 @@ class EuropeanUnionVat extends LocalTaxTypeBase {
         [
           'id' => 'standard',
           'label' => $labels['standard'],
-          'percentages' => [
-            ['number' => '0.17', 'start_date' => '2015-01-01'],
+          'amounts' => [
+            ['amount' => '0.17', 'start_date' => '2015-01-01'],
           ],
           'default' => TRUE,
         ],
         [
           'id' => 'intermediate',
           'label' => $labels['intermediate'],
-          'percentages' => [
-            ['number' => '0.14', 'start_date' => '2015-01-01'],
+          'amounts' => [
+            ['amount' => '0.14', 'start_date' => '2015-01-01'],
           ],
         ],
         [
           'id' => 'reduced',
           'label' => $labels['reduced'],
-          'percentages' => [
-            ['number' => '0.08', 'start_date' => '2015-01-01'],
+          'amounts' => [
+            ['amount' => '0.08', 'start_date' => '2015-01-01'],
           ],
         ],
         [
           'id' => 'super_reduced',
           'label' => $labels['super_reduced'],
-          'percentages' => [
-            ['number' => '0.03', 'start_date' => '1983-07-01'],
+          'amounts' => [
+            ['amount' => '0.03', 'start_date' => '1983-07-01'],
           ],
         ],
       ],
@@ -808,16 +808,16 @@ class EuropeanUnionVat extends LocalTaxTypeBase {
         [
           'id' => 'standard',
           'label' => $labels['standard'],
-          'percentages' => [
-            ['number' => '0.21', 'start_date' => '2012-07-01'],
+          'amounts' => [
+            ['amount' => '0.21', 'start_date' => '2012-07-01'],
           ],
           'default' => TRUE,
         ],
         [
           'id' => 'reduced',
           'label' => $labels['reduced'],
-          'percentages' => [
-            ['number' => '0.12', 'start_date' => '2011-01-01'],
+          'amounts' => [
+            ['amount' => '0.12', 'start_date' => '2011-01-01'],
           ],
         ],
       ],
@@ -833,23 +833,23 @@ class EuropeanUnionVat extends LocalTaxTypeBase {
         [
           'id' => 'standard',
           'label' => $labels['standard'],
-          'percentages' => [
-            ['number' => '0.18', 'start_date' => '2004-05-01'],
+          'amounts' => [
+            ['amount' => '0.18', 'start_date' => '2004-05-01'],
           ],
           'default' => TRUE,
         ],
         [
           'id' => 'intermediate',
           'label' => $labels['intermediate'],
-          'percentages' => [
-            ['number' => '0.07', 'start_date' => '2011-01-01'],
+          'amounts' => [
+            ['amount' => '0.07', 'start_date' => '2011-01-01'],
           ],
         ],
         [
           'id' => 'reduced',
           'label' => $labels['reduced'],
-          'percentages' => [
-            ['number' => '0.05', 'start_date' => '2004-05-01'],
+          'amounts' => [
+            ['amount' => '0.05', 'start_date' => '2004-05-01'],
           ],
         ],
       ],
@@ -865,16 +865,16 @@ class EuropeanUnionVat extends LocalTaxTypeBase {
         [
           'id' => 'standard',
           'label' => $labels['standard'],
-          'percentages' => [
-            ['number' => '0.21', 'start_date' => '2012-10-01'],
+          'amounts' => [
+            ['amount' => '0.21', 'start_date' => '2012-10-01'],
           ],
           'default' => TRUE,
         ],
         [
           'id' => 'reduced',
           'label' => $labels['reduced'],
-          'percentages' => [
-            ['number' => '0.06', 'start_date' => '1986-10-01'],
+          'amounts' => [
+            ['amount' => '0.06', 'start_date' => '1986-10-01'],
           ],
         ],
       ],
@@ -890,23 +890,23 @@ class EuropeanUnionVat extends LocalTaxTypeBase {
         [
           'id' => 'standard',
           'label' => $labels['standard'],
-          'percentages' => [
-            ['number' => '0.23', 'start_date' => '2011-01-01'],
+          'amounts' => [
+            ['amount' => '0.23', 'start_date' => '2011-01-01'],
           ],
           'default' => TRUE,
         ],
         [
           'id' => 'intermediate',
           'label' => $labels['intermediate'],
-          'percentages' => [
-            ['number' => '0.08', 'start_date' => '2011-01-01'],
+          'amounts' => [
+            ['amount' => '0.08', 'start_date' => '2011-01-01'],
           ],
         ],
         [
           'id' => 'reduced',
           'label' => $labels['reduced'],
-          'percentages' => [
-            ['number' => '0.05', 'start_date' => '2011-01-01'],
+          'amounts' => [
+            ['amount' => '0.05', 'start_date' => '2011-01-01'],
           ],
         ],
       ],
@@ -923,23 +923,23 @@ class EuropeanUnionVat extends LocalTaxTypeBase {
         [
           'id' => 'standard',
           'label' => $labels['standard'],
-          'percentages' => [
-            ['number' => '0.23', 'start_date' => '2011-01-01'],
+          'amounts' => [
+            ['amount' => '0.23', 'start_date' => '2011-01-01'],
           ],
           'default' => TRUE,
         ],
         [
           'id' => 'intermediate',
           'label' => $labels['intermediate'],
-          'percentages' => [
-            ['number' => '0.13', 'start_date' => '2010-07-01'],
+          'amounts' => [
+            ['amount' => '0.13', 'start_date' => '2010-07-01'],
           ],
         ],
         [
           'id' => 'reduced',
           'label' => $labels['reduced'],
-          'percentages' => [
-            ['number' => '0.06', 'start_date' => '2010-07-01'],
+          'amounts' => [
+            ['amount' => '0.06', 'start_date' => '2010-07-01'],
           ],
         ],
       ],
@@ -955,23 +955,23 @@ class EuropeanUnionVat extends LocalTaxTypeBase {
         [
           'id' => 'standard',
           'label' => $labels['standard'],
-          'percentages' => [
-            ['number' => '0.22', 'start_date' => '2012-04-01'],
+          'amounts' => [
+            ['amount' => '0.22', 'start_date' => '2012-04-01'],
           ],
           'default' => TRUE,
         ],
         [
           'id' => 'intermediate',
           'label' => $labels['intermediate'],
-          'percentages' => [
-            ['number' => '0.12', 'start_date' => '2012-04-01'],
+          'amounts' => [
+            ['amount' => '0.12', 'start_date' => '2012-04-01'],
           ],
         ],
         [
           'id' => 'reduced',
           'label' => $labels['reduced'],
-          'percentages' => [
-            ['number' => '0.05', 'start_date' => '2012-04-01'],
+          'amounts' => [
+            ['amount' => '0.05', 'start_date' => '2012-04-01'],
           ],
         ],
       ],
@@ -987,24 +987,24 @@ class EuropeanUnionVat extends LocalTaxTypeBase {
         [
           'id' => 'standard',
           'label' => $labels['standard'],
-          'percentages' => [
-            ['number' => '0.20', 'start_date' => '2016-01-01', 'end_date' => '2016-12-31'],
-            ['number' => '0.19', 'start_date' => '2017-01-01'],
+          'amounts' => [
+            ['amount' => '0.20', 'start_date' => '2016-01-01', 'end_date' => '2016-12-31'],
+            ['amount' => '0.19', 'start_date' => '2017-01-01'],
           ],
           'default' => TRUE,
         ],
         [
           'id' => 'intermediate',
           'label' => $labels['intermediate'],
-          'percentages' => [
-            ['number' => '0.09', 'start_date' => '2008-12-01'],
+          'amounts' => [
+            ['amount' => '0.09', 'start_date' => '2008-12-01'],
           ],
         ],
         [
           'id' => 'reduced',
           'label' => $labels['reduced'],
-          'percentages' => [
-            ['number' => '0.05', 'start_date' => '2008-12-01'],
+          'amounts' => [
+            ['amount' => '0.05', 'start_date' => '2008-12-01'],
           ],
         ],
       ],
@@ -1020,23 +1020,23 @@ class EuropeanUnionVat extends LocalTaxTypeBase {
         [
           'id' => 'standard',
           'label' => $labels['standard'],
-          'percentages' => [
-            ['number' => '0.25', 'start_date' => '1995-01-01'],
+          'amounts' => [
+            ['amount' => '0.25', 'start_date' => '1995-01-01'],
           ],
           'default' => TRUE,
         ],
         [
           'id' => 'intermediate',
           'label' => $labels['intermediate'],
-          'percentages' => [
-            ['number' => '0.12', 'start_date' => '1995-01-01'],
+          'amounts' => [
+            ['amount' => '0.12', 'start_date' => '1995-01-01'],
           ],
         ],
         [
           'id' => 'reduced',
           'label' => $labels['reduced'],
-          'percentages' => [
-            ['number' => '0.06', 'start_date' => '1996-01-01'],
+          'amounts' => [
+            ['amount' => '0.06', 'start_date' => '1996-01-01'],
           ],
         ],
       ],
@@ -1052,16 +1052,16 @@ class EuropeanUnionVat extends LocalTaxTypeBase {
         [
           'id' => 'standard',
           'label' => $labels['standard'],
-          'percentages' => [
-            ['number' => '0.22', 'start_date' => '2013-07-01'],
+          'amounts' => [
+            ['amount' => '0.22', 'start_date' => '2013-07-01'],
           ],
           'default' => TRUE,
         ],
         [
           'id' => 'reduced',
           'label' => $labels['reduced'],
-          'percentages' => [
-            ['number' => '0.095', 'start_date' => '2013-07-01'],
+          'amounts' => [
+            ['amount' => '0.095', 'start_date' => '2013-07-01'],
           ],
         ],
       ],
@@ -1077,16 +1077,16 @@ class EuropeanUnionVat extends LocalTaxTypeBase {
         [
           'id' => 'standard',
           'label' => $labels['standard'],
-          'percentages' => [
-            ['number' => '0.2', 'start_date' => '2011-01-01'],
+          'amounts' => [
+            ['amount' => '0.2', 'start_date' => '2011-01-01'],
           ],
           'default' => TRUE,
         ],
         [
           'id' => 'reduced',
           'label' => $labels['reduced'],
-          'percentages' => [
-            ['number' => '0.1', 'start_date' => '2011-01-01'],
+          'amounts' => [
+            ['amount' => '0.1', 'start_date' => '2011-01-01'],
           ],
         ],
       ],
@@ -1115,8 +1115,8 @@ class EuropeanUnionVat extends LocalTaxTypeBase {
         [
           'id' => 'ic',
           'label' => $this->t('Intra-Community Supply'),
-          'percentages' => [
-            ['number' => '0', 'start_date' => '1970-01-01'],
+          'amounts' => [
+            ['amount' => '0', 'start_date' => '1970-01-01'],
           ],
           'default' => TRUE,
         ],

@@ -6,7 +6,6 @@ use Drupal\commerce_payment\CreditCard;
 use Drupal\commerce_payment\Exception\DeclineException;
 use Drupal\commerce_payment\Exception\PaymentGatewayException;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\profile\Entity\Profile;
 
 class PaymentMethodAddForm extends PaymentGatewayFormBase {
 
@@ -54,11 +53,6 @@ class PaymentMethodAddForm extends PaymentGatewayFormBase {
 
     /** @var \Drupal\commerce_payment\Entity\PaymentMethodInterface $payment_method */
     $payment_method = $this->entity;
-    /** @var \Drupal\profile\Entity\ProfileInterface $billing_profile */
-    $billing_profile = Profile::create([
-      'type' => 'customer',
-      'uid' => $payment_method->getOwnerId(),
-    ]);
     if ($order = $this->routeMatch->getParameter('commerce_order')) {
       $store = $order->getStore();
     }
@@ -71,9 +65,12 @@ class PaymentMethodAddForm extends PaymentGatewayFormBase {
     $form['billing_information'] = [
       '#parents' => array_merge($form['#parents'], ['billing_information']),
       '#type' => 'commerce_profile_select',
-      '#default_value' => $billing_profile,
+      '#title' => t('Select an address'),
+      '#create_title' => t('+ Enter a new address'),
       '#default_country' => $store ? $store->getAddress()->getCountryCode() : NULL,
       '#available_countries' => $store ? $store->getBillingCountries() : [],
+      '#profile_type' => 'customer',
+      '#owner_uid' => $payment_method->getOwnerId(),
     ];
 
     return $form;
@@ -109,9 +106,9 @@ class PaymentMethodAddForm extends PaymentGatewayFormBase {
     }
     /** @var \Drupal\commerce_payment\Entity\PaymentMethodInterface $payment_method */
     $payment_method = $this->entity;
-    $payment_method->setBillingProfile($form['billing_information']['#profile']);
 
     $values = $form_state->getValue($form['#parents']);
+    $payment_method->setBillingProfile($values['billing_information']);
     /** @var \Drupal\commerce_payment\Plugin\Commerce\PaymentGateway\SupportsStoredPaymentMethodsInterface $payment_gateway_plugin */
     $payment_gateway_plugin = $this->plugin;
     // The payment method form is customer facing. For security reasons

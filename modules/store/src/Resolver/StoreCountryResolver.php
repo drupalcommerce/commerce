@@ -4,7 +4,7 @@ namespace Drupal\commerce_store\Resolver;
 
 use Drupal\commerce\Country;
 use Drupal\commerce\Resolver\CountryResolverInterface;
-use Drupal\commerce_store\CurrentStoreInterface;
+use Drupal\commerce_store\StoreContextInterface;
 
 /**
  * Returns the store's billing country.
@@ -20,27 +20,27 @@ use Drupal\commerce_store\CurrentStoreInterface;
 class StoreCountryResolver implements CountryResolverInterface {
 
   /**
-   * The current store.
+   * The store context.
    *
-   * @var \Drupal\commerce_store\CurrentStoreInterface
+   * @var \Drupal\commerce_store\StoreContextInterface
    */
-  protected $currentStore;
+  protected $storeContext;
 
   /**
    * Constructs a new StoreCountryResolver object.
    *
-   * @param \Drupal\commerce_store\CurrentStoreInterface $current_store
-   *   The current store.
+   * @param \Drupal\commerce_store\StoreContextInterface $store_context
+   *   The store context.
    */
-  public function __construct(CurrentStoreInterface $current_store) {
-    $this->currentStore = $current_store;
+  public function __construct(StoreContextInterface $store_context) {
+    $this->storeContext = $store_context;
   }
 
   /**
    * {@inheritdoc}
    */
   public function resolve() {
-    $store = $this->currentStore->getStore();
+    $store = $this->storeContext->getStore();
     if ($store) {
       return new Country($store->getAddress()->getCountryCode());
     }

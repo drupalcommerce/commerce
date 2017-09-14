@@ -17,11 +17,11 @@ class CurrencyTest extends CommerceBrowserTestBase {
    * Tests importing a currency.
    */
   public function testCurrencyImport() {
-    $this->drupalGet('admin/commerce/config/currencies/add');
+    $this->drupalGet('admin/commerce/config/currency/import');
     $edit = [
       'currency_codes[]' => ['CHF'],
     ];
-    $this->submitForm($edit, 'Add');
+    $this->submitForm($edit, 'Import');
 
     $url = Url::fromRoute('entity.commerce_currency.collection');
     $this->assertEquals($this->getUrl(), $this->getAbsoluteUrl($url->toString()));
@@ -35,11 +35,11 @@ class CurrencyTest extends CommerceBrowserTestBase {
   }
 
   /**
-   * Tests adding a currency.
+   * Tests creating a currency.
    */
   public function testCurrencyCreation() {
-    $this->drupalGet('admin/commerce/config/currencies');
-    $this->getSession()->getPage()->clickLink('Add custom currency');
+    $this->drupalGet('admin/commerce/config/currency');
+    $this->getSession()->getPage()->clickLink('Add currency');
     $edit = [
       'name' => 'Test currency',
       'currencyCode' => 'XXX',
@@ -69,7 +69,7 @@ class CurrencyTest extends CommerceBrowserTestBase {
       'symbol' => '§',
       'fractionDigits' => 2,
     ]);
-    $this->drupalGet('admin/commerce/config/currencies/XXX');
+    $this->drupalGet('admin/commerce/config/currency/XXX');
 
     $edit = [
       'name' => 'Test currency2',
@@ -93,7 +93,7 @@ class CurrencyTest extends CommerceBrowserTestBase {
       'symbol' => '§',
       'fractionDigits' => 2,
     ]);
-    $this->drupalGet('admin/commerce/config/currencies/' . $currency->id() . '/delete');
+    $this->drupalGet('admin/commerce/config/currency/' . $currency->id() . '/delete');
     $this->assertSession()->pageTextContains(t("Are you sure you want to delete the currency @currency?", ['@currency' => $currency->getName()]));
     $this->assertSession()->pageTextContains(t('This action cannot be undone.'));
     $this->submitForm([], 'Delete');

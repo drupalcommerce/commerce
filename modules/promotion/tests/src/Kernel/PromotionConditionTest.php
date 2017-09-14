@@ -79,7 +79,7 @@ class PromotionConditionTest extends CommerceKernelTestBase {
    * Tests promotions with an order condition.
    */
   public function testOrderCondition() {
-    // Starts now, enabled. No end time. Matches orders under $20 or over $100.
+    // Starts now, enabled. No end time.
     $promotion = Promotion::create([
       'name' => 'Promotion 1',
       'order_types' => [$this->order->bundle()],
@@ -95,33 +95,22 @@ class PromotionConditionTest extends CommerceKernelTestBase {
         [
           'target_plugin_id' => 'order_total_price',
           'target_plugin_configuration' => [
-            'operator' => '<',
-            'amount' => [
-              'number' => '20.00',
-              'currency_code' => 'USD',
-            ],
-          ],
-        ],
-        [
-          'target_plugin_id' => 'order_total_price',
-          'target_plugin_configuration' => [
             'operator' => '>',
             'amount' => [
-              'number' => '100.00',
+              'number' => '50.00',
               'currency_code' => 'USD',
             ],
           ],
         ],
       ],
-      'condition_operator' => 'OR',
     ]);
     $promotion->save();
 
     $order_item = OrderItem::create([
       'type' => 'test',
-      'quantity' => 3,
+      'quantity' => 2,
       'unit_price' => [
-        'number' => '10.00',
+        'number' => '20.00',
         'currency_code' => 'USD',
       ],
     ]);
@@ -130,13 +119,7 @@ class PromotionConditionTest extends CommerceKernelTestBase {
     $result = $promotion->applies($this->order);
     $this->assertFalse($result);
 
-    $order_item->setQuantity(1);
-    $order_item->save();
-    $this->order->save();
-    $result = $promotion->applies($this->order);
-    $this->assertTrue($result);
-
-    $order_item->setQuantity(11);
+    $order_item->setQuantity(3);
     $order_item->save();
     $this->order->save();
     $result = $promotion->applies($this->order);
@@ -178,7 +161,6 @@ class PromotionConditionTest extends CommerceKernelTestBase {
           ],
         ],
       ],
-      'condition_operator' => 'AND',
     ]);
     $promotion->save();
 

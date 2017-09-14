@@ -114,7 +114,7 @@ class Number extends FormElement {
    *   The current state of the form.
    */
   public static function validateNumber(array $element, FormStateInterface $form_state) {
-    $value = trim($element['#value']);
+    $value = $form_state->getValue($element['#parents']);
     if ($value === '') {
       return;
     }

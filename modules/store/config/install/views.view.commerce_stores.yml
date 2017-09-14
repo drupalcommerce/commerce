@@ -422,7 +422,7 @@ display:
     position: 1
     display_options:
       display_extenders: {  }
-      path: admin/commerce/config/stores
+      path: admin/commerce/stores
     cache_metadata:
       contexts:
         - 'languages:language_content'

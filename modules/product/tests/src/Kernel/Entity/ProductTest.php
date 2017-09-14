@@ -49,6 +49,8 @@ class ProductTest extends CommerceKernelTestBase {
   /**
    * @covers ::getTitle
    * @covers ::setTitle
+   * @covers ::isPublished
+   * @covers ::setPublished
    * @covers ::getCreatedTime
    * @covers ::setCreatedTime
    * @covers ::getStores
@@ -68,6 +70,10 @@ class ProductTest extends CommerceKernelTestBase {
 
     $product->setTitle('My title');
     $this->assertEquals('My title', $product->getTitle());
+
+    $this->assertEquals(TRUE, $product->isPublished());
+    $product->setPublished(FALSE);
+    $this->assertEquals(FALSE, $product->isPublished());
 
     $product->setCreatedTime(635879700);
     $this->assertEquals(635879700, $product->getCreatedTime());

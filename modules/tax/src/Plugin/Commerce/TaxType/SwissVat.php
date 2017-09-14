@@ -48,23 +48,23 @@ class SwissVat extends LocalTaxTypeBase {
         [
           'id' => 'standard',
           'label' => $this->t('Standard'),
-          'percentages' => [
-            ['number' => '0.08', 'start_date' => '2011-01-01'],
+          'amounts' => [
+            ['amount' => '0.08', 'start_date' => '2011-01-01'],
           ],
           'default' => TRUE,
         ],
         [
           'id' => 'hotel',
           'label' => $this->t('Hotel'),
-          'percentages' => [
-            ['number' => '0.038', 'start_date' => '2011-01-01'],
+          'amounts' => [
+            ['amount' => '0.038', 'start_date' => '2011-01-01'],
           ],
         ],
         [
           'id' => 'reduced',
           'label' => $this->t('Reduced'),
-          'percentages' => [
-            ['number' => '0.025', 'start_date' => '2011-01-01'],
+          'amounts' => [
+            ['amount' => '0.025', 'start_date' => '2011-01-01'],
           ],
         ],
       ],

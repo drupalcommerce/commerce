@@ -2,15 +2,12 @@
 
 namespace Drupal\commerce;
 
-use Drupal\commerce\Event\CommerceEvents;
-use Drupal\commerce\Event\FilterConditionsEvent;
 use Drupal\Component\Plugin\Exception\PluginException;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Plugin\CategorizingPluginManagerTrait;
 use Drupal\Core\Plugin\DefaultPluginManager;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
  * Manages discovery and instantiation of condition plugins.
@@ -30,13 +27,6 @@ class ConditionManager extends DefaultPluginManager implements ConditionManagerI
   protected $entityTypeManager;
 
   /**
-   * The event dispatcher.
-   *
-   * @var \Symfony\Component\EventDispatcher\EventDispatcherInterface
-   */
-  protected $eventDispatcher;
-
-  /**
    * Constructs a new ConditionManager object.
    *
    * @param \Traversable $namespaces
@@ -48,16 +38,13 @@ class ConditionManager extends DefaultPluginManager implements ConditionManagerI
    *   The module handler.
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
-   * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface $event_dispatcher
-   *   The event dispatcher.
    */
-  public function __construct(\Traversable $namespaces, CacheBackendInterface $cache_backend, ModuleHandlerInterface $module_handler, EntityTypeManagerInterface $entity_type_manager, EventDispatcherInterface $event_dispatcher) {
+  public function __construct(\Traversable $namespaces, CacheBackendInterface $cache_backend, ModuleHandlerInterface $module_handler, EntityTypeManagerInterface $entity_type_manager) {
     parent::__construct('Plugin/Commerce/Condition', $namespaces, $module_handler, 'Drupal\commerce\Plugin\Commerce\Condition\ConditionInterface', 'Drupal\commerce\Annotation\CommerceCondition');
 
     $this->alterInfo('commerce_condition_info');
     $this->setCacheBackend($cache_backend, 'commerce_condition_plugins');
     $this->entityTypeManager = $entity_type_manager;
-    $this->eventDispatcher = $event_dispatcher;
   }
 
   /**
@@ -81,14 +68,14 @@ class ConditionManager extends DefaultPluginManager implements ConditionManagerI
   /**
    * {@inheritdoc}
    */
-  public function getFilteredDefinitions($parent_entity_type_id, array $entity_type_ids) {
-    $definitions = array_filter($this->getDefinitions(), function ($definition) use ($entity_type_ids) {
-      return in_array($definition['entity_type'], $entity_type_ids);
-    });
-    // Certain conditions might be unavailable to the given parent entity type.
-    $event = new FilterConditionsEvent($definitions, $parent_entity_type_id);
-    $this->eventDispatcher->dispatch(CommerceEvents::FILTER_CONDITIONS, $event);
-    $definitions = $event->getDefinitions();
+  public function getDefinitionsByEntityTypes(array $entity_types) {
+    $definitions = $this->getDefinitions();
+    if (!empty($entity_types)) {
+      // Remove conditions not matching the specified entity types.
+      $definitions = array_filter($definitions, function ($definition) use ($entity_types) {
+        return in_array($definition['entity_type'], $entity_types);
+      });
+    }
 
     return $definitions;
   }

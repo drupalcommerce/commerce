@@ -1,7 +1,0 @@
-commerce_product.configuration:
-  path: '/admin/commerce/config/products'
-  defaults:
-    _controller: '\Drupal\system\Controller\SystemController::systemAdminMenuBlockPage'
-    _title: 'Products'
-  requirements:
-    _permission: 'access commerce administration pages'

@@ -86,7 +86,7 @@ class CouponRedemptionPaneTest extends CommerceBrowserTestBase {
       'offer' => [
         'target_plugin_id' => 'order_percentage_off',
         'target_plugin_configuration' => [
-          'percentage' => '0.10',
+          'amount' => '0.10',
         ],
       ],
       'start_date' => '2017-01-01',

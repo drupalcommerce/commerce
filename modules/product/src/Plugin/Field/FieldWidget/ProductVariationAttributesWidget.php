@@ -128,17 +128,10 @@ class ProductVariationAttributesWidget extends ProductVariationWidgetBase implem
     }
     // Otherwise load from the current context.
     else {
-      /** @var \Drupal\commerce_order\Entity\OrderItemInterface $order_item */
-      $order_item = $items->getEntity();
-      if (!$order_item->isNew()) {
-        $selected_variation = $order_item->getPurchasedEntity();
-      }
-      else {
-        $selected_variation = $this->variationStorage->loadFromContext($product);
-        // The returned variation must also be enabled.
-        if (!in_array($selected_variation, $variations)) {
-          $selected_variation = reset($variations);
-        }
+      $selected_variation = $this->variationStorage->loadFromContext($product);
+      // The returned variation must also be enabled.
+      if (!in_array($selected_variation, $variations)) {
+        $selected_variation = reset($variations);
       }
     }
     $element['variation'] = [
