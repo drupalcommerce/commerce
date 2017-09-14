@@ -28,15 +28,15 @@ order_assigned:
   label: 'Order assigned'
   template: '<p>The order was assigned to {{ user }}.</p>'
 
-payment_insert:
+payment_inserted:
   category: commerce_payment
   label: 'Payment created'
   template: '<p>Payment of {{ amount|commerce_price_format }} was created.</p>'
-payment_update:
+payment_price_updated:
   category: commerce_payment
-  label: 'Payment updated'
-  template: '<p>Payment of {{ amount|commerce_price_format }} was updated.</p>'
-payment_delete:
+  label: 'Payment price updated'
+  template: '<p>Payment was changed from {{ previous_amount|commerce_price_format }} to {{ current_amount|commerce_price_format }}.</p>'
+payment_deleted:
   category: commerce_payment
   label: 'Payment deleted'
   template: '<p>Payment of {{ amount|commerce_price_format }} was deleted.</p>'

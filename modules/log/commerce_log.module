@@ -24,6 +24,8 @@ function commerce_log_preprocess_commerce_order(&$variables) {
 }
 
 function commerce_log_entity_type_alter(array &$entity_types) {
-  /** @var $entity_types \Drupal\Core\Entity\EntityTypeInterface[] */
-  $entity_types['commerce_payment']->setListBuilderClass(PaymentListBuilder::class);
+  if (isset($entity_types['commerce_payment'])) {
+    /** @var $entity_types \Drupal\Core\Entity\EntityTypeInterface[] */
+    $entity_types['commerce_payment']->setListBuilderClass(PaymentListBuilder::class);
+  }
 }

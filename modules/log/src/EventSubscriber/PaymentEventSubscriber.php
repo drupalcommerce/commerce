@@ -5,6 +5,7 @@ namespace Drupal\commerce_log\EventSubscriber;
 use Drupal\commerce_payment\Entity\PaymentInterface;
 use Drupal\commerce_payment\Event\PaymentEvent;
 use Drupal\commerce_payment\Event\PaymentEvents;
+use Drupal\commerce_price\Calculator;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\state_machine\Event\WorkflowTransitionEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -36,7 +37,7 @@ class PaymentEventSubscriber implements EventSubscriberInterface {
   public static function getSubscribedEvents() {
     $events = [
       PaymentEvents::PAYMENT_INSERT => ['onPaymentInsert', -100],
-      PaymentEvents::PAYMENT_UPDATE => ['onPaymentUpdate', -100],
+      PaymentEvents::PAYMENT_PRESAVE => ['onPaymentPresave', -100],
       PaymentEvents::PAYMENT_DELETE => ['onPaymentDelete', -100],
     ];
     return $events;
@@ -51,23 +52,29 @@ class PaymentEventSubscriber implements EventSubscriberInterface {
    * @throws \Drupal\Core\Entity\EntityStorageException
    */
   public function onPaymentInsert(PaymentEvent $event) {
-    $this->logPayment($event->getPayment(), 'payment_insert');
+    $this->logPayment($event->getPayment(), 'payment_inserted');
   }
 
   /**
-   * Creates a log when a payment is updated.
+   * Creates a log before a payment is saved.
    *
    * @param \Drupal\commerce_payment\Event\PaymentEvent $event
    *   The payment event.
    *
    * @throws \Drupal\Core\Entity\EntityStorageException
    */
-  public function onPaymentUpdate(PaymentEvent $event) {
+  public function onPaymentPresave(PaymentEvent $event) {
     $payment = $event->getPayment();
-    $this->logPayment($payment, 'payment_update');
-    if ($refunded = $payment->getRefundedAmount()) {
-      $this->logStorage->generate($payment, 'refund', [
-        'refunded_amount' => $refunded,
+    $refund = $payment->getRefundedAmount();
+    if (!$payment->isNew() && !$payment->getAmount()->equals($payment->original->getAmount())) {
+      $this->logStorage->generate($payment, 'payment_price_updated', [
+        'previous_amount' => $payment->original->getAmount(),
+        'current_amount' => $payment->getAmount(),
+      ])->save();
+    }
+    if ($refund && Calculator::trim($refund->getNumber())) {
+      $this->logStorage->generate($payment, 'payment_refunded', [
+        'refunded_amount' => $refund,
       ])->save();
     }
   }
@@ -81,7 +88,7 @@ class PaymentEventSubscriber implements EventSubscriberInterface {
    * @throws \Drupal\Core\Entity\EntityStorageException
    */
   public function onPaymentDelete(PaymentEvent $event) {
-    $this->logPayment($event->getPayment(), 'payment_delete');
+    $this->logPayment($event->getPayment(), 'payment_deleted');
   }
 
   /**
