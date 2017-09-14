@@ -27,3 +27,20 @@ order_assigned:
   category: commerce_order
   label: 'Order assigned'
   template: '<p>The order was assigned to {{ user }}.</p>'
+
+payment_insert:
+  category: commerce_payment
+  label: 'Payment created'
+  template: '<p>Payment of {{ amount|commerce_price_format }} was created.</p>'
+payment_update:
+  category: commerce_payment
+  label: 'Payment updated'
+  template: '<p>Payment of {{ amount|commerce_price_format }} was updated.</p>'
+payment_delete:
+  category: commerce_payment
+  label: 'Payment deleted'
+  template: '<p>Payment of {{ amount|commerce_price_format }} was deleted.</p>'
+payment_refunded:
+  category: commerce_payment
+  label: 'Payment refunded'
+  template: '<p>Payment of {{ refunded_amount|commerce_price_format }} was refunded.</p>'
