@@ -54,8 +54,8 @@ class CompletionMessage extends CheckoutPaneBase {
    * Gets the completion messages.
    */
   private function populateCompletionMessages() {
-    $this->populateCompletionMessagesWithDefaultMessage();
-    $this->populateCompletionMessagesWithLoggedInMessageIfLoggedIn();
+    $this->populateCompletionMessagesWithAnonymousMessage();
+    $this->populateCompletionMessagesWithAuthenticatedMessage();
 
     $this->allowOthersToModifyMessages();
   }
@@ -63,16 +63,24 @@ class CompletionMessage extends CheckoutPaneBase {
   /**
    * Gets the default completion message.
    */
-  private function populateCompletionMessagesWithDefaultMessage() {
-    return $this->completionMessags->addMessage($this->t('Your order number is @number.', ['@number' => $this->order->id()]));
+  private function populateCompletionMessagesWithAnonymousMessage() {
+    if (\Drupal::currentUser()->isAnonymous()) {
+      $this->completionMessags->addMessage($this->t('Your order number is @number.', ['@number' => $this->order->id()]));
+      $this->completionMessags->addMessage($this->t('You can view your order on your account page when logged in.'));
+    }
   }
 
   /**
    * Populate the completion messages with the logged in message.
    */
-  private function populateCompletionMessagesWithLoggedInMessageIfLoggedIn() {
+  private function populateCompletionMessagesWithAuthenticatedMessage() {
     if (\Drupal::currentUser()->isAuthenticated()) {
-      $this->completionMessags->addMessage($this->t('You can view your order on your account page when logged in.'));
+      $this->completionMessags->addMessage(
+        $this->t(
+          'Your order number is %order_number_with_link.',
+          ['%order_number_with_link' => $this->order->toLink($this->order->getOrderNumber())]
+        )
+      );
     }
   }
 
