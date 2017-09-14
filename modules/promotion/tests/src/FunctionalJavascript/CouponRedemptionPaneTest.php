@@ -235,7 +235,7 @@ class CouponRedemptionPaneTest extends CommerceBrowserTestBase {
     $this->assertSession()->pageTextContains('$899.10');
 
     $this->submitForm([], 'Pay and complete purchase');
-    $this->assertSession()->pageTextContains('Your order number is 1. You can view your order on your account page when logged in.');
+    $this->assertSession()->pageTextContains('Your order number is 1.');
 
     $order_storage = $this->container->get('entity_type.manager')->getStorage('commerce_order');
     $order_storage->resetCache([$this->cart->id()]);
@@ -259,7 +259,7 @@ class CouponRedemptionPaneTest extends CommerceBrowserTestBase {
     $this->assertSession()->pageTextContains('$899.10');
 
     $this->submitForm([], 'Pay and complete purchase');
-    $this->assertSession()->pageTextContains('Your order number is 1. You can view your order on your account page when logged in.');
+    $this->assertSession()->pageTextContains('Your order number is 1.');
 
     $order_storage = $this->container->get('entity_type.manager')->getStorage('commerce_order');
     $order_storage->resetCache([$this->cart->id()]);

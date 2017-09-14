@@ -266,7 +266,7 @@ class PaymentCheckoutTest extends CommerceBrowserTestBase {
     $this->assertSession()->pageTextContains('Frederick Pabst');
     $this->assertSession()->pageTextContains('Pabst Blue Ribbon Dr');
     $this->submitForm([], 'Pay and complete purchase');
-    $this->assertSession()->pageTextContains('Your order number is 1. You can view your order on your account page when logged in.');
+    $this->assertSession()->pageTextContains('Your order number is 1.');
 
     $order = Order::load(1);
     $this->assertEquals('onsite', $order->get('payment_gateway')->target_id);
@@ -317,7 +317,7 @@ class PaymentCheckoutTest extends CommerceBrowserTestBase {
     $this->assertSession()->pageTextContains('Johnny Appleseed');
     $this->assertSession()->pageTextContains('123 New York Drive');
     $this->submitForm([], 'Pay and complete purchase');
-    $this->assertSession()->pageTextContains('Your order number is 1. You can view your order on your account page when logged in.');
+    $this->assertSession()->pageTextContains('Your order number is 1.');
 
     $order = Order::load(1);
     $this->assertEquals('onsite', $order->get('payment_gateway')->target_id);
@@ -360,7 +360,7 @@ class PaymentCheckoutTest extends CommerceBrowserTestBase {
     $this->assertSession()->pageTextContains('Visa ending in 1111');
     $this->assertSession()->pageTextContains('Expires 2/2020');
     $this->submitForm([], 'Pay and complete purchase');
-    $this->assertSession()->pageTextNotContains('Your order number is 1. You can view your order on your account page when logged in.');
+    $this->assertSession()->pageTextNotContains('Your order number is 1.');
     $this->assertSession()->pageTextContains('We encountered an error processing your payment method. Please verify your details and try again.');
     $this->assertSession()->addressEquals('checkout/1/order_information');
 
@@ -393,7 +393,7 @@ class PaymentCheckoutTest extends CommerceBrowserTestBase {
     $this->assertSession()->pageTextContains('Johnny Appleseed');
     $this->assertSession()->pageTextContains('123 New York Drive');
     $this->submitForm([], 'Pay and complete purchase');
-    $this->assertSession()->pageTextContains('Your order number is 1. You can view your order on your account page when logged in.');
+    $this->assertSession()->pageTextContains('Your order number is 1.');
     $order = Order::load(1);
     $this->assertEquals('offsite', $order->get('payment_gateway')->target_id);
 
@@ -440,7 +440,7 @@ class PaymentCheckoutTest extends CommerceBrowserTestBase {
     $this->assertSession()->pageTextContains('Johnny Appleseed');
     $this->assertSession()->pageTextContains('123 New York Drive');
     $this->submitForm([], 'Pay and complete purchase');
-    $this->assertSession()->pageTextContains('Your order number is 1. You can view your order on your account page when logged in.');
+    $this->assertSession()->pageTextContains('Your order number is 1.');
     $order = Order::load(1);
     $this->assertEquals('offsite', $order->get('payment_gateway')->target_id);
 
@@ -483,7 +483,7 @@ class PaymentCheckoutTest extends CommerceBrowserTestBase {
     $this->assertSession()->pageTextContains('Johnny FAIL');
     $this->assertSession()->pageTextContains('123 New York Drive');
     $this->submitForm([], 'Pay and complete purchase');
-    $this->assertSession()->pageTextNotContains('Your order number is 1. You can view your order on your account page when logged in.');
+    $this->assertSession()->pageTextNotContains('Your order number is 1.');
     $this->assertSession()->pageTextContains('We encountered an unexpected error processing your payment. Please try again later.');
     $this->assertSession()->addressEquals('checkout/1/order_information');
 
@@ -516,7 +516,7 @@ class PaymentCheckoutTest extends CommerceBrowserTestBase {
     $this->assertSession()->pageTextContains('Johnny Appleseed');
     $this->assertSession()->pageTextContains('123 New York Drive');
     $this->submitForm([], 'Pay and complete purchase');
-    $this->assertSession()->pageTextContains('Your order number is 1. You can view your order on your account page when logged in.');
+    $this->assertSession()->pageTextContains('Your order number is 1.');
     $this->assertSession()->pageTextContains('Sample payment instructions.');
     $order = Order::load(1);
     $this->assertEquals('manual', $order->get('payment_gateway')->target_id);

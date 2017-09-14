@@ -162,7 +162,7 @@ class CheckoutOrderTest extends CommerceBrowserTestBase {
     $this->assertSession()->pageTextContains('Billing information');
     $this->assertSession()->pageTextContains('Order Summary');
     $this->submitForm([], 'Pay and complete purchase');
-    $this->assertSession()->pageTextContains('Your order number is 1. You can view your order on your account page when logged in.');
+    $this->assertSession()->pageTextContains('Your order number is 1.');
     $this->assertSession()->pageTextContains('0 items');
     // Test second order.
     $this->drupalGet($this->product->toUrl()->toString());
@@ -198,7 +198,7 @@ class CheckoutOrderTest extends CommerceBrowserTestBase {
     $this->assertCheckoutProgressStep('Review');
 
     $this->submitForm([], 'Pay and complete purchase');
-    $this->assertSession()->pageTextContains('Your order number is 2. You can view your order on your account page when logged in.');
+    $this->assertSession()->pageTextContains('Your order number is 2.');
     $this->assertSession()->pageTextContains('0 items');
   }
 
