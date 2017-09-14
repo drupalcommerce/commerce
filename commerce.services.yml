@@ -50,6 +50,11 @@ services:
     class: Drupal\commerce\Config\ConfigUpdater
     arguments: ['@entity_type.manager', '@config.storage', '@config.factory']
 
+  commerce.twig_extension:
+    class: Drupal\commerce\TwigExtension\CommerceTwigExtension
+    tags:
+      - { name: twig.extension }
+
   cache_context.country:
     class: Drupal\commerce\Cache\Context\CountryCacheContext
     arguments: ['@commerce.current_country']
@@ -58,7 +63,7 @@ services:
 
   plugin.manager.commerce_condition:
     class: Drupal\commerce\ConditionManager
-    arguments: ['@container.namespaces', '@cache.discovery', '@module_handler', '@entity_type.manager']
+    arguments: ['@container.namespaces', '@cache.discovery', '@module_handler', '@entity_type.manager', '@event_dispatcher']
 
   plugin.manager.commerce_entity_trait:
     class: Drupal\commerce\EntityTraitManager

@@ -324,8 +324,9 @@ class Order extends ContentEntityBase implements OrderInterface {
         $multiplied_adjustment = new Adjustment([
           'type' => $adjustment->getType(),
           'label' => $adjustment->getLabel(),
-          'source_id' => $adjustment->getSourceId(),
           'amount' => $adjustment->getAmount()->multiply($order_item->getQuantity()),
+          'percentage' => $adjustment->getPercentage(),
+          'source_id' => $adjustment->getSourceId(),
           'included' => $adjustment->isIncluded(),
         ]);
         $adjustments[] = $multiplied_adjustment;

@@ -3,6 +3,7 @@
 namespace Drupal\commerce_promotion\Entity;
 
 use Drupal\commerce_order\Entity\OrderInterface;
+use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Entity\ContentEntityBase;
 use Drupal\Core\Entity\EntityTypeInterface;
@@ -20,12 +21,17 @@ use Drupal\Core\Entity\EntityTypeInterface;
  *     plural = "@count coupons",
  *   ),
  *   handlers = {
+ *     "list_builder" = "Drupal\commerce_promotion\CouponListBuilder",
  *     "storage" = "Drupal\commerce_promotion\CouponStorage",
+ *     "access" = "Drupal\commerce_promotion\CouponAccessControlHandler",
  *     "views_data" = "Drupal\views\EntityViewsData",
  *     "form" = {
- *       "add" = "Drupal\Core\Entity\ContentEntityForm",
- *       "edit" = "Drupal\Core\Entity\ContentEntityForm",
+ *       "add" = "Drupal\commerce_promotion\Form\CouponForm",
+ *       "edit" = "Drupal\commerce_promotion\Form\CouponForm",
  *       "delete" = "Drupal\Core\Entity\ContentEntityDeleteForm"
+ *     },
+ *     "route_provider" = {
+ *       "default" = "Drupal\commerce_promotion\CouponRouteProvider",
  *     },
  *   },
  *   base_table = "commerce_promotion_coupon",
@@ -36,9 +42,24 @@ use Drupal\Core\Entity\EntityTypeInterface;
  *     "uuid" = "uuid",
  *     "status" = "status",
  *   },
+ *   links = {
+ *     "add-form" = "/promotion/{commerce_promotion}/coupons/add",
+ *     "edit-form" = "/promotion/{commerce_promotion}/coupons/{commerce_promotion_coupon}/edit",
+ *     "delete-form" = "/promotion/{commerce_promotion}/coupons/{commerce_promotion_coupon}/delete",
+ *     "collection" = "/promotion/{commerce_promotion}/coupons",
+ *   },
  * )
  */
 class Coupon extends ContentEntityBase implements CouponInterface {
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function urlRouteParameters($rel) {
+    $uri_route_parameters = parent::urlRouteParameters($rel);
+    $uri_route_parameters['commerce_promotion'] = $this->getPromotionId();
+    return $uri_route_parameters;
+  }
 
   /**
    * {@inheritdoc}
@@ -112,12 +133,36 @@ class Coupon extends ContentEntityBase implements CouponInterface {
     if ($usage_limit = $this->getUsageLimit()) {
       /** @var \Drupal\commerce_promotion\PromotionUsageInterface $usage */
       $usage = \Drupal::service('commerce_promotion.usage');
-      if ($usage_limit <= $usage->getUsage($this->getPromotion(), $this)) {
+      if ($usage_limit <= $usage->loadByCoupon($this)) {
         return FALSE;
       }
     }
 
     return TRUE;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function postSave(EntityStorageInterface $storage, $update = TRUE) {
+    parent::postSave($storage, $update);
+
+    // Ensure there's a reference on each promotion.
+    $promotion = $this->getPromotion();
+    if ($promotion && !$promotion->hasCoupon($this)) {
+      $promotion->addCoupon($this);
+      $promotion->save();
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function postDelete(EntityStorageInterface $storage, array $entities) {
+    // Delete the related usage.
+    /** @var \Drupal\commerce_promotion\PromotionUsageInterface $usage */
+    $usage = \Drupal::service('commerce_promotion.usage');
+    $usage->deleteByCoupon($entities);
   }
 
   /**

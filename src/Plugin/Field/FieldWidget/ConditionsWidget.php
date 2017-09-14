@@ -110,7 +110,8 @@ class ConditionsWidget extends WidgetBase implements ContainerFactoryPluginInter
       '#title' => $this->t('Entity types'),
       '#options' => $entity_types,
       '#default_value' => $this->getSetting('entity_types'),
-      '#description' => $this->t('Only conditions matching the specified entity types will be displayed. Leave empty to show all.'),
+      '#description' => $this->t('Only conditions matching the specified entity types will be displayed.'),
+      '#required' => TRUE,
     ];
 
     return $element;
@@ -135,9 +136,6 @@ class ConditionsWidget extends WidgetBase implements ContainerFactoryPluginInter
 
       $summary[] = $this->t('Entity types: @entity_types', ['@entity_types' => implode(', ', $entity_types)]);
     }
-    else {
-      $summary[] = $this->t('No entity type restrictions');
-    }
 
     return $summary;
   }
@@ -158,6 +156,7 @@ class ConditionsWidget extends WidgetBase implements ContainerFactoryPluginInter
       '#type' => 'commerce_conditions',
       '#title' => $this->fieldDefinition->getLabel(),
       '#default_value' => $values,
+      '#parent_entity_type' => $this->fieldDefinition->getTargetEntityTypeId(),
       '#entity_types' => array_filter($this->getSetting('entity_types')),
       '#required' => $this->fieldDefinition->isRequired(),
     ];

@@ -112,12 +112,27 @@ class PaymentGatewayForm extends CommercePluginEntityFormBase {
     $form['conditions'] = [
       '#type' => 'commerce_conditions',
       '#title' => $this->t('Conditions'),
+      '#parent_entity_type' => 'commerce_payment_gateway',
       '#entity_types' => ['commerce_order'],
       '#default_value' => $gateway->get('conditions'),
     ];
+    $form['conditionOperator'] = [
+      '#type' => 'radios',
+      '#title' => $this->t('Condition operator'),
+      '#title_display' => 'invisible',
+      '#options' => [
+        'AND' => $this->t('All conditions must pass'),
+        'OR' => $this->t('Only one condition must pass'),
+      ],
+      '#default_value' => $gateway->getConditionOperator(),
+    ];
     $form['status'] = [
-      '#type' => 'checkbox',
-      '#title' => $this->t('Enabled'),
+      '#type' => 'radios',
+      '#title' => $this->t('Status'),
+      '#options' => [
+        FALSE => $this->t('Disabled'),
+        TRUE  => $this->t('Enabled'),
+      ],
       '#default_value' => $gateway->status(),
     ];
 

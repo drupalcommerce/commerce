@@ -65,7 +65,9 @@ abstract class ConditionBase extends PluginBase implements ConditionInterface {
   /**
    * {@inheritdoc}
    */
-  public function submitConfigurationForm(array &$form, FormStateInterface $form_state) {}
+  public function submitConfigurationForm(array &$form, FormStateInterface $form_state) {
+    $this->configuration = [];
+  }
 
   /**
    * {@inheritdoc}

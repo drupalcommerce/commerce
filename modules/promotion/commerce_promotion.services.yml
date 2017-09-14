@@ -15,6 +15,11 @@ services:
     tags:
       - { name: backend_overridable }
 
+  commerce_promotion.filter_conditions_subscriber:
+    class: Drupal\commerce_promotion\EventSubscriber\FilterConditionsEventSubscriber
+    tags:
+      - { name: event_subscriber }
+
   commerce_promotion.order_subscriber:
     class: Drupal\commerce_promotion\EventSubscriber\OrderEventSubscriber
     arguments: ['@entity_type.manager', '@commerce_promotion.usage']

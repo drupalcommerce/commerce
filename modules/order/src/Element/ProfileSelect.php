@@ -105,6 +105,7 @@ class ProfileSelect extends FormElement {
     if (!is_array($element['#available_countries'])) {
       throw new \InvalidArgumentException('The commerce_profile_select #available_countries property must be an array.');
     }
+
     if (empty($element['#profile_type'])) {
       throw new \InvalidArgumentException('The commerce_profile_select #profile_type property must be provided.');
     }

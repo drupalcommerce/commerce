@@ -10,14 +10,18 @@ use Drupal\Component\Plugin\CategorizingPluginManagerInterface;
 interface ConditionManagerInterface extends CategorizingPluginManagerInterface {
 
   /**
-   * Gets the plugin definitions for the given entity types.
+   * Gets the filtered plugin definitions.
    *
-   * @param array $entity_types
-   *   The entity type IDs.
+   * @param string $parent_entity_type_id
+   *   The parent entity type ID. For example: 'commerce_promotion' if the
+   *   conditions are being loaded for a promotion.
+   * @param array $entity_type_ids
+   *   The entity type IDs. For example: ['commerce_order'] to get
+   *   only conditions that evaluate orders.
    *
    * @return array
-   *   The plugin definitions.
+   *   The filtered plugin definitions.
    */
-  public function getDefinitionsByEntityTypes(array $entity_types);
+  public function getFilteredDefinitions($parent_entity_type_id, array $entity_type_ids);
 
 }
