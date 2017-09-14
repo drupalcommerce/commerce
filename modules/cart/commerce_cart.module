@@ -12,14 +12,6 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Session\AnonymousUserSession;
 
 /**
- * Implements hook_menu_links_discovered_alter().
- */
-function commerce_cart_menu_links_discovered_alter(&$links) {
-  $description = t('Manage fields, Add to Cart forms, other form and display settings for your order items.');
-  $links['entity.commerce_order_item_type.collection']['description'] = $description;
-}
-
-/**
  * Implements hook_theme().
  */
 function commerce_cart_theme($existing, $type, $theme, $path) {
@@ -239,13 +231,6 @@ function commerce_cart_views_data_alter(array &$data) {
     'title' => t('Remove button'),
     'help' => t('Adds a button for removing the order item.'),
     'id' => 'commerce_order_item_remove_button',
-  ];
-  $data['commerce_order']['empty_cart_button'] = [
-    'title' => t('Empty cart button'),
-    'help' => t('Adds a button for emptying the cart.'),
-    'area' => [
-      'id' => 'commerce_order_empty_cart_button',
-    ],
   ];
 }
 

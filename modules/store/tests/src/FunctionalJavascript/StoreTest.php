@@ -35,7 +35,7 @@ class StoreTest extends CommerceBrowserTestBase {
    * Tests creating a store.
    */
   public function testCreateStore() {
-    $this->drupalGet('admin/commerce/config/stores');
+    $this->drupalGet('admin/commerce/stores');
     $this->getSession()->getPage()->clickLink('Add store');
 
     // Check the integrity of the form.

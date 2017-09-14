@@ -36,8 +36,8 @@ class TaxTypeManager extends DefaultPluginManager {
   public function __construct(\Traversable $namespaces, CacheBackendInterface $cache_backend, ModuleHandlerInterface $module_handler) {
     parent::__construct('Plugin/Commerce/TaxType', $namespaces, $module_handler, 'Drupal\commerce_tax\Plugin\Commerce\TaxType\TaxTypeInterface', 'Drupal\commerce_tax\Annotation\CommerceTaxType');
 
-    $this->alterInfo('commerce_tax_type_info');
-    $this->setCacheBackend($cache_backend, 'commerce_tax_type_plugins');
+    $this->alterInfo('commerce_tax type_info');
+    $this->setCacheBackend($cache_backend, 'commerce_tax type_plugins');
   }
 
   /**

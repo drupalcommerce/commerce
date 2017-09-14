@@ -115,8 +115,8 @@ class ConfigUpdaterTest extends CommerceKernelTestBase {
     $failed = $result->getFailed();
     $succeeded = $result->getSucceeded();
 
-    $this->assertEmpty($failed);
-    $this->assertEquals($succeeded[$config_name], "Skipped: $config_name was not reverted because it was modified by the user");
+    $this->assertEmpty($succeeded);
+    $this->assertEquals($failed[$config_name], "$config_name could not be reverted because it was modified by the user");
 
     $result = $this->configUpdater->revert([$config_name], FALSE);
     $succeeded = $result->getSucceeded();

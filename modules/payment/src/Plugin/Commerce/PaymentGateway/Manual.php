@@ -69,7 +69,7 @@ class Manual extends PaymentGatewayBase implements ManualPaymentGatewayInterface
   /**
    * {@inheritdoc}
    */
-  public function buildPaymentInstructions(PaymentInterface $payment) {
+  public function buildPaymentInstructions() {
     $instructions = [];
     if (!empty($this->configuration['instructions']['value'])) {
       $instructions = [

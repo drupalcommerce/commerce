@@ -7,7 +7,7 @@ use Drupal\Tests\commerce\Functional\CommerceBrowserTestBase;
 use Drupal\Tests\commerce\FunctionalJavascript\JavascriptTestTrait;
 
 /**
- * Tests the admin UI for promotions.
+ * Create, view, edit, delete, and change promotion entities.
  *
  * @group commerce
  */
@@ -41,7 +41,8 @@ class PromotionTest extends CommerceBrowserTestBase {
    */
   public function testCreatePromotion() {
     $this->drupalGet('admin/commerce/promotions');
-    $this->getSession()->getPage()->clickLink('Add promotion');
+    $this->getSession()->getPage()->clickLink('Add a new promotion');
+    $this->drupalGet('promotion/add');
 
     // Check the integrity of the form.
     $this->assertSession()->fieldExists('name[0][value]');
@@ -49,13 +50,13 @@ class PromotionTest extends CommerceBrowserTestBase {
     $this->getSession()->getPage()->fillField('name[0][value]', $name);
     $this->getSession()->getPage()->selectFieldOption('offer[0][target_plugin_id]', 'order_item_percentage_off');
     $this->waitForAjaxToFinish();
-    $this->getSession()->getPage()->fillField('offer[0][target_plugin_configuration][order_item_percentage_off][percentage]', '10.0');
+    $this->getSession()->getPage()->fillField('offer[0][target_plugin_configuration][order_item_percentage_off][amount]', '10.0');
 
     // Change, assert any values reset.
     $this->getSession()->getPage()->selectFieldOption('offer[0][target_plugin_id]', 'order_percentage_off');
     $this->waitForAjaxToFinish();
-    $this->assertSession()->fieldValueNotEquals('offer[0][target_plugin_configuration][order_percentage_off][percentage]', '10.0');
-    $this->getSession()->getPage()->fillField('offer[0][target_plugin_configuration][order_percentage_off][percentage]', '10.0');
+    $this->assertSession()->fieldValueNotEquals('offer[0][target_plugin_configuration][order_percentage_off][amount]', '10.0');
+    $this->getSession()->getPage()->fillField('offer[0][target_plugin_configuration][order_percentage_off][amount]', '10.0');
 
     // Confirm the integrity of the conditions UI.
     foreach (['order', 'product', 'customer'] as $condition_group) {
@@ -85,7 +86,7 @@ class PromotionTest extends CommerceBrowserTestBase {
     $promotion = Promotion::load(1);
     /** @var \Drupal\commerce\Plugin\Field\FieldType\PluginItem $offer_field */
     $offer_field = $promotion->get('offer')->first();
-    $this->assertEquals('0.10', $offer_field->target_plugin_configuration['percentage']);
+    $this->assertEquals('0.10', $offer_field->target_plugin_configuration['amount']);
 
     /** @var \Drupal\commerce\Plugin\Field\FieldType\PluginItem $condition_field */
     $condition_field = $promotion->get('conditions')->first();
@@ -102,7 +103,7 @@ class PromotionTest extends CommerceBrowserTestBase {
    */
   public function testCreatePromotionWithEndDate() {
     $this->drupalGet('admin/commerce/promotions');
-    $this->getSession()->getPage()->clickLink('Add promotion');
+    $this->getSession()->getPage()->clickLink('Add a new promotion');
     $this->drupalGet('promotion/add');
 
     // Check the integrity of the form.
@@ -114,7 +115,7 @@ class PromotionTest extends CommerceBrowserTestBase {
     $name = $this->randomMachineName(8);
     $edit = [
       'name[0][value]' => $name,
-      'offer[0][target_plugin_configuration][order_percentage_off][percentage]' => '10.0',
+      'offer[0][target_plugin_configuration][order_percentage_off][amount]' => '10.0',
     ];
 
     // Set an end date.
@@ -128,7 +129,7 @@ class PromotionTest extends CommerceBrowserTestBase {
 
     /** @var \Drupal\commerce\Plugin\Field\FieldType\PluginItem $offer_field */
     $offer_field = Promotion::load(1)->get('offer')->first();
-    $this->assertEquals('0.10', $offer_field->target_plugin_configuration['percentage']);
+    $this->assertEquals('0.10', $offer_field->target_plugin_configuration['amount']);
   }
 
   /**
@@ -141,7 +142,7 @@ class PromotionTest extends CommerceBrowserTestBase {
       'offer' => [
         'target_plugin_id' => 'order_item_percentage_off',
         'target_plugin_configuration' => [
-          'percentage' => '0.10',
+          'amount' => '0.10',
         ],
       ],
       'conditions' => [
@@ -159,7 +160,7 @@ class PromotionTest extends CommerceBrowserTestBase {
 
     /** @var \Drupal\commerce\Plugin\Field\FieldType\PluginItem $offer_field */
     $offer_field = $promotion->get('offer')->first();
-    $this->assertEquals('0.10', $offer_field->target_plugin_configuration['percentage']);
+    $this->assertEquals('0.10', $offer_field->target_plugin_configuration['amount']);
 
     $this->drupalGet($promotion->toUrl('edit-form'));
     $this->assertSession()->pageTextContains('Restricted');
@@ -169,7 +170,7 @@ class PromotionTest extends CommerceBrowserTestBase {
     $new_promotion_name = $this->randomMachineName(8);
     $edit = [
       'name[0][value]' => $new_promotion_name,
-      'offer[0][target_plugin_configuration][order_item_percentage_off][percentage]' => '20',
+      'offer[0][target_plugin_configuration][order_item_percentage_off][amount]' => '20',
     ];
     $this->submitForm($edit, 'Save');
 
@@ -179,7 +180,7 @@ class PromotionTest extends CommerceBrowserTestBase {
 
     /** @var \Drupal\commerce\Plugin\Field\FieldType\PluginItem $offer_field */
     $offer_field = $promotion_changed->get('offer')->first();
-    $this->assertEquals('0.20', $offer_field->target_plugin_configuration['percentage']);
+    $this->assertEquals('0.20', $offer_field->target_plugin_configuration['amount']);
   }
 
   /**

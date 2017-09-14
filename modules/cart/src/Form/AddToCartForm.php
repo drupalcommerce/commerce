@@ -8,7 +8,7 @@ use Drupal\commerce_cart\CartManagerInterface;
 use Drupal\commerce_cart\CartProviderInterface;
 use Drupal\commerce_order\Resolver\OrderTypeResolverInterface;
 use Drupal\commerce_price\Resolver\ChainPriceResolverInterface;
-use Drupal\commerce_store\CurrentStoreInterface;
+use Drupal\commerce_store\StoreContextInterface;
 use Drupal\Component\Datetime\TimeInterface;
 use Drupal\Core\Entity\ContentEntityForm;
 use Drupal\Core\Entity\EntityInterface;
@@ -46,11 +46,11 @@ class AddToCartForm extends ContentEntityForm implements AddToCartFormInterface 
   protected $orderTypeResolver;
 
   /**
-   * The current store.
+   * The store context.
    *
-   * @var \Drupal\commerce_store\CurrentStoreInterface
+   * @var \Drupal\commerce_store\StoreContextInterface
    */
-  protected $currentStore;
+  protected $storeContext;
 
   /**
    * The chain base price resolver.
@@ -88,20 +88,20 @@ class AddToCartForm extends ContentEntityForm implements AddToCartFormInterface 
    *   The cart provider.
    * @param \Drupal\commerce_order\Resolver\OrderTypeResolverInterface $order_type_resolver
    *   The order type resolver.
-   * @param \Drupal\commerce_store\CurrentStoreInterface $current_store
-   *   The current store.
+   * @param \Drupal\commerce_store\StoreContextInterface $store_context
+   *   The store context.
    * @param \Drupal\commerce_price\Resolver\ChainPriceResolverInterface $chain_price_resolver
    *   The chain base price resolver.
    * @param \Drupal\Core\Session\AccountInterface $current_user
    *   The current user.
    */
-  public function __construct(EntityManagerInterface $entity_manager, EntityTypeBundleInfoInterface $entity_type_bundle_info, TimeInterface $time, CartManagerInterface $cart_manager, CartProviderInterface $cart_provider, OrderTypeResolverInterface $order_type_resolver, CurrentStoreInterface $current_store, ChainPriceResolverInterface $chain_price_resolver, AccountInterface $current_user) {
+  public function __construct(EntityManagerInterface $entity_manager, EntityTypeBundleInfoInterface $entity_type_bundle_info, TimeInterface $time, CartManagerInterface $cart_manager, CartProviderInterface $cart_provider, OrderTypeResolverInterface $order_type_resolver, StoreContextInterface $store_context, ChainPriceResolverInterface $chain_price_resolver, AccountInterface $current_user) {
     parent::__construct($entity_manager, $entity_type_bundle_info, $time);
 
     $this->cartManager = $cart_manager;
     $this->cartProvider = $cart_provider;
     $this->orderTypeResolver = $order_type_resolver;
-    $this->currentStore = $current_store;
+    $this->storeContext = $store_context;
     $this->chainPriceResolver = $chain_price_resolver;
     $this->currentUser = $current_user;
   }
@@ -117,7 +117,7 @@ class AddToCartForm extends ContentEntityForm implements AddToCartFormInterface 
       $container->get('commerce_cart.cart_manager'),
       $container->get('commerce_cart.cart_provider'),
       $container->get('commerce_order.chain_order_type_resolver'),
-      $container->get('commerce_store.current_store'),
+      $container->get('commerce_store.store_context'),
       $container->get('commerce_price.chain_price_resolver'),
       $container->get('current_user')
     );
@@ -224,13 +224,11 @@ class AddToCartForm extends ContentEntityForm implements AddToCartFormInterface 
     $entity = parent::buildEntity($form, $form_state);
     // Now that the purchased entity is set, populate the title and price.
     $purchased_entity = $entity->getPurchasedEntity();
+    $store = $this->selectStore($purchased_entity);
+    $context = new Context($this->currentUser, $store);
+    $resolved_price = $this->chainPriceResolver->resolve($purchased_entity, $entity->getQuantity(), $context);
     $entity->setTitle($purchased_entity->getOrderItemTitle());
-    if (!$entity->isUnitPriceOverridden()) {
-      $store = $this->selectStore($purchased_entity);
-      $context = new Context($this->currentUser, $store);
-      $resolved_price = $this->chainPriceResolver->resolve($purchased_entity, $entity->getQuantity(), $context);
-      $entity->setUnitPrice($resolved_price);
-    }
+    $entity->setUnitPrice($resolved_price);
 
     return $entity;
   }
@@ -261,7 +259,7 @@ class AddToCartForm extends ContentEntityForm implements AddToCartFormInterface 
       throw new \Exception('The given entity is not assigned to any store.');
     }
     else {
-      $store = $this->currentStore->getStore();
+      $store = $this->storeContext->getStore();
       if (!in_array($store, $stores)) {
         // Indicates that the site listings are not filtered properly.
         throw new \Exception("The given entity can't be purchased from the current store.");

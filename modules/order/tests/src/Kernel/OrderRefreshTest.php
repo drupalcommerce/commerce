@@ -205,30 +205,18 @@ class OrderRefreshTest extends CommerceKernelTestBase {
     $this->order->save();
 
     $this->assertEquals($order_item->label(), $this->variation2->getTitle());
-    $this->assertEquals($order_item->getUnitPrice(), $this->variation2->getPrice());
+    $this->assertEquals($this->variation2->getPrice(), $order_item->getUnitPrice());
 
     $this->variation2->setTitle('Changed title');
     $this->variation2->setPrice(new Price('12.00', 'USD'));
     $this->variation2->save();
     $order_refresh->refresh($this->order);
-    /** @var \Drupal\commerce_order\Entity\OrderItemInterface $order_item */
+
+    $this->variation2 = $this->reloadEntity($this->variation2);
     $order_item = $this->reloadEntity($order_item);
 
     $this->assertEquals($order_item->label(), $this->variation2->getTitle());
-    $this->assertEquals($order_item->getUnitPrice(), $this->variation2->getPrice());
-
-    // Confirm that overridden unit prices stay untouched.
-    $unit_price = new Price('15.00', 'USD');
-    $order_item->setUnitPrice($unit_price, TRUE);
-    $this->variation2->setTitle('Changed title2');
-    $this->variation2->setPrice(new Price('16.00', 'USD'));
-    $this->variation2->save();
-    $order_refresh->refresh($this->order);
-    /** @var \Drupal\commerce_order\Entity\OrderItemInterface $order_item */
-    $order_item = $this->reloadEntity($order_item);
-
-    $this->assertEquals($this->variation2->getTitle(), $order_item->label());
-    $this->assertEquals($unit_price, $order_item->getUnitPrice());
+    $this->assertEquals($this->variation2->getPrice(), $order_item->getUnitPrice());
   }
 
   /**

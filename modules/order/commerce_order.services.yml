@@ -56,9 +56,3 @@ services:
   commerce_order.order_total_summary:
     class: Drupal\commerce_order\OrderTotalSummary
     arguments: ['@plugin.manager.commerce_adjustment_type']
-
-  commerce_order.order_store_resolver:
-    class: Drupal\commerce_order\Resolver\OrderStoreResolver
-    arguments: ['@current_route_match']
-    tags:
-      - { name: commerce_store.store_resolver, priority: 100 }

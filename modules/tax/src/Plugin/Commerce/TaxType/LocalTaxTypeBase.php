@@ -146,8 +146,12 @@ abstract class LocalTaxTypeBase extends TaxTypeBase implements LocalTaxTypeInter
       foreach ($rates as $zone_id => $rate) {
         $zone = $zones[$zone_id];
         $unit_price = $order_item->getUnitPrice();
-        $percentage = $rate->getPercentage();
-        $tax_amount = $percentage->calculateTaxAmount($unit_price, $prices_include_tax);
+        $rate_amount = $rate->getAmount()->getAmount();
+        $tax_amount = $unit_price->multiply($rate_amount);
+        if ($prices_include_tax) {
+          $divisor = (string) (1 + $rate_amount);
+          $tax_amount = $tax_amount->divide($divisor);
+        }
         if ($this->shouldRound()) {
           $tax_amount = $this->rounder->round($tax_amount);
         }
@@ -164,7 +168,6 @@ abstract class LocalTaxTypeBase extends TaxTypeBase implements LocalTaxTypeInter
           'type' => 'tax',
           'label' => $zone->getDisplayLabel(),
           'amount' => $negate ? $tax_amount->multiply('-1') : $tax_amount,
-          'percentage' => $percentage->getNumber(),
           'source_id' => $this->entityId . '|' . $zone->getId() . '|' . $rate->getId(),
           'included' => !$negate && $this->isDisplayInclusive(),
         ]));
@@ -307,7 +310,7 @@ abstract class LocalTaxTypeBase extends TaxTypeBase implements LocalTaxTypeInter
       '#type' => 'table',
       '#header' => [
         $this->t('Tax rate'),
-        ['data' => $this->t('Percentage'), 'colspan' => 2],
+        ['data' => $this->t('Amount'), 'colspan' => 2],
       ],
       '#input' => FALSE,
     ];
@@ -325,17 +328,17 @@ abstract class LocalTaxTypeBase extends TaxTypeBase implements LocalTaxTypeInter
         ];
       }
       foreach ($zone->getRates() as $rate) {
-        $formatted_percentages = array_map(function ($percentage) {
-          /** @var \Drupal\commerce_tax\TaxRatePercentage $percentage */
-          return $percentage->toString();
-        }, $rate->getPercentages());
+        $formatted_amounts = array_map(function ($amount) {
+          /** @var \Drupal\commerce_tax\TaxRateAmount $amount */
+          return $amount->toString();
+        }, $rate->getAmounts());
 
         $element['table'][] = [
           'rate' => [
             '#markup' => $rate->getLabel(),
           ],
-          'percentages' => [
-            '#markup' => implode('<br>', $formatted_percentages),
+          'amounts' => [
+            '#markup' => implode('<br>', $formatted_amounts),
           ],
         ];
       }

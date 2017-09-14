@@ -45,6 +45,12 @@ class CurrencyForm extends EntityForm {
     /** @var \Drupal\commerce_price\Entity\CurrencyInterface $currency */
     $currency = $this->entity;
 
+    $import_url = Url::fromRoute('entity.commerce_currency.import')->toString();
+    $form['message'] = [
+      '#type' => 'markup',
+      '#markup' => $this->t('This form is only intended for creating custom currencies. Real-world currencies should be <a href=":url">imported</a>.', [':url' => $import_url]),
+    ];
+
     $form['name'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Name'),

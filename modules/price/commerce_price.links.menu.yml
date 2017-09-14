@@ -1,6 +1,5 @@
 entity.commerce_currency.collection:
   title: Currencies
   route_name: entity.commerce_currency.collection
-  parent: 'commerce.store_configuration'
+  parent: commerce.configuration
   description: 'Manage your currencies.'
-  weight: -20

@@ -9,16 +9,7 @@ commerce.admin_commerce:
 commerce.configuration:
   path: '/admin/commerce/config'
   defaults:
-    _controller: '\Drupal\system\Controller\SystemController::overview'
-    link_id: 'commerce.configuration'
-    _title: 'Configuration'
-  requirements:
-    _permission: 'access commerce administration pages'
-
-commerce.store_configuration:
-  path: '/admin/commerce/config/store'
-  defaults:
     _controller: '\Drupal\system\Controller\SystemController::systemAdminMenuBlockPage'
-    _title: 'Store'
+    _title: 'Configuration'
   requirements:
     _permission: 'access commerce administration pages'

@@ -5,8 +5,6 @@
  * Post update functions for Order.
  */
 
-use Drupal\Core\Entity\Entity\EntityFormDisplay;
-
 /**
  * Revert Order views to fix broken Price fields.
  */
@@ -150,23 +148,4 @@ function commerce_order_post_update_5() {
   }
 
   return $message;
-}
-
-/**
- * Update the profile address field.
- */
-function commerce_order_post_update_6() {
-  // Remove the default_country setting from any profile form.
-  // That allows Commerce to apply its own default taken from the store.
-  $query = \Drupal::entityQuery('entity_form_display')->condition('targetEntityType', 'profile');
-  $ids = $query->execute();
-  $form_displays = EntityFormDisplay::loadMultiple($ids);
-  foreach ($form_displays as $id => $form_display) {
-    /** @var \Drupal\Core\Entity\Display\EntityDisplayInterface $form_display */
-    if ($component = $form_display->getComponent('address')) {
-      $component['settings'] = [];
-      $form_display->setComponent('address', $component);
-      $form_display->save();
-    }
-  }
 }

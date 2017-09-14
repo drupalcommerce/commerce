@@ -1,11 +1,5 @@
 entity.commerce_promotion.add_form:
   route_name: entity.commerce_promotion.add_form
-  title: 'Add promotion'
+  title: 'Add a new promotion'
   appears_on:
     - entity.commerce_promotion.collection
-
-entity.commerce_promotion_coupon.add_form:
-  route_name: entity.commerce_promotion_coupon.add_form
-  title: 'Add coupon'
-  appears_on:
-    - entity.commerce_promotion_coupon.collection

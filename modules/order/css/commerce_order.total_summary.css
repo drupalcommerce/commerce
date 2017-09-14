@@ -5,7 +5,6 @@
 
 .order-total-line {
   padding: 0 10px;
-  text-align: right;
 }
 .order-total-line__total {
   padding-top: 5px;
@@ -13,9 +12,10 @@
 }
 .order-total-line-label {
   display: inline-block;
+  width: 48%;
 }
 .order-total-line-value {
   display: inline-block;
-  width: 80px;
+  width: 50%;
   text-align: right;
 }

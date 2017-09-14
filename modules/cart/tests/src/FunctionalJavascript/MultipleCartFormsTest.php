@@ -50,7 +50,7 @@ class MultipleCartFormsTest extends CartBrowserTestBase {
     $this->maximumMetaRefreshCount = 0;
 
     // Delete parent test product.
-    $this->variation->getProduct()->setUnpublished();
+    $this->variation->getProduct()->setPublished(FALSE);
     $this->variation->getProduct()->save();
 
     /** @var \Drupal\Core\Entity\Entity\EntityFormDisplay $order_item_form_display */

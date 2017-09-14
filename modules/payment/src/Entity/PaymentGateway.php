@@ -2,9 +2,9 @@
 
 namespace Drupal\commerce_payment\Entity;
 
-use Drupal\commerce\CommerceSinglePluginCollection;
 use Drupal\commerce\ConditionGroup;
 use Drupal\commerce_order\Entity\OrderInterface;
+use Drupal\commerce_payment\PaymentGatewayPluginCollection;
 use Drupal\Core\Config\Entity\ConfigEntityBase;
 
 /**
@@ -49,7 +49,6 @@ use Drupal\Core\Config\Entity\ConfigEntityBase;
  *     "plugin",
  *     "configuration",
  *     "conditions",
- *     "conditionOperator",
  *   },
  *   links = {
  *     "add-form" = "/admin/commerce/config/payment-gateways/add",
@@ -104,16 +103,9 @@ class PaymentGateway extends ConfigEntityBase implements PaymentGatewayInterface
   protected $conditions = [];
 
   /**
-   * The condition operator.
-   *
-   * @var string
-   */
-  protected $conditionOperator = 'AND';
-
-  /**
    * The plugin collection that holds the payment gateway plugin.
    *
-   * @var \Drupal\commerce\CommerceSinglePluginCollection
+   * @var \Drupal\commerce_payment\PaymentGatewayPluginCollection
    */
   protected $pluginCollection;
 
@@ -151,7 +143,6 @@ class PaymentGateway extends ConfigEntityBase implements PaymentGatewayInterface
    */
   public function setPluginId($plugin_id) {
     $this->plugin = $plugin_id;
-    $this->configuration = [];
     $this->pluginCollection = NULL;
     return $this;
   }
@@ -196,21 +187,6 @@ class PaymentGateway extends ConfigEntityBase implements PaymentGatewayInterface
   /**
    * {@inheritdoc}
    */
-  public function getConditionOperator() {
-    return $this->conditionOperator;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function setConditionOperator($condition_operator) {
-    $this->conditionOperator = $condition_operator;
-    return $this;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function applies(OrderInterface $order) {
     $conditions = $this->getConditions();
     if (!$conditions) {
@@ -221,25 +197,9 @@ class PaymentGateway extends ConfigEntityBase implements PaymentGatewayInterface
       /** @var \Drupal\commerce\Plugin\Commerce\Condition\ConditionInterface $condition */
       return $condition->getEntityTypeId() == 'commerce_order';
     });
-    $order_conditions = new ConditionGroup($order_conditions, $this->getConditionOperator());
+    $order_conditions = new ConditionGroup($order_conditions, 'AND');
 
     return $order_conditions->evaluate($order);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function set($property_name, $value) {
-    // Invoke the setters to clear related properties.
-    if ($property_name == 'plugin') {
-      $this->setPluginId($value);
-    }
-    elseif ($property_name == 'configuration') {
-      $this->setPluginConfiguration($value);
-    }
-    else {
-      return parent::set($property_name, $value);
-    }
   }
 
   /**
@@ -247,13 +207,13 @@ class PaymentGateway extends ConfigEntityBase implements PaymentGatewayInterface
    *
    * Ensures the plugin collection is initialized before returning it.
    *
-   * @return \Drupal\commerce\CommerceSinglePluginCollection
+   * @return \Drupal\commerce_payment\PaymentGatewayPluginCollection
    *   The plugin collection.
    */
   protected function getPluginCollection() {
     if (!$this->pluginCollection) {
       $plugin_manager = \Drupal::service('plugin.manager.commerce_payment_gateway');
-      $this->pluginCollection = new CommerceSinglePluginCollection($plugin_manager, $this->plugin, $this->configuration, $this->id);
+      $this->pluginCollection = new PaymentGatewayPluginCollection($plugin_manager, $this->plugin, $this->configuration, $this->id);
     }
     return $this->pluginCollection;
   }

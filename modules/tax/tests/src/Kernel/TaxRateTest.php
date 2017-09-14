@@ -28,11 +28,11 @@ class TaxRateTest extends CommerceKernelTestBase {
    *
    * @expectedException \InvalidArgumentException
    */
-  public function testInvalidPercentages() {
+  public function testInvalidAmounts() {
     $definition = [
       'id' => 'test',
       'label' => 'Test',
-      'percentages' => 'WRONG',
+      'amounts' => 'WRONG',
     ];
     $rate = new TaxRate($definition);
   }
@@ -41,8 +41,8 @@ class TaxRateTest extends CommerceKernelTestBase {
    * @covers ::__construct
    * @covers ::getId
    * @covers ::getLabel
-   * @covers ::getPercentages
-   * @covers ::getPercentage
+   * @covers ::getAmounts
+   * @covers ::getAmount
    * @covers ::isDefault
    */
   public function testValid() {
@@ -50,8 +50,8 @@ class TaxRateTest extends CommerceKernelTestBase {
     $definition = [
       'id' => 'standard',
       'label' => 'Standard',
-      'percentages' => [
-        ['number' => '0.23', 'start_date' => '2012-01-01'],
+      'amounts' => [
+        ['amount' => '0.23', 'start_date' => '2012-01-01'],
       ],
       'default' => TRUE,
     ];
@@ -60,11 +60,11 @@ class TaxRateTest extends CommerceKernelTestBase {
     $this->assertEquals($definition['id'], $rate->getId());
     $this->assertEquals($definition['label'], $rate->getLabel());
     $this->assertTrue($rate->isDefault());
-    $this->assertCount(1, $rate->getPercentages());
+    $this->assertCount(1, $rate->getAmounts());
 
-    $percentage = $rate->getPercentage();
-    $this->assertEquals($percentage, $rate->getPercentages()[0]);
-    $this->assertEquals($definition['percentages'][0]['number'], $percentage->getNumber());
+    $amount = $rate->getAmount();
+    $this->assertEquals($amount, $rate->getAmounts()[0]);
+    $this->assertEquals($definition['amounts'][0]['amount'], $amount->getAmount());
   }
 
 }

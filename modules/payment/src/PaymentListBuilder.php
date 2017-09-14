@@ -79,7 +79,7 @@ class PaymentListBuilder extends EntityListBuilder {
    */
   public function load() {
     $order = $this->routeMatch->getParameter('commerce_order');
-    return $this->storage->loadMultipleByOrder($order);
+    return $this->storage->loadMultipleForOrder($order);
   }
 
   /**

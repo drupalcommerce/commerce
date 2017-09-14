@@ -94,34 +94,10 @@ class PromotionForm extends ContentEntityForm {
   /**
    * {@inheritdoc}
    */
-  protected function actions(array $form, FormStateInterface $form_state) {
-    $actions = parent::actions($form, $form_state);
-
-    if ($this->entity->isNew()) {
-      $actions['submit_continue'] = [
-        '#type' => 'submit',
-        '#value' => $this->t('Save and add coupons'),
-        '#continue' => TRUE,
-        '#submit' => ['::submitForm', '::save'],
-      ];
-    }
-
-    return $actions;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function save(array $form, FormStateInterface $form_state) {
     $this->entity->save();
     drupal_set_message($this->t('Saved the %label promotion.', ['%label' => $this->entity->label()]));
-
-    if (!empty($form_state->getTriggeringElement()['#continue'])) {
-      $form_state->setRedirect('entity.commerce_promotion_coupon.collection', ['commerce_promotion' => $this->entity->id()]);
-    }
-    else {
-      $form_state->setRedirect('entity.commerce_promotion.collection');
-    }
+    $form_state->setRedirect('entity.commerce_promotion.collection');
   }
 
 }

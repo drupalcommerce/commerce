@@ -87,7 +87,7 @@ abstract class PaymentGatewayBase extends PluginBase implements PaymentGatewayIn
 
     $this->entityTypeManager = $entity_type_manager;
     $this->time = $time;
-    if (array_key_exists('_entity_id', $configuration)) {
+    if (isset($configuration['_entity_id'])) {
       $this->entityId = $configuration['_entity_id'];
       unset($configuration['_entity_id']);
     }
@@ -319,7 +319,6 @@ abstract class PaymentGatewayBase extends PluginBase implements PaymentGatewayIn
       $values = $form_state->getValue($form['#parents']);
       $values['payment_method_types'] = array_filter($values['payment_method_types']);
 
-      $this->configuration = [];
       $this->configuration['display_label'] = $values['display_label'];
       $this->configuration['mode'] = $values['mode'];
       $this->configuration['payment_method_types'] = array_keys($values['payment_method_types']);

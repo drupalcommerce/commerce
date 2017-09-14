@@ -97,9 +97,7 @@ abstract class PromotionOfferBase extends PluginBase implements PromotionOfferIn
   /**
    * {@inheritdoc}
    */
-  public function submitConfigurationForm(array &$form, FormStateInterface $form_state) {
-    $this->configuration = [];
-  }
+  public function submitConfigurationForm(array &$form, FormStateInterface $form_state) {}
 
   /**
    * {@inheritdoc}

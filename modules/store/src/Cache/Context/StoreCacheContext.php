@@ -2,7 +2,7 @@
 
 namespace Drupal\commerce_store\Cache\Context;
 
-use Drupal\commerce_store\CurrentStoreInterface;
+use Drupal\commerce_store\StoreContextInterface;
 use Drupal\Core\Cache\Context\CacheContextInterface;
 use Drupal\Core\Cache\CacheableMetadata;
 
@@ -14,20 +14,20 @@ use Drupal\Core\Cache\CacheableMetadata;
 class StoreCacheContext implements CacheContextInterface {
 
   /**
-   * The current store.
+   * The store context.
    *
-   * @var \Drupal\commerce_store\CurrentStoreInterface
+   * @var \Drupal\commerce_store\StoreContextInterface
    */
-  protected $currentStore;
+  protected $storeContext;
 
   /**
    * Constructs a new StoreCacheContext class.
    *
-   * @param \Drupal\commerce_store\CurrentStoreInterface $current_store
-   *   The current store.
+   * @param \Drupal\commerce_store\StoreContextInterface $context
+   *   The store context.
    */
-  public function __construct(CurrentStoreInterface $current_store) {
-    $this->currentStore = $current_store;
+  public function __construct(StoreContextInterface $context) {
+    $this->storeContext = $context;
   }
 
   /**
@@ -41,7 +41,7 @@ class StoreCacheContext implements CacheContextInterface {
    * {@inheritdoc}
    */
   public function getContext() {
-    return $this->currentStore->getStore()->id();
+    return $this->storeContext->getStore()->id();
   }
 
   /**

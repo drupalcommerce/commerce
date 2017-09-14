@@ -52,8 +52,8 @@ class CommerceCondition extends Plugin {
   /**
    * The condition entity type ID.
    *
-   * This is the entity type ID of the entity passed to the plugin during
-   * evaluation. For example: 'commerce_order'.
+   * This is the entity type ID of the entity passed to the plugin during evaluation.
+   * For example: 'commerce_order'.
    *
    * @var string
    */

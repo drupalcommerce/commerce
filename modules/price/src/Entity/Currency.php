@@ -24,7 +24,7 @@ use Drupal\Core\Config\Entity\ConfigEntityBase;
  *       "delete" = "Drupal\Core\Entity\EntityDeleteForm"
  *     },
  *     "route_provider" = {
- *       "default" = "Drupal\commerce_price\CurrencyRouteProvider",
+ *       "default" = "Drupal\Core\Entity\Routing\AdminHtmlRouteProvider",
  *     },
  *     "list_builder" = "Drupal\commerce_price\CurrencyListBuilder",
  *   },
@@ -43,10 +43,10 @@ use Drupal\Core\Config\Entity\ConfigEntityBase;
  *     "fractionDigits"
  *   },
  *   links = {
- *     "add-form" = "/admin/commerce/config/currencies/add-custom",
- *     "edit-form" = "/admin/commerce/config/currencies/{commerce_currency}",
- *     "delete-form" = "/admin/commerce/config/currencies/{commerce_currency}/delete",
- *     "collection" = "/admin/commerce/config/currencies"
+ *     "add-form" = "/admin/commerce/config/currency/add",
+ *     "edit-form" = "/admin/commerce/config/currency/{commerce_currency}",
+ *     "delete-form" = "/admin/commerce/config/currency/{commerce_currency}/delete",
+ *     "collection" = "/admin/commerce/config/currency"
  *   }
  * )
  */

@@ -4,13 +4,12 @@ namespace Drupal\Tests\commerce_payment\Unit;
 
 use Drupal\commerce_payment\CreditCard;
 use Drupal\commerce_payment\CreditCardType;
-use Drupal\Tests\UnitTestCase;
 
 /**
  * @coversDefaultClass \Drupal\commerce_payment\CreditCard
  * @group commerce
  */
-class CreditCardTest extends UnitTestCase {
+class CreditCardTest extends \PHPUnit_Framework_TestCase {
 
   /**
    * @covers ::getTypes
