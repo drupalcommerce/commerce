@@ -78,7 +78,7 @@ class CompletionMessage extends CheckoutPaneBase {
       $this->completionMessags->addMessage(
         $this->t(
           'Your order number is %order_number_with_link.',
-          ['%order_number_with_link' => $this->order->toLink($this->order->getOrderNumber())]
+          ['%order_number_with_link' => $this->order->toLink($this->order->id())]
         )
       );
     }
