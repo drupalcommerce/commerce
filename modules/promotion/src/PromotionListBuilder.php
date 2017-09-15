@@ -9,6 +9,7 @@ use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Form\FormInterface;
 use Drupal\Core\Form\FormBuilderInterface;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Url;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -229,6 +230,24 @@ class PromotionListBuilder extends EntityListBuilder implements FormInterface {
         $this->entities[$id]->save();
       }
     }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function getDefaultOperations(EntityInterface $entity) {
+    $operations = parent::getDefaultOperations($entity);
+    if ($entity->access('update')) {
+      $operations['coupons'] = [
+        'title' => $this->t('Coupons'),
+        'weight' => 20,
+        'url' => new Url('entity.commerce_promotion_coupon.collection', [
+          'commerce_promotion' => $entity->id(),
+        ]),
+      ];
+    }
+
+    return $operations;
   }
 
 }

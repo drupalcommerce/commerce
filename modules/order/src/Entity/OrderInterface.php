@@ -310,7 +310,7 @@ interface OrderInterface extends ContentEntityInterface, EntityAdjustableInterfa
   public function setTotalPaid(Price $amount);
 
   /**
-   * Gets the remaining amount unpaid on the order.
+   * Gets the amount unpaid on the order.
    *
    * @return \Drupal\commerce_price\Price|null
    *   The total order amount minus the total paid, or NULL.
