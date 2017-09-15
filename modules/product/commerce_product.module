@@ -22,7 +22,7 @@ function commerce_product_config_translation_info_alter(&$info) {
 }
 
 /**
- * Implements hook_ENTITY_TYPE_presave().
+ * Implements hook_ENTITY_TYPE_update().
  */
 function commerce_product_entity_form_display_update(EntityFormDisplayInterface $form_display) {
   // Reset the cached attribute field map when the 'default' product variation

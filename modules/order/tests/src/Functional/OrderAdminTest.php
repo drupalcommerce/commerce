@@ -167,6 +167,29 @@ class OrderAdminTest extends OrderBrowserTestBase {
   }
 
   /**
+   * Tests unlocking an order.
+   */
+  public function testUnlockOrder() {
+    $order = $this->createEntity('commerce_order', [
+      'type' => 'default',
+      'mail' => $this->loggedInUser->getEmail(),
+      'uid' => $this->loggedInUser,
+      'store_id' => $this->store,
+      'locked' => TRUE,
+    ]);
+    $this->drupalGet($order->toUrl('unlock-form'));
+    $this->assertSession()->statusCodeEquals(200);
+    $this->assertSession()->pageTextContains(t('Are you sure you want to unlock the order @label?', [
+      '@label' => $order->label(),
+    ]));
+    $this->submitForm([], t('Unlock'));
+
+    \Drupal::service('entity_type.manager')->getStorage('commerce_order')->resetCache([$order->id()]);
+    $order = Order::load($order->id());
+    $this->assertFalse($order->isLocked());
+  }
+
+  /**
    * Tests that an admin can view an order's details.
    */
   public function testAdminOrderView() {

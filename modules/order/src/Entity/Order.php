@@ -37,7 +37,8 @@ use Drupal\profile\Entity\ProfileInterface;
  *       "default" = "Drupal\commerce_order\Form\OrderForm",
  *       "add" = "Drupal\commerce_order\Form\OrderForm",
  *       "edit" = "Drupal\commerce_order\Form\OrderForm",
- *       "delete" = "Drupal\Core\Entity\ContentEntityDeleteForm"
+ *       "delete" = "Drupal\Core\Entity\ContentEntityDeleteForm",
+ *       "unlock" = "Drupal\commerce_order\Form\OrderUnlockForm",
  *     },
  *     "route_provider" = {
  *       "default" = "Drupal\commerce_order\OrderRouteProvider",
@@ -60,6 +61,7 @@ use Drupal\profile\Entity\ProfileInterface;
  *     "delete-form" = "/admin/commerce/orders/{commerce_order}/delete",
  *     "delete-multiple-form" = "/admin/commerce/orders/delete",
  *     "reassign-form" = "/admin/commerce/orders/{commerce_order}/reassign",
+ *     "unlock-form" = "/admin/commerce/orders/{commerce_order}/unlock",
  *     "collection" = "/admin/commerce/orders"
  *   },
  *   bundle_entity_type = "commerce_order_type",
@@ -428,6 +430,29 @@ class Order extends ContentEntityBase implements OrderInterface {
   /**
    * {@inheritdoc}
    */
+  public function isLocked() {
+    return !empty($this->get('locked')->value);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function lock() {
+    $this->set('locked', TRUE);
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function unlock() {
+    $this->set('locked', FALSE);
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function getCreatedTime() {
     return $this->get('created')->value;
   }
@@ -660,6 +685,14 @@ class Order extends ContentEntityBase implements OrderInterface {
     $fields['data'] = BaseFieldDefinition::create('map')
       ->setLabel(t('Data'))
       ->setDescription(t('A serialized array of additional data.'));
+
+    $fields['locked'] = BaseFieldDefinition::create('boolean')
+      ->setLabel(t('Locked'))
+      ->setSettings([
+        'on_label' => t('Yes'),
+        'off_label' => t('No'),
+      ])
+      ->setDefaultValue(FALSE);
 
     $fields['created'] = BaseFieldDefinition::create('created')
       ->setLabel(t('Created'))
