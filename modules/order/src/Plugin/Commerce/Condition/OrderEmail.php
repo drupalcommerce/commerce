@@ -10,14 +10,14 @@ use Drupal\Core\Form\FormStateInterface;
  * Provides the Email address condition for orders.
  *
  * @CommerceCondition(
- *   id = "order_email_address",
+ *   id = "order_email",
  *   label = @Translation("Email address"),
  *   display_label = @Translation("Limit by email address"),
  *   category = @Translation("Customer"),
  *   entity_type = "commerce_order",
  * )
  */
-class OrderEmailAddress extends ConditionBase {
+class OrderEmail extends ConditionBase {
 
   /**
    * {@inheritdoc}
