@@ -7,7 +7,7 @@ use Drupal\Tests\commerce\Functional\CommerceBrowserTestBase;
 use Drupal\Tests\commerce\FunctionalJavascript\JavascriptTestTrait;
 
 /**
- * Create, view, edit, delete, and change promotion entities.
+ * Tests the admin UI for promotions.
  *
  * @group commerce
  */
@@ -41,8 +41,7 @@ class PromotionTest extends CommerceBrowserTestBase {
    */
   public function testCreatePromotion() {
     $this->drupalGet('admin/commerce/promotions');
-    $this->getSession()->getPage()->clickLink('Add a new promotion');
-    $this->drupalGet('promotion/add');
+    $this->getSession()->getPage()->clickLink('Add promotion');
 
     // Check the integrity of the form.
     $this->assertSession()->fieldExists('name[0][value]');
@@ -103,7 +102,7 @@ class PromotionTest extends CommerceBrowserTestBase {
    */
   public function testCreatePromotionWithEndDate() {
     $this->drupalGet('admin/commerce/promotions');
-    $this->getSession()->getPage()->clickLink('Add a new promotion');
+    $this->getSession()->getPage()->clickLink('Add promotion');
     $this->drupalGet('promotion/add');
 
     // Check the integrity of the form.

@@ -382,6 +382,7 @@ class Product extends ContentEntityBase implements ProductInterface {
       ->setComputed(TRUE);
 
     $fields['status']
+      ->setLabel(t('Published'))
       ->setDisplayOptions('form', [
         'type' => 'boolean_checkbox',
         'settings' => [

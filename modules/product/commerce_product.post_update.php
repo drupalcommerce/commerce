@@ -5,6 +5,8 @@
  * Post update functions for Product.
  */
 
+use Drupal\Core\Entity\Entity\EntityFormDisplay;
+
 /**
  * Revert the Products view because of the updated permission.
  */
@@ -99,4 +101,22 @@ function commerce_product_post_update_3() {
   }
 
   return $message;
+}
+
+/**
+ * Expose the status field on every product form.
+ */
+function commerce_product_post_update_4() {
+  $query = \Drupal::entityQuery('entity_form_display')->condition('targetEntityType', 'commerce_product');
+  $ids = $query->execute();
+  $form_displays = EntityFormDisplay::loadMultiple($ids);
+  foreach ($form_displays as $id => $form_display) {
+    /** @var \Drupal\Core\Entity\Display\EntityDisplayInterface $form_display */
+    $form_display->setComponent('status', [
+      'type' => 'boolean_checkbox',
+      'settings' => [
+        'display_label' => TRUE,
+      ],
+    ])->save();
+  }
 }

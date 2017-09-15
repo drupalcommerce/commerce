@@ -1,25 +1,25 @@
 <?php
 
-namespace Drupal\commerce_tax;
+namespace Drupal\commerce;
 
 use Drupal\Component\Plugin\Exception\PluginException;
 use Drupal\Component\Plugin\PluginManagerInterface;
 use Drupal\Core\Plugin\DefaultSingleLazyPluginCollection;
 
 /**
- * A collection of tax type plugins.
+ * A collection that stores a single plugin, aware of its parent entity ID.
  */
-class TaxTypePluginCollection extends DefaultSingleLazyPluginCollection {
+class CommerceSinglePluginCollection extends DefaultSingleLazyPluginCollection {
 
   /**
-   * The tax type entity ID this plugin collection belongs to.
+   * The entity ID this plugin collection belongs to.
    *
    * @var string
    */
   protected $entityId;
 
   /**
-   * Constructs a new TaxTypePluginCollection object.
+   * Constructs a new CommerceSinglePluginCollection object.
    *
    * @param \Drupal\Component\Plugin\PluginManagerInterface $manager
    *   The manager to be used for instantiating plugins.
@@ -28,12 +28,13 @@ class TaxTypePluginCollection extends DefaultSingleLazyPluginCollection {
    * @param array $configuration
    *   An array of configuration.
    * @param string $entity_id
-   *   The tax type entity ID this plugin collection belongs to.
+   *   The entity ID this plugin collection belongs to.
    */
   public function __construct(PluginManagerInterface $manager, $instance_id, array $configuration, $entity_id) {
-    parent::__construct($manager, $instance_id, $configuration);
-
     $this->entityId = $entity_id;
+    // The parent constructor initializes the plugin, so it needs to be called
+    // after $this->entityId is set.
+    parent::__construct($manager, $instance_id, $configuration);
   }
 
   /**
@@ -41,7 +42,7 @@ class TaxTypePluginCollection extends DefaultSingleLazyPluginCollection {
    */
   protected function initializePlugin($instance_id) {
     if (!$instance_id) {
-      throw new PluginException("The tax type '{$this->entityId}' did not specify a plugin.");
+      throw new PluginException("The entity '{$this->entityId}' did not specify a plugin.");
     }
 
     $configuration = ['_entity_id' => $this->entityId] + $this->configuration;

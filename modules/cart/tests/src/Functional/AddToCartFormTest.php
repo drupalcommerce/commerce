@@ -74,7 +74,7 @@ class AddToCartFormTest extends CartBrowserTestBase {
 
     $variation1 = $this->createEntity('commerce_product_variation', [
       'type' => 'default',
-      'sku' => $this->randomMachineName(),
+      'sku' => 'not-canonical',
       'price' => [
         'number' => '5.00',
         'currency_code' => 'USD',
