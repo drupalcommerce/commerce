@@ -112,6 +112,7 @@ class OrderItem extends ContentEntityBase implements OrderItemInterface {
    */
   public function setQuantity($quantity) {
     $this->set('quantity', (string) $quantity);
+    $this->recalculateTotalPrice();
     return $this;
   }
 
@@ -139,6 +140,21 @@ class OrderItem extends ContentEntityBase implements OrderItemInterface {
    */
   public function isUnitPriceOverridden() {
     return $this->get('overridden_unit_price')->value;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getAdjustedUnitPrice() {
+    if ($unit_price = $this->getUnitPrice()) {
+      $adjusted_price = $unit_price;
+      foreach ($this->getAdjustments() as $adjustment) {
+        if (!$adjustment->isIncluded()) {
+          $adjusted_price = $adjusted_price->add($adjustment->getAmount());
+        }
+      }
+      return $adjusted_price;
+    }
   }
 
   /**
@@ -178,6 +194,18 @@ class OrderItem extends ContentEntityBase implements OrderItemInterface {
   public function getTotalPrice() {
     if (!$this->get('total_price')->isEmpty()) {
       return $this->get('total_price')->first()->toPrice();
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getAdjustedTotalPrice() {
+    if ($adjusted_unit_price = $this->getAdjustedUnitPrice()) {
+      $rounder = \Drupal::service('commerce_price.rounder');
+      $adjusted_total_price = $adjusted_unit_price->multiply($this->getQuantity());
+      $adjusted_total_price = $rounder->round($adjusted_total_price);
+      return $adjusted_total_price;
     }
   }
 

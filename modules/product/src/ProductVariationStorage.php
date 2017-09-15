@@ -69,6 +69,16 @@ class ProductVariationStorage extends CommerceContentEntityStorage implements Pr
   /**
    * {@inheritdoc}
    */
+  public function loadBySku($sku) {
+    $variations = $this->loadByProperties(['sku' => $sku]);
+    $variation = reset($variations);
+
+    return $variation ?: NULL;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function loadFromContext(ProductInterface $product) {
     $current_request = $this->requestStack->getCurrentRequest();
     if ($variation_id = $current_request->query->get('v')) {

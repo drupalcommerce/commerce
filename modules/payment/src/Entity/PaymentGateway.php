@@ -2,9 +2,9 @@
 
 namespace Drupal\commerce_payment\Entity;
 
+use Drupal\commerce\CommerceSinglePluginCollection;
 use Drupal\commerce\ConditionGroup;
 use Drupal\commerce_order\Entity\OrderInterface;
-use Drupal\commerce_payment\PaymentGatewayPluginCollection;
 use Drupal\Core\Config\Entity\ConfigEntityBase;
 
 /**
@@ -113,7 +113,7 @@ class PaymentGateway extends ConfigEntityBase implements PaymentGatewayInterface
   /**
    * The plugin collection that holds the payment gateway plugin.
    *
-   * @var \Drupal\commerce_payment\PaymentGatewayPluginCollection
+   * @var \Drupal\commerce\CommerceSinglePluginCollection
    */
   protected $pluginCollection;
 
@@ -247,13 +247,13 @@ class PaymentGateway extends ConfigEntityBase implements PaymentGatewayInterface
    *
    * Ensures the plugin collection is initialized before returning it.
    *
-   * @return \Drupal\commerce_payment\PaymentGatewayPluginCollection
+   * @return \Drupal\commerce\CommerceSinglePluginCollection
    *   The plugin collection.
    */
   protected function getPluginCollection() {
     if (!$this->pluginCollection) {
       $plugin_manager = \Drupal::service('plugin.manager.commerce_payment_gateway');
-      $this->pluginCollection = new PaymentGatewayPluginCollection($plugin_manager, $this->plugin, $this->configuration, $this->id);
+      $this->pluginCollection = new CommerceSinglePluginCollection($plugin_manager, $this->plugin, $this->configuration, $this->id);
     }
     return $this->pluginCollection;
   }

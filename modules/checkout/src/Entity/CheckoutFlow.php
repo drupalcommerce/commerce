@@ -2,7 +2,7 @@
 
 namespace Drupal\commerce_checkout\Entity;
 
-use Drupal\commerce_checkout\CheckoutFlowPluginCollection;
+use Drupal\commerce\CommerceSinglePluginCollection;
 use Drupal\Core\Config\Entity\ConfigEntityBase;
 
 /**
@@ -83,7 +83,7 @@ class CheckoutFlow extends ConfigEntityBase implements CheckoutFlowInterface {
   /**
    * The plugin collection that holds the checkout flow plugin.
    *
-   * @var \Drupal\commerce_checkout\CheckoutFlowPluginCollection
+   * @var \Drupal\commerce\CommerceSinglePluginCollection
    */
   protected $pluginCollection;
 
@@ -138,13 +138,13 @@ class CheckoutFlow extends ConfigEntityBase implements CheckoutFlowInterface {
    *
    * Ensures the plugin collection is initialized before returning it.
    *
-   * @return \Drupal\commerce_checkout\CheckoutFlowPluginCollection
+   * @return \Drupal\commerce\CommerceSinglePluginCollection
    *   The plugin collection.
    */
   protected function getPluginCollection() {
     if (!$this->pluginCollection) {
       $plugin_manager = \Drupal::service('plugin.manager.commerce_checkout_flow');
-      $this->pluginCollection = new CheckoutFlowPluginCollection($plugin_manager, $this->plugin, $this->configuration, $this->id);
+      $this->pluginCollection = new CommerceSinglePluginCollection($plugin_manager, $this->plugin, $this->configuration, $this->id);
     }
     return $this->pluginCollection;
   }

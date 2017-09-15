@@ -407,7 +407,7 @@ class Promotion extends ContentEntityBase implements PromotionInterface {
     if ($usage_limit = $this->getUsageLimit()) {
       /** @var \Drupal\commerce_promotion\PromotionUsageInterface $usage */
       $usage = \Drupal::service('commerce_promotion.usage');
-      if ($usage_limit <= $usage->getUsage($this)) {
+      if ($usage_limit <= $usage->load($this)) {
         return FALSE;
       }
     }
@@ -520,7 +520,7 @@ class Promotion extends ContentEntityBase implements PromotionInterface {
     $coupon_storage->delete($coupons);
     /** @var \Drupal\commerce_promotion\PromotionUsageInterface $usage */
     $usage = \Drupal::service('commerce_promotion.usage');
-    $usage->deleteUsage($entities);
+    $usage->delete($entities);
   }
 
   /**
@@ -628,17 +628,7 @@ class Promotion extends ContentEntityBase implements PromotionInterface {
       ->setCardinality(BaseFieldDefinition::CARDINALITY_UNLIMITED)
       ->setRequired(FALSE)
       ->setSetting('target_type', 'commerce_promotion_coupon')
-      ->setSetting('handler', 'default')
-      ->setTranslatable(TRUE)
-      ->setDisplayOptions('form', [
-        'type' => 'inline_entity_form_complex',
-        'weight' => 10,
-        'settings' => [
-          'override_labels' => TRUE,
-          'label_singular' => 'coupon',
-          'label_plural' => 'coupons',
-        ],
-      ]);
+      ->setSetting('handler', 'default');
 
     $fields['usage_limit'] = BaseFieldDefinition::create('integer')
       ->setLabel(t('Usage limit'))
