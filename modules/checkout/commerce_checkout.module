@@ -48,13 +48,43 @@ function commerce_checkout_theme() {
 /**
  * Implements hook_theme_suggestions_HOOK().
  */
+function commerce_checkout_theme_suggestions_commerce_checkout_completion_message(array $variables) {
+  /** @var \Drupal\commerce_checkout\Entity\CheckoutFlowInterface $checkout_flow */
+  $checkout_flow = $variables['order_entity']->get('checkout_flow')->entity;
+  $original = $variables['theme_hook_original'];
+  $suggestions = [];
+  $suggestions[] = $original;
+  $suggestions[] = $original . '__' . $checkout_flow->getPluginId();
+  $suggestions[] = $original . '__' . $checkout_flow->id();
+}
+
+/**
+ * Implements hook_theme_suggestions_HOOK().
+ */
+function commerce_checkout_theme_suggestions_commerce_checkout_order_summary(array $variables) {
+  /** @var \Drupal\commerce_checkout\Entity\CheckoutFlowInterface $checkout_flow */
+  $checkout_flow = $variables['order_entity']->get('checkout_flow')->entity;
+  $original = $variables['theme_hook_original'];
+  $suggestions = [];
+  $suggestions[] = $original;
+  $suggestions[] = $original . '__' . $checkout_flow->getPluginId();
+  $suggestions[] = $original . '__' . $checkout_flow->id();
+}
+
+/**
+ * Implements hook_theme_suggestions_HOOK().
+ */
 function commerce_checkout_theme_suggestions_commerce_checkout_form(array $variables) {
   $original = $variables['theme_hook_original'];
   $suggestions = [];
   $suggestions[] = $original;
+  $suggestions[] = $original . '__' . $variables['form']['#plugin_id'];
+  $suggestions[] = $original . '__' . $variables['form']['#entity_id'];
   // If the checkout form has a sidebar, suggest the enhanced layout.
   if (isset($variables['form']['sidebar']) && Element::isVisibleElement($variables['form']['sidebar'])) {
     $suggestions[] = $original . '__with_sidebar';
+    $suggestions[] = $original . '__' . $variables['form']['#plugin_id'] . '__with_sidebar';
+    $suggestions[] = $original . '__' . $variables['form']['#entity_id'] . '__with_sidebar';
   }
 
   return $suggestions;
