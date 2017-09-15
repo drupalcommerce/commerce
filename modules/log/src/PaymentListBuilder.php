@@ -14,20 +14,21 @@ class PaymentListBuilder extends BasePaymentListBuilder {
    */
   public function render() {
     $build = parent::render();
-    $entityIds = [];
-    foreach ($this->load() as $entity) {
-      $entityIds[] = $entity->id();
+    $entities = $this->load();
+    /** @var \Drupal\commerce_payment\Entity\PaymentInterface $payment */
+    $payment = reset($entities);
+    if ($payment) {
+      $build['log']['title'] = [
+        '#markup' => '<h3>' . $this->t('Order activity') . '</h3>',
+      ];
+      $build['log']['activity'] = [
+        '#type' => 'view',
+        '#name' => 'commerce_activity',
+        '#display_id' => 'default',
+        '#arguments' => [$payment->getOrder()->id(), 'commerce_order'],
+        '#embed' => FALSE,
+      ];
     }
-    $build['log']['title'] = [
-      '#markup' => '<h3>' . $this->t('Payment activity') . '</h3>',
-    ];
-    $build['log']['activity'] = [
-      '#type' => 'view',
-      '#name' => 'commerce_activity',
-      '#display_id' => 'default',
-      '#arguments' => [implode('+', $entityIds), 'commerce_payment'],
-      '#embed' => FALSE,
-    ];
     return $build;
   }
 

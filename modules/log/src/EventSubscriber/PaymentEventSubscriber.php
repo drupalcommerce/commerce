@@ -36,23 +36,10 @@ class PaymentEventSubscriber implements EventSubscriberInterface {
    */
   public static function getSubscribedEvents() {
     $events = [
-      PaymentEvents::PAYMENT_INSERT => ['onPaymentInsert', -100],
       PaymentEvents::PAYMENT_PRESAVE => ['onPaymentPresave', -100],
-      PaymentEvents::PAYMENT_DELETE => ['onPaymentDelete', -100],
+      PaymentEvents::PAYMENT_PREDELETE => ['onPaymentPredelete', -100],
     ];
     return $events;
-  }
-
-  /**
-   * Creates a log when a payment is inserted.
-   *
-   * @param \Drupal\commerce_payment\Event\PaymentEvent $event
-   *   The payment event.
-   *
-   * @throws \Drupal\Core\Entity\EntityStorageException
-   */
-  public function onPaymentInsert(PaymentEvent $event) {
-    $this->logPayment($event->getPayment(), 'payment_inserted');
   }
 
   /**
@@ -64,19 +51,7 @@ class PaymentEventSubscriber implements EventSubscriberInterface {
    * @throws \Drupal\Core\Entity\EntityStorageException
    */
   public function onPaymentPresave(PaymentEvent $event) {
-    $payment = $event->getPayment();
-    $refund = $payment->getRefundedAmount();
-    if (!$payment->isNew() && !$payment->getAmount()->equals($payment->original->getAmount())) {
-      $this->logStorage->generate($payment, 'payment_price_updated', [
-        'previous_amount' => $payment->original->getAmount(),
-        'current_amount' => $payment->getAmount(),
-      ])->save();
-    }
-    if ($refund && Calculator::trim($refund->getNumber())) {
-      $this->logStorage->generate($payment, 'payment_refunded', [
-        'refunded_amount' => $refund,
-      ])->save();
-    }
+    $this->logPayment($event->getPayment());
   }
 
   /**
@@ -87,8 +62,9 @@ class PaymentEventSubscriber implements EventSubscriberInterface {
    *
    * @throws \Drupal\Core\Entity\EntityStorageException
    */
-  public function onPaymentDelete(PaymentEvent $event) {
-    $this->logPayment($event->getPayment(), 'payment_deleted');
+  public function onPaymentPredelete(PaymentEvent $event) {
+    $event->getPayment()->setState('deleted');
+    $this->logPayment($event->getPayment());
   }
 
   /**
@@ -96,15 +72,38 @@ class PaymentEventSubscriber implements EventSubscriberInterface {
    *
    * @param \Drupal\commerce_payment\Entity\PaymentInterface $payment
    *   The payment.
-   * @param string $templateId
-   *   The log template ID.
    *
    * @throws \Drupal\Core\Entity\EntityStorageException
    */
-  protected function logPayment(PaymentInterface $payment, $templateId) {
-    $this->logStorage->generate($payment, $templateId, [
-      'amount' => $payment->getAmount(),
-    ])->save();
+  protected function logPayment(PaymentInterface $payment) {
+    $refund = $payment->getRefundedAmount();
+    $isNew = $payment->isNew();
+    $previousAmount =  FALSE;
+    if (!empty($payment->original) && !$payment->getAmount()->equals($payment->original->getAmount())) {
+      $previousAmount = $payment->original->getAmount();
+    }
+    if ($refund && Calculator::trim($refund->getNumber())) {
+      if (!empty($payment->original) && !$payment->getRefundedAmount()->equals($payment->original->getRefundedAmount())) {
+        $refund = $payment->getRefundedAmount()->subtract($payment->original->getRefundedAmount());
+      }
+      $this->logStorage->generate($payment->getOrder(), 'payment_refunded', [
+        'id' => $payment->id(),
+        'remote_id' => $payment->getRemoteId(),
+        'refunded_amount' => $refund,
+        'state' => $payment->getState()->value,
+        'new' => $isNew,
+      ])->save();
+    }
+    else {
+      $this->logStorage->generate($payment->getOrder(), 'payment_log', [
+        'id' => $payment->id(),
+        'remote_id' => $payment->getRemoteId(),
+        'new' => $isNew,
+        'amount' => $payment->getAmount(),
+        'previous_amount' => $previousAmount,
+        'state' => $payment->getState()->value,
+      ])->save();
+    }
   }
 
 }

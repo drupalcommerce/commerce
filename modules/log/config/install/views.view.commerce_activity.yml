@@ -288,7 +288,7 @@ display:
           entity_type: commerce_log
           entity_field: log_id
           plugin_id: standard
-      title: 'Activity log'
+      title: 'Order activity'
       header: {  }
       footer: {  }
       empty:
@@ -337,7 +337,7 @@ display:
             type: none
             fail: 'not found'
           validate_options: {  }
-          break_phrase: true
+          break_phrase: false
           not: false
           entity_type: commerce_log
           entity_field: source_entity_id
