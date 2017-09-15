@@ -2,6 +2,8 @@
 
 namespace Drupal\commerce_payment\Entity;
 
+use Drupal\commerce_payment\Event\PaymentEvents;
+use Drupal\commerce_payment\PaymentStorage;
 use Drupal\commerce_price\Price;
 use Drupal\Core\Entity\ContentEntityBase;
 use Drupal\Core\Entity\EntityMalformedException;
@@ -303,6 +305,9 @@ class Payment extends ContentEntityBase implements PaymentInterface {
       $this->getOrder()->addPayment($this->getAmount())->save();
       if (empty($this->getCompletedTime())) {
         $this->setCompletedTime(\Drupal::time()->getRequestTime());
+      }
+      if ($this->getOrder()->getBalance()->isZero() && $storage instanceof PaymentStorage) {
+        $storage->dispatchPaymentEvent($this, PaymentEvents::PAYMENT_ORDER_PAID_IN_FULL);
       }
     }
     elseif (in_array($state, ['partially_refunded', 'refunded']) &&
