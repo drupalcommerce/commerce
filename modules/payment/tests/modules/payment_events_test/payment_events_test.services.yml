@@ -1,0 +1,6 @@
+services:
+  payment_events_test.event_subscriber:
+    class: Drupal\payment_events_test\EventSubscriber
+    arguments: ['@state']
+    tags:
+      - { name: event_subscriber }
