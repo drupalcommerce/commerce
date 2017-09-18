@@ -28,7 +28,7 @@ commerce.commerce_condition.plugin.order_item_quantity:
 commerce.commerce_condition.plugin.order_email:
   type: commerce_condition_configuration
   mapping:
-    operator:
+    email:
       type: string
       label: 'Email'
       
