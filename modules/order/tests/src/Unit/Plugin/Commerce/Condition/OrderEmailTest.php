@@ -7,8 +7,8 @@ use Drupal\commerce_order\Plugin\Commerce\Condition\OrderEmail;
 use Drupal\Tests\UnitTestCase;
 
 /**
- * @coversDefaultClass \Drupal\commerce_order\Plugin\Commerce\Condition\OrderCustomerRole
- * @group commerce, orderemail
+ * @coversDefaultClass \Drupal\commerce_order\Plugin\Commerce\Condition\OrderEmail
+ * @group commerce
  */
 class OrderEmailTest extends UnitTestCase {
 
@@ -17,13 +17,20 @@ class OrderEmailTest extends UnitTestCase {
    */
   public function testOrderEmail() {
     $condition = new OrderEmail([
-      'mail' => ['test@test.com'],
+      'mail' => 'tests@test.com',
     ], 'order_mail', ['entity_type' => 'commerce_order']);
-    $order = $this->prophesize(OrderInterface::class);
-    $order->getEntityTypeId()->willReturn('commerce_order');
-    $order->getEmail()->willReturn(NULL);
-    $order = $order->reveal();
-    $this->assertFalse($condition->evaluate($order));
+    $orderFalse = $this->prophesize(OrderInterface::class);
+    $orderFalse->getEntityTypeId()->willReturn('commerce_order');
+    $orderFalse->getEmail()->willReturn(NULL);
+    $orderFalse = $orderFalse->reveal();
+    $this->assertFalse($condition->evaluate($orderFalse));
+    $orderTrue = $this->prophesize(OrderInterface::class);
+    $orderTrue->getEntityTypeId()->willReturn('commerce_order');
+    $orderTrue->setEmail('tests@test.com');
+    $orderTrue->getEmail()->willReturn('tests@test.com');
+    $orderTrue = $orderTrue->reveal();
+    $this->assertTrue($condition->evaluate($orderTrue));
+
   }
 
 }

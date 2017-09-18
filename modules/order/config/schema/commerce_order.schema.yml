@@ -5,16 +5,6 @@ commerce.commerce_condition.plugin.order_billing_address:
       type: address_zone
       label: 'Zone'
 
-commerce.commerce_condition.plugin.order_currency:
-  type: commerce_condition_configuration
-  mapping:
-    currencies:
-      type: sequence
-      label: 'Currencies'
-      sequence:
-        type: string
-        label: 'Currency'
-
 commerce.commerce_condition.plugin.order_customer_role:
   type: commerce_condition_configuration
   mapping:
@@ -34,18 +24,15 @@ commerce.commerce_condition.plugin.order_item_quantity:
     quantity:
       type: integer
       label: 'Quantity'
-
-commerce.commerce_condition.plugin.order_store:
+      
+commerce.commerce_condition.plugin.order_email:
   type: commerce_condition_configuration
   mapping:
-    stores:
-      type: sequence
-      label: 'Stores'
-      sequence:
-        type: string
-        label: 'Store'
-
-commerce.commerce_condition.plugin.order_total_price:
+    operator:
+      type: string
+      label: 'Email'
+      
+commerce.commerce_condition.plugin.commerce_promotion_order_total_price:
   type: commerce_condition_configuration
   mapping:
     operator:
@@ -54,9 +41,6 @@ commerce.commerce_condition.plugin.order_total_price:
     amount:
       type: field.value.commerce_price
       label: 'Amount'
-
-commerce.commerce_condition.plugin.order_type:
-  type: commerce.commerce_condition.plugin.entity_bundle
 
 commerce_order.commerce_order_type.*:
   type: commerce_config_entity_bundle
@@ -88,22 +72,3 @@ commerce_order.commerce_order_item_type.*:
     orderType:
       type: string
       label: 'Order type'
-
-field.widget.settings.commerce_quantity:
-  type: mapping
-  label: 'Quantity widget settings'
-  mapping:
-    placeholder:
-      type: label
-      label: 'Placeholder'
-    step:
-      type: string
-      label: 'Step'
-
-field.widget.settings.commerce_unit_price:
-  type: mapping
-  label: 'Unit price widget settings'
-  mapping:
-    require_confirmation:
-      type: boolean
-      label: 'Require confirmation before overriding the unit price'
