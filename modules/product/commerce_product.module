@@ -7,7 +7,6 @@
 
 use Drupal\commerce\BundleFieldDefinition;
 use Drupal\commerce_product\Entity\ProductTypeInterface;
-use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Entity\EntityInterface;
@@ -42,23 +41,6 @@ function commerce_product_entity_view_display_update(EntityInterface $entity) {
   if (substr($entity->getConfigTarget(), 0, 27) === 'commerce_product_variation.') {
     Cache::invalidateTags(['commerce_product_view']);
   }
-}
-
-/**
- * Implements hook_entity_access().
- */
-function commerce_product_entity_access(EntityInterface $entity, $operation, $account) {
-  // Allow published products to be viewed by all users for now.
-  // @todo Remove once we implement the full product permissions.
-  if ($operation == 'view') {
-    if ($entity->getEntityTypeId() == 'commerce_product' && $entity->isPublished()) {
-      return AccessResult::allowed();
-    }
-    elseif ($entity->getEntityTypeId() == 'commerce_product_variation' && $entity->isActive()) {
-      return AccessResult::allowed();
-    }
-  }
-  return AccessResult::neutral();
 }
 
 /**

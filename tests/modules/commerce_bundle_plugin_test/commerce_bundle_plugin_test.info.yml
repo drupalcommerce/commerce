@@ -1,7 +1,0 @@
-name: 'Commerce bundle plugin test'
-type: module
-description: 'Module for testing bundle plugins.'
-package: Testing
-core: 8.x
-dependencies:
-  - commerce

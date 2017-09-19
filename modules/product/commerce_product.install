@@ -6,6 +6,16 @@
  */
 
 use Drupal\Core\Field\BaseFieldDefinition;
+use Drupal\Core\Session\AccountInterface;
+
+/**
+ * Implements hook_install().
+ */
+function commerce_product_install() {
+  // Allow all roles to view published products.
+  user_role_grant_permissions(AccountInterface::ANONYMOUS_ROLE, ['view commerce_product']);
+  user_role_grant_permissions(AccountInterface::AUTHENTICATED_ROLE, ['view commerce_product']);
+}
 
 /**
  * Change the path field to computed.
