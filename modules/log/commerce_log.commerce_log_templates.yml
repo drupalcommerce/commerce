@@ -31,12 +31,12 @@ order_assigned:
 variation_added:
   category: commerce_product
   label: 'Variation added'
-  template: '<p>Variation id {{ id }} with sku {{ sku }} was added.</p>'
+  template: '<p>Variation added</p><p>id: {{ id }}</p><p>sku: {{ sku }}</p><p>title: {{ label }}</p>'
 variation_field_changed:
   category: commerce_product
   label: 'Variation changed'
-  template: '<p>Variation id {{ id }} with sku {{ sku }} had the following fields changed: {{ changed_fields }}.</p>'
+  template: '<p>Variation changed</p><p>id: {{ id }}</p><p>sku: {{ sku }}</p><p>changed fields: {{ changed_fields }}</p>'
 variation_deleted:
   category: commerce_product
   label: 'Variation deleted'
-  template: '<p>Variation id {{ id }} with sku {{ sku }} was deleted.</p>'
+  template: '<p>Variation deleted</p><p>id: {{ id }}</p><p>sku: {{ sku }}</p>'

@@ -70,6 +70,7 @@ class ProductVariationEventSubscriber implements EventSubscriberInterface {
         $this->logStorage->generate($product, 'variation_added', [
           'id' => $event->getProductVariation()->id(),
           'sku' => $event->getProductVariation()->getSku(),
+          'label' => $event->getProductVariation()->label(),
         ])->save();
       }
       elseif ($changedValues = $this->getChangedFields($original, $variation)) {
