@@ -23,9 +23,12 @@ function commerce_log_preprocess_commerce_order(&$variables) {
   ];
 }
 
+/**
+ * Implements hook_entity_type_alter() for commerce_payment.
+ */
 function commerce_log_entity_type_alter(array &$entity_types) {
   if (isset($entity_types['commerce_payment'])) {
-    /** @var $entity_types \Drupal\Core\Entity\EntityTypeInterface[] */
+    /** @var \Drupal\Core\Entity\EntityTypeInterface[] $entity_types */
     $entity_types['commerce_payment']->setListBuilderClass(PaymentListBuilder::class);
   }
 }

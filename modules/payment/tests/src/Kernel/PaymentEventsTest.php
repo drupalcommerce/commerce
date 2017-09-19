@@ -93,7 +93,7 @@ class PaymentEventsTest extends CommerceKernelTestBase {
 
     // Check the create event.
     $event_recorder = \Drupal::state()->get('payment_events_test.event', FALSE);
-    $this->assertEquals('commerce_payment.commerce_payment.create', $event_recorder['event_name']);
+    $this->assertEquals('commerce_payment.commerce_payment.insert', $event_recorder['event_name']);
     $this->assertEquals($payment->id(), $event_recorder['event_entity']->id());
 
     // Reload the payment.

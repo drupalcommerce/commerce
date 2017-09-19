@@ -3,7 +3,6 @@
 namespace Drupal\commerce_payment\Event;
 
 use Drupal\commerce_payment\Entity\PaymentInterface;
-use Drupal\commerce_price\Price;
 use Symfony\Component\EventDispatcher\Event;
 
 /**

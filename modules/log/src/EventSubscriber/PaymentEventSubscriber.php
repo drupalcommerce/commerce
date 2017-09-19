@@ -7,7 +7,6 @@ use Drupal\commerce_payment\Event\PaymentEvent;
 use Drupal\commerce_payment\Event\PaymentEvents;
 use Drupal\commerce_price\Calculator;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
-use Drupal\state_machine\Event\WorkflowTransitionEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class PaymentEventSubscriber implements EventSubscriberInterface {
@@ -78,7 +77,7 @@ class PaymentEventSubscriber implements EventSubscriberInterface {
   protected function logPayment(PaymentInterface $payment) {
     $refund = $payment->getRefundedAmount();
     $isNew = $payment->isNew();
-    $previousAmount =  FALSE;
+    $previousAmount = FALSE;
     if (!empty($payment->original) && !$payment->getAmount()->equals($payment->original->getAmount())) {
       $previousAmount = $payment->original->getAmount();
     }
