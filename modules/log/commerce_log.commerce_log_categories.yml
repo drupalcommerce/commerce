@@ -5,3 +5,7 @@ commerce_cart:
 commerce_order:
   label: Order
   entity_type: commerce_order
+
+commerce_product:
+  label: Product
+  entity_type: commerce_product

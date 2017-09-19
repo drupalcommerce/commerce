@@ -6,7 +6,7 @@
  */
 
 /**
- * Implements hook_preprocess_commerce_order().
+ * Implements hook_preprocess_HOOK() for commerce_order.
  */
 function commerce_log_preprocess_commerce_order(&$variables) {
   /** @var \Drupal\commerce_order\Entity\OrderInterface $order */
@@ -18,5 +18,26 @@ function commerce_log_preprocess_commerce_order(&$variables) {
     '#arguments' => [$order->id(), 'commerce_order'],
     '#embed' => TRUE,
     '#title' => t('Order activity'),
+  ];
+}
+
+/**
+ * Implements hook_preprocess_HOOK() for commerce_product_form.
+ */
+function commerce_log_preprocess_commerce_product_form(&$variables) {
+  /** @var \Drupal\commerce_product\Entity\ProductInterface $product */
+  $product = \Drupal::service('current_route_match')->getParameter('commerce_product');
+  $variables['form']['actions']['activity'] = [
+    '#weight' => 100,
+    'title' => [
+      '#markup' => '<h3>' . t('Product activity') . '</h3>',
+    ],
+    'log' => [
+      '#type' => 'view',
+      '#name' => 'commerce_activity',
+      '#display_id' => 'default',
+      '#arguments' => [$product->id(), 'commerce_product'],
+      '#weight' => 100,
+    ],
   ];
 }

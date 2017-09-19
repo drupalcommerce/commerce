@@ -2,6 +2,8 @@
 
 namespace Drupal\commerce_log;
 
+use Drupal\commerce_log\EventSubscriber\ProductVariationEventSubscriber;
+use Drupal\commerce_product\Event\ProductVariationEvent;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\DependencyInjection\ServiceProviderBase;
 use Symfony\Component\DependencyInjection\Reference;
@@ -28,6 +30,12 @@ class CommerceLogServiceProvider extends ServiceProviderBase {
       $container->register('commerce_log.order_subscriber', 'Drupal\commerce_log\EventSubscriber\OrderEventSubscriber')
         ->addTag('event_subscriber')
         ->addArgument(new Reference('entity_type.manager'));
+    }
+    if (isset($modules['commerce_product'])) {
+      $container->register('commerce_log.product_variation_subscriber', ProductVariationEventSubscriber::class)
+        ->addTag('event_subscriber')
+        ->addArgument(new Reference('entity_type.manager'))
+        ->addArgument(new Reference('event_dispatcher'));
     }
   }
 

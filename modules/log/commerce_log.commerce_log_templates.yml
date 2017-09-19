@@ -27,3 +27,16 @@ order_assigned:
   category: commerce_order
   label: 'Order assigned'
   template: '<p>The order was assigned to {{ user }}.</p>'
+
+variation_added:
+  category: commerce_product
+  label: 'Variation added'
+  template: '<p>Variation id {{ id }} with sku {{ sku }} was added.</p>'
+variation_field_changed:
+  category: commerce_product
+  label: 'Variation changed'
+  template: '<p>Variation id {{ id }} with sku {{ sku }} had the following fields changed: {{ changed_fields }}.</p>'
+variation_deleted:
+  category: commerce_product
+  label: 'Variation deleted'
+  template: '<p>Variation id {{ id }} with sku {{ sku }} was deleted.</p>'
