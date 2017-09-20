@@ -4,4 +4,3 @@ services:
     arguments: ['@commerce_price.currency_importer', '@entity_type.manager', '@address.country_repository', '@url_generator', '@email.validator']
     tags:
       - { name: drupal.command }
-
