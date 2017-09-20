@@ -15,6 +15,13 @@ commerce.commerce_condition.plugin.order_currency:
         type: string
         label: 'Currency'
 
+commerce.commerce_condition.plugin.order_email:
+  type: commerce_condition_configuration
+  mapping:
+    mail:
+      type: string
+      label: 'Email'
+
 commerce.commerce_condition.plugin.order_customer_role:
   type: commerce_condition_configuration
   mapping:
