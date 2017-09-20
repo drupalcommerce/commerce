@@ -158,7 +158,7 @@ class ProductVariationFieldRendererTest extends CommerceKernelTestBase {
     $this->render($product_build);
 
     $this->assertEmpty($this->cssSelect('.product--variation-field--variation_attribute_color__' . $variation->getProductId()));
-    $this->assertNotEmpty($this->cssSelect('.product--variation-field--variation_sku__' . $variation->getProductId()));
+    $this->assertEmpty($this->cssSelect('.product--variation-field--variation_sku__' . $variation->getProductId()));
   }
 
   /**
