@@ -3,6 +3,7 @@
 namespace Drupal\commerce_promotion\Entity;
 
 use Drupal\commerce\ConditionGroup;
+use Drupal\commerce\Plugin\Commerce\Condition\ConditionInterface;
 use Drupal\commerce_order\Entity\OrderInterface;
 use Drupal\commerce_promotion\Plugin\Commerce\PromotionOffer\PromotionOfferInterface;
 use Drupal\Core\Datetime\DrupalDateTime;
@@ -195,6 +196,22 @@ class Promotion extends ContentEntityBase implements PromotionInterface {
       $conditions[] = $field_item->getTargetInstance();
     }
     return $conditions;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setConditions(array $conditions) {
+    $this->set('conditions', []);
+    foreach ($conditions as $condition) {
+      if ($condition instanceof ConditionInterface) {
+        $this->get('conditions')->appendItem([
+          'target_plugin_id' => $condition->getPluginId(),
+          'target_plugin_configuration' => $condition->getConfiguration(),
+        ]);
+      }
+    }
+    return $this;
   }
 
   /**
