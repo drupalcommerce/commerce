@@ -119,7 +119,7 @@ class CartIntegrationTest extends CommerceKernelTestBase {
     $cart = $this->cartProvider->createCart('default', $this->store, $this->user);
     $this->cartManager->addEntity($cart, $this->variation);
 
-    $logs = $this->logStorage->loadByEntity($cart);
+    $logs = $this->logStorage->loadMultipleByEntity($cart);
     $this->assertEquals(1, count($logs));
     $log = reset($logs);
     $build = $this->logViewBuilder->view($log);
@@ -148,7 +148,7 @@ class CartIntegrationTest extends CommerceKernelTestBase {
     $order_item->save();
     $this->cartManager->addOrderItem($cart, $order_item);
 
-    $logs = $this->logStorage->loadByEntity($cart);
+    $logs = $this->logStorage->loadMultipleByEntity($cart);
     $this->assertEquals(0, count($logs));
   }
 
@@ -161,7 +161,7 @@ class CartIntegrationTest extends CommerceKernelTestBase {
     $order_item = $this->cartManager->addEntity($cart, $this->variation);
     $this->cartManager->removeOrderItem($cart, $order_item);
 
-    $logs = $this->logStorage->loadByEntity($cart);
+    $logs = $this->logStorage->loadMultipleByEntity($cart);
     $this->assertEquals(2, count($logs));
     $log = end($logs);
     $build = $this->logViewBuilder->view($log);
@@ -189,7 +189,7 @@ class CartIntegrationTest extends CommerceKernelTestBase {
     $order_item = $this->cartManager->addOrderItem($cart, $order_item);
     $this->cartManager->removeOrderItem($cart, $order_item);
 
-    $logs = $this->logStorage->loadByEntity($cart);
+    $logs = $this->logStorage->loadMultipleByEntity($cart);
     $this->assertEquals(1, count($logs));
     $log = end($logs);
     $build = $this->logViewBuilder->view($log);

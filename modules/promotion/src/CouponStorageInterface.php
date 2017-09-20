@@ -11,7 +11,7 @@ use Drupal\Core\Entity\ContentEntityStorageInterface;
 interface CouponStorageInterface extends ContentEntityStorageInterface {
 
   /**
-   * Loads the coupon for the given coupon code.
+   * Loads the enabled coupon for the given coupon code.
    *
    * @param string $code
    *   The coupon code.
@@ -19,7 +19,7 @@ interface CouponStorageInterface extends ContentEntityStorageInterface {
    * @return \Drupal\commerce_promotion\Entity\CouponInterface
    *   The coupon.
    */
-  public function loadByCode($code);
+  public function loadEnabledByCode($code);
 
   /**
    * Loads all coupons for the given promotion.
