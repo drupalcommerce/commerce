@@ -66,7 +66,7 @@ class NorwegianVat extends LocalTaxTypeBase {
           'id' => 'zero',
           'label' => $this->t('Zero'),
           'percentages' => [
-            ['number' => '0.00', 'start_date' => '2012-01-01'],
+            ['number' => '0', 'start_date' => '2012-01-01'],
           ],
         ],
       ],
