@@ -10,6 +10,7 @@ use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Session\AnonymousUserSession;
+use Drupal\views\Form\ViewsForm;
 
 /**
  * Implements hook_menu_links_discovered_alter().
@@ -212,6 +213,34 @@ function commerce_cart_form_commerce_order_type_form_alter(array &$form, FormSta
   ];
 
   $form['actions']['submit']['#submit'][] = 'commerce_cart_order_type_form_submit';
+}
+
+/**
+ * Implements hook_form_alter().
+ */
+function commerce_cart_form_alter(&$form, FormStateInterface $form_state, $form_id) {
+  if ($form_state->getFormObject() instanceof ViewsForm) {
+    /** @var \Drupal\views\ViewExecutable $view */
+    $view = reset($form_state->getBuildInfo()['args']);
+    if ($view->storage->get('tag') == 'commerce_cart_form' && !empty($view->result)) {
+      $form['actions']['submit']['#submit'] = array_merge($form['#submit'], ['commerce_cart_order_item_views_form_submit']);
+      $form['actions']['submit']['#order_id'] = $view->argument['order_id']->value[0];
+    }
+  }
+}
+
+/**
+ * Form submission handler for 'views_form_commerce_cart_form_'.
+ */
+function commerce_cart_order_item_views_form_submit($form, FormStateInterface $form_state) {
+  if (!$form_state->has('quantity_updated')) {
+    return;
+  }
+  $order_id = $form_state->getTriggeringElement()['#order_id'];
+  /** @var \Drupal\commerce_order\Entity\OrderInterface $order */
+  $order = \Drupal::entityTypeManager()->getStorage('commerce_order')->load($order_id);
+  $order->save();
+  drupal_set_message(t('Your shopping cart has been updated.'));
 }
 
 /**
