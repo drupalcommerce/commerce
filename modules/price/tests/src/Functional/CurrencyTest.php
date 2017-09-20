@@ -14,6 +14,15 @@ use Drupal\Core\Url;
 class CurrencyTest extends CommerceBrowserTestBase {
 
   /**
+   * Tests the initial currency creation.
+   */
+  public function testInitialCurrency() {
+    // We are expecting commerce_price_install() to import 'USD'.
+    $currency = Currency::load('USD');
+    $this->assertNotEmpty($currency);
+  }
+
+  /**
    * Tests importing a currency.
    */
   public function testCurrencyImport() {

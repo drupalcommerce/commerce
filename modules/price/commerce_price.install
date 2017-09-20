@@ -21,3 +21,15 @@ function commerce_price_requirements($phase) {
 
   return $requirements;
 }
+
+/**
+ * Implements hook_install().
+ */
+function commerce_price_install() {
+  // Import a currency to speed up initial store setup.
+  // If no default country is set, import the US Dollar, since it's common.
+  $default_country = \Drupal::config('system.date')->get('country.default');
+  $default_country = $default_country ?: 'US';
+  $currency_importer = \Drupal::service('commerce_price.currency_importer');
+  $currency_importer->importByCountry($default_country);
+}
