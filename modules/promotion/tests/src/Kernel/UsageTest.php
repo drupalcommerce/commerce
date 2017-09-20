@@ -103,6 +103,7 @@ class UsageTest extends CommerceKernelTestBase {
       'state' => 'draft',
       'mail' => 'test@example.com',
       'ip_address' => '127.0.0.1',
+      'order_id' => '6',
       'order_number' => '6',
       'store_id' => $this->store,
       'uid' => $this->createUser(),
@@ -248,6 +249,61 @@ class UsageTest extends CommerceKernelTestBase {
     $order_type = OrderType::load($this->order->bundle());
     $valid_promotions = $this->promotionStorage->loadAvailable($order_type, $this->store);
     $this->assertEmpty($valid_promotions);
+  }
+
+  /**
+   * Tests the Promotions module cron job.
+   */
+  public function testPromotionCron() {
+    $order_type = OrderType::load($this->order->bundle());
+
+    // Date restricted promotions.
+    $valid_promotion = Promotion::create([
+      'name' => 'Valid Promotion',
+      'order_types' => [$order_type],
+      'stores' => [$this->store->id()],
+      'status' => TRUE,
+      'start_date' => gmdate('Y-m-d', time()),
+      'end_date' => gmdate('Y-m-d', time() + 86400),
+    ]);
+    $this->assertEquals(SAVED_NEW, $valid_promotion->save());
+
+    $expired_promotion = Promotion::create([
+      'name' => 'Expired Promotion',
+      'order_types' => [$order_type],
+      'stores' => [$this->store->id()],
+      'status' => TRUE,
+      'start_date' => gmdate('Y-m-d', time() - 172800),
+      'end_date' => gmdate('Y-m-d', time() - 86400),
+    ]);
+    $this->assertEquals(SAVED_NEW, $expired_promotion->save());
+
+    // Usage restricted promotions.
+    $promotion1 = Promotion::create([
+      'name' => 'Promotion 1',
+      'order_types' => [$order_type],
+      'stores' => [$this->store->id()],
+      'status' => TRUE,
+      'usage_limit' => 1,
+    ]);
+    $this->assertEquals(SAVED_NEW, $promotion1->save());
+    $this->usage->addUsage($this->order, $promotion1);
+
+    $promotion2 = Promotion::create([
+      'name' => 'Promotion 2',
+      'order_types' => [$order_type],
+      'stores' => [$this->store->id()],
+      'status' => TRUE,
+      'usage_limit' => 2,
+    ]);
+    $this->assertEquals(SAVED_NEW, $promotion2->save());
+    $this->usage->addUsage($this->order, $promotion2);
+
+    commerce_promotion_cron();
+
+    $valid_promotions = $this->promotionStorage->loadAvailable($order_type, $this->store);
+    $this->assertCount(2, $valid_promotions);
+
   }
 
 }

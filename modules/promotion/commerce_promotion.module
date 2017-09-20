@@ -98,3 +98,34 @@ function commerce_promotion_entity_base_field_info(EntityTypeInterface $entity_t
     return $fields;
   }
 }
+
+/**
+ * Implements hook_cron().
+ */
+function commerce_promotion_cron() {
+  /** @var \Drupal\commerce_promotion\PromotionStorageInterface $promotion_storage */
+  $promotion_storage = \Drupal::service('entity_type.manager')->getStorage('commerce_promotion');
+
+  // Disable any promotions that have passed their end date.
+  $promotions = $promotion_storage->loadExpired();
+
+  if (!empty($promotions)) {
+    /** @var \Drupal\commerce_promotion\Entity\PromotionInterface $promotion */
+    foreach ($promotions as $promotion) {
+      $promotion->setEnabled(FALSE);
+      $promotion->save();
+    }
+  }
+
+  // Disable any promotions that have met their max usage.
+  $promotions = $promotion_storage->loadMaxedUsage();
+
+  if (!empty($promotions)) {
+    /** @var \Drupal\commerce_promotion\Entity\PromotionInterface $promotion */
+    foreach ($promotions as $promotion) {
+      $promotion->setEnabled(FALSE);
+      $promotion->save();
+    }
+  }
+
+}

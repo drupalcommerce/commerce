@@ -118,4 +118,55 @@ class PromotionStorage extends CommerceContentEntityStorage implements Promotion
     return $promotions;
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function loadExpired() {
+    $query = $this->getQuery();
+
+    $query
+      ->condition('end_date', gmdate('Y-m-d'), '<')
+      ->condition('status', TRUE);
+
+    $result = $query->execute();
+
+    if (empty($result)) {
+      return [];
+    }
+
+    return $this->loadMultiple($result);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function loadMaxedUsage() {
+    $query = $this->getQuery();
+
+    $query
+      ->condition('usage_limit', 1, '>=')
+      ->condition('status', TRUE);
+
+    $result = $query->execute();
+
+    if (empty($result)) {
+      return [];
+    }
+
+    $promotions = $this->loadMultiple($result);
+    $maxed_promotions = [];
+
+    // Get an array of each promotion's use count.
+    $promotion_uses = $this->usage->getUsageMultiple($promotions);
+
+    /** @var \Drupal\commerce_promotion\Entity\PromotionInterface $promotion */
+    foreach ($promotions as $promotion) {
+      if ($promotion_uses[$promotion->id()] >= $promotion->getUsageLimit()) {
+        $maxed_promotions[] = $promotion;
+      }
+    }
+
+    return $maxed_promotions;
+  }
+
 }
