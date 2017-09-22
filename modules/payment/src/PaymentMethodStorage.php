@@ -79,13 +79,20 @@ class PaymentMethodStorage extends CommerceContentEntityStorage implements Payme
       return [];
     }
 
-    $query = $this->getQuery()
-      ->condition('uid', $account->id())
+    $query = $this->getQuery();
+
+    $expires = $query->orConditionGroup()
+    ->condition('expires', 0)
+    ->condition('expires', $this->time->getRequestTime(), '>');
+
+    $query->condition('uid', $account->id())
       ->condition('payment_gateway', $payment_gateway->id())
       ->condition('reusable', TRUE)
-      ->condition('expires', $this->time->getRequestTime(), '>')
+      ->condition($expires)
       ->sort('created', 'DESC');
+
     $result = $query->execute();
+
     if (empty($result)) {
       return [];
     }
