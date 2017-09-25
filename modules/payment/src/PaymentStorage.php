@@ -6,7 +6,6 @@ use Drupal\commerce\CommerceContentEntityStorage;
 use Drupal\commerce_order\Entity\OrderInterface;
 use Drupal\commerce_payment\Entity\PaymentInterface;
 use Drupal\commerce_payment\Event\PaymentEvent;
-use Drupal\commerce_payment\Event\PaymentEvents;
 use Drupal\Core\Entity\EntityStorageException;
 
 /**
