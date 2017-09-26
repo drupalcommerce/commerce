@@ -12,7 +12,7 @@ use Drupal\Console\Core\Command\Shared\CommandTrait;
 use Drupal\Console\Core\Style\DrupalStyle;
 use Drupal\Console\Annotations\DrupalCommand;
 use Drupal\commerce_price\CurrencyImporter;
-use Drupal\Core\Entity\EntityTypeManager;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\address\Repository\CountryRepository;
 use Drupal\Core\Render\MetadataBubblingUrlGenerator;
 use Egulias\EmailValidator\EmailValidator;
@@ -43,7 +43,7 @@ class CreateStoreCommand extends Command {
   /**
    * The entity type manager.
    *
-   * @var \Drupal\Core\Entity\EntityTypeManager
+   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
    */
   protected $entityTypeManager;
 
@@ -73,7 +73,7 @@ class CreateStoreCommand extends Command {
    *
    * @param \Drupal\commerce_price\CurrencyImporter $commerce_price_currency_importer
    *   The currency importer.
-   * @param \Drupal\Core\Entity\EntityTypeManager $entity_type_manager
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
    * @param \Drupal\address\Repository\CountryRepository $address_country_repository
    *   The country repository.
@@ -82,7 +82,7 @@ class CreateStoreCommand extends Command {
    * @param \Egulias\EmailValidator\EmailValidator $email_validator
    *   The email validator.
    */
-  public function __construct(CurrencyImporter $commerce_price_currency_importer, EntityTypeManager $entity_type_manager, CountryRepository $address_country_repository, MetadataBubblingUrlGenerator $url_generator, EmailValidator $email_validator) {
+  public function __construct(CurrencyImporter $commerce_price_currency_importer, EntityTypeManagerInterface $entity_type_manager, CountryRepository $address_country_repository, MetadataBubblingUrlGenerator $url_generator, EmailValidator $email_validator) {
     $this->currencyImporter = $commerce_price_currency_importer;
     $this->entityTypeManager = $entity_type_manager;
     $this->countryRepository = $address_country_repository;
