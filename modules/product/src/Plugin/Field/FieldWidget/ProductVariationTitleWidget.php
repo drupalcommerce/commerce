@@ -113,7 +113,9 @@ class ProductVariationTitleWidget extends ProductVariationWidgetBase implements 
     }
 
     // Set the selected variation in the form state for our AJAX callback.
-    $form_state->set('selected_variation', $selected_variation->id());
+    if($selected_variation) {
+      $form_state->set('selected_variation', $selected_variation->id());
+    }
 
     $variation_options = [];
     foreach ($variations as $option) {
@@ -124,7 +126,8 @@ class ProductVariationTitleWidget extends ProductVariationWidgetBase implements 
       '#title' => $this->getSetting('label_text'),
       '#options' => $variation_options,
       '#required' => TRUE,
-      '#default_value' => $selected_variation->id(),
+      '#default_value' => $selected_variation ? $selected_variation->id() : NULL,
+      '#attributes' => ['data-disable-refocus' => 'true'],
       '#ajax' => [
         'callback' => [get_class($this), 'ajaxRefresh'],
         'wrapper' => $form['#wrapper_id'],
@@ -153,6 +156,9 @@ class ProductVariationTitleWidget extends ProductVariationWidgetBase implements 
    */
   protected function selectVariationFromUserInput(array $variations, array $user_input) {
     $current_variation = NULL;
+    if (!isset($variations[$user_input['variation']])) {
+      $variations[$user_input['variation']] = [];
+    }
     if (!empty($user_input['variation']) && $variations[$user_input['variation']]) {
       $current_variation = $variations[$user_input['variation']];
     }
