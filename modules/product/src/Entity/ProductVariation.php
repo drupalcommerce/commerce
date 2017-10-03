@@ -401,11 +401,6 @@ class ProductVariation extends CommerceContentEntityBase implements ProductVaria
       ->setRequired(TRUE)
       ->addConstraint('ProductVariationSku')
       ->setSetting('display_description', TRUE)
-      ->setDisplayOptions('view', [
-        'label' => 'hidden',
-        'type' => 'string',
-        'weight' => -4,
-      ])
       ->setDisplayOptions('form', [
         'type' => 'string_textfield',
         'weight' => -4,
@@ -421,11 +416,6 @@ class ProductVariation extends CommerceContentEntityBase implements ProductVaria
       ->setSettings([
         'default_value' => '',
         'max_length' => 255,
-      ])
-      ->setDisplayOptions('view', [
-        'label' => 'hidden',
-        'type' => 'string',
-        'weight' => -5,
       ])
       ->setDisplayOptions('form', [
         'type' => 'string_textfield',

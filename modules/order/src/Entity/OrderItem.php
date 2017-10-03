@@ -67,6 +67,13 @@ class OrderItem extends CommerceContentEntityBase implements OrderItemInterface 
   /**
    * {@inheritdoc}
    */
+  public function hasPurchasedEntity() {
+    return !$this->get('purchased_entity')->isEmpty();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function getPurchasedEntity() {
     $purchased_entity = $this->getTranslatedReferencedEntities('purchased_entity');
     return reset($purchased_entity);
@@ -106,6 +113,7 @@ class OrderItem extends CommerceContentEntityBase implements OrderItemInterface 
    */
   public function setQuantity($quantity) {
     $this->set('quantity', (string) $quantity);
+    $this->recalculateTotalPrice();
     return $this;
   }
 
@@ -121,10 +129,33 @@ class OrderItem extends CommerceContentEntityBase implements OrderItemInterface 
   /**
    * {@inheritdoc}
    */
-  public function setUnitPrice(Price $unit_price) {
+  public function setUnitPrice(Price $unit_price, $override = FALSE) {
     $this->set('unit_price', $unit_price);
+    $this->set('overridden_unit_price', $override);
     $this->recalculateTotalPrice();
     return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function isUnitPriceOverridden() {
+    return $this->get('overridden_unit_price')->value;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getAdjustedUnitPrice() {
+    if ($unit_price = $this->getUnitPrice()) {
+      $adjusted_price = $unit_price;
+      foreach ($this->getAdjustments() as $adjustment) {
+        if (!$adjustment->isIncluded()) {
+          $adjusted_price = $adjusted_price->add($adjustment->getAmount());
+        }
+      }
+      return $adjusted_price;
+    }
   }
 
   /**
@@ -164,6 +195,18 @@ class OrderItem extends CommerceContentEntityBase implements OrderItemInterface 
   public function getTotalPrice() {
     if (!$this->get('total_price')->isEmpty()) {
       return $this->get('total_price')->first()->toPrice();
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getAdjustedTotalPrice() {
+    if ($adjusted_unit_price = $this->getAdjustedUnitPrice()) {
+      $rounder = \Drupal::service('commerce_price.rounder');
+      $adjusted_total_price = $adjusted_unit_price->multiply($this->getQuantity());
+      $adjusted_total_price = $rounder->round($adjusted_total_price);
+      return $adjusted_total_price;
     }
   }
 
@@ -276,11 +319,19 @@ class OrderItem extends CommerceContentEntityBase implements OrderItemInterface 
       ->setDescription(t('The price of a single unit.'))
       ->setRequired(TRUE)
       ->setDisplayOptions('form', [
-        'type' => 'commerce_price_default',
+        'type' => 'commerce_unit_price',
         'weight' => 2,
+        'settings' => [
+          'require_confirmation' => TRUE,
+        ],
       ])
       ->setDisplayConfigurable('form', TRUE)
       ->setDisplayConfigurable('view', TRUE);
+
+    $fields['overridden_unit_price'] = BaseFieldDefinition::create('boolean')
+      ->setLabel(t('Overridden unit price'))
+      ->setDescription(t('Whether the unit price is overridden.'))
+      ->setDefaultValue(FALSE);
 
     $fields['adjustments'] = BaseFieldDefinition::create('commerce_adjustment')
       ->setLabel(t('Adjustments'))
@@ -352,6 +403,16 @@ class OrderItem extends CommerceContentEntityBase implements OrderItemInterface 
       ]);
       $fields['title']->setDisplayConfigurable('form', TRUE);
       $fields['title']->setDisplayConfigurable('view', TRUE);
+
+      // The unit price is always an override when there's no purchased entity.
+      $fields['unit_price'] = clone $base_field_definitions['unit_price'];
+      $fields['unit_price']->setDisplayOptions('form', [
+        'type' => 'commerce_unit_price',
+        'weight' => 2,
+        'settings' => [
+          'require_confirmation' => FALSE,
+        ],
+      ]);
     }
 
     return $fields;

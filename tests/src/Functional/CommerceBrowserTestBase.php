@@ -61,9 +61,6 @@ abstract class CommerceBrowserTestBase extends BrowserTestBase {
 
     $this->adminUser = $this->drupalCreateUser($this->getAdministratorPermissions());
     $this->drupalLogin($this->adminUser);
-
-    $currency_importer = \Drupal::service('commerce_price.currency_importer');
-    $currency_importer->import('USD');
   }
 
   /**

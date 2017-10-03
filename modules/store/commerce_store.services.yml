@@ -1,6 +1,6 @@
 services:
-  commerce_store.store_context:
-    class: Drupal\commerce_store\StoreContext
+  commerce_store.current_store:
+    class: Drupal\commerce_store\CurrentStore
     arguments: ['@request_stack', '@commerce_store.chain_store_resolver']
 
   commerce_store.chain_store_resolver:
@@ -16,12 +16,12 @@ services:
 
   commerce_store.store_country_resolver:
     class: Drupal\commerce_store\Resolver\StoreCountryResolver
-    arguments: ['@commerce_store.store_context']
+    arguments: ['@commerce_store.current_store']
     tags:
       - { name: commerce.country_resolver, priority: -90 }
 
   cache_context.store:
     class: Drupal\commerce_store\Cache\Context\StoreCacheContext
-    arguments: ['@commerce_store.store_context']
+    arguments: ['@commerce_store.current_store']
     tags:
       - { name: cache.context}

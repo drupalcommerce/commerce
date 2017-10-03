@@ -21,4 +21,4 @@ Use [Composer](https://getcomposer.org/) to get Drupal + Commerce with all depen
 composer create-project drupalcommerce/project-base mysite --stability dev --no-interaction
 ```
 
-See the [install documentation](http://docs.drupalcommerce.org/v2/getting-started/install.html) for more details.
+See the [install documentation](https://docs.drupalcommerce.org/commerce2/developer-guide/install-update/installation) for more details.

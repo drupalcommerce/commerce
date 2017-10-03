@@ -86,7 +86,7 @@ class CouponRedemptionPaneTest extends CommerceBrowserTestBase {
       'offer' => [
         'target_plugin_id' => 'order_percentage_off',
         'target_plugin_configuration' => [
-          'amount' => '0.10',
+          'percentage' => '0.10',
         ],
       ],
       'start_date' => '2017-01-01',
@@ -102,7 +102,19 @@ class CouponRedemptionPaneTest extends CommerceBrowserTestBase {
     $this->promotion->save();
 
     /** @var \Drupal\commerce_payment\Entity\PaymentGateway $gateway */
-    $gateway = PaymentGateway::create([
+    $offsite_gateway = PaymentGateway::create([
+      'id' => 'offsite',
+      'label' => 'Off-site',
+      'plugin' => 'example_offsite_redirect',
+      'configuration' => [
+        'redirect_method' => 'post',
+        'payment_method_types' => ['credit_card'],
+      ],
+    ]);
+    $offsite_gateway->save();
+
+    /** @var \Drupal\commerce_payment\Entity\PaymentGateway $gateway */
+    $onsite_gateway = PaymentGateway::create([
       'id' => 'onsite',
       'label' => 'On-site',
       'plugin' => 'example_onsite',
@@ -111,7 +123,7 @@ class CouponRedemptionPaneTest extends CommerceBrowserTestBase {
         'payment_method_types' => ['credit_card'],
       ],
     ]);
-    $gateway->save();
+    $onsite_gateway->save();
 
     $profile = $this->createEntity('profile', [
       'type' => 'customer',
@@ -265,6 +277,49 @@ class CouponRedemptionPaneTest extends CommerceBrowserTestBase {
     $order_storage->resetCache([$this->cart->id()]);
     $this->cart = $order_storage->load($this->cart->id());
     $this->assertEquals(new Price('899.10', 'USD'), $this->cart->getTotalPrice());
+  }
+
+  /**
+   * Tests that adding/removing coupons does not submit other panes.
+   */
+  public function testCheckoutSubmit() {
+    // Start checkout, and enter billing information.
+    $this->drupalGet(Url::fromRoute('commerce_checkout.form', ['commerce_order' => $this->cart->id()]));
+    $this->getSession()->getPage()->findField('Example')->check();
+    $this->waitForAjaxToFinish();
+    $this->submitForm([
+      'payment_information[billing_information][address][0][address][given_name]' => 'Johnny',
+      'payment_information[billing_information][address][0][address][family_name]' => 'Appleseed',
+      'payment_information[billing_information][address][0][address][address_line1]' => '123 New York Drive',
+      'payment_information[billing_information][address][0][address][locality]' => 'New York City',
+      'payment_information[billing_information][address][0][address][administrative_area]' => 'NY',
+      'payment_information[billing_information][address][0][address][postal_code]' => '10001',
+    ], 'Continue to review');
+
+    // Go back and edit the billing information, but don't submit it.
+    $this->getSession()->getPage()->clickLink('Go back');
+    $address_prefix = 'payment_information[billing_information][address][0][address]';
+    $this->getSession()->getPage()->fillField($address_prefix . '[given_name]', 'John');
+    $this->getSession()->getPage()->fillField($address_prefix . '[family_name]', 'Smith');
+
+    // Add a coupon.
+    $coupons = $this->promotion->getCoupons();
+    $coupon = reset($coupons);
+    $page = $this->getSession()->getPage();
+    $page->fillField('Coupon code', $coupon->getCode());
+    $page->pressButton('Apply coupon');
+    $this->waitForAjaxToFinish();
+    $this->assertSession()->pageTextContains($coupon->getCode());
+    $this->assertSession()->fieldNotExists('Coupon code');
+    $this->assertSession()->buttonNotExists('Apply coupon');
+
+    // Refresh the page and ensure the billing information hasn't been modified.
+    $this->drupalGet(Url::fromRoute('commerce_checkout.form', ['commerce_order' => $this->cart->id(), 'step' => 'order_information']));
+    $page = $this->getSession()->getPage();
+    $given_name_field = $page->findField('payment_information[billing_information][address][0][address][given_name]');
+    $family_name_field = $page->findField('payment_information[billing_information][address][0][address][family_name]');
+    $this->assertEquals($given_name_field->getValue(), 'Johnny');
+    $this->assertEquals($family_name_field->getValue(), 'Appleseed');
   }
 
 }

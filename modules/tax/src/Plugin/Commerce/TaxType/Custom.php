@@ -86,6 +86,21 @@ class Custom extends LocalTaxTypeBase {
   /**
    * {@inheritdoc}
    */
+  public function setConfiguration(array $configuration) {
+    parent::setConfiguration($configuration);
+
+    foreach ($this->configuration['rates'] as &$rate) {
+      if (isset($rate['amount'])) {
+        // The 'amount' key was renamed to 'percentage' in 2.0-rc2.
+        $rate['percentage'] = $rate['amount'];
+        unset($rate['amount']);
+      }
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function buildConfigurationForm(array $form, FormStateInterface $form_state) {
     $form = parent::buildConfigurationForm($form, $form_state);
 
@@ -123,7 +138,7 @@ class Custom extends LocalTaxTypeBase {
       '#type' => 'table',
       '#header' => [
         $this->t('Tax rate'),
-        $this->t('Amount'),
+        $this->t('Percentage'),
         $this->t('Operations'),
       ],
       '#input' => FALSE,
@@ -141,10 +156,10 @@ class Custom extends LocalTaxTypeBase {
         '#maxlength' => 255,
         '#required' => TRUE,
       ];
-      $rate_form['amount'] = [
+      $rate_form['percentage'] = [
         '#type' => 'commerce_number',
-        '#title' => $this->t('Amount'),
-        '#default_value' => $rate ? $rate['amount'] * 100 : 0,
+        '#title' => $this->t('Percentage'),
+        '#default_value' => $rate ? $rate['percentage'] * 100 : 0,
         '#field_suffix' => $this->t('%'),
         '#min' => 0,
         '#max' => 100,
@@ -306,7 +321,7 @@ class Custom extends LocalTaxTypeBase {
         $this->configuration['rates'][] = [
           'id' => $rate['rate']['id'],
           'label' => $rate['rate']['label'],
-          'amount' => $rate['amount'] / 100,
+          'percentage' => $rate['percentage'] / 100,
         ];
       }
       $this->configuration['territories'] = [];
@@ -363,14 +378,14 @@ class Custom extends LocalTaxTypeBase {
    */
   public function buildZones() {
     $rates = $this->configuration['rates'];
-    // The plugin doesn't support defining multiple amounts with own
+    // The plugin doesn't support defining multiple percentages with own
     // start/end dates for UX reasons, so a start date is invented here.
     foreach ($rates as &$rate) {
-      $rate['amounts'][] = [
-        'amount' => $rate['amount'],
+      $rate['percentages'][] = [
+        'number' => $rate['percentage'],
         'start_date' => '2000-01-01',
       ];
-      unset($rate['amount']);
+      unset($rate['percentage']);
     }
     // The first defined rate is assumed to be the default.
     $rates[0]['default'] = TRUE;

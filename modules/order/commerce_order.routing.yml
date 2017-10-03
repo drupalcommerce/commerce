@@ -1,3 +1,11 @@
+commerce_order.configuration:
+  path: '/admin/commerce/config/orders'
+  defaults:
+    _controller: '\Drupal\system\Controller\SystemController::systemAdminMenuBlockPage'
+    _title: 'Orders'
+  requirements:
+    _permission: 'access commerce administration pages'
+
 entity.commerce_order.add_page:
   path: '/admin/commerce/orders/add'
   defaults:
@@ -17,6 +25,13 @@ entity.commerce_order.reassign_form:
         type: 'entity:commerce_order'
   requirements:
     _permission: 'administer commerce_order'
+
+entity.commerce_order.unlock_form:
+  path: '/admin/commerce/orders/{commerce_order}/unlock'
+  defaults:
+    _entity_form: 'commerce_order.unlock'
+  requirements:
+    _entity_access: 'commerce_order.unlock'
 
 entity.commerce_order.user_view:
   path: '/user/{user}/orders/{commerce_order}'

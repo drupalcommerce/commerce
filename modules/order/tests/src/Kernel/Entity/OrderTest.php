@@ -99,6 +99,9 @@ class OrderTest extends CommerceKernelTestBase {
    * @covers ::setRefreshState
    * @covers ::getData
    * @covers ::setData
+   * @covers ::isLocked
+   * @covers ::lock
+   * @covers ::unlock
    * @covers ::getCreatedTime
    * @covers ::setCreatedTime
    * @covers ::getPlacedTime
@@ -233,6 +236,12 @@ class OrderTest extends CommerceKernelTestBase {
     $this->assertEquals('default', $order->getData('test', 'default'));
     $order->setData('test', 'value');
     $this->assertEquals('value', $order->getData('test', 'default'));
+
+    $this->assertFalse($order->isLocked());
+    $order->lock();
+    $this->assertTrue($order->isLocked());
+    $order->unlock();
+    $this->assertFalse($order->isLocked());
 
     $order->setCreatedTime(635879700);
     $this->assertEquals(635879700, $order->getCreatedTime());

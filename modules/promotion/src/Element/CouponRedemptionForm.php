@@ -200,7 +200,7 @@ class CouponRedemptionForm extends FormElement {
     }
     /** @var \Drupal\commerce_promotion\CouponStorageInterface $coupon_storage */
     $coupon_storage = \Drupal::entityTypeManager()->getStorage('commerce_promotion_coupon');
-    $coupon = $coupon_storage->loadByCode($coupon_code);
+    $coupon = $coupon_storage->loadEnabledByCode($coupon_code);
     if (empty($coupon)) {
       $form_state->setErrorByName($coupon_code_path, t('The provided coupon code is invalid.'));
       return;

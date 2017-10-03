@@ -5,6 +5,23 @@ commerce.commerce_condition.plugin.order_billing_address:
       type: address_zone
       label: 'Zone'
 
+commerce.commerce_condition.plugin.order_currency:
+  type: commerce_condition_configuration
+  mapping:
+    currencies:
+      type: sequence
+      label: 'Currencies'
+      sequence:
+        type: string
+        label: 'Currency'
+
+commerce.commerce_condition.plugin.order_email:
+  type: commerce_condition_configuration
+  mapping:
+    mail:
+      type: string
+      label: 'Email'
+
 commerce.commerce_condition.plugin.order_customer_role:
   type: commerce_condition_configuration
   mapping:
@@ -89,3 +106,11 @@ field.widget.settings.commerce_quantity:
     step:
       type: string
       label: 'Step'
+
+field.widget.settings.commerce_unit_price:
+  type: mapping
+  label: 'Unit price widget settings'
+  mapping:
+    require_confirmation:
+      type: boolean
+      label: 'Require confirmation before overriding the unit price'
