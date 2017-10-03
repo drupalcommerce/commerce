@@ -112,7 +112,7 @@ class PromotionOfferTest extends CommerceKernelTestBase {
       'offer' => [
         'target_plugin_id' => 'order_percentage_off',
         'target_plugin_configuration' => [
-          'amount' => '0.10',
+          'percentage' => '0.10',
         ],
       ],
     ]);
@@ -120,7 +120,7 @@ class PromotionOfferTest extends CommerceKernelTestBase {
 
     /** @var \Drupal\commerce\Plugin\Field\FieldType\PluginItem $offer_field */
     $offer_field = $promotion->get('offer')->first();
-    $this->assertEquals('0.10', $offer_field->target_plugin_configuration['amount']);
+    $this->assertEquals('0.10', $offer_field->target_plugin_configuration['percentage']);
 
     $promotion->apply($this->order);
     $this->assertEquals(1, count($this->order->getAdjustments()));
@@ -218,7 +218,7 @@ class PromotionOfferTest extends CommerceKernelTestBase {
       'offer' => [
         'target_plugin_id' => 'order_item_percentage_off',
         'target_plugin_configuration' => [
-          'amount' => '0.50',
+          'percentage' => '0.50',
         ],
       ],
     ]);
@@ -226,7 +226,7 @@ class PromotionOfferTest extends CommerceKernelTestBase {
 
     /** @var \Drupal\commerce\Plugin\Field\FieldType\PluginItem $offer_field */
     $offer_field = $promotion->get('offer')->first();
-    $this->assertEquals('0.50', $offer_field->target_plugin_configuration['amount']);
+    $this->assertEquals('0.50', $offer_field->target_plugin_configuration['percentage']);
 
     $this->container->get('commerce_order.order_refresh')->refresh($this->order);
     $this->order = $this->reloadEntity($this->order);
@@ -238,6 +238,7 @@ class PromotionOfferTest extends CommerceKernelTestBase {
     $adjustment = reset($adjustments);
     // Adjustment for 50% of the order item total.
     $this->assertEquals(new Price('-5.00', 'USD'), $adjustment->getAmount());
+    $this->assertEquals('0.50', $adjustment->getPercentage());
     // Adjustments don't affect total order item price, but the order's total.
     $this->assertEquals(new Price('20.00', 'USD'), $order_item->getTotalPrice());
 

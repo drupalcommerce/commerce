@@ -77,7 +77,7 @@ class LogStorage extends CommerceContentEntityStorage implements LogStorageInter
   /**
    * {@inheritdoc}
    */
-  public function loadByEntity(ContentEntityInterface $entity) {
+  public function loadMultipleByEntity(ContentEntityInterface $entity) {
     return $this->loadByProperties([
       'source_entity_id' => $entity->id(),
       'source_entity_type' => $entity->getEntityTypeId(),
