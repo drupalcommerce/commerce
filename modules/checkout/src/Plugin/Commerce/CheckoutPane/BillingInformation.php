@@ -33,20 +33,14 @@ class BillingInformation extends CheckoutPaneBase implements CheckoutPaneInterfa
    */
   public function buildPaneForm(array $pane_form, FormStateInterface $form_state, array &$complete_form) {
     $store = $this->order->getStore();
-    $billing_profile = $this->order->getBillingProfile();
-    if (!$billing_profile) {
-      $profile_storage = $this->entityTypeManager->getStorage('profile');
-      $billing_profile = $profile_storage->create([
-        'type' => 'customer',
-        'uid' => $this->order->getCustomerId(),
-      ]);
-    }
-
     $pane_form['profile'] = [
       '#type' => 'commerce_profile_select',
-      '#default_value' => $billing_profile,
+      '#title' => $this->t('Select an address'),
+      '#default_value' => $this->order->getBillingProfile(),
       '#default_country' => $store->getAddress()->getCountryCode(),
       '#available_countries' => $store->getBillingCountries(),
+      '#profile_type' => 'customer',
+      '#owner_uid' => $this->order->getCustomerId(),
     ];
 
     return $pane_form;
@@ -56,7 +50,8 @@ class BillingInformation extends CheckoutPaneBase implements CheckoutPaneInterfa
    * {@inheritdoc}
    */
   public function submitPaneForm(array &$pane_form, FormStateInterface $form_state, array &$complete_form) {
-    $this->order->setBillingProfile($pane_form['profile']['#profile']);
+    $values = $form_state->getValue($pane_form['#parents']);
+    $this->order->setBillingProfile($values['profile']);
   }
 
 }
