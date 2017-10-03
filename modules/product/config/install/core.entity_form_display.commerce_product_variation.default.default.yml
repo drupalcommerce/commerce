@@ -16,9 +16,15 @@ content:
     settings: {  }
     third_party_settings: {  }
   sku:
-    type: string_textfield
+    type: commerce_auto_sku
     weight: -4
     settings:
+      custom_label: ''
+      uniqid_enabled: true
+      more_entropy: false
+      hide: false
+      prefix: 'sku-'
+      suffix: ''
       size: 60
       placeholder: ''
     third_party_settings: {  }

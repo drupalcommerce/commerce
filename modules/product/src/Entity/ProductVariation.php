@@ -392,11 +392,12 @@ class ProductVariation extends ContentEntityBase implements ProductVariationInte
     $fields['sku'] = BaseFieldDefinition::create('string')
       ->setLabel(t('SKU'))
       ->setDescription(t('The unique, machine-readable identifier for a variation.'))
+      ->setDefaultValueCallback('Drupal\commerce_product\ProductVariationBulkCreator::getAutoSku')
       ->setRequired(TRUE)
       ->addConstraint('ProductVariationSku')
       ->setSetting('display_description', TRUE)
       ->setDisplayOptions('form', [
-        'type' => 'string_textfield',
+        'type' => 'commerce_auto_sku',
         'weight' => -4,
       ])
       ->setDisplayConfigurable('form', TRUE)

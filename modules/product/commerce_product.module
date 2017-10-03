@@ -259,12 +259,153 @@ function commerce_product_field_widget_form_alter(&$element, FormStateInterface 
   $entity_type = $field_definition->getTargetEntityTypeId();
   $widget_name = $context['widget']->getPluginId();
   $required = $field_definition->isRequired();
-  if ($field_name == 'path' && $entity_type == 'commerce_product' && $widget_name == 'path') {
-    $element['alias']['#description'] = t('The alternative URL for this product. Use a relative path. For example, "/my-product".');
-  }
-  elseif ($field_name == 'title' && $entity_type == 'commerce_product_variation' && !$required) {
-    // The title field is optional only when its value is automatically
-    // generated, in which case the widget needs to be hidden.
-    $element['#access'] = FALSE;
+  switch (TRUE) {
+  // The filtering only current owner stores is now moved to: https://github.com/drugan/commerce_multistore
+//     case ($field_name == 'stores'):
+//       $user = \Drupal::currentUser();
+//       // If current user has no admin permission then display only those stores
+//       // which are owned by the user.
+//       if (!$user->hasPermission('administer commerce_store')) {
+//         $stores = \Drupal::service('entity.manager')->getStorage('commerce_store')->loadMultiple();
+//         $id = $user->id();
+//         $i = 0;
+//         foreach ($stores as $store) {
+//           if ($store->getOwnerId() != $id) {
+//             $element['alter_data_' . $i] = [
+//               '#parents' => ['target_id', 'value'],
+//               $store->id() => [],
+//             ];
+//             $i++;
+//           }
+//         }
+//         if ($i) {
+//           $creator = \Drupal::service('commerce_product.variation_bulk_creator');
+//           $element['#after_build'][] = [get_class($creator), 'afterBuildPreRenderArrayAlter'];
+//         }
+//       }
+//     break;
+    case ($field_name == 'variations' && $entity_type == 'commerce_product'):
+      /** @var \Drupal\commerce_product\ProductVariationBulkCreator $creator */
+      $creator = \Drupal::service('commerce_product.variation_bulk_creator');
+      /** @var \Drupal\commerce_product\Entity\Product $product */
+      $product = $form_state->getFormObject()->getEntity();
+      /** @var \Drupal\commerce_product\Entity\ProductVariation $variation */
+      $variation = $creator->getProductVariation($product);
+      $sku_settings = $creator::getSkuwidget($variation)->getSettings();
+      $form_state->setValue('sku_settings', $sku_settings);
+      extract($sku_settings);
+      $widget_settings = $context['widget']->getSettings();
+      $one = isset($widget_settings['label_singular']) ? $widget_settings['label_singular'] : FALSE;
+      $many = $one ? $widget_settings['label_plural'] : FALSE;
+      // Disable autocompletion and autocreation if the widget is not inline
+      // entity form or if all commerce SKU settings are empty.
+      if (!$one || (empty($uniqid_enabled) && empty($prefix) && empty($suffix))) {
+        break;
+      }
+      $ief = isset($element['form']['inline_entity_form']);
+      $add = isset($element['actions']['ief_add']);
+      $add_existing = isset($element['actions']['ief_add_existing']);
+      $autocomplete = isset($element['form']['entity_id']);
+      $id = isset($element['#ief_id']) ? $element['#ief_id'] : FALSE;
+      if ($new = !isset($element['entities']['0'])) {
+        $all = $creator->getNotUsedAttributesCombination([$variation]);
+        $count = $all ? $all['count'] : 0;
+        if ($count > 1 && ($add || $add_existing || $autocomplete || $ief)) {
+          $i = 0;
+          // The disabled button is shown to reveal the bulk creator service
+          // availability and the number of variations to create.
+          $parents = ['form', 'inline_entity_form', 'actions', 'ief_add_all'];
+          $element['alter_data_' . $i] = [
+            '#parents' => $add_existing ? ['actions'] : ($autocomplete ? ['form', 'actions'] : $parents),
+            '#type' => 'submit',
+            '#value' => t('Create @count @variations', ['@count'=> $count, '@variations' => $count > 1 ? $many : $one]),
+            '#weight' => 10,
+            '#disabled' => TRUE,
+            '#attributes'=> [
+              'title' => t('To enable this functionality you need to create at least one @variation', ['@variation'=> $one]),
+              ],
+          ];
+          if ($ief) {
+            $i++;
+            foreach ($all['not_used_combination'] as $field_name => $value) {
+              // Do respect the default value defined on the attribute field.
+              if (empty($variation->getFieldDefinition($field_name)->getDefaultValueLiteral())) {
+                $element['alter_data_' . $i] = [
+                  '#parents' => ['form', 'inline_entity_form', $field_name, 'widget'],
+                  '#value' => $value  == '_none' ? [] : ['target_id' => $value],
+                ];
+                $i++;
+              }
+            }
+          }
+          $element['#after_build'][] = [get_class($creator), 'afterBuildPreRenderArrayAlter'];
+        }
+      }
+      elseif ($id && $all = $creator->getIefFormNotUsedAttributesCombination($form_state, $id)) {
+        if ($all['duplicated']) {
+          $placeholders = [
+            '@variations' => $all['duplicated'] > 1 ? $many : $one,
+            '@count' => $all['duplicated'],
+            '@labels' => $all['duplications_list'],
+          ];
+          $warning = t('You have @count @variations duplicated: @labels', $placeholders);
+          drupal_set_message($warning, 'warning');
+        }
+        if (!empty($all['not_used_combination'])) {
+          $form_state->setValue('next_attribute_value_ids', $all['not_used_combination']);
+          /** @var \Drupal\commerce_product\Entity\ProductVariation $all['last_variation'] */
+          !$new && $form_state->setValue('last_added_price', $all['last_variation']->getPrice());
+          if (!$new && ($add || $add_existing)) {
+            $count = $all['count'] - $all['used'];
+            $not_all = isset($all['not_all']) ? $all['not_all'] : 0;
+            $out_of = $not_all && $all['count'] > $not_all ? t('(out of @count)', ['@count'=> $count]) : '';
+            $value = t('Create @not_used @out_of @variations (done @used)', ['@used' => $all['used'], '@not_used' => $all['not_used'], '@out_of'=> $out_of, '@variations' => $count > 1 ? $many : $one]);
+            $warning = t('Be reasonable! An attempt to autocreate a huge amount of data in one go may not work and even freeze your system.');
+            $description = t('Automatically create @variations based on price and attributes combination of the last added @variation. Other specific values such as @variation image or SKU may be edited inline later. Helpful for not missing any @variation.',
+                  ['@variation'=> $one, '@variations'=> $many]);
+            $element['actions']['ief_add_all'] = [
+              '#submit' => [[$creator, 'createAllIefFormVariations']],
+              '#value' => $value,
+              '#weight' => 10,
+              '#attributes'=> [
+                'title' => $not_all && $all['used'] > $not_all ? $warning : $description,
+                ],
+            ] + $element['actions']['ief_add' . ($add ? '' : '_existing')];
+          }
+        }
+      }
+    break;
+    case ($field_name == 'path' && $entity_type == 'commerce_product' && $widget_name == 'path'):
+      $element['alias']['#description'] = t('The alternative URL for this product. Use a relative path. For example, "/my-product".');
+    break;
+    case ($field_name == 'title' && $entity_type == 'commerce_product_variation' && !$required):
+      // The title field is optional only when its value is automatically
+      // generated, in which case the widget needs to be hidden.
+      $element['#access'] = FALSE;
+    break;
+    case ($field_name == 'price' && empty($element['#default_value']) && ($price = $form_state->getValue('last_added_price'))):
+      $element['#default_value'] = $price->toArray();
+    break;
+    case (($ids = $form_state->getValue('next_attribute_value_ids')) && isset($ids[$field_name]) && empty($element['#default_value'])):
+      $element['#default_value'] = $ids[$field_name];
+    break;
+    case ($field_name == 'sku'):
+      if (!$sku_settings = $form_state->getValue('sku_settings')) {
+        $creator = \Drupal::service('commerce_product.variation_bulk_creator');
+        $product = $form_state->getFormObject()->getEntity();
+        $variation = $creator->getProductVariation($product);
+        $sku_settings = $creator::getSkuwidget($variation)->getSettings();
+      }
+      extract($sku_settings);
+      if (!empty($uniqid_enabled) && $hide) {
+        $element['value']['#type'] = 'value';
+        $element['value']['#value'] = $element['value']['#default_value'];
+      }
+      else {
+        global $base_url;
+        $setup_link = t('<a href=":href" target="_blank">Set up default SKU.</a>', [':href' => $base_url . '/admin/commerce/config/product-variation-types/' . $context['form']['#bundle'] . '/edit/form-display']);
+        $element['value']['#description'] = implode(' ', [$element['value']['#description'], $setup_link]);
+      }
+    break;
   }
 }

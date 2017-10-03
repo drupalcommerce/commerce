@@ -76,6 +76,64 @@ field.widget.settings.commerce_entity_select:
       type: string
       label: 'Autocomplete placeholder'
 
+field.widget.settings.commerce_auto_sku:
+  type: mapping
+  label: 'Commerce auto SKU format settings'
+  mapping:
+    custom_label:
+      type: label
+      label: 'Custom label'
+    uniqid_enabled:
+      type: boolean
+      label: 'Enable unique auto SKU values generation'
+    more_entropy:
+      type: boolean
+      label: 'More unique'
+    hide:
+      type: boolean
+      label: 'Hide SKU'
+    prefix:
+      type: label
+      label: 'SKU prefix'
+    suffix:
+      type: label
+      label: 'SKU suffix'
+    size:
+      type: integer
+      label: 'Size of textfield'
+    placeholder:
+      type: label
+      label: 'Placeholder'
+
+field.widget.settings.commerce_auto_sku:
+  type: mapping
+  label: 'Commerce auto SKU format settings'
+  mapping:
+    custom_label:
+      type: label
+      label: 'Custom label'
+    uniqid_enabled:
+      type: boolean
+      label: 'Enable unique auto SKU values generation'
+    more_entropy:
+      type: boolean
+      label: 'More unique'
+    hide:
+      type: boolean
+      label: 'Hide SKU'
+    prefix:
+      type: label
+      label: 'SKU prefix'
+    suffix:
+      type: label
+      label: 'SKU suffix'
+    size:
+      type: integer
+      label: 'Size of textfield'
+    placeholder:
+      type: label
+      label: 'Placeholder'
+
 views.argument_validator.commerce_current_user:
   type: mapping
   label: 'Current user'

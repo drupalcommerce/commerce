@@ -10,3 +10,7 @@ services:
   commerce_product.variation_field_renderer:
     class: Drupal\commerce_product\ProductVariationFieldRenderer
     arguments: ['@entity_type.manager', '@entity_field.manager']
+
+  commerce_product.variation_bulk_creator:
+    class: Drupal\commerce_product\ProductVariationBulkCreator
+    arguments: ['@entity_type.manager']
