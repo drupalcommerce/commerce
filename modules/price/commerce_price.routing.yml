@@ -1,7 +1,8 @@
+# The import URL and title use the "Add" verb to better match user expectations.
 entity.commerce_currency.import:
-  path: '/admin/commerce/config/currency/import'
+  path: '/admin/commerce/config/currencies/add'
   defaults:
     _form: '\Drupal\commerce_price\Form\CurrencyImportForm'
-    _title: 'Import currencies'
+    _title: 'Add currency'
   requirements:
     _permission: 'administer commerce_currency'

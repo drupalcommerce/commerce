@@ -242,6 +242,15 @@ class ProductVariation extends ContentEntityBase implements ProductVariationInte
   /**
    * {@inheritdoc}
    */
+  public function getAttributeFieldNames() {
+    $attribute_field_manager = \Drupal::service('commerce_product.attribute_field_manager');
+    $field_map = $attribute_field_manager->getFieldMap($this->bundle());
+    return array_column($field_map, 'field_name');
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function getAttributeValueIds() {
     $attribute_ids = [];
     foreach ($this->getAttributeFieldNames() as $field_name) {
@@ -301,18 +310,6 @@ class ProductVariation extends ContentEntityBase implements ProductVariationInte
     }
 
     return $attribute_value;
-  }
-
-  /**
-   * Gets the names of the entity's attribute fields.
-   *
-   * @return string[]
-   *   The attribute field names.
-   */
-  protected function getAttributeFieldNames() {
-    $attribute_field_manager = \Drupal::service('commerce_product.attribute_field_manager');
-    $field_map = $attribute_field_manager->getFieldMap($this->bundle());
-    return array_column($field_map, 'field_name');
   }
 
   /**
@@ -398,11 +395,6 @@ class ProductVariation extends ContentEntityBase implements ProductVariationInte
       ->setRequired(TRUE)
       ->addConstraint('ProductVariationSku')
       ->setSetting('display_description', TRUE)
-      ->setDisplayOptions('view', [
-        'label' => 'hidden',
-        'type' => 'string',
-        'weight' => -4,
-      ])
       ->setDisplayOptions('form', [
         'type' => 'string_textfield',
         'weight' => -4,
@@ -419,11 +411,6 @@ class ProductVariation extends ContentEntityBase implements ProductVariationInte
         'default_value' => '',
         'max_length' => 255,
       ])
-      ->setDisplayOptions('view', [
-        'label' => 'hidden',
-        'type' => 'string',
-        'weight' => -5,
-      ])
       ->setDisplayOptions('form', [
         'type' => 'string_textfield',
         'weight' => -5,
@@ -431,11 +418,10 @@ class ProductVariation extends ContentEntityBase implements ProductVariationInte
       ->setDisplayConfigurable('form', TRUE)
       ->setDisplayConfigurable('view', TRUE);
 
-    // The price is not required because it's not guaranteed to be used
-    // for storage (there might be a price per currency, role, country, etc).
     $fields['price'] = BaseFieldDefinition::create('commerce_price')
       ->setLabel(t('Price'))
       ->setDescription(t('The variation price'))
+      ->setRequired(TRUE)
       ->setDisplayOptions('view', [
         'label' => 'above',
         'type' => 'commerce_price_default',

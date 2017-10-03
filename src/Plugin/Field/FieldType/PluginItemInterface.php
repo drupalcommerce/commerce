@@ -23,8 +23,8 @@ interface PluginItemInterface extends FieldItemInterface {
    * @param array $contexts
    *   An array of context values to pass to the plugin.
    *
-   * @return \\Drupal\Core\Plugin\PluginBase
-   *   The executable plugin.
+   * @return \Drupal\Core\Plugin\PluginBase
+   *   The plugin instance.
    */
   public function getTargetInstance(array $contexts = []);
 

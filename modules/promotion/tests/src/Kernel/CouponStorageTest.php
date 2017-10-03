@@ -56,7 +56,7 @@ class CouponStorageTest extends CommerceKernelTestBase {
   /**
    * Loads a coupon by its code.
    */
-  public function testLoadByCode() {
+  public function testLoadEnabledByCode() {
     $coupon_code = $this->randomMachineName();
     $coupon = Coupon::create([
       'code' => $coupon_code,
@@ -64,7 +64,7 @@ class CouponStorageTest extends CommerceKernelTestBase {
     ]);
     $coupon->save();
 
-    $coupon_loaded = $this->couponStorage->loadByCode($coupon_code);
+    $coupon_loaded = $this->couponStorage->loadEnabledByCode($coupon_code);
     $this->assertEquals($coupon->id(), $coupon_loaded->id());
 
     $coupon_code = $this->randomMachineName();
@@ -74,7 +74,7 @@ class CouponStorageTest extends CommerceKernelTestBase {
     ]);
     $coupon->save();
 
-    $coupon_loaded = $this->couponStorage->loadByCode($coupon_code);
+    $coupon_loaded = $this->couponStorage->loadEnabledByCode($coupon_code);
     $this->assertEmpty($coupon_loaded);
   }
 

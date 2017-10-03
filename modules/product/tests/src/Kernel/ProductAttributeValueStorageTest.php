@@ -34,9 +34,9 @@ class ProductAttributeValueStorageTest extends CommerceKernelTestBase {
   }
 
   /**
-   * Tests loadByAttribute()
+   * Tests loadMultipleByAttribute()
    */
-  public function testLoadByAttribute() {
+  public function testLoadMultipleByAttribute() {
     $color_attribute = ProductAttribute::create([
       'id' => 'color',
       'label' => 'Color',
@@ -67,7 +67,7 @@ class ProductAttributeValueStorageTest extends CommerceKernelTestBase {
     /** @var \Drupal\commerce_product\ProductAttributeValueStorageInterface $attribute_value_storage */
     $attribute_value_storage = \Drupal::service('entity_type.manager')->getStorage('commerce_product_attribute_value');
     /** @var \Drupal\commerce_product\Entity\ProductAttributeValueInterface[] $attribute_values */
-    $attribute_values = $attribute_value_storage->loadByAttribute('color');
+    $attribute_values = $attribute_value_storage->loadMultipleByAttribute('color');
 
     $value = array_shift($attribute_values);
     $this->assertEquals('Cyan', $value->getName());

@@ -2,7 +2,7 @@
 
 namespace Drupal\commerce_tax\Entity;
 
-use Drupal\commerce_tax\TaxTypePluginCollection;
+use Drupal\commerce\CommerceSinglePluginCollection;
 use Drupal\Core\Config\Entity\ConfigEntityBase;
 
 /**
@@ -83,7 +83,7 @@ class TaxType extends ConfigEntityBase implements TaxTypeInterface {
   /**
    * The plugin collection that holds the tax type plugin.
    *
-   * @var \Drupal\commerce_tax\TaxTypePluginCollection
+   * @var \Drupal\commerce\CommerceSinglePluginCollection
    */
   protected $pluginCollection;
 
@@ -106,6 +106,23 @@ class TaxType extends ConfigEntityBase implements TaxTypeInterface {
    */
   public function setPluginId($plugin_id) {
     $this->plugin = $plugin_id;
+    $this->configuration = [];
+    $this->pluginCollection = NULL;
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getPluginConfiguration() {
+    return $this->configuration;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setPluginConfiguration(array $configuration) {
+    $this->configuration = $configuration;
     $this->pluginCollection = NULL;
     return $this;
   }
@@ -120,17 +137,33 @@ class TaxType extends ConfigEntityBase implements TaxTypeInterface {
   }
 
   /**
+   * {@inheritdoc}
+   */
+  public function set($property_name, $value) {
+    // Invoke the setters to clear related properties.
+    if ($property_name == 'plugin') {
+      $this->setPluginId($value);
+    }
+    elseif ($property_name == 'configuration') {
+      $this->setPluginConfiguration($value);
+    }
+    else {
+      return parent::set($property_name, $value);
+    }
+  }
+
+  /**
    * Gets the plugin collection that holds the tax type plugin.
    *
    * Ensures the plugin collection is initialized before returning it.
    *
-   * @return \Drupal\commerce_tax\TaxTypePluginCollection
+   * @return \Drupal\commerce\CommerceSinglePluginCollection
    *   The plugin collection.
    */
   protected function getPluginCollection() {
     if (!$this->pluginCollection) {
       $plugin_manager = \Drupal::service('plugin.manager.commerce_tax_type');
-      $this->pluginCollection = new TaxTypePluginCollection($plugin_manager, $this->plugin, $this->configuration, $this->id);
+      $this->pluginCollection = new CommerceSinglePluginCollection($plugin_manager, $this->plugin, $this->configuration, $this->id);
     }
     return $this->pluginCollection;
   }

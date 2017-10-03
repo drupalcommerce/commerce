@@ -151,7 +151,7 @@ class PriceDefaultFormatter extends FormatterBase implements ContainerFactoryPlu
     foreach ($items as $delta => $item) {
       $currency_codes[] = $item->currency_code;
     }
-    $currencies = $this->currencyStorage->loadMultiple($currency_codes);
+    $currencies = $currency_codes ? $this->currencyStorage->loadMultiple($currency_codes) : [];
 
     $elements = [];
     foreach ($items as $delta => $item) {

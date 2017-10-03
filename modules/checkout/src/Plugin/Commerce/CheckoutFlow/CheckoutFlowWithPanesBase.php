@@ -309,7 +309,7 @@ abstract class CheckoutFlowWithPanesBase extends CheckoutFlowBase implements Che
    */
   protected function buildPaneRow(CheckoutPaneInterface $pane, array &$form, FormStateInterface $form_state) {
     $pane_id = $pane->getPluginId();
-    $label = $pane->getAdminLabel();
+    $label = $pane->getLabel();
     $region_titles = array_map(function ($region) {
       return $region['title'];
     }, $this->getTableRegions());
@@ -533,12 +533,23 @@ abstract class CheckoutFlowWithPanesBase extends CheckoutFlowBase implements Che
    */
   public function buildForm(array $form, FormStateInterface $form_state, $step_id = NULL) {
     $form = parent::buildForm($form, $form_state, $step_id);
+    if ($form_state->isRebuilding()) {
+      // The order reference on the panes might be outdated due to
+      // the form cache, so update the order manually once the
+      // parent class reloads it.
+      foreach ($this->panes as $pane_id => $pane) {
+        $this->panes[$pane_id] = $pane->setOrder($this->order);
+      }
+    }
 
     foreach ($this->getVisiblePanes($step_id) as $pane_id => $pane) {
       $form[$pane_id] = [
         '#parents' => [$pane_id],
         '#type' => $pane->getWrapperElement(),
-        '#title' => $pane->getLabel(),
+        '#title' => $pane->getDisplayLabel(),
+        '#attributes' => [
+          'class' => ['checkout-pane', 'checkout-pane-' . str_replace('_', '-', $pane_id)],
+        ],
       ];
       $form[$pane_id] = $pane->buildPaneForm($form[$pane_id], $form_state, $form);
     }
@@ -551,7 +562,10 @@ abstract class CheckoutFlowWithPanesBase extends CheckoutFlowBase implements Che
         $form['sidebar'][$pane_id] = [
           '#parents' => ['sidebar', $pane_id],
           '#type' => $pane->getWrapperElement(),
-          '#title' => $pane->getLabel(),
+          '#title' => $pane->getDisplayLabel(),
+          '#attributes' => [
+            'class' => ['checkout-pane', 'checkout-pane-' . str_replace('_', '-', $pane_id)],
+          ],
         ];
         $form['sidebar'][$pane_id] = $pane->buildPaneForm($form['sidebar'][$pane_id], $form_state, $form);
       }

@@ -40,6 +40,27 @@ class TaxOrderProcessor implements OrderProcessorInterface {
         $tax_type->getPlugin()->apply($order);
       }
     }
+    // Tax types can create a negative adjustment when a price includes
+    // tax, but the customer is tax-exempt. These negative adjustments
+    // are removed and applied directly to the unit price, so that the
+    // customer always sees the actual price they are being charged.
+    // @todo Figure out if this conversion should be optional/configurable.
+    if ($order->getStore()->get('prices_include_tax')->value) {
+      foreach ($order->getItems() as $order_item) {
+        $adjustments = $order_item->getAdjustments();
+        $negative_tax_adjustments = array_filter($adjustments, function ($adjustment) {
+          /** @var \Drupal\commerce_order\Adjustment $adjustment */
+          return $adjustment->getType() == 'tax' && $adjustment->isNegative();
+        });
+        $adjustments = array_diff_key($adjustments, $negative_tax_adjustments);
+        $unit_price = $order_item->getUnitPrice();
+        foreach ($negative_tax_adjustments as $adjustment) {
+          $unit_price = $unit_price->add($adjustment->getAmount());
+        }
+        $order_item->setUnitPrice($unit_price);
+        $order_item->setAdjustments($adjustments);
+      }
+    }
   }
 
 }

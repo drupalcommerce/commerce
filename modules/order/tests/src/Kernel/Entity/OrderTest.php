@@ -99,6 +99,9 @@ class OrderTest extends CommerceKernelTestBase {
    * @covers ::setRefreshState
    * @covers ::getData
    * @covers ::setData
+   * @covers ::isLocked
+   * @covers ::lock
+   * @covers ::unlock
    * @covers ::getCreatedTime
    * @covers ::setCreatedTime
    * @covers ::getPlacedTime
@@ -234,6 +237,12 @@ class OrderTest extends CommerceKernelTestBase {
     $order->setData('test', 'value');
     $this->assertEquals('value', $order->getData('test', 'default'));
 
+    $this->assertFalse($order->isLocked());
+    $order->lock();
+    $this->assertTrue($order->isLocked());
+    $order->unlock();
+    $this->assertFalse($order->isLocked());
+
     $order->setCreatedTime(635879700);
     $this->assertEquals(635879700, $order->getCreatedTime());
 
@@ -293,6 +302,30 @@ class OrderTest extends CommerceKernelTestBase {
       $currency_mismatch = TRUE;
     }
     $this->assertTrue($currency_mismatch);
+  }
+
+  /**
+   * Tests that an order's email updates with the customer.
+   */
+  public function testOrderEmail() {
+    $customer = $this->createUser(['mail' => 'test@example.com']);
+    $order_with_customer = Order::create([
+      'type' => 'default',
+      'state' => 'completed',
+      'uid' => $customer,
+    ]);
+    $order_with_customer->save();
+    $this->assertEquals($customer->getEmail(), $order_with_customer->getEmail());
+
+    $order_without_customer = Order::create([
+      'type' => 'default',
+      'state' => 'completed',
+    ]);
+    $order_without_customer->save();
+    $this->assertEquals('', $order_without_customer->getEmail());
+    $order_without_customer->setCustomer($customer);
+    $order_without_customer->save();
+    $this->assertEquals($customer->getEmail(), $order_without_customer->getEmail());
   }
 
 }

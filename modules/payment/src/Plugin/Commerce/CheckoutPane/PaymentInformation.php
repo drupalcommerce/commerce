@@ -285,7 +285,8 @@ class PaymentInformation extends CheckoutPaneBase {
     elseif ($order_payment_gateway && !($order_payment_gateway instanceof SupportsStoredPaymentMethodsInterface)) {
       $default_option = $order_payment_gateway->id();
     }
-    else {
+    // The order doesn't have a payment method/gateway specified, or it has, but it is no longer available.
+    if (!$default_option || !isset($options[$default_option])) {
       $option_ids = array_keys($options);
       $default_option = reset($option_ids);
     }

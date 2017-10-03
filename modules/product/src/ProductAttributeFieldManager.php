@@ -215,10 +215,11 @@ class ProductAttributeFieldManager implements ProductAttributeFieldManagerInterf
    */
   public function canDeleteField(ProductAttributeInterface $attribute, $variation_type_id) {
     $field_name = $this->buildFieldName($attribute);
-    // Prevent an EntityQuery crash by first confirming the field exists.
     $field = FieldConfig::loadByName('commerce_product_variation', $variation_type_id, $field_name);
     if (!$field) {
-      throw new \InvalidArgumentException(sprintf('Could not find the attribute field "%s" for attribute "%s".', $field_name, $attribute->id()));
+      // The matching field was already deleted, or follows a different naming
+      // pattern, because it wasn't created by this class.
+      return FALSE;
     }
     $query = $this->entityTypeManager->getStorage('commerce_product_variation')->getQuery()
       ->condition('type', $variation_type_id)

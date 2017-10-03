@@ -113,6 +113,14 @@ interface ProductVariationInterface extends PurchasableEntityInterface, EntityCh
   public function setCreatedTime($timestamp);
 
   /**
+   * Gets the names of the variation's attribute fields.
+   *
+   * @return string[]
+   *   The attribute field names.
+   */
+  public function getAttributeFieldNames();
+
+  /**
    * Gets the attribute value IDs.
    *
    * @return int[]

@@ -7,6 +7,7 @@
 
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
+use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\Element;
 
 /**
@@ -18,6 +19,9 @@ function commerce_promotion_theme() {
       'render element' => 'elements',
     ],
     'commerce_promotion_form' => [
+      'render element' => 'form',
+    ],
+    'commerce_coupon_redemption_form' => [
       'render element' => 'form',
     ],
   ];
@@ -49,6 +53,21 @@ function template_preprocess_commerce_promotion(array &$variables) {
   $variables['promotion'] = [];
   foreach (Element::children($variables['elements']) as $key) {
     $variables['promotion'][$key] = $variables['elements'][$key];
+  }
+}
+
+/**
+ * Implements hook_field_widget_form_alter().
+ */
+function commerce_promotion_field_widget_form_alter(&$element, FormStateInterface $form_state, $context) {
+  /** @var \Drupal\Core\Field\BaseFieldDefinition $field_definition */
+  $field_definition = $context['items']->getFieldDefinition();
+  $field_name = $field_definition->getName();
+  $entity_type = $field_definition->getTargetEntityTypeId();
+  $widget_name = $context['widget']->getPluginId();
+  if ($field_name == 'condition_operator' && $entity_type == 'commerce_promotion' && $widget_name == 'options_buttons') {
+    // Hide the label.
+    $element['#title_display'] = 'invisible';
   }
 }
 

@@ -45,6 +45,9 @@ class TaxTypeForm extends CommercePluginEntityFormBase {
     $type = $this->entity;
     $plugins = array_column($this->pluginManager->getDefinitions(), 'label', 'id');
     asort($plugins);
+    // Move the Custom plugin to the front.
+    unset($plugins['custom']);
+    $plugins = ['custom' => $this->t('Custom')] + $plugins;
 
     // Use the first available plugin as the default value.
     if (!$type->getPluginId()) {
@@ -54,6 +57,8 @@ class TaxTypeForm extends CommercePluginEntityFormBase {
     }
     // The form state will have a plugin value if #ajax was used.
     $plugin = $form_state->getValue('plugin', $type->getPluginId());
+    // Pass the plugin configuration only if the plugin hasn't been changed via #ajax.
+    $plugin_configuration = $type->getPluginId() == $plugin ? $type->getPluginConfiguration() : [];
 
     $wrapper_id = Html::getUniqueId('tax-type-form');
     $form['#tree'] = TRUE;
@@ -82,15 +87,18 @@ class TaxTypeForm extends CommercePluginEntityFormBase {
       '#default_value' => $plugin,
       '#required' => TRUE,
       '#disabled' => !$type->isNew(),
+      '#limit_validation_errors' => [],
       '#ajax' => [
         'callback' => '::ajaxRefresh',
         'wrapper' => $wrapper_id,
       ],
     ];
     $form['configuration'] = [
-      '#parents' => ['configuration'],
+      '#type' => 'commerce_plugin_configuration',
+      '#plugin_type' => 'commerce_tax_type',
+      '#plugin_id' => $plugin,
+      '#default_value' => $plugin_configuration,
     ];
-    $form['configuration'] = $type->getPlugin()->buildConfigurationForm($form['configuration'], $form_state);
     $form['status'] = [
       '#type' => 'checkbox',
       '#title' => $this->t('Enabled'),
@@ -110,23 +118,12 @@ class TaxTypeForm extends CommercePluginEntityFormBase {
   /**
    * {@inheritdoc}
    */
-  public function validateForm(array &$form, FormStateInterface $form_state) {
-    parent::validateForm($form, $form_state);
-
-    /** @var \Drupal\commerce_tax\Entity\TaxTypeInterface $type */
-    $type = $this->entity;
-    $type->getPlugin()->validateConfigurationForm($form['configuration'], $form_state);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function submitForm(array &$form, FormStateInterface $form_state) {
     parent::submitForm($form, $form_state);
 
     /** @var \Drupal\commerce_tax\Entity\TaxTypeInterface $type */
     $type = $this->entity;
-    $type->getPlugin()->submitConfigurationForm($form['configuration'], $form_state);
+    $type->setPluginConfiguration($form_state->getValue(['configuration']));
   }
 
   /**

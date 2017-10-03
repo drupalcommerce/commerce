@@ -9,6 +9,7 @@ use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Form\FormInterface;
 use Drupal\Core\Form\FormBuilderInterface;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Url;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -98,7 +99,7 @@ class PromotionListBuilder extends EntityListBuilder implements FormInterface {
     // Sort the entities using the entity class's sort() method.
     uasort($entities, [$this->entityType->getClass(), 'sort']);
     // Load the usage counts for each promotion.
-    $this->usageCounts = $this->usage->getUsageMultiple($entities);
+    $this->usageCounts = $this->usage->loadMultiple($entities);
 
     return $entities;
   }
@@ -151,7 +152,15 @@ class PromotionListBuilder extends EntityListBuilder implements FormInterface {
    * {@inheritdoc}
    */
   public function render() {
-    return $this->formBuilder->getForm($this);
+    $build = $this->formBuilder->getForm($this);
+    // Only add the pager if a limit is specified.
+    if ($this->limit) {
+      $build['pager'] = [
+        '#type' => 'pager',
+      ];
+    }
+
+    return $build;
   }
 
   /**
@@ -221,6 +230,24 @@ class PromotionListBuilder extends EntityListBuilder implements FormInterface {
         $this->entities[$id]->save();
       }
     }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function getDefaultOperations(EntityInterface $entity) {
+    $operations = parent::getDefaultOperations($entity);
+    if ($entity->access('update')) {
+      $operations['coupons'] = [
+        'title' => $this->t('Coupons'),
+        'weight' => 20,
+        'url' => new Url('entity.commerce_promotion_coupon.collection', [
+          'commerce_promotion' => $entity->id(),
+        ]),
+      ];
+    }
+
+    return $operations;
   }
 
 }

@@ -44,7 +44,7 @@ class Custom extends LocalTaxTypeBase {
    *   The event dispatcher.
    * @param \Drupal\commerce_price\RounderInterface $rounder
    *   The rounder.
-   * @param \Drupal\commerce_tax\ChainTaxRateResolverInterface $chain_rate_resolver
+   * @param \Drupal\commerce_tax\Resolver\ChainTaxRateResolverInterface $chain_rate_resolver
    *   The chain tax rate resolver.
    * @param \Drupal\Component\Uuid\UuidInterface $uuid_generator
    *   The UUID generator.
@@ -81,6 +81,21 @@ class Custom extends LocalTaxTypeBase {
       'rates' => [],
       'territories' => [],
     ] + parent::defaultConfiguration();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setConfiguration(array $configuration) {
+    parent::setConfiguration($configuration);
+
+    foreach ($this->configuration['rates'] as &$rate) {
+      if (isset($rate['amount'])) {
+        // The 'amount' key was renamed to 'percentage' in 2.0-rc2.
+        $rate['percentage'] = $rate['amount'];
+        unset($rate['amount']);
+      }
+    }
   }
 
   /**
@@ -123,7 +138,7 @@ class Custom extends LocalTaxTypeBase {
       '#type' => 'table',
       '#header' => [
         $this->t('Tax rate'),
-        $this->t('Amount'),
+        $this->t('Percentage'),
         $this->t('Operations'),
       ],
       '#input' => FALSE,
@@ -141,10 +156,10 @@ class Custom extends LocalTaxTypeBase {
         '#maxlength' => 255,
         '#required' => TRUE,
       ];
-      $rate_form['amount'] = [
-        '#type' => 'number',
-        '#title' => 'Amount',
-        '#default_value' => $rate ? $rate['amount'] * 100 : 0,
+      $rate_form['percentage'] = [
+        '#type' => 'commerce_number',
+        '#title' => $this->t('Percentage'),
+        '#default_value' => $rate ? $rate['percentage'] * 100 : 0,
         '#field_suffix' => $this->t('%'),
         '#min' => 0,
         '#max' => 100,
@@ -187,7 +202,7 @@ class Custom extends LocalTaxTypeBase {
     foreach ($form_state->get('territories') as $index => $territory) {
       $territory_form = &$form['territories'][$index];
       $territory_form['territory'] = [
-        '#type' => 'zone_territory',
+        '#type' => 'address_zone_territory',
         '#default_value' => $territory,
         '#required' => TRUE,
       ];
@@ -223,14 +238,14 @@ class Custom extends LocalTaxTypeBase {
   /**
    * Ajax callback for tax rate and zone territory operations.
    */
-  public function ajaxCallback(array $form, FormStateInterface $form_state) {
+  public static function ajaxCallback(array $form, FormStateInterface $form_state) {
     return $form['configuration'];
   }
 
   /**
    * Submit callback for adding a new rate.
    */
-  public function addRateSubmit(array $form, FormStateInterface $form_state) {
+  public static function addRateSubmit(array $form, FormStateInterface $form_state) {
     $rates = $form_state->get('rates');
     $rates[] = [];
     $form_state->set('rates', $rates);
@@ -240,7 +255,7 @@ class Custom extends LocalTaxTypeBase {
   /**
    * Submit callback for removing a rate.
    */
-  public function removeRateSubmit(array $form, FormStateInterface $form_state) {
+  public static function removeRateSubmit(array $form, FormStateInterface $form_state) {
     $rates = $form_state->get('rates');
     $index = $form_state->getTriggeringElement()['#rate_index'];
     unset($rates[$index]);
@@ -251,7 +266,7 @@ class Custom extends LocalTaxTypeBase {
   /**
    * Submit callback for adding a new territory.
    */
-  public function addTerritorySubmit(array $form, FormStateInterface $form_state) {
+  public static function addTerritorySubmit(array $form, FormStateInterface $form_state) {
     $territories = $form_state->get('territories');
     $territories[] = [];
     $form_state->set('territories', $territories);
@@ -261,7 +276,7 @@ class Custom extends LocalTaxTypeBase {
   /**
    * Submit callback for removing a territory.
    */
-  public function removeTerritorySubmit(array $form, FormStateInterface $form_state) {
+  public static function removeTerritorySubmit(array $form, FormStateInterface $form_state) {
     $territories = $form_state->get('territories');
     $index = $form_state->getTriggeringElement()['#territory_index'];
     unset($territories[$index]);
@@ -274,12 +289,15 @@ class Custom extends LocalTaxTypeBase {
    */
   public function validateConfigurationForm(array &$form, FormStateInterface $form_state) {
     $values = $form_state->getValue($form['#parents']);
+    // Filter out the button rows.
     $values['rates'] = array_filter($values['rates'], function ($rate) {
       return !empty($rate) && !isset($rate['add_rate']);
     });
     $values['territories'] = array_filter($values['territories'], function ($territory) {
       return !empty($territory) && !isset($territory['add_territory']);
     });
+    $form_state->setValue($form['#parents'], $values);
+
     if (empty($values['rates'])) {
       $form_state->setError($form['rates'], $this->t('Please add at least one rate.'));
     }
@@ -296,13 +314,14 @@ class Custom extends LocalTaxTypeBase {
 
     if (!$form_state->getErrors()) {
       $values = $form_state->getValue($form['#parents']);
+      $this->configuration['display_label'] = $values['display_label'];
       $this->configuration['round'] = $values['round'];
       $this->configuration['rates'] = [];
       foreach (array_filter($values['rates']) as $rate) {
         $this->configuration['rates'][] = [
           'id' => $rate['rate']['id'],
           'label' => $rate['rate']['label'],
-          'amount' => $rate['amount'] / 100,
+          'percentage' => $rate['percentage'] / 100,
         ];
       }
       $this->configuration['territories'] = [];
@@ -330,9 +349,12 @@ class Custom extends LocalTaxTypeBase {
   }
 
   /**
-   * {@inheritdoc}
+   * Gets the configured display label.
+   *
+   * @return string
+   *   The configured display label.
    */
-  public function getDisplayLabel() {
+  protected function getDisplayLabel() {
     $display_labels = $this->getDisplayLabels();
     $display_label_id = $this->configuration['display_label'];
     if (isset($display_labels[$display_label_id])) {
@@ -354,16 +376,16 @@ class Custom extends LocalTaxTypeBase {
   /**
    * {@inheritdoc}
    */
-  public function getZones() {
+  public function buildZones() {
     $rates = $this->configuration['rates'];
-    // The plugin doesn't support defining multiple amounts with own
+    // The plugin doesn't support defining multiple percentages with own
     // start/end dates for UX reasons, so a start date is invented here.
     foreach ($rates as &$rate) {
-      $rate['amounts'][] = [
-        'amount' => $rate['amount'],
+      $rate['percentages'][] = [
+        'number' => $rate['percentage'],
         'start_date' => '2000-01-01',
       ];
-      unset($rate['amount']);
+      unset($rate['percentage']);
     }
     // The first defined rate is assumed to be the default.
     $rates[0]['default'] = TRUE;
@@ -372,6 +394,7 @@ class Custom extends LocalTaxTypeBase {
     $zones['default'] = new TaxZone([
       'id' => 'default',
       'label' => 'Default',
+      'display_label' => $this->getDisplayLabel(),
       'territories' => $this->configuration['territories'],
       'rates' => $rates,
     ]);

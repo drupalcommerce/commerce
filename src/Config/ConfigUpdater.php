@@ -4,6 +4,7 @@ namespace Drupal\commerce\Config;
 
 use Drupal\Component\Utility\Crypt;
 use Drupal\Core\Config\ConfigFactoryInterface;
+use Drupal\Core\Config\Entity\ConfigEntityInterface;
 use Drupal\Core\Config\ExtensionInstallStorage;
 use Drupal\Core\Config\InstallStorage;
 use Drupal\Core\Config\StorageInterface;
@@ -77,7 +78,7 @@ class ConfigUpdater implements ConfigUpdaterInterface {
     $this->configFactory = $config_factory;
 
     foreach ($this->entityTypeManager->getDefinitions() as $entity_type => $definition) {
-      if ($definition->isSubclassOf('Drupal\Core\Config\Entity\ConfigEntityInterface')) {
+      if ($definition->entityClassImplements(ConfigEntityInterface::class)) {
         /** @var \Drupal\Core\Config\Entity\ConfigEntityTypeInterface $definition */
         $prefix = $definition->getConfigPrefix();
         $this->typesByPrefix[$prefix] = $entity_type;
@@ -133,11 +134,11 @@ class ConfigUpdater implements ConfigUpdaterInterface {
       }
       $active_config_data = $this->loadFromActive($config_name);
       if (!$active_config_data) {
-        $failed[$config_name] = $this->t('@config does not exist in active storage', ['@config' => $config_name]);
+        $succeeded[$config_name] = $this->t('Skipped: @config does not exist in active storage', ['@config' => $config_name]);
         continue;
       }
       if ($this->isModified($active_config_data) && $skip_modified) {
-        $failed[$config_name] = $this->t('@config could not be reverted because it was modified by the user', ['@config' => $config_name]);
+        $succeeded[$config_name] = $this->t('Skipped: @config was not reverted because it was modified by the user', ['@config' => $config_name]);
         continue;
       }
 
@@ -173,9 +174,8 @@ class ConfigUpdater implements ConfigUpdaterInterface {
     $succeeded = [];
     $failed = [];
     foreach ($config_names as $config_name) {
-      // Ensure there's something to delete.
       if (!$this->loadFromActive($config_name)) {
-        $failed[$config_name] = $this->t('@config does not exist in active storage', ['@config' => $config_name]);
+        $succeeded[$config_name] = $this->t('Skipped: @config does not exist in active storage', ['@config' => $config_name]);
         continue;
       }
 

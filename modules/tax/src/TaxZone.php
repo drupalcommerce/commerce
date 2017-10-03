@@ -7,8 +7,6 @@ use CommerceGuys\Addressing\Zone\ZoneTerritory;
 
 /**
  * Represents a tax zone.
- *
- * Based on \CommerceGuys\Addressing\Zone\Zone, expanded to contain tax rates.
  */
 class TaxZone {
 
@@ -25,6 +23,13 @@ class TaxZone {
    * @var string
    */
   protected $label;
+
+  /**
+   * The display label.
+   *
+   * @var string
+   */
+  protected $displayLabel;
 
   /**
    * The territories.
@@ -47,7 +52,7 @@ class TaxZone {
    *   The definition.
    */
   public function __construct(array $definition) {
-    foreach (['id', 'label', 'territories', 'rates'] as $required_property) {
+    foreach (['id', 'label', 'display_label', 'territories', 'rates'] as $required_property) {
       if (empty($definition[$required_property])) {
         throw new \InvalidArgumentException(sprintf('Missing required property "%s".', $required_property));
       }
@@ -60,6 +65,7 @@ class TaxZone {
 
     $this->id = $definition['id'];
     $this->label = $definition['label'];
+    $this->displayLabel = $definition['display_label'];
     foreach ($definition['territories'] as $territory_definition) {
       $this->territories[] = new ZoneTerritory($territory_definition);
     }
@@ -86,6 +92,18 @@ class TaxZone {
    */
   public function getLabel() {
     return $this->label;
+  }
+
+  /**
+   * Gets the display label.
+   *
+   * Used to identify the applied tax in order summaries.
+   *
+   * @return string
+   *   The display label.
+   */
+  public function getDisplayLabel() {
+    return $this->displayLabel;
   }
 
   /**

@@ -110,9 +110,9 @@ class PromotionOfferTest extends CommerceKernelTestBase {
       'stores' => [$this->store->id()],
       'status' => TRUE,
       'offer' => [
-        'target_plugin_id' => 'commerce_promotion_order_percentage_off',
+        'target_plugin_id' => 'order_percentage_off',
         'target_plugin_configuration' => [
-          'amount' => '0.10',
+          'percentage' => '0.10',
         ],
       ],
     ]);
@@ -120,12 +120,63 @@ class PromotionOfferTest extends CommerceKernelTestBase {
 
     /** @var \Drupal\commerce\Plugin\Field\FieldType\PluginItem $offer_field */
     $offer_field = $promotion->get('offer')->first();
-    $this->assertEquals('0.10', $offer_field->target_plugin_configuration['amount']);
+    $this->assertEquals('0.10', $offer_field->target_plugin_configuration['percentage']);
 
     $promotion->apply($this->order);
     $this->assertEquals(1, count($this->order->getAdjustments()));
     $this->assertEquals(new Price('36.00', 'USD'), $this->order->getTotalPrice());
 
+  }
+
+  /**
+   * Tests order fixed amount off.
+   */
+  public function testOrderFixedAmountOff() {
+    // Starts now, enabled. No end time.
+    $promotion = Promotion::create([
+      'name' => 'Promotion 1',
+      'order_types' => [$this->order->bundle()],
+      'stores' => [$this->store->id()],
+      'status' => TRUE,
+      'offer' => [
+        'target_plugin_id' => 'order_fixed_amount_off',
+        'target_plugin_configuration' => [
+          'amount' => [
+            'number' => '25.00',
+            'currency_code' => 'USD',
+          ],
+        ],
+      ],
+    ]);
+    $promotion->save();
+
+    $order_item = OrderItem::create([
+      'type' => 'test',
+      'quantity' => '1',
+      'unit_price' => [
+        'number' => '20.00',
+        'currency_code' => 'USD',
+      ],
+    ]);
+    $order_item->save();
+    $this->order->addItem($order_item);
+    $this->order->state = 'draft';
+    $this->order->save();
+    $this->order = $this->reloadEntity($this->order);
+
+    // Offer amount larger than the order total.
+    $this->assertEquals(1, count($this->order->getAdjustments()));
+    $this->assertEquals(new Price('-20.00', 'USD'), $this->order->getAdjustments()[0]->getAmount());
+    $this->assertEquals(new Price('0.00', 'USD'), $this->order->getTotalPrice());
+
+    // Offer amount smaller than the order total.
+    $order_item->setQuantity(2);
+    $order_item->save();
+    $this->order->save();
+    $this->order = $this->reloadEntity($this->order);
+    $this->assertEquals(1, count($this->order->getAdjustments()));
+    $this->assertEquals(new Price('-25.00', 'USD'), $this->order->getAdjustments()[0]->getAmount());
+    $this->assertEquals(new Price('15.00', 'USD'), $this->order->getTotalPrice());
   }
 
   /**
@@ -155,10 +206,8 @@ class PromotionOfferTest extends CommerceKernelTestBase {
       'purchased_entity' => $variation->id(),
     ]);
     $order_item->save();
-    $this->assertEquals($variation->id(), $order_item->getPurchasedEntityId());
     $this->order->addItem($order_item);
     $this->order->save();
-    $this->assertCount(1, $this->order->getItems());
 
     // Starts now, enabled. No end time.
     $promotion = Promotion::create([
@@ -167,10 +216,9 @@ class PromotionOfferTest extends CommerceKernelTestBase {
       'stores' => [$this->store->id()],
       'status' => TRUE,
       'offer' => [
-        'target_plugin_id' => 'commerce_promotion_product_percentage_off',
+        'target_plugin_id' => 'order_item_percentage_off',
         'target_plugin_configuration' => [
-          'amount' => '0.50',
-          'product_id' => $product->id(),
+          'percentage' => '0.50',
         ],
       ],
     ]);
@@ -178,8 +226,7 @@ class PromotionOfferTest extends CommerceKernelTestBase {
 
     /** @var \Drupal\commerce\Plugin\Field\FieldType\PluginItem $offer_field */
     $offer_field = $promotion->get('offer')->first();
-    $this->assertEquals('0.50', $offer_field->target_plugin_configuration['amount']);
-    $this->assertEquals($product->id(), $offer_field->target_plugin_configuration['product_id']);
+    $this->assertEquals('0.50', $offer_field->target_plugin_configuration['percentage']);
 
     $this->container->get('commerce_order.order_refresh')->refresh($this->order);
     $this->order = $this->reloadEntity($this->order);
@@ -191,11 +238,83 @@ class PromotionOfferTest extends CommerceKernelTestBase {
     $adjustment = reset($adjustments);
     // Adjustment for 50% of the order item total.
     $this->assertEquals(new Price('-5.00', 'USD'), $adjustment->getAmount());
+    $this->assertEquals('0.50', $adjustment->getPercentage());
     // Adjustments don't affect total order item price, but the order's total.
     $this->assertEquals(new Price('20.00', 'USD'), $order_item->getTotalPrice());
 
     $this->order->recalculateTotalPrice();
     $this->assertEquals(new Price('10.00', 'USD'), $this->order->getTotalPrice());
+  }
+
+  /**
+   * Tests product fixed amount off.
+   */
+  public function testProductFixedAmountOff() {
+    $variation = ProductVariation::create([
+      'type' => 'default',
+      'sku' => strtolower($this->randomMachineName()),
+      'price' => [
+        'number' => '10.00',
+        'currency_code' => 'USD',
+      ],
+    ]);
+    $variation->save();
+    $product = Product::create([
+      'type' => 'default',
+      'title' => 'My product',
+      'variations' => [$variation],
+    ]);
+    $product->save();
+
+    $order_item = OrderItem::create([
+      'type' => 'default',
+      'quantity' => '1',
+      'unit_price' => $variation->getPrice(),
+      'purchased_entity' => $variation->id(),
+    ]);
+    $order_item->save();
+    $this->order->addItem($order_item);
+    $this->order->save();
+
+    // Starts now, enabled. No end time.
+    $promotion = Promotion::create([
+      'name' => 'Promotion 1',
+      'order_types' => [$this->order->bundle()],
+      'stores' => [$this->store->id()],
+      'status' => TRUE,
+      'offer' => [
+        'target_plugin_id' => 'order_item_fixed_amount_off',
+        'target_plugin_configuration' => [
+          'amount' => [
+            'number' => '15.00',
+            'currency_code' => 'USD',
+          ],
+        ],
+      ],
+    ]);
+    $promotion->save();
+
+    /** @var \Drupal\commerce\Plugin\Field\FieldType\PluginItem $offer_field */
+    $offer_field = $promotion->get('offer')->first();
+    $this->assertEquals('15.00', $offer_field->target_plugin_configuration['amount']['number']);
+
+    $this->container->get('commerce_order.order_refresh')->refresh($this->order);
+    $this->order = $this->reloadEntity($this->order);
+    /** @var \Drupal\commerce_order\Entity\OrderItemInterface $order_item */
+    $order_item = $this->reloadEntity($order_item);
+
+    // Offer amount larger than the order item price.
+    $this->assertEquals(1, count($order_item->getAdjustments()));
+    $this->assertEquals(new Price('-10.00', 'USD'), $order_item->getAdjustments()[0]->getAmount());
+
+    // Offer amount smaller than the order item unit price.
+    $variation->setPrice(new Price('20', 'USD'));
+    $variation->save();
+    $this->container->get('commerce_order.order_refresh')->refresh($this->order);
+    $this->order = $this->reloadEntity($this->order);
+    $order_item = $this->reloadEntity($order_item);
+    $this->assertEquals(1, count($order_item->getAdjustments()));
+    $this->assertEquals(new Price('-15.00', 'USD'), $order_item->getAdjustments()[0]->getAmount());
   }
 
 }
