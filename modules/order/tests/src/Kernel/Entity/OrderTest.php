@@ -99,6 +99,9 @@ class OrderTest extends CommerceKernelTestBase {
    * @covers ::setRefreshState
    * @covers ::getData
    * @covers ::setData
+   * @covers ::isLocked
+   * @covers ::lock
+   * @covers ::unlock
    * @covers ::getCreatedTime
    * @covers ::setCreatedTime
    * @covers ::getPlacedTime
@@ -189,17 +192,26 @@ class OrderTest extends CommerceKernelTestBase {
       'label' => 'Handling fee',
       'amount' => new Price('10.00', 'USD'),
     ]);
+    // Included adjustments do not affect the order total.
+    $adjustments[] = new Adjustment([
+      'type' => 'custom',
+      'label' => 'Tax',
+      'amount' => new Price('12.00', 'USD'),
+      'included' => TRUE,
+    ]);
     $order->addAdjustment($adjustments[0]);
     $order->addAdjustment($adjustments[1]);
+    $order->addAdjustment($adjustments[2]);
     $adjustments = $order->getAdjustments();
     $this->assertEquals($adjustments, $order->getAdjustments());
     $collected_adjustments = $order->collectAdjustments();
     $this->assertEquals($adjustments[0]->getAmount(), $collected_adjustments[0]->getAmount());
     $this->assertEquals($adjustments[1]->getAmount(), $collected_adjustments[1]->getAmount());
+    $this->assertEquals($adjustments[2]->getAmount(), $collected_adjustments[2]->getAmount());
     $order->removeAdjustment($adjustments[0]);
     $this->assertEquals(new Price('8.00', 'USD'), $order->getSubtotalPrice());
     $this->assertEquals(new Price('18.00', 'USD'), $order->getTotalPrice());
-    $this->assertEquals([$adjustments[1]], $order->getAdjustments());
+    $this->assertEquals([$adjustments[1], $adjustments[2]], $order->getAdjustments());
     $order->setAdjustments($adjustments);
     $this->assertEquals($adjustments, $order->getAdjustments());
     $this->assertEquals(new Price('17.00', 'USD'), $order->getTotalPrice());
@@ -224,6 +236,12 @@ class OrderTest extends CommerceKernelTestBase {
     $this->assertEquals('default', $order->getData('test', 'default'));
     $order->setData('test', 'value');
     $this->assertEquals('value', $order->getData('test', 'default'));
+
+    $this->assertFalse($order->isLocked());
+    $order->lock();
+    $this->assertTrue($order->isLocked());
+    $order->unlock();
+    $this->assertFalse($order->isLocked());
 
     $order->setCreatedTime(635879700);
     $this->assertEquals(635879700, $order->getCreatedTime());
@@ -284,6 +302,30 @@ class OrderTest extends CommerceKernelTestBase {
       $currency_mismatch = TRUE;
     }
     $this->assertTrue($currency_mismatch);
+  }
+
+  /**
+   * Tests that an order's email updates with the customer.
+   */
+  public function testOrderEmail() {
+    $customer = $this->createUser(['mail' => 'test@example.com']);
+    $order_with_customer = Order::create([
+      'type' => 'default',
+      'state' => 'completed',
+      'uid' => $customer,
+    ]);
+    $order_with_customer->save();
+    $this->assertEquals($customer->getEmail(), $order_with_customer->getEmail());
+
+    $order_without_customer = Order::create([
+      'type' => 'default',
+      'state' => 'completed',
+    ]);
+    $order_without_customer->save();
+    $this->assertEquals('', $order_without_customer->getEmail());
+    $order_without_customer->setCustomer($customer);
+    $order_without_customer->save();
+    $this->assertEquals($customer->getEmail(), $order_without_customer->getEmail());
   }
 
 }

@@ -10,6 +10,7 @@ use Drupal\commerce\Entity\CommerceBundleEntityBase;
  * @ConfigEntityType(
  *   id = "commerce_product_type",
  *   label = @Translation("Product type"),
+ *   label_collection = @Translation("Product types"),
  *   label_singular = @Translation("product type"),
  *   label_plural = @Translation("product types"),
  *   label_count = @PluralTranslation(
@@ -21,7 +22,7 @@ use Drupal\commerce\Entity\CommerceBundleEntityBase;
  *     "form" = {
  *       "add" = "Drupal\commerce_product\Form\ProductTypeForm",
  *       "edit" = "Drupal\commerce_product\Form\ProductTypeForm",
- *       "delete" = "Drupal\commerce_product\Form\ProductTypeDeleteForm"
+ *       "delete" = "Drupal\commerce\Form\CommerceBundleEntityDeleteFormBase"
  *     },
  *     "route_provider" = {
  *       "default" = "Drupal\Core\Entity\Routing\DefaultHtmlRouteProvider",

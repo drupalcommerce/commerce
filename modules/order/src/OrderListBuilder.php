@@ -107,11 +107,19 @@ class OrderListBuilder extends EntityListBuilder {
   protected function getDefaultOperations(EntityInterface $entity) {
     $operations = parent::getDefaultOperations($entity);
 
+    /** @var \Drupal\commerce_order\Entity\OrderInterface $entity */
     if ($entity->access('update') && $entity->hasLinkTemplate('reassign-form')) {
       $operations['reassign'] = [
         'title' => $this->t('Reassign'),
         'weight' => 20,
         'url' => $entity->toUrl('reassign-form'),
+      ];
+    }
+    if ($entity->access('unlock')) {
+      $operations['unlock'] = [
+        'title' => $this->t('Unlock'),
+        'weight' => 25,
+        'url' => $entity->toUrl('unlock-form'),
       ];
     }
 

@@ -2,6 +2,8 @@
 
 namespace Drupal\commerce_promotion\Plugin\Field\FieldWidget;
 
+use Drupal\commerce_promotion\Entity\CouponInterface;
+use Drupal\commerce_promotion\Entity\PromotionInterface;
 use Drupal\commerce_promotion\PromotionUsageInterface;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FieldItemListInterface;
@@ -70,11 +72,22 @@ class UsageLimitWidget extends WidgetBase implements ContainerFactoryPluginInter
    * {@inheritdoc}
    */
   public function formElement(FieldItemListInterface $items, $delta, array $element, array &$form, FormStateInterface $form_state) {
-    $field_name = $this->fieldDefinition->getName();
-    /** @var \Drupal\commerce_promotion\Entity\PromotionInterface $promotion */
-    $promotion = $items[$delta]->getEntity();
     $value = isset($items[$delta]->value) ? $items[$delta]->value : NULL;
-    $usage = $this->formatPlural($this->usage->getUsage($promotion), '1 use', '@count uses');
+    $usage = 0;
+    /** @var \Drupal\Core\Entity\EntityInterface $entity */
+    $entity = $items[$delta]->getEntity();
+    if (!$entity->isNew()) {
+      if ($entity instanceof PromotionInterface) {
+        $usage = $this->usage->load($entity);
+      }
+      elseif ($entity instanceof CouponInterface) {
+        $usage = $this->usage->loadByCoupon($entity);
+      }
+    }
+    $formatted_usage = $this->formatPlural($usage, '1 use', '@count uses');
+    $radio_parents = array_merge($form['#parents'], [$this->fieldDefinition->getName(), 0, 'limit']);
+    $radio_path = array_shift($radio_parents);
+    $radio_path .= '[' . implode('][', $radio_parents) . ']';
 
     $element['limit'] = [
       '#type' => 'radios',
@@ -90,10 +103,10 @@ class UsageLimitWidget extends WidgetBase implements ContainerFactoryPluginInter
       '#title' => $this->t('Number of uses'),
       '#title_display' => 'invisible',
       '#default_value' => $value ?: 10,
-      '#description' => $this->t('Current usage: @usage.', ['@usage' => $usage]),
+      '#description' => $this->t('Current usage: @usage.', ['@usage' => $formatted_usage]),
       '#states' => [
         'invisible' => [
-          ':input[name="' . $field_name . '[0][limit]"]' => ['value' => 0],
+          ':input[name="' . $radio_path . '"]' => ['value' => 0],
         ],
       ],
     ];
@@ -121,7 +134,7 @@ class UsageLimitWidget extends WidgetBase implements ContainerFactoryPluginInter
   public static function isApplicable(FieldDefinitionInterface $field_definition) {
     $entity_type = $field_definition->getTargetEntityTypeId();
     $field_name = $field_definition->getName();
-    return $entity_type == 'commerce_promotion' && $field_name == 'usage_limit';
+    return in_array($entity_type, ['commerce_promotion', 'commerce_promotion_coupon']) && $field_name == 'usage_limit';
   }
 
 }

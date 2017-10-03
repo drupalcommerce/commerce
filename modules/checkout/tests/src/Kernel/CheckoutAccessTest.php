@@ -74,12 +74,10 @@ class CheckoutAccessTest extends CommerceKernelTestBase {
     parent::setUp();
 
     $this->installEntitySchema('profile');
-    $this->installEntitySchema('commerce_store');
     $this->installEntitySchema('commerce_product');
     $this->installEntitySchema('commerce_product_variation');
     $this->installEntitySchema('commerce_order');
     $this->installEntitySchema('commerce_order_item');
-    $this->installConfig('commerce_store');
     $this->installConfig('commerce_order');
     $this->installConfig('commerce_product');
     $this->installConfig('commerce_checkout');

@@ -30,21 +30,13 @@ class CommercePromotionOffer extends Plugin {
   public $label;
 
   /**
-   * An array of context definitions describing the context used by the plugin.
+   * The offer entity type ID.
    *
-   * The array is keyed by context names.
+   * This is the entity type ID of the entity passed to the plugin during execution.
+   * For example: 'commerce_order'.
    *
-   * @var \Drupal\Core\Annotation\ContextDefinition[]
+   * @var string
    */
-  public $context = [];
-
-  /**
-   * The category under which the offer should listed in the UI.
-   *
-   * @var \Drupal\Core\Annotation\Translation
-   *
-   * @ingroup plugin_translatable
-   */
-  public $category;
+  public $entity_type;
 
 }

@@ -98,3 +98,20 @@ function commerce_promotion_update_8202() {
     ]);
   $entity_definition_update->installFieldStorageDefinition('weight', 'commerce_promotion', 'commerce_promotion', $storage_definition);
 }
+
+/**
+ * Add the usage_limit field to coupons.
+ */
+function commerce_promotion_update_8203() {
+  $entity_definition_update = \Drupal::entityDefinitionUpdateManager();
+
+  $storage_definition = BaseFieldDefinition::create('integer')
+    ->setLabel(t('Usage limit'))
+    ->setDescription(t('The maximum number of times the coupon can be used. 0 for unlimited.'))
+    ->setDefaultValue(0)
+    ->setDisplayOptions('form', [
+      'type' => 'commerce_usage_limit',
+      'weight' => 4,
+    ]);
+  $entity_definition_update->installFieldStorageDefinition('usage_limit', 'commerce_promotion_coupon', 'commerce_promotion', $storage_definition);
+}

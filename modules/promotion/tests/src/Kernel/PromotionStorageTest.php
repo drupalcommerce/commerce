@@ -7,6 +7,9 @@ use Drupal\commerce_promotion\Entity\Coupon;
 use Drupal\commerce_promotion\Entity\Promotion;
 use Drupal\Core\Datetime\DrupalDateTime;
 use Drupal\Tests\commerce\Kernel\CommerceKernelTestBase;
+use Drupal\commerce_order\Entity\OrderItem;
+use Drupal\commerce_price\Price;
+use Drupal\commerce_order\Entity\Order;
 
 /**
  * Tests promotion storage.
@@ -37,6 +40,20 @@ class PromotionStorageTest extends CommerceKernelTestBase {
   ];
 
   /**
+   * The test order.
+   *
+   * @var \Drupal\commerce_order\Entity\OrderInterface
+   */
+  protected $order;
+
+  /**
+   * The test order type.
+   *
+   * @var \Drupal\commerce_order\Entity\OrderTypeInterface
+   */
+  protected $orderType;
+
+  /**
    * {@inheritdoc}
    */
   protected function setUp() {
@@ -44,7 +61,7 @@ class PromotionStorageTest extends CommerceKernelTestBase {
 
     $this->installEntitySchema('profile');
     $this->installEntitySchema('commerce_order');
-    $this->installEntitySchema('commerce_order_type');
+    $this->installEntitySchema('commerce_order_item');
     $this->installEntitySchema('commerce_promotion');
     $this->installEntitySchema('commerce_promotion_coupon');
     $this->installConfig([
@@ -55,18 +72,35 @@ class PromotionStorageTest extends CommerceKernelTestBase {
     $this->installSchema('commerce_promotion', ['commerce_promotion_usage']);
 
     $this->promotionStorage = $this->container->get('entity_type.manager')->getStorage('commerce_promotion');
+
+    $this->orderType = OrderType::load('default');
+    $order_item = OrderItem::create([
+      'type' => 'default',
+      'quantity' => 1,
+      'unit_price' => new Price('12.00', 'USD'),
+    ]);
+    $order_item->save();
+
+    $this->order = Order::create([
+      'type' => 'default',
+      'state' => 'draft',
+      'mail' => 'test@example.com',
+      'ip_address' => '127.0.0.1',
+      'order_number' => '6',
+      'store_id' => $this->store,
+      'uid' => $this->createUser(),
+      'order_items' => [$order_item],
+    ]);
   }
 
   /**
-   * Tests loadValid().
+   * Tests loadAvailable().
    */
-  public function testLoadValid() {
-    $order_type = OrderType::load('default');
-
+  public function testLoadAvailable() {
     // Starts now, enabled. No end time.
     $promotion1 = Promotion::create([
       'name' => 'Promotion 1',
-      'order_types' => [$order_type],
+      'order_types' => [$this->orderType],
       'stores' => [$this->store->id()],
       'status' => TRUE,
     ]);
@@ -76,7 +110,7 @@ class PromotionStorageTest extends CommerceKernelTestBase {
     /** @var \Drupal\commerce_promotion\Entity\Promotion $promotion2 */
     $promotion2 = Promotion::create([
       'name' => 'Promotion 2',
-      'order_types' => [$order_type],
+      'order_types' => [$this->orderType],
       'stores' => [$this->store->id()],
       'status' => FALSE,
     ]);
@@ -84,7 +118,7 @@ class PromotionStorageTest extends CommerceKernelTestBase {
     // Jan 2014, enabled. No end time.
     $promotion3 = Promotion::create([
       'name' => 'Promotion 3',
-      'order_types' => [$order_type],
+      'order_types' => [$this->orderType],
       'stores' => [$this->store->id()],
       'status' => TRUE,
       'start_date' => '2014-01-01T20:00:00Z',
@@ -93,7 +127,7 @@ class PromotionStorageTest extends CommerceKernelTestBase {
     // Start in 1 week, end in 1 year. Enabled.
     $promotion4 = Promotion::create([
       'name' => 'Promotion 4',
-      'order_types' => [$order_type],
+      'order_types' => [$this->orderType],
       'stores' => [$this->store->id()],
       'status' => TRUE,
       'start_date' => gmdate('Y-m-d', time() + 604800),
@@ -102,21 +136,21 @@ class PromotionStorageTest extends CommerceKernelTestBase {
     $this->assertEquals(SAVED_NEW, $promotion4->save());
 
     // Verify valid promotions load.
-    $valid_promotions = $this->promotionStorage->loadValid($order_type, $this->store);
+    $valid_promotions = $this->promotionStorage->loadAvailable($this->order);
     $this->assertEquals(2, count($valid_promotions));
 
     // Move the 4th promotions start week to a week ago, makes it valid.
     $promotion4->setStartDate(new DrupalDateTime('-1 week'));
     $promotion4->save();
 
-    $valid_promotions = $this->promotionStorage->loadValid($order_type, $this->store);
+    $valid_promotions = $this->promotionStorage->loadAvailable($this->order);
     $this->assertEquals(3, count($valid_promotions));
 
     // Set promotion 3's end date six months ago, making it invalid.
     $promotion3->setEndDate(new DrupalDateTime('-6 month'));
     $promotion3->save();
 
-    $valid_promotions = $this->promotionStorage->loadValid($order_type, $this->store);
+    $valid_promotions = $this->promotionStorage->loadAvailable($this->order);
     $this->assertEquals(2, count($valid_promotions));
   }
 
@@ -124,11 +158,9 @@ class PromotionStorageTest extends CommerceKernelTestBase {
    * Tests that promotions with coupons do not get loaded.
    */
   public function testValidWithCoupons() {
-    $order_type = OrderType::load('default');
-
     $promotion1 = Promotion::create([
       'name' => 'Promotion 1',
-      'order_types' => [$order_type],
+      'order_types' => [$this->orderType],
       'stores' => [$this->store->id()],
       'status' => TRUE,
     ]);
@@ -137,7 +169,7 @@ class PromotionStorageTest extends CommerceKernelTestBase {
     /** @var \Drupal\commerce_promotion\Entity\Promotion $promotion2 */
     $promotion2 = Promotion::create([
       'name' => 'Promotion 2',
-      'order_types' => [$order_type],
+      'order_types' => [$this->orderType],
       'stores' => [$this->store->id()],
       'status' => TRUE,
     ]);
@@ -154,49 +186,13 @@ class PromotionStorageTest extends CommerceKernelTestBase {
 
     $promotion3 = Promotion::create([
       'name' => 'Promotion 3',
-      'order_types' => [$order_type],
+      'order_types' => [$this->orderType],
       'stores' => [$this->store->id()],
       'status' => TRUE,
     ]);
     $promotion3->save();
 
-    $this->assertEquals(2, count($this->promotionStorage->loadValid($order_type, $this->store)));
-  }
-
-  /**
-   * Tests loading a promotion by a coupon.
-   */
-  public function testLoadByCoupon() {
-    $order_type = OrderType::load('default');
-
-    $coupon_code = $this->randomMachineName();
-    $coupon = Coupon::create([
-      'code' => $coupon_code,
-      'status' => TRUE,
-    ]);
-    $coupon->save();
-
-    // Starts now, enabled. No end time.
-    $promotion1 = Promotion::create([
-      'name' => 'Promotion 1',
-      'order_types' => [$order_type],
-      'stores' => [$this->store->id()],
-      'status' => TRUE,
-      'coupons' => [$coupon],
-    ]);
-    $this->assertEquals(SAVED_NEW, $promotion1->save());
-    // Starts now, enabled. No end time.
-    $promotion2 = Promotion::create([
-      'name' => 'Promotion 2',
-      'order_types' => [$order_type],
-      'stores' => [$this->store->id()],
-      'status' => TRUE,
-    ]);
-    $this->assertEquals(SAVED_NEW, $promotion2->save());
-
-    // Verify valid promotions load.
-    $valid_promotion = $this->promotionStorage->loadByCoupon($order_type, $this->store, $coupon);
-    $this->assertEquals($promotion1->label(), $valid_promotion->label());
+    $this->assertEquals(2, count($this->promotionStorage->loadAvailable($this->order)));
   }
 
   /**
@@ -205,43 +201,39 @@ class PromotionStorageTest extends CommerceKernelTestBase {
    * @group debug
    */
   public function testWeight() {
-    $order_type = OrderType::load('default');
-
     $promotion1 = Promotion::create([
       'name' => 'Promotion 1',
-      'order_types' => [$order_type],
+      'order_types' => [$this->orderType],
       'stores' => [$this->store->id()],
       'status' => TRUE,
       'weight' => 4,
     ]);
-    $this->assertEquals(SAVED_NEW, $promotion1->save());
+    $promotion1->save();
     $promotion2 = Promotion::create([
       'name' => 'Promotion 2',
-      'order_types' => [$order_type],
+      'order_types' => [$this->orderType],
       'stores' => [$this->store->id()],
       'status' => TRUE,
       'weight' => 2,
     ]);
-    $this->assertEquals(SAVED_NEW, $promotion2->save());
+    $promotion2->save();
     $promotion3 = Promotion::create([
       'name' => 'Promotion 3',
-      'order_types' => [$order_type],
+      'order_types' => [$this->orderType],
       'stores' => [$this->store->id()],
       'status' => TRUE,
       'weight' => -10,
     ]);
-    $this->assertEquals(SAVED_NEW, $promotion3->save());
+    $promotion3->save();
     $promotion4 = Promotion::create([
       'name' => 'Promotion 4',
-      'order_types' => [$order_type],
+      'order_types' => [$this->orderType],
       'stores' => [$this->store->id()],
       'status' => TRUE,
-      'weight' => 1,
     ]);
-    $this->assertEquals(SAVED_NEW, $promotion4->save());
+    $promotion4->save();
 
-    $promotions = $this->promotionStorage->loadValid($order_type, $this->store);
-
+    $promotions = $this->promotionStorage->loadAvailable($this->order);
     $promotion = array_shift($promotions);
     $this->assertEquals($promotion3->label(), $promotion->label());
     $promotion = array_shift($promotions);

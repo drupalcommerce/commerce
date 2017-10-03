@@ -1,0 +1,4 @@
+entity.commerce_tax_type.edit_form:
+  route_name: entity.commerce_tax_type.edit_form
+  base_route: entity.commerce_tax_type.edit_form
+  title: Edit

@@ -63,15 +63,18 @@ interface CheckoutFlowInterface extends FormInterface, BaseFormIdInterface, Conf
    *
    * @return array
    *   An array of step definitions, keyed by step ID.
-   *   Each step definition has the following keys:
+   *   Possible keys:
    *   - label: The label of the step.
    *   - previous_label: The label shown on the button that returns the
    *                     customer back to this step.
    *   - next_label: The label shown on the button that sends the customer to
    *                 this step.
    *   - has_sidebar: Whether the step has a sidebar.
-   *   If the previous_label or next_label keys are missing, the corresponding
-   *   buttons will not be shown to the customer.
+   *   - hidden: Whether the step is hidden. Hidden steps aren't shown
+   *             in the checkout progress block until they are reached.
+   *   Note:
+   *   If the previous_label or next_label keys are missing, the
+   *   corresponding buttons will not be shown to the customer.
    */
   public function getSteps();
 

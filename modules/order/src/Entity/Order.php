@@ -18,6 +18,7 @@ use Drupal\profile\Entity\ProfileInterface;
  * @ContentEntityType(
  *   id = "commerce_order",
  *   label = @Translation("Order"),
+ *   label_collection = @Translation("Orders"),
  *   label_singular = @Translation("order"),
  *   label_plural = @Translation("orders"),
  *   label_count = @PluralTranslation(
@@ -36,7 +37,8 @@ use Drupal\profile\Entity\ProfileInterface;
  *       "default" = "Drupal\commerce_order\Form\OrderForm",
  *       "add" = "Drupal\commerce_order\Form\OrderForm",
  *       "edit" = "Drupal\commerce_order\Form\OrderForm",
- *       "delete" = "Drupal\Core\Entity\ContentEntityDeleteForm"
+ *       "delete" = "Drupal\Core\Entity\ContentEntityDeleteForm",
+ *       "unlock" = "Drupal\commerce_order\Form\OrderUnlockForm",
  *     },
  *     "route_provider" = {
  *       "default" = "Drupal\commerce_order\OrderRouteProvider",
@@ -59,6 +61,7 @@ use Drupal\profile\Entity\ProfileInterface;
  *     "delete-form" = "/admin/commerce/orders/{commerce_order}/delete",
  *     "delete-multiple-form" = "/admin/commerce/orders/delete",
  *     "reassign-form" = "/admin/commerce/orders/{commerce_order}/reassign",
+ *     "unlock-form" = "/admin/commerce/orders/{commerce_order}/unlock",
  *     "collection" = "/admin/commerce/orders"
  *   },
  *   bundle_entity_type = "commerce_order_type",
@@ -297,6 +300,23 @@ class Order extends ContentEntityBase implements OrderInterface {
   /**
    * {@inheritdoc}
    */
+  public function clearAdjustments() {
+    foreach ($this->getItems() as $order_item) {
+      $order_item->setAdjustments([]);
+    }
+    // Remove all order-level adjustments except the ones added via the UI.
+    $adjustments = $this->getAdjustments();
+    $adjustments = array_filter($adjustments, function ($adjustment) {
+      /** @var \Drupal\commerce_order\Adjustment $adjustment */
+      return $adjustment->getType() == 'custom';
+    });
+    $this->setAdjustments($adjustments);
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function collectAdjustments() {
     $adjustments = [];
     foreach ($this->getItems() as $order_item) {
@@ -306,8 +326,10 @@ class Order extends ContentEntityBase implements OrderInterface {
         $multiplied_adjustment = new Adjustment([
           'type' => $adjustment->getType(),
           'label' => $adjustment->getLabel(),
-          'source_id' => $adjustment->getSourceId(),
           'amount' => $adjustment->getAmount()->multiply($order_item->getQuantity()),
+          'percentage' => $adjustment->getPercentage(),
+          'source_id' => $adjustment->getSourceId(),
+          'included' => $adjustment->isIncluded(),
         ]);
         $adjustments[] = $multiplied_adjustment;
       }
@@ -346,7 +368,9 @@ class Order extends ContentEntityBase implements OrderInterface {
         $total_price = $total_price ? $total_price->add($order_item_total) : $order_item_total;
       }
       foreach ($this->collectAdjustments() as $adjustment) {
-        $total_price = $total_price->add($adjustment->getAmount());
+        if (!$adjustment->isIncluded()) {
+          $total_price = $total_price->add($adjustment->getAmount());
+        }
       }
     }
     $this->total_price = $total_price;
@@ -406,6 +430,29 @@ class Order extends ContentEntityBase implements OrderInterface {
   /**
    * {@inheritdoc}
    */
+  public function isLocked() {
+    return !empty($this->get('locked')->value);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function lock() {
+    $this->set('locked', TRUE);
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function unlock() {
+    $this->set('locked', FALSE);
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function getCreatedTime() {
     return $this->get('created')->value;
   }
@@ -458,10 +505,10 @@ class Order extends ContentEntityBase implements OrderInterface {
       if (!$this->getIpAddress()) {
         $this->setIpAddress(\Drupal::request()->getClientIp());
       }
+    }
 
-      if (!$this->getEmail() && $customer = $this->getCustomer()) {
-        $this->setEmail($customer->getEmail());
-      }
+    if (!$this->getEmail() && $customer = $this->getCustomer()) {
+      $this->setEmail($customer->getEmail());
     }
 
     // Maintain the completed timestamp.
@@ -469,10 +516,9 @@ class Order extends ContentEntityBase implements OrderInterface {
     $original_state = isset($this->original) ? $this->original->getState()->value : '';
     if ($state == 'completed' && $original_state != 'completed') {
       if (empty($this->getCompletedTime())) {
-        $this->setCompletedTime(REQUEST_TIME);
+        $this->setCompletedTime(\Drupal::time()->getRequestTime());
       }
     }
-
     // Refresh draft orders on every save.
     if ($this->getState()->value == 'draft' && empty($this->getRefreshState())) {
       $this->setRefreshState(self::REFRESH_ON_SAVE);
@@ -639,6 +685,14 @@ class Order extends ContentEntityBase implements OrderInterface {
     $fields['data'] = BaseFieldDefinition::create('map')
       ->setLabel(t('Data'))
       ->setDescription(t('A serialized array of additional data.'));
+
+    $fields['locked'] = BaseFieldDefinition::create('boolean')
+      ->setLabel(t('Locked'))
+      ->setSettings([
+        'on_label' => t('Yes'),
+        'off_label' => t('No'),
+      ])
+      ->setDefaultValue(FALSE);
 
     $fields['created'] = BaseFieldDefinition::create('created')
       ->setLabel(t('Created'))

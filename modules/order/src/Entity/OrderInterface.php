@@ -221,6 +221,16 @@ interface OrderInterface extends ContentEntityInterface, EntityAdjustableInterfa
   public function hasItem(OrderItemInterface $order_item);
 
   /**
+   * Removes all adjustments that belong to the order.
+   *
+   * This includes both order and order item adjustments, with the exception
+   * of adjustments added via the UI.
+   *
+   * @return $this
+   */
+  public function clearAdjustments();
+
+  /**
    * Collects all adjustments that belong to the order.
    *
    * Unlike getAdjustments() which returns only order adjustments,
@@ -317,6 +327,28 @@ interface OrderInterface extends ContentEntityInterface, EntityAdjustableInterfa
    * @return $this
    */
   public function setData($key, $value);
+
+  /**
+   * Gets whether the order is locked.
+   *
+   * @return bool
+   *   TRUE if the order is locked, FALSE otherwise.
+   */
+  public function isLocked();
+
+  /**
+   * Locks the order.
+   *
+   * @return $this
+   */
+  public function lock();
+
+  /**
+   * Unlocks the order.
+   *
+   * @return $this
+   */
+  public function unlock();
 
   /**
    * Gets the order creation timestamp.
