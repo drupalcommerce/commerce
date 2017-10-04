@@ -152,7 +152,7 @@ function commerce_order_post_update_5() {
   return $message;
 }
 
-/*
+/**
  * Update the profile address field.
  */
 function commerce_order_post_update_6() {
