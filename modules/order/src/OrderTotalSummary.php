@@ -35,7 +35,8 @@ class OrderTotalSummary implements OrderTotalSummaryInterface {
         $key = count($adjustments);
       }
       else {
-        // Adjustments with the same type and source ID are combined.
+        // Adjustments with the same
+        // type and source ID are combined.
         $key = $type . '_' . $source_id;
       }
 

@@ -64,7 +64,7 @@ class OrderIntegrationTest extends CommerceKernelTestBase {
           [
             'id' => 'standard',
             'label' => 'Standard',
-            'amount' => '0.2',
+            'percentage' => '0.2',
           ],
         ],
         'territories' => [

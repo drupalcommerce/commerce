@@ -1,3 +1,11 @@
+commerce_payment.configuration:
+  path: '/admin/commerce/config/payment'
+  defaults:
+    _controller: '\Drupal\system\Controller\SystemController::systemAdminMenuBlockPage'
+    _title: 'Payment'
+  requirements:
+    _permission: 'access commerce administration pages'
+
 entity.commerce_payment.add_form:
   path: '/admin/commerce/orders/{commerce_order}/payments/add'
   defaults:
@@ -62,7 +70,7 @@ entity.commerce_payment_method.collection:
 commerce_payment.checkout.return:
   path: '/checkout/{commerce_order}/{step}/return'
   defaults:
-    _controller: '\Drupal\commerce_payment\Controller\OffsitePaymentController::returnCheckoutPage'
+    _controller: '\Drupal\commerce_payment\Controller\PaymentCheckoutController::returnPage'
   requirements:
     _custom_access: '\Drupal\commerce_checkout\Controller\CheckoutController::checkAccess'
     _module_dependencies: commerce_checkout
@@ -74,7 +82,7 @@ commerce_payment.checkout.return:
 commerce_payment.checkout.cancel:
   path: '/checkout/{commerce_order}/{step}/cancel'
   defaults:
-    _controller: '\Drupal\commerce_payment\Controller\OffsitePaymentController::cancelCheckoutPage'
+    _controller: '\Drupal\commerce_payment\Controller\PaymentCheckoutController::cancelPage'
   requirements:
     _custom_access: '\Drupal\commerce_checkout\Controller\CheckoutController::checkAccess'
     _module_dependencies: commerce_checkout
@@ -86,7 +94,7 @@ commerce_payment.checkout.cancel:
 commerce_payment.notify:
   path: '/payment/notify/{commerce_payment_gateway}'
   defaults:
-    _controller: '\Drupal\commerce_payment\Controller\OffsitePaymentController::notifyPage'
+    _controller: '\Drupal\commerce_payment\Controller\PaymentNotificationController::notifyPage'
   requirements:
     _access: 'TRUE'
   options:

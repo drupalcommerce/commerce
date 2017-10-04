@@ -5,7 +5,6 @@
  * Defines common functionality for all Commerce modules.
  */
 
-use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\Element;
@@ -132,83 +131,4 @@ function _commerce_entity_theme_suggestions($entity_type_id, array $variables) {
   $suggestions[] = $original . '__' . $entity->id() . '__' . $sanitized_view_mode;
 
   return $suggestions;
-}
-
-/**
- * Gets the entity types which use bundle plugins.
- *
- * @return \Drupal\Core\Entity\EntityTypeInterface[]
- *   The entity types.
- */
-function commerce_get_bundle_plugin_entity_types() {
-  $entity_types = \Drupal::entityTypeManager()->getDefinitions();
-  $entity_types = array_filter($entity_types, function (EntityTypeInterface $entity_type) {
-    return $entity_type->hasHandlerClass('bundle_plugin');
-  });
-
-  return $entity_types;
-}
-
-/**
- * Implements hook_entity_type_build().
- */
-function commerce_entity_type_build(array &$entity_types) {
-  foreach ($entity_types as $entity_type) {
-    if ($entity_type->get('bundle_plugin_type')) {
-      $entity_type->setHandlerClass('bundle_plugin', 'Drupal\commerce\BundlePluginHandler');
-    }
-  }
-}
-
-/**
- * Implements hook_entity_bundle_info().
- */
-function commerce_entity_bundle_info() {
-  $bundles = [];
-  foreach (commerce_get_bundle_plugin_entity_types() as $entity_type) {
-    /** @var \Drupal\commerce\BundlePluginHandler $bundle_handler */
-    $bundle_handler = \Drupal::entityTypeManager()->getHandler($entity_type->id(), 'bundle_plugin');
-    $bundles[$entity_type->id()] = $bundle_handler->getBundleInfo();
-  }
-  return $bundles;
-}
-
-/**
- * Implements hook_entity_field_storage_info().
- */
-function commerce_entity_field_storage_info(EntityTypeInterface $entity_type) {
-  if ($entity_type->hasHandlerClass('bundle_plugin')) {
-    /** @var \Drupal\commerce\BundlePluginHandler $bundle_handler */
-    $bundle_handler = \Drupal::entityTypeManager()->getHandler($entity_type->id(), 'bundle_plugin');
-    return $bundle_handler->getFieldStorageDefinitions();
-  }
-}
-
-/**
- * Implements hook_entity_bundle_field_info().
- */
-function commerce_entity_bundle_field_info(EntityTypeInterface $entity_type, $bundle) {
-  if ($entity_type->hasHandlerClass('bundle_plugin')) {
-    /** @var \Drupal\commerce\BundlePluginHandler $bundle_handler */
-    $bundle_handler = \Drupal::entityTypeManager()->getHandler($entity_type->id(), 'bundle_plugin');
-    return $bundle_handler->getFieldDefinitions($bundle);
-  }
-}
-
-/**
- * Implements hook_modules_installed().
- */
-function commerce_modules_installed($modules) {
-  foreach (commerce_get_bundle_plugin_entity_types() as $entity_type) {
-    \Drupal::service('commerce.bundle_plugin_installer')->installBundles($entity_type, $modules);
-  }
-}
-
-/**
- * Implements hook_module_preuninstall().
- */
-function commerce_module_preuninstall($module) {
-  foreach (commerce_get_bundle_plugin_entity_types() as $entity_type) {
-    \Drupal::service('commerce.bundle_plugin_installer')->uninstallBundles($entity_type, [$module]);
-  }
 }

@@ -215,7 +215,16 @@ class CartProviderTest extends CommerceKernelTestBase {
    */
   public function testCartValidation() {
     $this->installCommerceCart();
+    /** @var \Drupal\commerce_cart\CartProviderInterface $cart_provider */
     $cart_provider = $this->container->get('commerce_cart.cart_provider');
+
+    // Locked carts should not be returned.
+    $cart = $cart_provider->createCart('default', $this->store, $this->authenticatedUser);
+    $cart->lock();
+    $cart->save();
+    $cart_provider->clearCaches();
+    $cart = $cart_provider->getCart('default', $this->store, $this->authenticatedUser);
+    $this->assertNull($cart);
 
     // Carts that are no longer carts should not be returned.
     $cart = $cart_provider->createCart('default', $this->store, $this->authenticatedUser);

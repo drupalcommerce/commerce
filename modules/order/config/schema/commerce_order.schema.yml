@@ -5,12 +5,31 @@ commerce.commerce_condition.plugin.order_billing_address:
       type: address_zone
       label: 'Zone'
 
+commerce.commerce_condition.plugin.order_currency:
+  type: commerce_condition_configuration
+  mapping:
+    currencies:
+      type: sequence
+      label: 'Currencies'
+      orderby: value
+      sequence:
+        type: string
+        label: 'Currency'
+
+commerce.commerce_condition.plugin.order_email:
+  type: commerce_condition_configuration
+  mapping:
+    mail:
+      type: string
+      label: 'Email'
+
 commerce.commerce_condition.plugin.order_customer_role:
   type: commerce_condition_configuration
   mapping:
     roles:
       type: sequence
       label: 'Roles'
+      orderby: value
       sequence:
         type: string
         label: 'Role'
@@ -31,6 +50,7 @@ commerce.commerce_condition.plugin.order_store:
     stores:
       type: sequence
       label: 'Stores'
+      orderby: value
       sequence:
         type: string
         label: 'Store'

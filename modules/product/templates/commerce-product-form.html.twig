@@ -11,12 +11,15 @@
 #}
 <div class="layout-product-form clearfix">
   <div class="layout-region layout-region-product-main">
-    {{ form|without('advanced', 'actions') }}
+    {{ form|without('advanced', 'footer', 'actions') }}
   </div>
   <div class="layout-region layout-region-product-secondary">
     {{ form.advanced }}
   </div>
   <div class="layout-region layout-region-product-footer">
-    {{ form.actions }}
+    <div class="layout-region-product-footer__content">
+      {{ form.footer }}
+      {{ form.actions }}
+    </div>
   </div>
 </div>

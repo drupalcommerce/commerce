@@ -41,7 +41,7 @@ class ProductAdminTest extends ProductBrowserTestBase {
       'variations[form][inline_entity_form][status][value]' => 1,
     ];
     $this->submitForm($variations_edit, t('Create variation'));
-    $this->submitForm($edit, t('Save and publish'));
+    $this->submitForm($edit, t('Save'));
 
     $result = \Drupal::entityQuery('commerce_product')
       ->condition("title", $edit['title[0][value]'])
@@ -108,7 +108,7 @@ class ProductAdminTest extends ProductBrowserTestBase {
       'variations[form][inline_entity_form][entities][0][form][status][value]' => 1,
     ];
     $this->submitForm($variations_edit, 'Update variation');
-    $this->submitForm($edit, 'Save and keep published');
+    $this->submitForm($edit, 'Save');
 
     \Drupal::service('entity_type.manager')->getStorage('commerce_product_variation')->resetCache([$variation->id()]);
     $variation = ProductVariation::load($variation->id());

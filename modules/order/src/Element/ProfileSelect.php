@@ -85,6 +85,12 @@ class ProfileSelect extends RenderElement {
     if (!is_array($element['#available_countries'])) {
       throw new \InvalidArgumentException('The commerce_profile_select #available_countries property must be an array.');
     }
+    // Make sure that the specified default country is available.
+    if (!empty($element['#default_country']) && !empty($element['#available_countries'])) {
+      if (!in_array($element['#default_country'], $element['#available_countries'])) {
+        $element['#default_country'] = NULL;
+      }
+    }
 
     $element['#profile'] = $element['#default_value'];
     $form_display = EntityFormDisplay::collectRenderDisplay($element['#profile'], 'default');

@@ -18,6 +18,6 @@ interface ProductAttributeValueStorageInterface extends ContentEntityStorageInte
    * @return \Drupal\commerce_product\Entity\ProductAttributeValueInterface[]
    *   The product attribute values, indexed by id, ordered by weight.
    */
-  public function loadByAttribute($attribute_id);
+  public function loadMultipleByAttribute($attribute_id);
 
 }
