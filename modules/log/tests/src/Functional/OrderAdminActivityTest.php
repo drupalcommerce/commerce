@@ -60,11 +60,11 @@ class OrderAdminActivityTest extends CommerceBrowserTestBase {
     $this->assertSession()->statusCodeEquals(200);
     $this->assertSession()->pageTextNotContains(t('Order activity'));
     $transition = $this->order->getState()->getTransitions();
-    $this->order->getState()->applyTransition($transition['place']);
+    $this->order->getState()->applyTransition($transition['cancel']);
     $this->order->save();
     $this->drupalGet($this->order->toUrl());
     $this->assertSession()->pageTextContains(t('Order activity'));
-    $this->assertSession()->pageTextContains(t('The order was placed.'));
+    $this->assertSession()->pageTextContains(t('The order was canceled.'));
   }
 
 }
