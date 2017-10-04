@@ -10,6 +10,26 @@ commerce.commerce_condition.plugin.order_item_product:
           product_id:
             type: integer
 
+commerce.commerce_condition.plugin.order_item_product_type:
+  type: commerce_condition_configuration
+  mapping:
+    product_types:
+      type: sequence
+      label: 'Product types'
+      sequence:
+        type: string
+        label: 'Product type'
+
+commerce.commerce_condition.plugin.order_item_variation_type:
+  type: commerce_condition_configuration
+  mapping:
+    variation_types:
+      type: sequence
+      label: 'Product variation types'
+      sequence:
+        type: string
+        label: 'Product variation type'
+
 commerce_product.commerce_product_type.*:
   type: commerce_config_entity_bundle
   label: 'Product type'

@@ -31,6 +31,6 @@ interface LogStorageInterface extends SqlEntityStorageInterface {
    * @return \Drupal\commerce_log\Entity\LogInterface[]
    *   The logs.
    */
-  public function loadByEntity(ContentEntityInterface $entity);
+  public function loadMultipleByEntity(ContentEntityInterface $entity);
 
 }

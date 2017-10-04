@@ -1,4 +1,0 @@
-services:
-  plugin.manager.bundle_plugin_test:
-    class: Drupal\commerce_bundle_plugin_test\BundlePluginTestManager
-    parent: default_plugin_manager

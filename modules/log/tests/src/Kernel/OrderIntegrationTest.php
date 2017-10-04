@@ -134,7 +134,7 @@ class OrderIntegrationTest extends CommerceKernelTestBase {
     $this->order->getState()->applyTransition($transition['cancel']);
     $this->order->save();
 
-    $logs = $this->logStorage->loadByEntity($this->order);
+    $logs = $this->logStorage->loadMultipleByEntity($this->order);
     $this->assertEquals(1, count($logs));
     $log = reset($logs);
     $build = $this->logViewBuilder->view($log);
@@ -152,7 +152,7 @@ class OrderIntegrationTest extends CommerceKernelTestBase {
     $this->order->getState()->applyTransition($transition['place']);
     $this->order->save();
 
-    $logs = $this->logStorage->loadByEntity($this->order);
+    $logs = $this->logStorage->loadMultipleByEntity($this->order);
     $this->assertEquals(1, count($logs));
     $log = reset($logs);
     $build = $this->logViewBuilder->view($log);
@@ -165,7 +165,7 @@ class OrderIntegrationTest extends CommerceKernelTestBase {
     $this->order->getState()->applyTransition($transition['validate']);
     $this->order->save();
 
-    $logs = $this->logStorage->loadByEntity($this->order);
+    $logs = $this->logStorage->loadMultipleByEntity($this->order);
     $this->assertEquals(2, count($logs));
     $log = $logs[2];
     $build = $this->logViewBuilder->view($log);
@@ -178,7 +178,7 @@ class OrderIntegrationTest extends CommerceKernelTestBase {
     $this->order->getState()->applyTransition($transition['fulfill']);
     $this->order->save();
 
-    $logs = $this->logStorage->loadByEntity($this->order);
+    $logs = $this->logStorage->loadMultipleByEntity($this->order);
     $this->assertEquals(3, count($logs));
     $log = $logs[3];
     $build = $this->logViewBuilder->view($log);
@@ -200,7 +200,7 @@ class OrderIntegrationTest extends CommerceKernelTestBase {
     $order_assignment = $this->container->get('commerce_order.order_assignment');
     $order_assignment->assign($this->order, $new_user);
 
-    $logs = $this->logStorage->loadByEntity($this->order);
+    $logs = $this->logStorage->loadMultipleByEntity($this->order);
     $this->assertEquals(1, count($logs));
     $log = reset($logs);
     $build = $this->logViewBuilder->view($log);

@@ -32,10 +32,26 @@ function commerce_order_update_8202() {
   $update_manager->installFieldStorageDefinition('overridden_unit_price', 'commerce_order_item', 'commerce_order', $storage_definition);
 }
 
+/*
+ * Add the 'locked' field to 'commerce_order' entities.
+ */
+function commerce_order_update_8203() {
+  $storage_definition = BaseFieldDefinition::create('boolean')
+    ->setLabel(t('Locked'))
+    ->setSettings([
+      'on_label' => t('Yes'),
+      'off_label' => t('No'),
+    ])
+    ->setDefaultValue(FALSE);
+
+  $update_manager = \Drupal::entityDefinitionUpdateManager();
+  $update_manager->installFieldStorageDefinition('locked', 'commerce_order', 'commerce_order', $storage_definition);
+}
+
 /**
  * Add 'version' field to 'commerce_order' entities.
  */
-function commerce_order_update_8203() {
+function commerce_order_update_8204() {
   $storage_definition = BaseFieldDefinition::create('integer')
     ->setLabel(t('Version'))
     ->setDescription(t('The order version number, it gets incremented on each save.'))

@@ -216,11 +216,15 @@ class CartProvider implements CartProviderInterface {
     // it's assumed that these entities would be loaded at one point anyway.
     /** @var \Drupal\commerce_order\Entity\OrderInterface[] $carts */
     $carts = $this->orderStorage->loadMultiple($cart_ids);
-    $skipped_cart_ids = [];
+    $non_eligible_cart_ids = [];
     foreach ($carts as $cart) {
+      if ($cart->isLocked()) {
+        // Skip locked carts, the customer is probably off-site for payment.
+        continue;
+      }
       if ($cart->getCustomerId() != $uid || empty($cart->cart) || $cart->getState()->value != 'draft') {
         // Skip carts that are no longer eligible.
-        $skipped_cart_ids[] = $cart->id();
+        $non_eligible_cart_ids[] = $cart->id();
         continue;
       }
 
@@ -229,10 +233,10 @@ class CartProvider implements CartProviderInterface {
         'store_id' => $cart->getStoreId(),
       ];
     }
-    // Avoid loading skipped carts on the next page load.
+    // Avoid loading non-eligible carts on the next page load.
     if (!$account->isAuthenticated()) {
-      foreach ($skipped_cart_ids as $skipped_cart_id) {
-        $this->cartSession->deleteCartId($skipped_cart_id);
+      foreach ($non_eligible_cart_ids as $cart_id) {
+        $this->cartSession->deleteCartId($cart_id);
       }
     }
 

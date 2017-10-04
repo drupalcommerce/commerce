@@ -20,6 +20,9 @@ commerce_payment.commerce_payment_gateway.*:
       type: sequence
       sequence:
         type: commerce_condition
+    conditionOperator:
+      type: string
+      label: 'Condition operator'
 
 commerce_payment.commerce_payment_gateway.plugin.*:
   type: commerce_payment_gateway_configuration

@@ -363,6 +363,28 @@ interface OrderInterface extends ContentEntityInterface, EntityAdjustableInterfa
   public function setData($key, $value);
 
   /**
+   * Gets whether the order is locked.
+   *
+   * @return bool
+   *   TRUE if the order is locked, FALSE otherwise.
+   */
+  public function isLocked();
+
+  /**
+   * Locks the order.
+   *
+   * @return $this
+   */
+  public function lock();
+
+  /**
+   * Unlocks the order.
+   *
+   * @return $this
+   */
+  public function unlock();
+
+  /**
    * Gets the order creation timestamp.
    *
    * @return int
