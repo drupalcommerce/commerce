@@ -32,7 +32,7 @@ function commerce_order_update_8202() {
   $update_manager->installFieldStorageDefinition('overridden_unit_price', 'commerce_order_item', 'commerce_order', $storage_definition);
 }
 
-/*
+/**
  * Add the 'locked' field to 'commerce_order' entities.
  */
 function commerce_order_update_8203() {
@@ -49,7 +49,7 @@ function commerce_order_update_8203() {
 }
 
 /**
- * Add 'version' field to 'commerce_order' entities.
+ * Add the 'version' field to 'commerce_order' entities.
  */
 function commerce_order_update_8204() {
   $storage_definition = BaseFieldDefinition::create('integer')
