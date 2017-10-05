@@ -139,16 +139,18 @@ function commerce_cart_commerce_order_delete(OrderInterface $order) {
  */
 function commerce_cart_form_alter(array &$form, FormStateInterface $form_state) {
   // Check for a Views commerce cart forms that has the order id argument.
-  if ($form_state->get('step') == 'views_form_views_form') {
+  if ($form_state->getFormObject() instanceof ViewsForm) {
     /** @var \Drupal\views\Entity\View $view */
     $view = reset($form_state->getBuildInfo()['args'])->storage;
     if (commerce_cart_is_commerce_cart_view($view) && !empty($view->getExecutable()->argument)) {
       $view_argument = reset($view->getExecutable()->argument);
       if (!empty($view_argument->value)) {
-        // Replace the form submit button label.
-        $form['actions']['submit']['#value'] = t('Update cart');
-
         $order_id = $view_argument->getValue();
+        // Alter update cart actions.
+        $form['actions']['submit']['#value'] = t('Update cart');
+        $form['actions']['submit']['#submit'] = array_merge($form['#submit'], ['commerce_cart_order_item_views_form_submit']);
+        $form['actions']['submit']['#order_id'] = $order_id;
+
         /** @var \Drupal\commerce_order\OrderStorage $storage */
         $storage = \Drupal::entityTypeManager()->getStorage('commerce_order');
         /** @var \Drupal\commerce_order\Entity\OrderInterface $order */
@@ -273,20 +275,6 @@ function commerce_cart_form_commerce_order_type_form_alter(array &$form, FormSta
   ];
 
   $form['actions']['submit']['#submit'][] = 'commerce_cart_order_type_form_submit';
-}
-
-/**
- * Implements hook_form_alter().
- */
-function commerce_cart_form_alter(&$form, FormStateInterface $form_state, $form_id) {
-  if ($form_state->getFormObject() instanceof ViewsForm) {
-    /** @var \Drupal\views\ViewExecutable $view */
-    $view = reset($form_state->getBuildInfo()['args']);
-    if ($view->storage->get('tag') == 'commerce_cart_form' && !empty($view->result)) {
-      $form['actions']['submit']['#submit'] = array_merge($form['#submit'], ['commerce_cart_order_item_views_form_submit']);
-      $form['actions']['submit']['#order_id'] = $view->argument['order_id']->value[0];
-    }
-  }
 }
 
 /**

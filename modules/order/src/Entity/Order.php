@@ -109,29 +109,6 @@ class Order extends ContentEntityBase implements OrderInterface {
   /**
    * {@inheritdoc}
    */
-  public function lock() {
-    /** @var OrderInterface $current_order */
-    $current_order = $this->entityTypeManager()->getStorage($this->entityTypeId)->loadUnchanged($this->id());
-    // Decrease the working order version to lock it.
-    $version = $current_order->getVersion() - 1;
-    $this->setVersion($version);
-    return $this;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function unlock() {
-    /** @var OrderInterface $current_order */
-    $current_order = $this->entityTypeManager()->getStorage($this->entityTypeId)->loadUnchanged($this->id());
-    $version = $current_order->getVersion() + 1;
-    $this->setVersion($version);
-    return $this;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function getStore() {
     return $this->get('store_id')->entity;
   }
@@ -481,6 +458,12 @@ class Order extends ContentEntityBase implements OrderInterface {
    */
   public function lock() {
     $this->set('locked', TRUE);
+    // Force decrease the working order version when lock it.
+    /** @var OrderInterface $current_order */
+    $current_order = $this->entityTypeManager()->getStorage($this->entityTypeId)->loadUnchanged($this->id());
+    $version = $current_order->getVersion() - 1;
+    $this->setVersion($version);
+
     return $this;
   }
 
@@ -489,6 +472,11 @@ class Order extends ContentEntityBase implements OrderInterface {
    */
   public function unlock() {
     $this->set('locked', FALSE);
+    // Force decrease the working order version when unlock it.
+    /** @var OrderInterface $current_order */
+    $current_order = $this->entityTypeManager()->getStorage($this->entityTypeId)->loadUnchanged($this->id());
+    $version = $current_order->getVersion() + 1;
+    $this->setVersion($version);
     return $this;
   }
 
@@ -555,10 +543,13 @@ class Order extends ContentEntityBase implements OrderInterface {
     else {
       // Increment order version on each save.
       /** @var OrderInterface $saved_entity */
-      $saved_entity = $storage->loadUnchanged($this->id());
-      // A change to the order version must add an exception.
-      if ($saved_entity && $saved_entity->getVersion() > $this->getVersion()) {
-        throw new OrderVersionMismatchException('The order has either been modified by another user, or you have already submitted modifications. As a result, your changes cannot be saved.');
+      // First we need to check the order has id.
+      if ($this->id()) {
+        $saved_entity = $storage->loadUnchanged($this->id());
+        // A change to the order version must add an exception.
+        if ($saved_entity && $saved_entity->getVersion() > $this->getVersion()) {
+          throw new OrderVersionMismatchException('The order has either been modified by another user, or you have already submitted modifications. As a result, your changes cannot be saved.');
+        }
       }
       $version = $this->getVersion() + 1;
       $this->setVersion($version);

@@ -56,22 +56,6 @@ interface OrderInterface extends ContentEntityInterface, EntityAdjustableInterfa
   public function setVersion($version);
 
   /**
-   * Lock the order for further savings.
-   * Force decrease the working order version to lock it.
-   *
-   * @return $this
-   */
-  public function lock();
-
-  /**
-   * Unlock the order for further savings.
-   * Force increase the working order version to unlock it.
-   *
-   * @return $this
-   */
-  public function unlock();
-
-  /**
    * Gets the store.
    *
    * @return \Drupal\commerce_store\Entity\StoreInterface|null
