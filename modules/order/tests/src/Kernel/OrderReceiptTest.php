@@ -115,7 +115,8 @@ class OrderReceiptTest extends CommerceKernelTestBase {
     $this->assertEquals(1, count($mails));
 
     $the_email = reset($mails);
-    $this->assertEquals('text/html', $the_email['headers']['Content-Type']);
+    $this->assertEquals('text/html; charset=UTF-8;', $the_email['headers']['Content-Type']);
+    $this->assertEquals('8Bit', $the_email['headers']['Content-Transfer-Encoding']);
     $this->assertEquals('Order #2017/01 confirmed', $the_email['subject']);
     $this->assertEmpty(isset($the_email['headers']['Bcc']));
   }

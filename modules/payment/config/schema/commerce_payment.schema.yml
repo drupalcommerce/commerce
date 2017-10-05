@@ -47,6 +47,7 @@ commerce_payment_gateway_configuration:
     payment_method_types:
       type: sequence
       label: 'Payment method types'
+      orderby: value
       sequence:
         type: string
 
