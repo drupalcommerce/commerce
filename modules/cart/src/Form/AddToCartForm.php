@@ -199,11 +199,6 @@ class AddToCartForm extends ContentEntityForm implements AddToCartFormInterface 
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
     $form = parent::buildForm($form, $form_state);
-    // Add base form id for form alter hooks to identify this form.
-    $form['base_form_id'] = [
-      '#type' => 'hidden',
-      '#value' => $this->getBaseFormId(),
-    ];
     // The widgets are allowed to signal that the form should be hidden
     // (because there's no purchasable entity to select, for example).
     if ($form_state->get('hide_form')) {
