@@ -3,7 +3,7 @@
 namespace Drupal\commerce;
 
 /**
- * An object representing a negative response to an availability request.
+ * An object representing a negative response to an availability check.
  */
 class AvailabilityResponseNeutral extends AvailabilityResponse {
 

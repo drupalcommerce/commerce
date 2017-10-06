@@ -3,7 +3,7 @@
 namespace Drupal\commerce;
 
 /**
- * An object representing a positive response to an availability request.
+ * An object representing a positive response to an availability check.
  */
 class AvailabilityResponseAvailable extends AvailabilityResponse {
 

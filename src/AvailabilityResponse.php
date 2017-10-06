@@ -3,7 +3,7 @@
 namespace Drupal\commerce;
 
 /**
- * An object representing a response to an availability request.
+ * An object representing a response to an availability check.
  */
 abstract class AvailabilityResponse implements AvailabilityResponseInterface {
 
