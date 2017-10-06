@@ -288,7 +288,7 @@ class AddToCartForm extends ContentEntityForm implements AddToCartFormInterface 
    * @return \Drupal\commerce_store\Entity\StoreInterface
    *   The selected store.
    */
-  public function selectStore(PurchasableEntityInterface $entity) {
+  protected function selectStore(PurchasableEntityInterface $entity) {
     $stores = $entity->getStores();
     if (count($stores) === 1) {
       $store = reset($stores);
