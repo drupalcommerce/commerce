@@ -20,7 +20,7 @@ interface AvailabilityCheckerInterface {
   public function applies(PurchasableEntityInterface $entity);
 
   /**
-   * Gets the availability of a given entity with the given context.
+   * Checks the availability of a given purchasable entity with given context.
    *
    * @param \Drupal\commerce\PurchasableEntityInterface $entity
    *   The purchasable entity.
