@@ -91,6 +91,7 @@ class PromotionAvailabilityTest extends CommerceKernelTestBase {
       'order_types' => ['default'],
       'stores' => [$this->store->id()],
       'usage_limit' => 2,
+      'usage_limit_per_client' => 1,
       'status' => TRUE,
     ]);
     $promotion->save();
@@ -118,6 +119,7 @@ class PromotionAvailabilityTest extends CommerceKernelTestBase {
       'order_types' => ['default'],
       'stores' => [$this->store->id()],
       'usage_limit' => 1,
+      'usage_limit_per_client' => 1,
       'status' => TRUE,
     ]);
     $promotion->save();
@@ -150,6 +152,7 @@ class PromotionAvailabilityTest extends CommerceKernelTestBase {
       'order_types' => ['default'],
       'stores' => [$this->store->id()],
       'usage_limit' => 1,
+      'usage_limit_per_client' => 1,
       'status' => TRUE,
     ]);
     $promotion->save();
@@ -175,6 +178,7 @@ class PromotionAvailabilityTest extends CommerceKernelTestBase {
       'order_types' => ['default'],
       'stores' => [$this->store->id()],
       'usage_limit' => 2,
+      'usage_limit_per_client' => 2,
       'status' => TRUE,
     ]);
     $promotion->save();
@@ -186,4 +190,21 @@ class PromotionAvailabilityTest extends CommerceKernelTestBase {
     $this->assertFalse($promotion->available($this->order));
   }
 
+  /**
+   * Tests the usage count per client logic.
+   */
+  public function testUsagePerClientCount() {
+    $promotion = Promotion::create([
+      'order_types' => ['default'],
+      'stores' => [$this->store->id()],
+      'usage_limit' => 2,
+      'usage_limit_per_client' => 1,
+      'status' => TRUE,
+    ]);
+    $promotion->save();
+    $this->assertTrue($promotion->available($this->order));
+
+    \Drupal::service('commerce_promotion.usage')->register($this->order, $promotion);
+    $this->assertFalse($promotion->available($this->order));
+  }
 }

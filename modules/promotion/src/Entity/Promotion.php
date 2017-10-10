@@ -322,6 +322,21 @@ class Promotion extends ContentEntityBase implements PromotionInterface {
   /**
    * {@inheritdoc}
    */
+  public function getUsageLimitPerClient() {
+    return $this->get('usage_limit_per_client')->value;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setUsageLimitPerClient($usage_limit_per_client) {
+    $this->set('usage_limit_per_client', $usage_limit_per_client);
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function getStartDate() {
     // Can't use the ->date property because it resets the timezone to UTC.
     return new DrupalDateTime($this->get('start_date')->value);
@@ -426,6 +441,15 @@ class Promotion extends ContentEntityBase implements PromotionInterface {
       $usage = \Drupal::service('commerce_promotion.usage');
       if ($usage_limit <= $usage->load($this)) {
         return FALSE;
+      }
+    }
+    if ($usage_limit_per_client = $this->getUsageLimitPerClient()) {
+      /** @var \Drupal\commerce_promotion\PromotionUsageInterface $usage */
+      $usage = \Drupal::service('commerce_promotion.usage');
+      if ($order->getEmail()) {
+        if ($usage_limit_per_client <= $usage->load($this, $order->getEmail())) {
+          return FALSE;
+        }
       }
     }
 
@@ -653,6 +677,16 @@ class Promotion extends ContentEntityBase implements PromotionInterface {
       ->setDefaultValue(0)
       ->setDisplayOptions('form', [
         'type' => 'commerce_usage_limit',
+        'weight' => 4,
+      ]);
+
+    $fields['usage_limit_per_client'] = BaseFieldDefinition::create('integer')
+      ->setLabel(t('Number of uses per client'))
+      ->setDescription(t('The maximum number of times the promotion can be used per client. 0 for unlimited.'))
+      ->setDefaultValue(0)
+      ->setSetting('parent', 'usage_limit')
+      ->setDisplayOptions('form', [
+        'type' => 'commerce_usage_limit_per_client',
         'weight' => 4,
       ]);
 

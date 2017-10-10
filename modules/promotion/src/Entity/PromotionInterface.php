@@ -229,6 +229,27 @@ interface PromotionInterface extends ContentEntityInterface, EntityStoresInterfa
   public function setUsageLimit($usage_limit);
 
   /**
+   * Gets the promotion usage limit per client.
+   *
+   * Represents maximum number of times the promotion can be used per client.
+   * 0 for unlimited.
+   *
+   * @return int
+   *   The promotion usage limit per client.
+   */
+  public function getUsageLimitPerClient();
+
+  /**
+   * Sets the promotion usage limit per client.
+   *
+   * @param int $usage_limit_per_client
+   *   The promotion usage limit per client.
+   *
+   * @return $this
+   */
+  public function setUsageLimitPerClient($usage_limit_per_client);
+
+  /**
    * Gets the promotion start date.
    *
    * @return \Drupal\Core\Datetime\DrupalDateTime

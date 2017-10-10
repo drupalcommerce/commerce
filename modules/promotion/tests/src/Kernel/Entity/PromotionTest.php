@@ -84,6 +84,8 @@ class PromotionTest extends CommerceKernelTestBase {
    * @covers ::hasCoupon
    * @covers ::getUsageLimit
    * @covers ::setUsageLimit
+   * @covers ::getUsageLimitPerClient
+   * @covers ::setUsageLimitPerClient
    * @covers ::getStartDate
    * @covers ::setStartDate
    * @covers ::getEndDate
@@ -154,6 +156,9 @@ class PromotionTest extends CommerceKernelTestBase {
 
     $promotion->setUsageLimit(10);
     $this->assertEquals(10, $promotion->getUsageLimit());
+
+    $promotion->setUsageLimitPerClient(5);
+    $this->assertEquals(5, $promotion->getUsageLimitPerClient());
 
     $promotion->setStartDate(new DrupalDateTime('2017-01-01'));
     $this->assertEquals('2017-01-01', $promotion->getStartDate()->format('Y-m-d'));

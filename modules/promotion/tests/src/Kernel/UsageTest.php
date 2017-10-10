@@ -230,6 +230,7 @@ class UsageTest extends CommerceKernelTestBase {
         ],
       ],
       'usage_limit' => 1,
+      'usage_limit_per_client' => 1,
       'start_date' => '2017-01-01',
       'status' => TRUE,
     ]);
@@ -248,6 +249,43 @@ class UsageTest extends CommerceKernelTestBase {
     $order_type = OrderType::load($this->order->bundle());
     $valid_promotions = $this->promotionStorage->loadAvailable($this->order);
     $this->assertEmpty($valid_promotions);
+
+  }
+
+  /**
+   * Tests the filtering of promotions past their usage per client limit.
+   */
+  public function testPromotionPerClientFiltering() {
+    $promotion = Promotion::create([
+      'name' => 'Promotion 1',
+      'order_types' => [$this->order->bundle()],
+      'stores' => [$this->store->id()],
+      'offer' => [
+        'target_plugin_id' => 'order_percentage_off',
+        'target_plugin_configuration' => [
+          'amount' => '0.10',
+        ],
+      ],
+      'usage_limit' => 10,
+      'usage_limit_per_client' => 1,
+      'start_date' => '2017-01-01',
+      'status' => TRUE,
+    ]);
+    $promotion->save();
+
+    $this->assertTrue($promotion->applies($this->order));
+    $this->container->get('commerce_order.order_refresh')->refresh($this->order);
+    $this->assertEquals(1, count($this->order->getAdjustments()));
+    $this->order->save();
+
+    $this->order->getState()->applyTransition($this->order->getState()->getTransitions()['place']);
+    $this->order->save();
+    $usage = $this->usage->load($promotion);
+    $this->assertEquals(1, $usage);
+
+    $valid_promotions = $this->promotionStorage->loadAvailable($this->order);
+    $this->assertEmpty($valid_promotions);
+
   }
 
 }
