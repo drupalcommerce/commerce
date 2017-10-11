@@ -98,8 +98,7 @@ class ProductVariationAttributesWidget extends ProductVariationWidgetBase implem
   public function formElement(FieldItemListInterface $items, $delta, array $element, array &$form, FormStateInterface $form_state) {
     /** @var \Drupal\commerce_product\Entity\ProductInterface $product */
     $product = $form_state->get('product');
-    $langcode = $product->language()->getId();
-    $variations = $product->getVariations();
+    $variations = $this->variationStorage->loadEnabled($product);
     if (count($variations) === 0) {
       // Nothing to purchase, tell the parent form to hide itself.
       $form_state->set('hide_form', TRUE);
@@ -153,11 +152,6 @@ class ProductVariationAttributesWidget extends ProductVariationWidgetBase implem
           $selected_variation = reset($variations);
         }
       }
-    }
-
-    // Make sure we use the translated selected variation.
-    if ($selected_variation->hasTranslation($langcode)) {
-      $selected_variation = $selected_variation->getTranslation($langcode);
     }
 
     $element['variation'] = [
