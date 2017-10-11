@@ -115,6 +115,19 @@ class ProductVariationStorage extends CommerceContentEntityStorage implements Pr
 
     /** @var \Drupal\commerce_product\Entity\ProductVariationInterface $enabled_variation */
     $enabled_variations = $this->loadMultiple($result);
+
+    if ($product->isTranslatable()) {
+      $langcode = $product->language()->getId();
+      foreach ($enabled_variations as $index => $enabled_variation) {
+        if (!$enabled_variation->hasTranslation($langcode)) {
+          unset($enabled_variations[$index]);
+        }
+        else {
+          $enabled_variations[$index] = $enabled_variation->getTranslation($langcode);
+        }
+      }
+    }
+
     // Allow modules to apply own filtering (based on date, stock, etc).
     $event = new FilterVariationsEvent($product, $enabled_variations);
     $this->eventDispatcher->dispatch(ProductEvents::FILTER_VARIATIONS, $event);
