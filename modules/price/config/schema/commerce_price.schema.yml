@@ -36,8 +36,9 @@ field.field_settings.commerce_price:
     available_currencies:
       type: sequence
       label: 'Available currencies'
+      orderby: value
       sequence:
-        - type: string
+        type: string
 
 field.formatter.settings.commerce_price_default:
   type: mapping
