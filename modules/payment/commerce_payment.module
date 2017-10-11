@@ -64,6 +64,9 @@ function commerce_payment_entity_operation(EntityInterface $entity) {
  */
 function commerce_payment_theme() {
   return [
+    'commerce_payment_gateway_form' => [
+      'render element' => 'form',
+    ],
     'commerce_payment_method' => [
       'render element' => 'elements',
     ],
@@ -72,6 +75,24 @@ function commerce_payment_theme() {
       'render element' => 'elements',
     ],
   ];
+}
+
+/**
+ * Implements hook_theme_suggestions_HOOK().
+ */
+function commerce_payment_theme_suggestions_commerce_payment_gateway_form(array $variables) {
+  $original = $variables['theme_hook_original'];
+  $operation = strtr($variables['form']['#operation'], '-', '_');
+  /** @var \Drupal\commerce_payment\Entity\PaymentMethodInterface $default_payment_method */
+  $default_payment_method = $variables['form']['#default_value'];
+  $plugin_id = $default_payment_method->getPaymentGatewayId();
+
+  $suggestions = [];
+  $suggestions[] = $original . '__' . $operation;
+  $suggestions[] = $original . '__' . $plugin_id;
+  $suggestions[] = $original . '__' . $plugin_id . '__' . $operation;
+
+  return $suggestions;
 }
 
 /**
