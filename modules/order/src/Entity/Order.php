@@ -301,16 +301,18 @@ class Order extends ContentEntityBase implements OrderInterface {
    * {@inheritdoc}
    */
   public function clearAdjustments() {
-    foreach ($this->getItems() as $order_item) {
-      $order_item->setAdjustments([]);
-    }
-    // Remove all order-level adjustments except the ones added via the UI.
-    $adjustments = $this->getAdjustments();
-    $adjustments = array_filter($adjustments, function ($adjustment) {
+    $locked_callback = function ($adjustment) {
       /** @var \Drupal\commerce_order\Adjustment $adjustment */
-      return $adjustment->getType() == 'custom';
-    });
+      return $adjustment->isLocked();
+    };
+    // Remove all unlocked adjustments.
+    foreach ($this->getItems() as $order_item) {
+      $adjustments = array_filter($order_item->getAdjustments(), $locked_callback);
+      $order_item->setAdjustments($adjustments);
+    }
+    $adjustments = array_filter($this->getAdjustments(), $locked_callback);
     $this->setAdjustments($adjustments);
+
     return $this;
   }
 
@@ -330,6 +332,7 @@ class Order extends ContentEntityBase implements OrderInterface {
           'percentage' => $adjustment->getPercentage(),
           'source_id' => $adjustment->getSourceId(),
           'included' => $adjustment->isIncluded(),
+          'locked' => $adjustment->isLocked(),
         ]);
         $adjustments[] = $multiplied_adjustment;
       }

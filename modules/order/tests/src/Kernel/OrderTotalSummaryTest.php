@@ -219,7 +219,6 @@ class OrderTotalSummaryTest extends CommerceKernelTestBase {
     ]);
     $this->order->setData('test_adjustments', $test_order_adjustments);
 
-    // Custom adjustments persist, so we manually add.
     $this->order->addAdjustment(new Adjustment([
       'type' => 'custom',
       'label' => 'Handling fee',
