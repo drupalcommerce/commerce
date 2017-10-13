@@ -1,6 +1,9 @@
 langcode: en
 status: true
 dependencies:
+  enforced:
+    module:
+      - commerce_checkout
   module:
     - commerce_product
 id: commerce_product_variation.summary

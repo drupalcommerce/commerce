@@ -4,6 +4,9 @@ dependencies:
   config:
     - commerce_product.commerce_product_variation_type.default
     - core.entity_view_mode.commerce_product_variation.summary
+  enforced:
+    module:
+      - commerce_checkout
   module:
     - commerce_price
 id: commerce_product_variation.default.summary
