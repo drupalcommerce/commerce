@@ -77,6 +77,7 @@ class CouponRedemption extends CheckoutPaneBase {
       '#cardinality' => $this->configuration['allow_multiple'] ? NULL : 1,
       '#element_ajax' => [
         [get_class($this), 'ajaxRefreshSummary'],
+        [get_class($this), 'ajaxRefreshPayment'],
       ],
     ];
 
@@ -90,6 +91,16 @@ class CouponRedemption extends CheckoutPaneBase {
     if (isset($form['sidebar']['order_summary'])) {
       $summary_element = $form['sidebar']['order_summary'];
       return new InsertCommand('[data-drupal-selector="edit-sidebar-order-summary"]', $summary_element);
+    }
+  }
+
+  /**
+   * Ajax callback for refreshing the payment information pane.
+   */
+  public static function ajaxRefreshPayment(array $form, FormStateInterface $form_state) {
+    if (isset($form['payment_information'])) {
+      $payment_element = $form['payment_information'];
+      return new InsertCommand('[data-drupal-selector="edit-payment-information"]', $payment_element);
     }
   }
 
