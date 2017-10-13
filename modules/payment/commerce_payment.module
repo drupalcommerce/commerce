@@ -64,7 +64,7 @@ function commerce_payment_entity_operation(EntityInterface $entity) {
  */
 function commerce_payment_theme() {
   return [
-    'commerce_payment_gateway_form' => [
+    'commerce_payment_payment_information_checkout_pane' => [
       'render element' => 'form',
     ],
     'commerce_payment_method' => [
@@ -80,17 +80,19 @@ function commerce_payment_theme() {
 /**
  * Implements hook_theme_suggestions_HOOK().
  */
-function commerce_payment_theme_suggestions_commerce_payment_gateway_form(array $variables) {
+function commerce_payment_theme_suggestions_commerce_payment_payment_information_checkout_pane(array $variables) {
   $original = $variables['theme_hook_original'];
-  $operation = strtr($variables['form']['#operation'], '-', '_');
-  /** @var \Drupal\commerce_payment\Entity\PaymentMethodInterface $default_payment_method */
-  $default_payment_method = $variables['form']['#default_value'];
-  $plugin_id = $default_payment_method->getPaymentGatewayId();
-
   $suggestions = [];
-  $suggestions[] = $original . '__' . $operation;
-  $suggestions[] = $original . '__' . $plugin_id;
-  $suggestions[] = $original . '__' . $plugin_id . '__' . $operation;
+
+  // Add suggestions when pane includes an 'Add payment method' element.
+  if (isset($variables['form']['add_payment_method'])) {
+    $operation = strtr($variables['form']['add_payment_method']['#operation'], '-', '_');
+    /** @var \Drupal\commerce_payment\Entity\PaymentMethodInterface $default_payment_method */
+    $default_payment_method = $variables['form']['add_payment_method']['#default_value'];
+    $plugin_id = $default_payment_method->getPaymentGatewayId();
+    $suggestions[] = $original . '__' . $operation;
+    $suggestions[] = $original . '__' . $operation . '__' . $plugin_id;
+  }
 
   return $suggestions;
 }

@@ -116,7 +116,7 @@ class PaymentInformation extends CheckoutPaneBase {
 
     $selected_option = $pane_form['payment_method'][$default_option];
     $payment_gateway = $payment_gateways[$selected_option['#payment_gateway']];
-    if ($payment_gateway->getPlugin() instanceof SupportsStoredPaymentMethodsInterface) {
+    if ($payment_gateway && $payment_gateway->getPlugin() instanceof SupportsStoredPaymentMethodsInterface) {
       if (!empty($selected_option['#payment_method_type'])) {
         /** @var \Drupal\commerce_payment\PaymentMethodStorageInterface $payment_method_storage */
         $payment_method_storage = $this->entityTypeManager->getStorage('commerce_payment_method');
@@ -150,6 +150,8 @@ class PaymentInformation extends CheckoutPaneBase {
         '#available_countries' => $store->getBillingCountries(),
       ];
     }
+
+    $pane_form['#theme'] = 'commerce_payment_payment_information_checkout_pane';
 
     return $pane_form;
   }

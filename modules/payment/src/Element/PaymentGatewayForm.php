@@ -55,7 +55,6 @@ class PaymentGatewayForm extends RenderElement {
       '#commerce_element_submit' => [
         [$class, 'submitForm'],
       ],
-      '#theme' => 'commerce_payment_gateway_form',
       '#theme_wrappers' => ['container'],
     ];
   }

@@ -1,0 +1,16 @@
+{#
+/**
+ * @file
+ * Default template for payment information pane forms.
+ *
+ * Available variables:
+ * - form: The form.
+ *
+ * @ingroup themeable
+ */
+#}
+
+{{ form.payment_method }}
+
+{{ form|without('payment_method') }}
+
