@@ -27,8 +27,7 @@ class CommerceContentEntityBase extends ContentEntityBase implements CommerceCon
   }
 
   /**
-   * Ensures that the provided entities are in the current entity's language if
-   * entity is translatable or current interface language otherwise.
+   * Ensures entities are in the current entity's language, if possible.
    *
    * @param \Drupal\Core\Entity\ContentEntityInterface[] $entities
    *   The entities to process.

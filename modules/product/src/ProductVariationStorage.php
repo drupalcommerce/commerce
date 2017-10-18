@@ -85,7 +85,7 @@ class ProductVariationStorage extends CommerceContentEntityStorage implements Pr
     $variations = $this->loadByProperties(['sku' => $sku]);
     $variation = reset($variations);
 
-    return $variation ?: NULL;
+    return $variation ? $this->entityRepository->getTranslationFromContext($variation) : NULL;
   }
 
   /**

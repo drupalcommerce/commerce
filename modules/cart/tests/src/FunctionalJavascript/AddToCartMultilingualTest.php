@@ -2,13 +2,13 @@
 
 namespace Drupal\Tests\commerce_cart\FunctionalJavascript;
 
+use Drupal\commerce_order\Entity\Order;
 use Drupal\commerce_product\Entity\Product;
+use Drupal\commerce_product\Entity\ProductVariation;
+use Drupal\commerce_product\Entity\ProductVariationType;
 use Drupal\Core\Entity\Entity\EntityFormDisplay;
 use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\Tests\commerce\FunctionalJavascript\JavascriptTestTrait;
-use Drupal\commerce_order\Entity\Order;
-use Drupal\commerce_product\Entity\ProductVariation;
-use Drupal\commerce_product\Entity\ProductVariationType;
 use Drupal\Tests\commerce_cart\Functional\CartBrowserTestBase;
 
 /**
@@ -62,16 +62,20 @@ class AddToCartMultilingualTest extends CartBrowserTestBase {
   public function setUp() {
     parent::setUp();
     // Add a new language.
-    ConfigurableLanguage::createFRomLangcode('fr')->save();
+    ConfigurableLanguage::createFromLangcode('fr')->save();
 
     /** @var \Drupal\commerce_product\Entity\ProductVariationTypeInterface $variation_type */
     $variation_type = ProductVariationType::load($this->variation->bundle());
     // Enable translation for the product and ensure the change is picked up.
+    // @see \Drupal\Tests\content_translation\Functional\ContentTranslationTestBase
     \Drupal::service('content_translation.manager')->setEnabled('commerce_product_variation', $variation_type->id(), TRUE);
     drupal_static_reset();
     \Drupal::entityManager()->clearCachedDefinitions();
     \Drupal::service('router.builder')->rebuild();
     \Drupal::service('entity.definition_update_manager')->applyUpdates();
+    // Rebuild the container so that the new languages are picked up by services
+    // that hold a list of languages.
+    $this->rebuildContainer();
 
     $color_attributes = $this->createAttributeSet($variation_type, 'color', [
       'red' => 'Red',
@@ -172,6 +176,7 @@ class AddToCartMultilingualTest extends CartBrowserTestBase {
 
     // Change the site language.
     $this->config('system.site')->set('default_langcode', 'fr')->save();
+
     $this->drupalGet($this->product->toUrl());
     // Use AJAX to change the size to Medium, keeping the color on Red.
     $this->getSession()->getPage()->selectFieldOption('purchased_entity[0][attributes][attribute_size]', 'FR Medium');
