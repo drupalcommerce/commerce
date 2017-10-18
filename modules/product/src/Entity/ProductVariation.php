@@ -91,8 +91,7 @@ class ProductVariation extends CommerceContentEntityBase implements ProductVaria
    * {@inheritdoc}
    */
   public function getProduct() {
-    $product = $this->getTranslatedReferencedEntities('product_id');
-    return reset($product);
+    return $this->getTranslatedReferencedEntity('product_id');
   }
 
   /**

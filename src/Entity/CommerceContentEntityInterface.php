@@ -16,8 +16,19 @@ interface CommerceContentEntityInterface extends ContentEntityInterface {
    *   The entity reference field name.
    *
    * @return \Drupal\Core\Entity\ContentEntityInterface[]
-   *   The entities.array
+   *   The entities.
    */
   public function getTranslatedReferencedEntities($field_name);
+
+  /**
+   * Gets the translation of an referenced entity.
+   *
+   * @param $field_name
+   *   The entity reference field name.
+   *
+   * @return \Drupal\Core\Entity\ContentEntityInterface
+   *   The entity.
+   */
+  public function getTranslatedReferencedEntity($field_name);
 
 }

@@ -5,7 +5,7 @@ services:
 
   commerce_product.lazy_builders:
     class: Drupal\commerce_product\ProductLazyBuilders
-    arguments: ['@entity_type.manager', '@form_builder']
+    arguments: ['@entity_type.manager', '@form_builder', '@entity.repository']
 
   commerce_product.variation_field_renderer:
     class: Drupal\commerce_product\ProductVariationFieldRenderer

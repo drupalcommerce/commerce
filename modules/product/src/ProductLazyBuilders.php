@@ -2,6 +2,7 @@
 
 namespace Drupal\commerce_product;
 
+use Drupal\Core\Entity\EntityRepositoryInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\FormBuilderInterface;
 use Drupal\Core\Form\FormState;
@@ -26,16 +27,26 @@ class ProductLazyBuilders {
   protected $formBuilder;
 
   /**
+   * The entity repository.
+   *
+   * @var \Drupal\Core\Entity\EntityRepositoryInterface
+   */
+  protected $entityRepository;
+
+  /**
    * Constructs a new CartLazyBuilders object.
    *
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
    * @param \Drupal\Core\Form\FormBuilderInterface $form_builder
    *   The form builder.
+   * @param \Drupal\Core\Entity\EntityRepositoryInterface $entity_repository
+   *   The entity repository.
    */
-  public function __construct(EntityTypeManagerInterface $entity_type_manager, FormBuilderInterface $form_builder) {
+  public function __construct(EntityTypeManagerInterface $entity_type_manager, FormBuilderInterface $form_builder, EntityRepositoryInterface $entity_repository) {
     $this->entityTypeManager = $entity_type_manager;
     $this->formBuilder = $form_builder;
+    $this->entityRepository = $entity_repository;
   }
 
   /**
@@ -59,9 +70,8 @@ class ProductLazyBuilders {
     /** @var \Drupal\commerce_product\Entity\ProductInterface $product */
     $product = $this->entityTypeManager->getStorage('commerce_product')->load($product_id);
     // Load Product for current language.
-    if ($product->isTranslatable() && $product->language()->getId() != $langcode && $product->hasTranslation($langcode)) {
-      $product = $product->getTranslation($langcode);
-    }
+    $product = $this->entityRepository->getTranslationFromContext($product, $langcode);
+
     $default_variation = $product->getDefaultVariation();
     if (!$default_variation) {
       return [];
