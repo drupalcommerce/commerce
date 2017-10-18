@@ -115,3 +115,21 @@ function commerce_promotion_update_8203() {
     ]);
   $entity_definition_update->installFieldStorageDefinition('usage_limit', 'commerce_promotion_coupon', 'commerce_promotion', $storage_definition);
 }
+
+/**
+ * Add the usage_limit_per_client field to promotions.
+ */
+function commerce_promotion_update_8204() {
+  $entity_definition_update = \Drupal::entityDefinitionUpdateManager();
+
+  $storage_definition = BaseFieldDefinition::create('integer')
+    ->setLabel(t('Number of uses per client'))
+    ->setDescription(t('The maximum number of times the promotion can be used per client. 0 for unlimited.'))
+    ->setDefaultValue(0)
+    ->setSetting('parent', 'usage_limit')
+    ->setDisplayOptions('form', [
+      'type' => 'commerce_usage_limit_per_client',
+      'weight' => 4,
+    ]);
+  $entity_definition_update->installFieldStorageDefinition('usage_limit_per_client', 'commerce_promotion', 'commerce_promotion', $storage_definition);
+}
