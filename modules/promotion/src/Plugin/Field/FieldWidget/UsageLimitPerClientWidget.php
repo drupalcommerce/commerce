@@ -83,4 +83,5 @@ class UsageLimitPerClientWidget extends WidgetBase {
     $field_name = $field_definition->getName();
     return in_array($entity_type, ['commerce_promotion', 'commerce_promotion_coupon']) && $field_name == 'usage_limit_per_client';
   }
+
 }

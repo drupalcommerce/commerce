@@ -207,4 +207,5 @@ class PromotionAvailabilityTest extends CommerceKernelTestBase {
     \Drupal::service('commerce_promotion.usage')->register($this->order, $promotion);
     $this->assertFalse($promotion->available($this->order));
   }
+
 }
