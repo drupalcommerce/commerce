@@ -47,3 +47,17 @@ function commerce_payment_update_8201() {
     ->setDisplayConfigurable('view', TRUE);
   $entity_definition_update->installFieldStorageDefinition('completed', 'commerce_payment', 'commerce_payment', $storage_definition);
 }
+
+/**
+ * Add deleted field to Payment method.
+ */
+function commerce_payment_update_8202() {
+  $entity_definition_update = \Drupal::entityDefinitionUpdateManager();
+
+  $storage_definition = BaseFieldDefinition::create('boolean')
+    ->setName('Deleted')
+    ->setTargetEntityTypeId('commerce_payment_method')
+    ->setLabel(t('Deleted'))
+    ->setDescription(t('Whether the payment method is soft-deleted.'));
+  $entity_definition_update->installFieldStorageDefinition('deleted','commerce_payment_method', 'commerce_payment', $storage_definition);
+}

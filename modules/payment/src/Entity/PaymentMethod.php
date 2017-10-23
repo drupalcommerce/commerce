@@ -335,6 +335,11 @@ class PaymentMethod extends ContentEntityBase implements PaymentMethodInterface 
       ->setLabel(t('Changed'))
       ->setDescription(t('The time when the payment method was last edited.'));
 
+    $fields['deleted'] = BaseFieldDefinition::create('boolean')
+      ->setLabel(t('Deleted'))
+      ->setDescription(t('Whether the payment method is soft-deleted.'))
+      ->setDefaultValue(FALSE);
+
     return $fields;
   }
 
