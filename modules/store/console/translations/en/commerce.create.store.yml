@@ -1,0 +1,9 @@
+description: 'Create a new store.'
+options:
+  name: 'The store name'
+  mail: 'The store mail'
+  country: 'The store country'
+  currency: 'The store currency (optional)'
+arguments: {}
+messages:
+    success: 'I am a new generated command.'

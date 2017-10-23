@@ -2,6 +2,7 @@
 
 namespace Drupal\commerce\Element;
 
+use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\Element;
 
@@ -71,21 +72,55 @@ trait CommerceElementTrait {
    * step of validation, allowing thrown exceptions to be converted into form
    * errors.
    *
-   * @param array $element
-   *   The form element.
+   * @param array &$form
+   *   The form.
    * @param \Drupal\Core\Form\FormStateInterface $form_state
    *   The form state.
    */
-  public static function executeElementSubmitHandlers(array &$element, FormStateInterface $form_state) {
+  public static function executeElementSubmitHandlers(array &$form, FormStateInterface $form_state) {
     if (!$form_state->isSubmitted() || $form_state->hasAnyErrors()) {
       // The form wasn't submitted (#ajax in progress) or failed validation.
       return;
     }
+    // A submit button might need to process only a part of the form.
+    // For example, the "Apply coupon" button at checkout should apply coupons,
+    // but not save the payment information. Use #limit_validation_errors
+    // as a guideline for which parts of the form to submit.
+    $triggering_element = $form_state->getTriggeringElement();
+    if (isset($triggering_element['#limit_validation_errors']) && $triggering_element['#limit_validation_errors'] !== FALSE) {
+      // #limit_validation_errors => [], the button cares about nothing.
+      if (empty($triggering_element['#limit_validation_errors'])) {
+        return;
+      }
 
+      foreach ($triggering_element['#limit_validation_errors'] as $limit_validation_errors) {
+        $element = NestedArray::getValue($form, $limit_validation_errors);
+        if (!$element) {
+          // The element will be empty if #parents don't match #array_parents,
+          // the case for IEF widgets. In that case just submit everything.
+          $element = &$form;
+        }
+        self::doExecuteSubmitHandlers($element, $form_state);
+      }
+    }
+    else {
+      self::doExecuteSubmitHandlers($form, $form_state);
+    }
+  }
+
+  /**
+   * Calls the #commerce_element_submit callbacks recursively.
+   *
+   * @param array &$element
+   *   The current element.
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   *   The form state.
+   */
+  public static function doExecuteSubmitHandlers(array &$element, FormStateInterface $form_state) {
     // Recurse through all children.
     foreach (Element::children($element) as $key) {
       if (!empty($element[$key])) {
-        static::executeElementSubmitHandlers($element[$key], $form_state);
+        static::doExecuteSubmitHandlers($element[$key], $form_state);
       }
     }
 

@@ -1,8 +1,4 @@
 services:
-  commerce.bundle_plugin_installer:
-    class: Drupal\commerce\BundlePluginInstaller
-    arguments: ['@entity_type.manager', '@entity_bundle.listener', '@field_storage_definition.listener', '@field_definition.listener']
-
   commerce.configurable_field_manager:
     class: Drupal\commerce\ConfigurableFieldManager
     arguments: ['@entity_type.manager']
@@ -49,6 +45,11 @@ services:
   commerce.config_updater:
     class: Drupal\commerce\Config\ConfigUpdater
     arguments: ['@entity_type.manager', '@config.storage', '@config.factory']
+
+  commerce.twig_extension:
+    class: Drupal\commerce\TwigExtension\CommerceTwigExtension
+    tags:
+      - { name: twig.extension }
 
   cache_context.country:
     class: Drupal\commerce\Cache\Context\CountryCacheContext

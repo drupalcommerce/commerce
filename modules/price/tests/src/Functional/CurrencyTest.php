@@ -14,14 +14,23 @@ use Drupal\Core\Url;
 class CurrencyTest extends CommerceBrowserTestBase {
 
   /**
+   * Tests the initial currency creation.
+   */
+  public function testInitialCurrency() {
+    // We are expecting commerce_price_install() to import 'USD'.
+    $currency = Currency::load('USD');
+    $this->assertNotEmpty($currency);
+  }
+
+  /**
    * Tests importing a currency.
    */
   public function testCurrencyImport() {
-    $this->drupalGet('admin/commerce/config/currencies/import');
+    $this->drupalGet('admin/commerce/config/currencies/add');
     $edit = [
       'currency_codes[]' => ['CHF'],
     ];
-    $this->submitForm($edit, 'Import');
+    $this->submitForm($edit, 'Add');
 
     $url = Url::fromRoute('entity.commerce_currency.collection');
     $this->assertEquals($this->getUrl(), $this->getAbsoluteUrl($url->toString()));
@@ -35,11 +44,11 @@ class CurrencyTest extends CommerceBrowserTestBase {
   }
 
   /**
-   * Tests creating a currency.
+   * Tests adding a currency.
    */
   public function testCurrencyCreation() {
     $this->drupalGet('admin/commerce/config/currencies');
-    $this->getSession()->getPage()->clickLink('Add currency');
+    $this->getSession()->getPage()->clickLink('Add custom currency');
     $edit = [
       'name' => 'Test currency',
       'currencyCode' => 'XXX',

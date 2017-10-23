@@ -163,7 +163,7 @@ class OrderForm extends ContentEntityForm {
   public function save(array $form, FormStateInterface $form_state) {
     $this->entity->save();
     drupal_set_message($this->t('The order %label has been successfully saved.', ['%label' => $this->entity->label()]));
-    $form_state->setRedirect('entity.commerce_order.collection');
+    $form_state->setRedirect('entity.commerce_order.canonical', ['commerce_order' => $this->entity->id()]);
   }
 
 }

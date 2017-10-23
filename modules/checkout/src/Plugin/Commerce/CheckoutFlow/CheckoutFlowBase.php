@@ -263,11 +263,9 @@ abstract class CheckoutFlowBase extends PluginBase implements CheckoutFlowInterf
     $form['#attached']['library'][] = 'commerce_checkout/form';
     if ($this->hasSidebar($step_id)) {
       $form['sidebar']['order_summary'] = [
-        '#type' => 'view',
-        '#name' => 'commerce_checkout_order_summary',
-        '#display_id' => 'default',
-        '#arguments' => [$this->order->id()],
-        '#embed' => TRUE,
+        '#theme' => 'commerce_checkout_order_summary',
+        '#order_entity' => $this->order,
+        '#checkout_step' => $step_id,
       ];
     }
     $form['actions'] = $this->actions($form, $form_state);
