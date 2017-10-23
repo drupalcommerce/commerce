@@ -29,6 +29,8 @@ interface PaymentMethodStorageInterface extends ContentEntityStorageInterface {
   public function loadReusable(UserInterface $account, PaymentGatewayInterface $payment_gateway, array $billing_countries = []);
 
   /**
+   * Loads the payment methods for the given payment gateway.
+   * 
    * @param \Drupal\commerce_payment\Entity\PaymentGatewayInterface $paymentGateway
    *   The payment gateway.
    *
