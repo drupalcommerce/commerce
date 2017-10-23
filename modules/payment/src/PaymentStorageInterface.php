@@ -32,4 +32,15 @@ interface PaymentStorageInterface extends ContentEntityStorageInterface {
    */
   public function loadMultipleByOrder(OrderInterface $order);
 
+  /**
+   * Loads all payments for the given payment method.
+   *
+   * @param \Drupal\commerce_payment\Entity\PaymentMethodInterface $payment_method
+   *   The payment method.
+   *
+   * @return \Drupal\commerce_payment\Entity\PaymentInterface[]
+   *   The payments.
+   */
+  public function loadMultipleByPaymentMethod(PaymentMethodInterface $payment_method);
+
 }

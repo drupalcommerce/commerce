@@ -56,4 +56,17 @@ class PaymentStorage extends CommerceContentEntityStorage implements PaymentStor
     return parent::doCreate($values);
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function loadMultipleByPaymentMethod(PaymentMethodInterface $payment_method) {
+    $query = $this->getQuery()
+      ->condition('payment_method', $payment_method->id());
+    $result = $query->execute();
+    if (empty($result)) {
+      return [];
+    }
+    return $this->loadMultiple($result);
+  }
+
 }

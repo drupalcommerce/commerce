@@ -119,4 +119,23 @@ class OrderStorage extends CommerceContentEntityStorage {
     return parent::postLoad($entities);
   }
 
+  /**
+   * Loads the orders for the given payment method.
+   *
+   * @param \Drupal\commerce_payment\Entity\PaymentMethodInterface $payment_method
+   *   The payment method.
+   *
+   * @return \Drupal\commerce_order\Entity\OrderInterface[]
+   *   The orders.
+   */
+  public function loadMultipleByPaymentMethod(PaymentMethodInterface $payment_method) {
+    $query = $this->getQuery()
+      ->condition('payment_method', $payment_method->id());
+    $result = $query->execute();
+    if (empty($result)) {
+      return [];
+    }
+    return $this->loadMultiple($result);
+  }
+
 }
