@@ -386,7 +386,6 @@ class ProductVariation extends CommerceContentEntityBase implements ProductVaria
     return $translation;
   }
 
-
   /**
    * {@inheritdoc}
    */

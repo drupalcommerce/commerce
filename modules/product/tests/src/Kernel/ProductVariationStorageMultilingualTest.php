@@ -3,6 +3,7 @@
 namespace Drupal\Tests\commerce_product\Kernel;
 
 use Drupal\commerce_product\Entity\Product;
+use Drupal\commerce_product\Entity\ProductType;
 use Drupal\commerce_product\Entity\ProductVariation;
 use Drupal\commerce_product\Entity\ProductVariationType;
 use Drupal\language\Entity\ConfigurableLanguage;
@@ -45,6 +46,13 @@ class ProductVariationStorageMultilingualTest extends CommerceKernelTestBase {
   protected $testSku = 'STORAGE-MULTILINGUAL-TEST';
 
   /**
+   * The test product.
+   *
+   * @var \Drupal\commerce_product\Entity\ProductInterface
+   */
+  protected $product;
+
+  /**
    * Modules to enable.
    *
    * @var array
@@ -74,16 +82,35 @@ class ProductVariationStorageMultilingualTest extends CommerceKernelTestBase {
     ConfigurableLanguage::createFromLangcode('sr')->save();
     ConfigurableLanguage::createFromLangcode('de')->save();
 
-    $variation_type = ProductVariationType::load('default');
+    $variation_type = ProductVariationType::create([
+      'id' => 'multilingual',
+      'label' => 'Multilingual',
+      'orderItemType' => 'default',
+      'generateTitle' => FALSE,
+    ]);
+    $variation_type->save();
     $this->container->get('content_translation.manager')
       ->setEnabled('commerce_product_variation', $variation_type->id(), TRUE);
+    $product_type = ProductType::create([
+      'id' => 'multilingual',
+      'label' => 'Multilingual',
+      'variationType' => $variation_type->id(),
+    ]);
+    $product_type->save();
+    commerce_product_add_stores_field($product_type);
+    commerce_product_add_variations_field($product_type);
+    $this->container->get('content_translation.manager')
+      ->setEnabled('commerce_product', $product_type->id(), TRUE);
 
     $sku = 'STORAGE-MULTILINGUAL-TEST';
     $variation = ProductVariation::create([
-      'type' => 'default',
+      'type' => $variation_type->id(),
       'sku' => $sku,
       'title' => 'English variation',
     ]);
+    $variation->save();
+    /** @var \Drupal\commerce_product\Entity\ProductVariationInterface $variation */
+    $variation = $this->reloadEntity($variation);
     $variation->addTranslation('fr', [
       'title' => 'Variation française',
     ]);
@@ -92,12 +119,13 @@ class ProductVariationStorageMultilingualTest extends CommerceKernelTestBase {
     ]);
     $variation->save();
     $product = Product::create([
-      'type' => 'default',
+      'type' => $product_type->id(),
       'variations' => [$variation],
     ]);
     $product->addTranslation('fr');
     $product->addTranslation('sr');
     $product->save();
+    $this->product = $product;
   }
 
   /**
@@ -124,22 +152,35 @@ class ProductVariationStorageMultilingualTest extends CommerceKernelTestBase {
   public function testLoadBySkuDe() {
     $this->languageDefault->set($this->languageManager->getLanguage('de'));
     $result = $this->variationStorage->loadBySku($this->testSku);
-    // @todo how can we get this to fall back to `und`?
-    $this->assertEquals(NULL, $result->label());
+    $this->assertEquals('English variation', $result->label());
   }
 
   /**
    * Tests loadEnabled() method.
    */
   public function testLoadEnabled() {
-    // @todo PORT AS MULTILINGUAL
+    $enabled = $this->variationStorage->loadEnabled($this->product);
+    $enabled_variation = reset($enabled);
+    $this->assertEquals($enabled_variation->language()->getId(), 'en');
+
+    $enabled = $this->variationStorage->loadEnabled($this->product->getTranslation('fr'));
+    $enabled_variation = reset($enabled);
+    $this->assertEquals($enabled_variation->language()->getId(), 'fr');
   }
 
   /**
    * Tests loadFromContext() method.
    */
   public function testLoadFromContext() {
-    // @todo PORT AS MULTILINGUAL
+    $product = $this->product->getTranslation('sr');
+    $request = Request::create('');
+    $request->query->add([
+      'v' => $product->getDefaultVariation()->id(),
+    ]);
+    // Push the request to the request stack so `current_route_match` works.
+    $this->container->get('request_stack')->push($request);
+    $context_variation = $this->variationStorage->loadFromContext($product);
+    $this->assertEquals($context_variation->language()->getId(), 'sr');
   }
 
 }
