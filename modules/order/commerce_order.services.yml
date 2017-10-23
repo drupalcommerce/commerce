@@ -62,3 +62,8 @@ services:
     arguments: ['@current_route_match']
     tags:
       - { name: commerce_store.store_resolver, priority: 100 }
+  commerce_order.normalizer.adjustment:
+    class: Drupal\commerce_order\Normalizer\AdjustmentNormalizer
+    tags:
+    # This normalizer must just be higher than serializer.normalizer.typed_data, so setting priority as 0 here.
+      - { name: normalizer, priority: 0}
