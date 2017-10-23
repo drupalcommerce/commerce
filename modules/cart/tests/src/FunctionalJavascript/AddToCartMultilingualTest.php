@@ -178,7 +178,7 @@ class AddToCartMultilingualTest extends CartBrowserTestBase {
     $this->config('system.site')->set('default_langcode', 'fr')->save();
     drupal_flush_all_caches();
 
-    $this->drupalGet($this->product->toUrl());
+    $this->drupalGet($this->product->getTranslation('fr')->toUrl());
     // Use AJAX to change the size to Medium, keeping the color on Red.
     $this->getSession()->getPage()->selectFieldOption('purchased_entity[0][attributes][attribute_size]', 'FR Medium');
     $this->waitForAjaxToFinish();
@@ -221,8 +221,9 @@ class AddToCartMultilingualTest extends CartBrowserTestBase {
 
     // Change the site language.
     $this->config('system.site')->set('default_langcode', 'fr')->save();
-    $this->product = Product::load($this->product->id());
-    $this->drupalGet($this->product->toUrl());
+    drupal_flush_all_caches();
+
+    $this->drupalGet($this->product->getTranslation('fr')->toUrl());
     // Use AJAX to change the size to Medium, keeping the color on Red.
     $this->assertAttributeSelected('purchased_entity[0][variation]', 'Mon super produit - FR Red, FR Small');
     $this->getSession()->getPage()->selectFieldOption('purchased_entity[0][variation]', 'Mon super produit - FR Red, FR Medium');
