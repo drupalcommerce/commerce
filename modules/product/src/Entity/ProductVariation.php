@@ -367,23 +367,7 @@ class ProductVariation extends CommerceContentEntityBase implements ProductVaria
       // When there are no attribute fields, there's only one variation.
       $title = $product_title;
     }
-
     return $title;
-  }
-
-  public function addTranslation($langcode, array $values = []) {
-    $translation = parent::addTranslation($langcode, $values);
-    /** @var \Drupal\commerce_product\Entity\ProductVariationTypeInterface $variation_type */
-    $variation_type = $this->entityTypeManager()
-      ->getStorage('commerce_product_variation_type')
-      ->load($translation->bundle());
-
-    if ($variation_type->shouldGenerateTitle()) {
-      $title = $this->generateTitle();
-      $translation->setTitle($title);
-    }
-
-    return $translation;
   }
 
   /**
