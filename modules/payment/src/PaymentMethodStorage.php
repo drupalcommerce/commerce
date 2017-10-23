@@ -125,4 +125,20 @@ class PaymentMethodStorage extends CommerceContentEntityStorage implements Payme
     return parent::doCreate($values);
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function loadByPaymentGateway(PaymentGatewayInterface $payment_gateway) {
+    if (!($payment_gateway->getPlugin() instanceof SupportsStoredPaymentMethodsInterface)) {
+      return [];
+    }
+    $query = $this->getQuery()
+      ->condition('payment_gateway', $payment_gateway->id());
+    $result = $query->execute();
+    if (empty($result)) {
+      return [];
+    }
+    return $this->loadMultiple($result);
+  }
+
 }
