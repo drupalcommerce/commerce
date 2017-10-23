@@ -106,7 +106,6 @@ class AddToCartMultilingualTest extends CartBrowserTestBase {
     $this->variation->get('attribute_color')->setValue($color_attributes['red']);
     $this->variation->get('attribute_size')->setValue($size_attributes['small']);
     $this->variation->save();
-    $this->variation->addTranslation('fr')->save();
 
     // The matrix is intentionally uneven, blue / large is missing.
     $attribute_values_matrix = [
@@ -131,12 +130,16 @@ class AddToCartMultilingualTest extends CartBrowserTestBase {
       $variation->get('attribute_color')->setValue($color_attributes[$value[0]]);
       $variation->get('attribute_size')->setValue($size_attributes[$value[1]]);
       $variation->save();
-      $variation->addTranslation('fr')->save();
       $product->addVariation($variation);
     }
 
     $product->save();
     $this->product = Product::load($product->id());
+
+    // Create a translation for each variation on the product.
+    foreach ($this->product->getVariations() as $variation) {
+      $variation->addTranslation('fr')->save();
+    }
 
     $this->variations = $product->getVariations();
     $this->colorAttributes = $color_attributes;
