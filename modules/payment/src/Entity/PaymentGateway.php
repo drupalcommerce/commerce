@@ -267,7 +267,7 @@ class PaymentGateway extends ConfigEntityBase implements PaymentGatewayInterface
     /** @var \Drupal\commerce_payment\PaymentMethodStorageInterface $payment_method_storage */
     $payment_method_storage = \Drupal::service('entity_type.manager')
       ->getStorage('commerce_payment_method');
-    
+
     foreach ($entities as $payment_gateway) {
       $payment_methods = $payment_method_storage->loadByPaymentGateway($payment_gateway);
       if (empty($payment_methods)) {
@@ -279,7 +279,6 @@ class PaymentGateway extends ConfigEntityBase implements PaymentGatewayInterface
       } else {
         // Else we queue them for deletion.
         $queue = \Drupal::queue('payment_methods_delete_queue');
-        //$queue->createQueue();
         foreach (array_chunk($payment_methods, 50) as $payment_methods_chunk) {
           $queue->createItem($payment_methods_chunk);
         }
