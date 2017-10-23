@@ -117,3 +117,20 @@ field.widget.settings.commerce_unit_price:
     require_confirmation:
       type: boolean
       label: 'Require confirmation before overriding the unit price'
+
+field.formatter.settings.commerce_price_calculated:
+  type: mapping
+  label: 'Calculated price formatter settings'
+  mapping:
+    strip_trailing_zeroes:
+      type: boolean
+      label: 'Strip trailing zeroes after the decimal point'
+    display_currency_code:
+      type: boolean
+      label: 'Display the currency code instead of the currency symbol'
+    adjustment_types:
+      type: sequence
+      label: 'Adjustment types'
+      sequence:
+        type: string
+        label: 'Adjustment type'
