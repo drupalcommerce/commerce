@@ -91,8 +91,7 @@ class Order extends CommerceContentEntityBase implements OrderInterface {
    * {@inheritdoc}
    */
   public function getStore() {
-    $store = $this->getTranslatedReferencedEntities('store_id');
-    return reset($store);
+    return $this->getTranslatedReferencedEntity('store_id');
   }
 
   /**

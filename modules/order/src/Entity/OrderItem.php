@@ -75,8 +75,7 @@ class OrderItem extends CommerceContentEntityBase implements OrderItemInterface 
    * {@inheritdoc}
    */
   public function getPurchasedEntity() {
-    $purchased_entity = $this->getTranslatedReferencedEntities('purchased_entity');
-    return reset($purchased_entity);
+    return $this->getTranslatedReferencedEntity('purchased_entity');
   }
 
   /**
