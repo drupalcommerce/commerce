@@ -99,7 +99,7 @@ class OrderAdminTest extends OrderBrowserTestBase {
       'adjustments[0][definition][amount][number]' => '2.00',
     ];
     $this->submitForm($edit, 'Save');
-
+    $this->drupalGet('/admin/commerce/orders');
     $order_number = $this->getSession()->getPage()->find('css', 'tr td.views-field-order-number');
     $this->assertEquals(1, count($order_number), 'Order exists in the table.');
 
