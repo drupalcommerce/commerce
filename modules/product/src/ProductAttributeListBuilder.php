@@ -15,6 +15,7 @@ class ProductAttributeListBuilder extends ConfigEntityListBuilder {
    */
   public function buildHeader() {
     $header['label'] = $this->t('Attribute name');
+    $header['type'] = $this->t('Machine name');
     return $header + parent::buildHeader();
   }
 
@@ -23,6 +24,7 @@ class ProductAttributeListBuilder extends ConfigEntityListBuilder {
    */
   public function buildRow(EntityInterface $entity) {
     $row['label'] = $entity->label();
+    $row['type'] = $entity->id();
     return $row + parent::buildRow($entity);
   }
 
