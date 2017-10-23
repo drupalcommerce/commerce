@@ -176,6 +176,7 @@ class AddToCartMultilingualTest extends CartBrowserTestBase {
 
     // Change the site language.
     $this->config('system.site')->set('default_langcode', 'fr')->save();
+    drupal_flush_all_caches();
 
     $this->drupalGet($this->product->toUrl());
     // Use AJAX to change the size to Medium, keeping the color on Red.
