@@ -58,66 +58,55 @@ class AddToCartMultilingualTest extends CartBrowserTestBase {
 
   /**
    * {@inheritdoc}
+   *
+   * @see \Drupal\Tests\content_translation\Functional\ContentTranslationTestBase
    */
   public function setUp() {
     parent::setUp();
-    // Add a new language.
-    ConfigurableLanguage::createFromLangcode('fr')->save();
+
+    $this->setupMultilingual();
 
     /** @var \Drupal\commerce_product\Entity\ProductVariationTypeInterface $variation_type */
     $variation_type = ProductVariationType::load($this->variation->bundle());
-    // Enable translation for the product and ensure the change is picked up.
-    // @see \Drupal\Tests\content_translation\Functional\ContentTranslationTestBase
-    \Drupal::service('content_translation.manager')->setEnabled('commerce_product_variation', $variation_type->id(), TRUE);
-    drupal_static_reset();
-    \Drupal::entityManager()->clearCachedDefinitions();
-    \Drupal::service('router.builder')->rebuild();
-    \Drupal::service('entity.definition_update_manager')->applyUpdates();
-    // Rebuild the container so that the new languages are picked up by services
-    // that hold a list of languages.
-    $this->rebuildContainer();
-
     $color_attributes = $this->createAttributeSet($variation_type, 'color', [
       'red' => 'Red',
       'blue' => 'Blue',
     ]);
-    $updated_color_attributes = [];
+
     foreach ($color_attributes as $key => $color_attribute) {
-      $color_attribute_fr = $color_attribute->toArray();
-      $color_attribute_fr['name'] = 'FR ' . $color_attribute->label();
-      $color_attribute->addTranslation('fr', $color_attribute_fr)->save();
-      $updated_color_attributes[$key] = $color_attribute;
+      $color_attribute->addTranslation('fr', [
+        'name' => 'FR ' . $color_attribute->label(),
+      ]);
+      $color_attribute->save();
     }
     $size_attributes = $this->createAttributeSet($variation_type, 'size', [
       'small' => 'Small',
       'medium' => 'Medium',
       'large' => 'Large',
     ]);
-    $updated_size_attributes = [];
     foreach ($size_attributes as $key => $size_attribute) {
-      $size_attribute_fr = $size_attribute->toArray();
-      $size_attribute_fr['name'] = 'FR ' . $size_attribute->label();
-      $size_attribute->addTranslation('fr', $size_attribute_fr)->save();
-      $updated_size_attributes[$key] = $size_attribute;
+      $size_attribute->addTranslation('fr', [
+        'name' => 'FR ' . $size_attribute->label(),
+      ]);
+      $size_attribute->save();
     }
 
     // Reload the variation since we have new fields.
     $this->variation = ProductVariation::load($this->variation->id());
+
+    // Translate the product's title.
     $product = $this->variation->getProduct();
-    $product->setTitle('Title');
+    $product->setTitle('My Super Product');
+    $product->addTranslation('fr', [
+      'title' => 'Mon super produit',
+    ]);
     $product->save();
-    // Add translation.
-    $product_fr = $product->toArray();
-    $product_fr['title'] = 'FR title';
-    $product->addTranslation('fr', $product_fr)->save();
 
     // Update first variation to have the attribute's value.
-    $this->variation->attribute_color = $color_attributes['red']->id();
-    $this->variation->attribute_size = $size_attributes['small']->id();
+    $this->variation->get('attribute_color')->setValue($color_attributes['red']);
+    $this->variation->get('attribute_size')->setValue($size_attributes['small']);
     $this->variation->save();
-
-    $variation_fr = $this->variation->toArray();
-    $this->variation->addTranslation('fr', $variation_fr)->save();
+    $this->variation->addTranslation('fr')->save();
 
     // The matrix is intentionally uneven, blue / large is missing.
     $attribute_values_matrix = [
@@ -127,9 +116,7 @@ class AddToCartMultilingualTest extends CartBrowserTestBase {
       ['blue', 'small'],
       ['blue', 'medium'],
     ];
-    $variations = [
-      $this->variation,
-    ];
+
     // Generate variations off of the attributes values matrix.
     foreach ($attribute_values_matrix as $key => $value) {
       /** @var \Drupal\commerce_product\Entity\ProductVariationInterface $variation */
@@ -141,29 +128,42 @@ class AddToCartMultilingualTest extends CartBrowserTestBase {
           'currency_code' => 'USD',
         ],
       ]);
-      $variation->attribute_color = $updated_color_attributes[$value[0]];
-      $variation->attribute_size = $updated_size_attributes[$value[1]];
+      $variation->get('attribute_color')->setValue($color_attributes[$value[0]]);
+      $variation->get('attribute_size')->setValue($size_attributes[$value[1]]);
       $variation->save();
-      $variation = ProductVariation::load($variation->id());
-      $product->variations->appendItem($variation);
-      $product->save();
-      // Add variation FR translation.
-      $variation_fr = $variation->toArray();
-      $variation->addTranslation('fr', $variation_fr)->save();
-      $variation->save();
-      $variations[] = $variation;
+      $variation->addTranslation('fr')->save();
+      $product->addVariation($variation);
     }
+
     $product->save();
     $this->product = Product::load($product->id());
 
     $this->variations = $product->getVariations();
-    $this->colorAttributes = $updated_color_attributes;
-    $this->sizeAttributes = $updated_size_attributes;
+    $this->colorAttributes = $color_attributes;
+    $this->sizeAttributes = $size_attributes;
   }
 
   /**
-   * Tests adding a product to the cart using
-   * 'commerce_product_variation_attributes' widget.
+   * Sets up the multilingual items.
+   */
+  protected function setupMultilingual() {
+    // Add a new language.
+    ConfigurableLanguage::createFromLangcode('fr')->save();
+
+    // Enable translation for the product and ensure the change is picked up.
+    $this->container->get('content_translation.manager')->setEnabled('commerce_product', $this->variation->bundle(), TRUE);
+    $this->container->get('content_translation.manager')->setEnabled('commerce_product_variation', $this->variation->bundle(), TRUE);
+    $this->container->get('entity.manager')->clearCachedDefinitions();
+    $this->container->get('router.builder')->rebuild();
+    $this->container->get('entity.definition_update_manager')->applyUpdates();
+
+    // Rebuild the container so that the new languages are picked up by services
+    // that hold a list of languages.
+    $this->rebuildContainer();
+  }
+
+  /**
+   * Tests that the attribute widget uses translated items.
    */
   public function testProductVariationAttributesWidget() {
     $this->drupalGet($this->product->toUrl());
@@ -204,8 +204,7 @@ class AddToCartMultilingualTest extends CartBrowserTestBase {
   }
 
   /**
-   * Tests adding a product to the cart using 'commerce_product_variation_title'
-   * widget.
+   * Tests the title widget has translated variation title.
    */
   public function testProductVariationTitleWidget() {
     $order_item_form_display = EntityFormDisplay::load('commerce_order_item.default.add_to_cart');
@@ -216,7 +215,7 @@ class AddToCartMultilingualTest extends CartBrowserTestBase {
 
     $this->drupalGet($this->product->toUrl());
     $this->assertSession()->selectExists('purchased_entity[0][variation]');
-    $this->assertAttributeSelected('purchased_entity[0][variation]', 'Title - Red, Small');
+    $this->assertAttributeSelected('purchased_entity[0][variation]', 'My Super Product - Red, Small');
     $this->getSession()->getPage()->pressButton('Add to cart');
 
     // Change the site language.
@@ -224,16 +223,16 @@ class AddToCartMultilingualTest extends CartBrowserTestBase {
     $this->product = Product::load($this->product->id());
     $this->drupalGet($this->product->toUrl());
     // Use AJAX to change the size to Medium, keeping the color on Red.
-    $this->assertAttributeSelected('purchased_entity[0][variation]', 'FR title - FR Red, FR Small');
-    $this->getSession()->getPage()->selectFieldOption('purchased_entity[0][variation]', 'FR title - FR Red, FR Medium');
+    $this->assertAttributeSelected('purchased_entity[0][variation]', 'Mon super produit - FR Red, FR Small');
+    $this->getSession()->getPage()->selectFieldOption('purchased_entity[0][variation]', 'Mon super produit - FR Red, FR Medium');
     $this->waitForAjaxToFinish();
-    $this->assertAttributeSelected('purchased_entity[0][variation]', 'FR title - FR Red, FR Medium');
-    $this->assertSession()->pageTextContains('FR title - FR Red, FR Medium');
+    $this->assertAttributeSelected('purchased_entity[0][variation]', 'Mon super produit - FR Red, FR Medium');
+    $this->assertSession()->pageTextContains('Mon super produit - FR Red, FR Medium');
     // Use AJAX to change the color to Blue, keeping the size on Medium.
-    $this->getSession()->getPage()->selectFieldOption('purchased_entity[0][variation]', 'FR title - FR Blue, FR Medium');
+    $this->getSession()->getPage()->selectFieldOption('purchased_entity[0][variation]', 'Mon super produit - FR Blue, FR Medium');
     $this->waitForAjaxToFinish();
-    $this->assertAttributeSelected('purchased_entity[0][variation]', 'FR title - FR Blue, FR Medium');
-    $this->assertSession()->pageTextContains('FR title - FR Blue, FR Medium');
+    $this->assertAttributeSelected('purchased_entity[0][variation]', 'Mon super produit - FR Blue, FR Medium');
+    $this->assertSession()->pageTextContains('Mon super produit - FR Blue, FR Medium');
     $this->getSession()->getPage()->pressButton('Add to cart');
 
     $this->cart = Order::load($this->cart->id());
