@@ -16,7 +16,7 @@ interface PurchasableEntityPriceCalculatorInterface {
    * @param array $adjustment_types
    *   The adjustment types to calculate.
    *
-   * @return \Drupal\commerce_price\Price The calculated price.
+   * @return \Drupal\commerce_price\Price[] The calculated price.
    * The calculated price.
    */
   public function calculate(PurchasableEntityInterface $purchasable_entity, $quantity, array $adjustment_types = []);

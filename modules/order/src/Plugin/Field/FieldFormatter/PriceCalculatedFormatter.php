@@ -193,8 +193,8 @@ class PriceCalculatedFormatter extends PriceDefaultFormatter implements Containe
       /** @var \Drupal\commerce\PurchasableEntityInterface $purchasable_entity */
       $purchasable_entity = $items->getEntity();
       $calculated_price = $this->priceCalculator->calculate($purchasable_entity, 1, $this->getSetting('adjustment_types'));
-      $number = $calculated_price->getNumber();
-      $currency = $this->currencyStorage->load($calculated_price->getCurrencyCode());
+      $number = $calculated_price['calculated']->getNumber();
+      $currency = $this->currencyStorage->load($calculated_price['calculated']->getCurrencyCode());
 
       $elements[$delta] = [
         '#markup' => $this->numberFormatter->formatCurrency($number, $currency),

@@ -6,6 +6,8 @@ use Drupal\commerce_price\Price;
 use Drupal\commerce_product\Entity\Product;
 use Drupal\commerce_product\Entity\ProductVariation;
 use Drupal\commerce_promotion\Entity\Promotion;
+use Drupal\Core\Session\AccountInterface;
+use Drupal\Core\Session\AnonymousUserSession;
 use Drupal\Tests\commerce\Kernel\CommerceKernelTestBase;
 use Drupal\user\Entity\User;
 
@@ -91,25 +93,31 @@ class PurchasableEntityPriceCalculatorTest extends CommerceKernelTestBase {
     $product->addVariation($variation)->save();
     $this->variation = $this->reloadEntity($variation);
 
-    $this->container->get('current_user')->setAccount(User::getAnonymousUser());
+    $this->container->get('current_user')->setAccount(new AnonymousUserSession());
     $this->priceCalculator = $this->container->get('commerce_order.purchasable_entity_price_calculator');
   }
 
   public function testCalculation() {
     $calculated = $this->priceCalculator->calculate($this->variation, 1);
-    $this->assertEquals(new Price('12.00', 'USD'), $calculated);
+    $this->assertEquals(new Price('12.00', 'USD'), $calculated['original']);
+    $this->assertEquals(new Price('12.00', 'USD'), $calculated['resolved']);
+    $this->assertEquals(new Price('12.00', 'USD'), $calculated['calculated']);
 
     $calculated = $this->priceCalculator->calculate($this->variation, 1, ['promotion']);
-    $this->assertEquals(new Price('6.00', 'USD'), $calculated);
+    $this->assertEquals(new Price('12.00', 'USD'), $calculated['original']);
+    $this->assertEquals(new Price('6.00', 'USD'), $calculated['calculated']);
 
     $calculated = $this->priceCalculator->calculate($this->variation, 1, ['fee']);
-    $this->assertEquals(new Price('12.00', 'USD'), $calculated);
+    $this->assertEquals(new Price('12.00', 'USD'), $calculated['original']);
+    $this->assertEquals(new Price('12.00', 'USD'), $calculated['calculated']);
 
     $calculated = $this->priceCalculator->calculate($this->variation, 1, ['test_adjustment_type']);
-    $this->assertEquals(new Price('14.00', 'USD'), $calculated);
+    $this->assertEquals(new Price('12.00', 'USD'), $calculated['original']);
+    $this->assertEquals(new Price('14.00', 'USD'), $calculated['calculated']);
 
     $calculated = $this->priceCalculator->calculate($this->variation, 1, ['promotion', 'test_adjustment_type']);
-    $this->assertEquals(new Price('8.00', 'USD'), $calculated);
+    $this->assertEquals(new Price('12.00', 'USD'), $calculated['original']);
+    $this->assertEquals(new Price('8.00', 'USD'), $calculated['calculated']);
   }
 
 }

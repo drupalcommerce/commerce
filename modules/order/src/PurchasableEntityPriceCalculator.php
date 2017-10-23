@@ -34,13 +34,6 @@ class PurchasableEntityPriceCalculator implements PurchasableEntityPriceCalculat
   protected $orderTypeResolver;
 
   /**
-   * The order refresh.
-   *
-   * @var \Drupal\commerce_order\OrderRefreshInterface
-   */
-  protected $orderRefresh;
-
-  /**
    * The chain base price resolver.
    *
    * @var \Drupal\commerce_price\Resolver\ChainPriceResolverInterface
@@ -61,15 +54,35 @@ class PurchasableEntityPriceCalculator implements PurchasableEntityPriceCalculat
    */
   protected $orderStorage;
 
+  /**
+   * The adjustment type manager.
+   *
+   * @var \Drupal\commerce_order\AdjustmentTypeManager
+   */
+  protected $adjustmentTypeManager;
 
-  public function __construct(EntityTypeManagerInterface $entity_type_manager, CurrentStoreInterface $current_store, AccountProxyInterface $current_user, OrderTypeResolverInterface $order_type_resolver, OrderRefreshInterface $order_refresh, ChainPriceResolverInterface $chain_price_resolver) {
+  /**
+   * The order processors.
+   *
+   * @var \Drupal\commerce_order\OrderProcessorInterface[]
+   */
+  protected $processors = [];
+
+  public function __construct(EntityTypeManagerInterface $entity_type_manager, CurrentStoreInterface $current_store, AccountProxyInterface $current_user, OrderTypeResolverInterface $order_type_resolver, ChainPriceResolverInterface $chain_price_resolver, AdjustmentTypeManager $adjustment_type_manager) {
     $this->currentStore = $current_store;
     $this->currentUser = $current_user;
     $this->orderTypeResolver = $order_type_resolver;
-    $this->orderRefresh = $order_refresh;
     $this->chainPriceResolver = $chain_price_resolver;
     $this->orderItemStorage = $entity_type_manager->getStorage('commerce_order_item');
     $this->orderStorage = $entity_type_manager->getStorage('commerce_order');
+    $this->adjustmentTypeManager = $adjustment_type_manager;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function addProcessor(OrderProcessorInterface $processor) {
+    $this->processors[] = $processor;
   }
 
   /**
@@ -83,8 +96,15 @@ class PurchasableEntityPriceCalculator implements PurchasableEntityPriceCalculat
 
     // We do not need adjustments to be calculated, return the resolved price.
     if (empty($adjustment_types)) {
-      return $resolved_price;
+      return [
+        'original' => $purchasable_entity->getPrice(),
+        'resolved' => $resolved_price,
+        'adjustments' => [],
+        'calculated' => $resolved_price,
+      ];
     }
+
+    $types = $this->adjustmentTypeManager->getDefinitions();
 
     $order_item = $this->orderItemStorage->createFromPurchasableEntity($purchasable_entity);
     $order_item->setUnitPrice($resolved_price);
@@ -97,16 +117,47 @@ class PurchasableEntityPriceCalculator implements PurchasableEntityPriceCalculat
     ]);
     $order->addItem($order_item);
 
-    $this->orderRefresh->refresh($order);
+    foreach ($this->processors as $processor) {
+      $processor->process($order);
+    }
 
     $calculated_price = $order_item->getUnitPrice();
+    $adjustments = [];
     foreach ($order_item->getAdjustments() as $adjustment) {
       if (!in_array($adjustment->getType(), $adjustment_types)) {
         continue;
       }
       $calculated_price = $calculated_price->add($adjustment->getAmount());
+
+      $type = $adjustment->getType();
+      $source_id = $adjustment->getSourceId();
+      if (empty($source_id)) {
+        // Adjustments without a source ID are always shown standalone.
+        $key = count($adjustments);
+      }
+      else {
+        // Adjustments with the same
+        // type and source ID are combined.
+        $key = $type . '_' . $source_id;
+      }
+      if (empty($adjustments[$key])) {
+        $adjustments[$key] = [
+          'type' => $type,
+          'label' => $adjustment->getLabel(),
+          'total' => $adjustment->getAmount(),
+          'weight' => $types[$type]['weight'],
+        ];
+      }
+      else {
+        $adjustments[$key]['total'] = $adjustments[$key]['total']->add($adjustment->getAmount());
+      }
     }
-    return $calculated_price;
+    return [
+      'original' => $purchasable_entity->getPrice(),
+      'resolved' => $resolved_price,
+      'adjustments' => $adjustments,
+      'calculated' => $calculated_price,
+    ];
   }
 
   /**
