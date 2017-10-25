@@ -35,8 +35,7 @@ class OrderTotalSummary implements OrderTotalSummaryInterface {
         $key = count($adjustments);
       }
       else {
-        // Adjustments with the same
-        // type and source ID are combined.
+        // Adjustments with the same type and source ID are combined.
         $key = $type . '_' . $source_id;
       }
 
@@ -45,6 +44,7 @@ class OrderTotalSummary implements OrderTotalSummaryInterface {
           'type' => $type,
           'label' => $adjustment->getLabel(),
           'total' => $adjustment->getAmount(),
+          'percentage' => $adjustment->getPercentage(),
           'weight' => $types[$type]['weight'],
         ];
       }
