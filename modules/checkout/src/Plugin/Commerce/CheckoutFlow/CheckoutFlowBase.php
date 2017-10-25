@@ -257,6 +257,8 @@ abstract class CheckoutFlowBase extends PluginBase implements CheckoutFlowInterf
 
     $steps = $this->getVisibleSteps();
     $form['#tree'] = TRUE;
+    $form['#entity_id'] = $this->entityId;
+    $form['#plugin_id'] = $this->pluginId;
     $form['#step_id'] = $step_id;
     $form['#title'] = $steps[$step_id]['label'];
     $form['#theme'] = ['commerce_checkout_form'];
