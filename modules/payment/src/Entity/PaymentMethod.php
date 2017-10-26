@@ -378,7 +378,6 @@ class PaymentMethod extends ContentEntityBase implements PaymentMethodInterface 
 
     // Check if payment method is in use (referenced by order or a payment),
     // and if yes, do a soft-delete (save with deleted=TRUE) instead of entity deletion.
-
     /** @var \Drupal\commerce_order\OrderStorage $order_storage */
     $order_storage = \Drupal::service('entity_type.manager')
       ->getStorage('commerce_order');
@@ -396,7 +395,8 @@ class PaymentMethod extends ContentEntityBase implements PaymentMethodInterface 
           $payment_method->setDeleted(TRUE);
           $payment_method->save();
         }
-      } else {
+      }
+      else {
         // Update payment method if payment method was deleted before, and had
         // referenced order/payment, which no longer exist. This is to allow deletion.
         if ($payment_method->isDeleted()) {

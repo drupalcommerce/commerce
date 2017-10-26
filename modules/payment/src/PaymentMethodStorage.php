@@ -136,7 +136,8 @@ class PaymentMethodStorage extends CommerceContentEntityStorage implements Payme
         // If a payment method is marked as deleted, don't delete
         // payment_method or it's field items.
         unset($payment_methods[$payment_method->id()]);
-      } else {
+      }
+      else {
         $this->invokeFieldMethod('delete', $payment_method);
       }
     }
