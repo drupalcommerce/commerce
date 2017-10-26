@@ -234,6 +234,21 @@ class PaymentMethod extends ContentEntityBase implements PaymentMethodInterface 
   /**
    * {@inheritdoc}
    */
+  public function isDeleted() {
+    return $this->get('deleted')->value;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setDeleted($deleted) {
+    $this->set('deleted', $deleted);
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function preSave(EntityStorageInterface $storage) {
     parent::preSave($storage);
 
