@@ -34,6 +34,7 @@ class PaymentMethodListBuilder extends EntityListBuilder {
     $query = $this->getStorage()->getQuery()
       ->condition('uid', $user->id())
       ->condition('reusable', TRUE)
+      ->condition('deleted', FALSE)
       ->sort('method_id');
     // Only add the pager if a limit is specified.
     if ($this->limit) {
