@@ -30,8 +30,8 @@ interface PaymentMethodStorageInterface extends ContentEntityStorageInterface {
 
   /**
    * Loads the payment methods for the given payment gateway.
-   * 
-   * @param \Drupal\commerce_payment\Entity\PaymentGatewayInterface $paymentGateway
+   *
+   * @param \Drupal\commerce_payment\Entity\PaymentGatewayInterface $payment_gateway
    *   The payment gateway.
    *
    * @return \Drupal\commerce_payment\Entity\PaymentMethodInterface[]
