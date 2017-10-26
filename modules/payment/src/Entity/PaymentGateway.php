@@ -282,7 +282,8 @@ class PaymentGateway extends ConfigEntityBase implements PaymentGatewayInterface
       if (count($payment_methods) < 50) {
         // If there is less than 50 payment methods, we delete them straight away.
         $payment_method_storage->delete($payment_methods);
-      } else {
+      }
+      else {
         // Else we queue them for deletion.
         $queue = \Drupal::queue('payment_methods_delete_queue');
         foreach (array_chunk($payment_methods, 50) as $payment_methods_chunk) {
