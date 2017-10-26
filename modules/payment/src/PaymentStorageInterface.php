@@ -3,6 +3,7 @@
 namespace Drupal\commerce_payment;
 
 use Drupal\commerce_order\Entity\OrderInterface;
+use Drupal\commerce_payment\Entity\PaymentMethodInterface;
 use Drupal\Core\Entity\ContentEntityStorageInterface;
 
 /**
