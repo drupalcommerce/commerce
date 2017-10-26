@@ -6,6 +6,7 @@ use Drupal\commerce\CommerceSinglePluginCollection;
 use Drupal\commerce\ConditionGroup;
 use Drupal\commerce_order\Entity\OrderInterface;
 use Drupal\Core\Config\Entity\ConfigEntityBase;
+use Drupal\Core\Entity\EntityStorageInterface;
 
 /**
  * Defines the payment gateway entity class.
@@ -253,7 +254,12 @@ class PaymentGateway extends ConfigEntityBase implements PaymentGatewayInterface
   protected function getPluginCollection() {
     if (!$this->pluginCollection) {
       $plugin_manager = \Drupal::service('plugin.manager.commerce_payment_gateway');
-      $this->pluginCollection = new CommerceSinglePluginCollection($plugin_manager, $this->plugin, $this->configuration, $this->id);
+      $this->pluginCollection = new CommerceSinglePluginCollection(
+        $plugin_manager,
+        $this->plugin,
+        $this->configuration,
+        $this->id
+      );
     }
     return $this->pluginCollection;
   }
