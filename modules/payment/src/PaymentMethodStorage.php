@@ -84,6 +84,7 @@ class PaymentMethodStorage extends CommerceContentEntityStorage implements Payme
       ->condition('uid', $account->id())
       ->condition('payment_gateway', $payment_gateway->id())
       ->condition('reusable', TRUE)
+      ->condition('deleted', FALSE)
       ->condition($query->orConditionGroup()
         ->condition('expires', $this->time->getRequestTime(), '>')
         ->condition('expires', 0))
@@ -123,6 +124,26 @@ class PaymentMethodStorage extends CommerceContentEntityStorage implements Payme
     }
 
     return parent::doCreate($values);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function doDelete($payment_methods) {
+    /** @var \Drupal\commerce_payment\Entity\PaymentMethodInterface[] $payment_methods */
+    foreach ($payment_methods as $payment_method) {
+      if ($payment_method->isDeleted()) {
+        // If a payment method is marked as deleted, don't delete
+        // payment_method or it's field items.
+        unset($payment_methods[$payment_method->id()]);
+      }
+      else {
+        $this->invokeFieldMethod('delete', $payment_method);
+      }
+    }
+    if (!empty($payment_methods)) {
+      $this->doDeleteFieldItems($payment_methods);
+    }
   }
 
 }

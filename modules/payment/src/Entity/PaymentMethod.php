@@ -234,6 +234,21 @@ class PaymentMethod extends ContentEntityBase implements PaymentMethodInterface 
   /**
    * {@inheritdoc}
    */
+  public function isDeleted() {
+    return $this->get('deleted')->value;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setDeleted($deleted) {
+    $this->set('deleted', $deleted);
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function preSave(EntityStorageInterface $storage) {
     parent::preSave($storage);
 
@@ -335,6 +350,11 @@ class PaymentMethod extends ContentEntityBase implements PaymentMethodInterface 
       ->setLabel(t('Changed'))
       ->setDescription(t('The time when the payment method was last edited.'));
 
+    $fields['deleted'] = BaseFieldDefinition::create('boolean')
+      ->setLabel(t('Deleted'))
+      ->setDescription(t('Whether the payment method is soft-deleted.'))
+      ->setDefaultValue(FALSE);
+
     return $fields;
   }
 
@@ -348,6 +368,43 @@ class PaymentMethod extends ContentEntityBase implements PaymentMethodInterface 
    */
   public static function getCurrentUserId() {
     return [\Drupal::currentUser()->id()];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function preDelete(EntityStorageInterface $storage, array $entities) {
+    parent::preDelete($storage, $entities);
+
+    // Check if payment method is in use (referenced by order or a payment),
+    // and if yes, do a soft-delete (save with deleted=TRUE) instead of entity deletion.
+    /** @var \Drupal\commerce_order\OrderStorage $order_storage */
+    $order_storage = \Drupal::service('entity_type.manager')
+      ->getStorage('commerce_order');
+    /** @var \Drupal\commerce_payment\PaymentStorageInterface $payment_storage */
+    $payment_storage = \Drupal::service('entity_type.manager')
+      ->getStorage('commerce_payment');
+
+    /** @var \Drupal\commerce_payment\Entity\PaymentMethodInterface $payment_method */
+    foreach ($entities as $payment_method) {
+      $orders = $order_storage->loadMultipleByPaymentMethod($payment_method);
+      $payments = $payment_storage->loadMultipleByPaymentMethod($payment_method);
+      if (!empty($orders) || !empty($payments)) {
+        // Set entity 'deleted' field to TRUE, if it is not already.
+        if (!$payment_method->isDeleted()) {
+          $payment_method->setDeleted(TRUE);
+          $payment_method->save();
+        }
+      }
+      else {
+        // Update payment method if payment method was deleted before, and had
+        // referenced order/payment, which no longer exist. This is to allow deletion.
+        if ($payment_method->isDeleted()) {
+          $payment_method->setDeleted(FALSE);
+          $payment_method->save();
+        }
+      }
+    }
   }
 
 }

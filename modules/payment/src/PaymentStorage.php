@@ -4,6 +4,7 @@ namespace Drupal\commerce_payment;
 
 use Drupal\commerce\CommerceContentEntityStorage;
 use Drupal\commerce_order\Entity\OrderInterface;
+use Drupal\commerce_payment\Entity\PaymentMethodInterface;
 use Drupal\Core\Entity\EntityStorageException;
 
 /**
@@ -54,6 +55,19 @@ class PaymentStorage extends CommerceContentEntityStorage implements PaymentStor
     }
 
     return parent::doCreate($values);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function loadMultipleByPaymentMethod(PaymentMethodInterface $payment_method) {
+    $query = $this->getQuery()
+      ->condition('payment_method', $payment_method->id());
+    $result = $query->execute();
+    if (empty($result)) {
+      return [];
+    }
+    return $this->loadMultiple($result);
   }
 
 }
