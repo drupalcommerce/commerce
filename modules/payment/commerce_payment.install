@@ -63,4 +63,3 @@ function commerce_payment_update_8202() {
   $field_definition->setRequired(FALSE);
   $entity_definition_update->updateFieldStorageDefinition($field_definition);
 }
-
