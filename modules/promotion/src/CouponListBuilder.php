@@ -73,7 +73,7 @@ class CouponListBuilder extends EntityListBuilder {
     $promotion = $this->routeMatch->getParameter('commerce_promotion');
     $coupons = $this->storage->loadMultipleByPromotion($promotion);
     // Load the usage counts for each coupon.
-    $this->usageCounts = $this->usage->loadMultiple($coupons);
+    $this->usageCounts = $this->usage->loadMultipleByCoupon($coupons);
 
     return $coupons;
   }

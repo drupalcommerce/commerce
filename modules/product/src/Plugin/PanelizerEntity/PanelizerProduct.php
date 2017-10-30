@@ -52,7 +52,7 @@ class PanelizerProduct extends PanelizerEntityBase {
    *   The entity type manager.
    */
   public function __construct(array $configuration, $plugin_id, $plugin_definition, PanelsDisplayManager $panels_manager, EntityFieldManagerInterface $entity_field_manager, ProductVariationFieldRenderer $variation_field_renderer, EntityTypeManagerInterface $entity_type_manager) {
-    parent::__construct($configuration, $plugin_id, $plugin_definition, $panels_manager, $entity_field_manager)
+    parent::__construct($configuration, $plugin_id, $plugin_definition, $panels_manager, $entity_field_manager);
 
     $this->variationFieldRenderer = $variation_field_renderer;
     $this->entityTypeManager = $entity_type_manager;
