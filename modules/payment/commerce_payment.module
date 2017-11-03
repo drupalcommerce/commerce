@@ -29,13 +29,11 @@ function commerce_payment_entity_base_field_info(EntityTypeInterface $entity_typ
     $fields['payment_gateway'] = BaseFieldDefinition::create('entity_reference')
       ->setLabel(t('Payment gateway'))
       ->setDescription(t('The payment gateway.'))
-      ->setRequired(TRUE)
       ->setSetting('target_type', 'commerce_payment_gateway');
 
     $fields['payment_method'] = BaseFieldDefinition::create('entity_reference')
       ->setLabel(t('Payment method'))
       ->setDescription(t('The payment method.'))
-      ->setRequired(TRUE)
       ->setSetting('target_type', 'commerce_payment_method');
 
     return $fields;
