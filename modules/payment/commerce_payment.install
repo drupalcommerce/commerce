@@ -49,8 +49,7 @@ function commerce_payment_update_8201() {
 }
 
 /**
- * Set payment_gateway and payment_method entity reference fields of order
- * optional.
+ * Make payment_gateway and payment_method order fields optional.
  */
 function commerce_payment_update_8202() {
   $entity_definition_update = \Drupal::entityDefinitionUpdateManager();
