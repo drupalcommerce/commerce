@@ -114,6 +114,7 @@ class IntervalTest extends KernelTestBase {
       ['2017-02-24 17:15', new Interval('2', 'month'), '2017-04-24 17:15'],
 
       ['2017-01-31 17:15', new Interval('1', 'month'), '2017-02-28 17:15'],
+      ['2017-02-28 17:15', new Interval('1', 'month'), '2017-03-28 17:15'],
       ['2017-01-31 17:15', new Interval('3', 'month'), '2017-04-30 17:15'],
 
       ['2017-02-24 17:15', new Interval('1', 'year'), '2018-02-24 17:15'],
@@ -142,6 +143,7 @@ class IntervalTest extends KernelTestBase {
       ['2017-02-24 17:15', new Interval('2', 'month'), '2016-12-24 17:15'],
 
       ['2017-03-31 17:15', new Interval('1', 'month'), '2017-02-28 17:15'],
+      ['2017-02-28 17:15', new Interval('1', 'month'), '2017-01-28 17:15'],
       ['2017-03-31 17:15', new Interval('4', 'month'), '2016-11-30 17:15'],
 
       ['2017-02-24 17:15', new Interval('1', 'year'), '2016-02-24 17:15'],
