@@ -45,15 +45,17 @@ function commerce_payment_entity_base_field_info(EntityTypeInterface $entity_typ
  */
 function commerce_payment_entity_operation(EntityInterface $entity) {
   if ($entity->getEntityTypeId() === 'commerce_order') {
-    $operations = [];
-    $operations['payments'] = [
-      'title' => t('Payments'),
-      'url' => Url::fromRoute('entity.commerce_payment.collection', [
-        'commerce_order' => $entity->id(),
-      ]),
-      'weight' => 50,
-    ];
-    return $operations;
+    if (\Drupal::currentUser()->hasPermission('administer commerce_payment')) {
+      $operations = [];
+      $operations['payments'] = [
+        'title' => t('Payments'),
+        'url' => Url::fromRoute('entity.commerce_payment.collection', [
+          'commerce_order' => $entity->id(),
+        ]),
+        'weight' => 50,
+      ];
+      return $operations;
+    }
   }
 }
 

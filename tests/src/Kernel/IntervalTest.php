@@ -93,7 +93,6 @@ class IntervalTest extends KernelTestBase {
     $this->assertEquals($expected_date, $interval->ceil($date));
   }
 
-
   /**
    * Data provider for ::testAddition.
    *
