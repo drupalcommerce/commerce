@@ -251,7 +251,7 @@ class Product extends CommerceContentEntityBase implements ProductInterface {
     foreach ($this->getVariations() as $variation) {
       // Return the first active variation.
       if ($variation->isActive() && $variation->access('view')) {
-        return $variation->getTranslation($this->language()->getId());
+        return $variation;
       }
     }
   }

@@ -288,10 +288,7 @@ class ProductVariation extends CommerceContentEntityBase implements ProductVaria
     foreach ($this->getAttributeFieldNames() as $field_name) {
       $field = $this->get($field_name);
       if (!$field->isEmpty()) {
-        /** @var \Drupal\commerce_product\Entity\ProductAttributeValueInterface $entity */
-        $entity = $field->entity;
-        $attribute_value = $entity->getTranslation($this->language()->getId());
-        $attribute_values[$field_name] = $attribute_value;
+        $attribute_values[$field_name] = $field->entity;
       }
     }
 
@@ -360,6 +357,7 @@ class ProductVariation extends CommerceContentEntityBase implements ProductVaria
       // When there are no attribute fields, there's only one variation.
       $title = $product_title;
     }
+
     return $title;
   }
 
