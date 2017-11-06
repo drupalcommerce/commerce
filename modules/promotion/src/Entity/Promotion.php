@@ -418,8 +418,12 @@ class Promotion extends ContentEntityBase implements PromotionInterface {
       return FALSE;
     }
     $end_date = $this->getEndDate();
-    if ($end_date && $end_date->format('U') <= $time) {
-      return FALSE;
+    // Our end dates are inclusive, up to midnight the next day.
+    if ($end_date) {
+      $end_date->modify('tomorrow')->modify('-1 second');
+      if ($end_date->format('U') <= $time) {
+        return FALSE;
+      }
     }
     if ($usage_limit = $this->getUsageLimit()) {
       /** @var \Drupal\commerce_promotion\PromotionUsageInterface $usage */
