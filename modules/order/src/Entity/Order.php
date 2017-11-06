@@ -2,9 +2,9 @@
 
 namespace Drupal\commerce_order\Entity;
 
+use Drupal\commerce\Entity\CommerceContentEntityBase;
 use Drupal\commerce_order\Adjustment;
 use Drupal\commerce_store\Entity\StoreInterface;
-use Drupal\Core\Entity\ContentEntityBase;
 use Drupal\Core\Entity\EntityChangedTrait;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
@@ -68,7 +68,7 @@ use Drupal\profile\Entity\ProfileInterface;
  *   field_ui_base_route = "entity.commerce_order_type.edit_form"
  * )
  */
-class Order extends ContentEntityBase implements OrderInterface {
+class Order extends CommerceContentEntityBase implements OrderInterface {
 
   use EntityChangedTrait;
 
@@ -91,7 +91,7 @@ class Order extends ContentEntityBase implements OrderInterface {
    * {@inheritdoc}
    */
   public function getStore() {
-    return $this->get('store_id')->entity;
+    return $this->getTranslatedReferencedEntity('store_id');
   }
 
   /**
