@@ -73,7 +73,6 @@ class ProductVariationTitleWidget extends ProductVariationWidgetBase implements 
     $product = $form_state->get('product');
     /** @var \Drupal\commerce_product\Entity\ProductVariationInterface[] $variations */
     $variations = $this->variationStorage->loadEnabled($product);
-
     if (count($variations) === 0) {
       // Nothing to purchase, tell the parent form to hide itself.
       $form_state->set('hide_form', TRUE);
@@ -153,8 +152,8 @@ class ProductVariationTitleWidget extends ProductVariationWidgetBase implements 
    *   The selected variation.
    */
   protected function selectVariationFromUserInput(array $variations, array $user_input) {
-    $current_variation = reset($variations);
-    if (!empty($user_input) && !empty($user_input['variation']) && $variations[$user_input['variation']]) {
+    $current_variation = NULL;
+    if (!empty($user_input['variation']) && $variations[$user_input['variation']]) {
       $current_variation = $variations[$user_input['variation']];
     }
 
