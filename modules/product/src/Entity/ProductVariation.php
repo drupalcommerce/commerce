@@ -295,7 +295,7 @@ class ProductVariation extends CommerceContentEntityBase implements ProductVaria
       }
     }
 
-    return $attribute_values;
+    return $this->ensureTranslations($attribute_values);
   }
 
   /**
@@ -306,14 +306,7 @@ class ProductVariation extends CommerceContentEntityBase implements ProductVaria
     if (!in_array($field_name, $attribute_field_names)) {
       throw new \InvalidArgumentException(sprintf('Unknown attribute field name "%s".', $field_name));
     }
-    $attribute_value = NULL;
-    $field = $this->get($field_name);
-    if (!$field->isEmpty()) {
-      /** @var \Drupal\commerce_product\Entity\ProductAttributeValueInterface $entity */
-      $entity = $field->entity;
-      $attribute_value = $entity->getTranslation($this->language()->getId());
-    }
-
+    $attribute_value = $this->getTranslatedReferencedEntity($field_name);
     return $attribute_value;
   }
 

@@ -40,13 +40,11 @@ class CommerceContentEntityBase extends ContentEntityBase implements CommerceCon
       $langcode = $this->language()->getId();
     }
     else {
-      $langcode = $this->languageManager()->getCurrentLanguage(LanguageInterface::TYPE_INTERFACE)->getId();
+      $langcode = $this->languageManager()->getCurrentLanguage(LanguageInterface::TYPE_CONTENT)->getId();
     }
     foreach ($entities as $index => $entity) {
       /** @var \Drupal\Core\Entity\ContentEntityInterface $entity */
-      if ($entity->hasTranslation($langcode)) {
-        $entities[$index] = $entity->getTranslation($langcode);
-      }
+      $entities[$index] = ($entity->hasTranslation($langcode)) ? $entity->getTranslation($langcode) : $entity;
     }
 
     return $entities;
