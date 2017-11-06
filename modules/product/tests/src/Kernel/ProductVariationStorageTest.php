@@ -115,18 +115,26 @@ class ProductVariationStorageTest extends CommerceKernelTestBase {
       'variations' => $variations,
     ]);
     $product->save();
-
     $request = Request::create('');
     $request->query->add([
       'v' => end($variations)->id(),
     ]);
     // Push the request to the request stack so `current_route_match` works.
     $this->container->get('request_stack')->push($request);
-
     $this->assertNotEquals($request->query->get('v'), $product->getDefaultVariation()->id());
-
     $context_variation = $this->variationStorage->loadFromContext($product);
     $this->assertEquals($request->query->get('v'), $context_variation->id());
+
+    // Invalid variation ID returns default variation.
+    $request = Request::create('');
+    $request->query->add([
+      'v' => '1111111',
+    ]);
+    // Push the request to the request stack so `current_route_match` works.
+    $this->container->get('request_stack')->push($request);
+    $this->assertNotEquals($request->query->get('v'), $product->getDefaultVariation()->id());
+    $context_variation = $this->variationStorage->loadFromContext($product);
+    $this->assertEquals($product->getDefaultVariation()->id(), $context_variation->id());
   }
 
 }
