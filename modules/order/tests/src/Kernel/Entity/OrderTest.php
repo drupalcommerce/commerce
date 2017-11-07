@@ -110,6 +110,8 @@ class OrderTest extends CommerceKernelTestBase {
    * @covers ::getAdjustments
    * @covers ::setAdjustments
    * @covers ::addAdjustment
+   * @covers ::removeAdjustment
+   * @covers ::clearAdjustments
    * @covers ::collectAdjustments
    * @covers ::getSubtotalPrice
    * @covers ::recalculateTotalPrice
@@ -124,6 +126,9 @@ class OrderTest extends CommerceKernelTestBase {
    * @covers ::setRefreshState
    * @covers ::getData
    * @covers ::setData
+   * @covers ::isLocked
+   * @covers ::lock
+   * @covers ::unlock
    * @covers ::getCreatedTime
    * @covers ::setCreatedTime
    * @covers ::getPlacedTime
@@ -212,13 +217,14 @@ class OrderTest extends CommerceKernelTestBase {
       'amount' => new Price('-1.00', 'USD'),
     ]);
     $adjustments[] = new Adjustment([
-      'type' => 'custom',
+      'type' => 'fee',
       'label' => 'Handling fee',
       'amount' => new Price('10.00', 'USD'),
+      'locked' => TRUE,
     ]);
     // Included adjustments do not affect the order total.
     $adjustments[] = new Adjustment([
-      'type' => 'custom',
+      'type' => 'tax',
       'label' => 'Tax',
       'amount' => new Price('12.00', 'USD'),
       'included' => TRUE,
@@ -226,7 +232,6 @@ class OrderTest extends CommerceKernelTestBase {
     $order->addAdjustment($adjustments[0]);
     $order->addAdjustment($adjustments[1]);
     $order->addAdjustment($adjustments[2]);
-    $adjustments = $order->getAdjustments();
     $this->assertEquals($adjustments, $order->getAdjustments());
     $collected_adjustments = $order->collectAdjustments();
     $this->assertEquals($adjustments[0]->getAmount(), $collected_adjustments[0]->getAmount());
@@ -243,22 +248,53 @@ class OrderTest extends CommerceKernelTestBase {
     // Add an adjustment to the second order item, confirm it's a part of the
     // order total, multiplied by quantity.
     $order->removeItem($another_order_item);
-    $another_order_item->addAdjustment(new Adjustment([
-      'type' => 'custom',
+    $order_item_adjustments = [];
+    $order_item_adjustments[] = new Adjustment([
+      'type' => 'fee',
       'label' => 'Random fee',
       'amount' => new Price('5.00', 'USD'),
-    ]));
+    ]);
+    $order_item_adjustments[] = new Adjustment([
+      'type' => 'fee',
+      'label' => 'Non-random fee',
+      'amount' => new Price('7.00', 'USD'),
+      'locked' => TRUE,
+    ]);
+    $multiplied_order_item_adjustments = [];
+    $multiplied_order_item_adjustments[] = new Adjustment([
+      'type' => 'fee',
+      'label' => 'Random fee',
+      'amount' => new Price('10.00', 'USD'),
+    ]);
+    $multiplied_order_item_adjustments[] = new Adjustment([
+      'type' => 'fee',
+      'label' => 'Non-random fee',
+      'amount' => new Price('14.00', 'USD'),
+      'locked' => TRUE,
+    ]);
+    $another_order_item->setAdjustments($order_item_adjustments);
     $order->addItem($another_order_item);
+    $this->assertEquals(new Price('41.00', 'USD'), $order->getTotalPrice());
     $collected_adjustments = $order->collectAdjustments();
-    $this->assertEquals(new Price('10.00', 'USD'), $collected_adjustments[2]->getAmount());
-    $this->assertEquals(new Price('27.00', 'USD'), $order->getTotalPrice());
-    $this->assertEquals(new Price('27.00', 'USD'), $order->getBalance());
+    $this->assertEquals($multiplied_order_item_adjustments[0], $collected_adjustments[0]);
+    $this->assertEquals($multiplied_order_item_adjustments[1], $collected_adjustments[1]);
+    // Confirm that locked adjustments persist after clear.
+    // Custom adjustments are locked by default.
+    $order->setAdjustments($adjustments);
+    $order->clearAdjustments();
+    unset($adjustments[2]);
+    unset($multiplied_order_item_adjustments[0]);
+    $this->assertEquals(array_merge($multiplied_order_item_adjustments, $adjustments), $order->collectAdjustments());
+
+    // getBalance
+    $this->assertEquals(new Price('31.00', 'USD'), $order->getTotalPrice());
+    $this->assertEquals(new Price('31.00', 'USD'), $order->getBalance());
 
     // Test that payments update the order total paid and balance.
     $order->save();
     $payment = Payment::create([
       'order_id' => $order->id(),
-      'amount' => new Price('25.00', 'USD'),
+      'amount' => new Price('29.00', 'USD'),
       'payment_gateway' => 'example',
       'state' => 'completed',
     ]);
@@ -270,10 +306,10 @@ class OrderTest extends CommerceKernelTestBase {
     $this->assertEquals(new Price('7.00', 'USD'), $order->getBalance());
     $payment->delete();
     $order = Order::load($order->id());
-    $this->assertEquals(new Price('27.00', 'USD'), $order->getBalance());
+    $this->assertEquals(new Price('31.00', 'USD'), $order->getBalance());
     $payment2 = Payment::create([
       'order_id' => $order->id(),
-      'amount' => new Price('27.00', 'USD'),
+      'amount' => new Price('31.00', 'USD'),
       'payment_gateway' => 'example',
       'state' => 'completed',
     ]);
@@ -292,7 +328,7 @@ class OrderTest extends CommerceKernelTestBase {
     // Test that the total paid amount can be set explicitly on the order.
     $order->setTotalPaid(new Price('0.00', 'USD'));
     $order->save();
-    $this->assertEquals(new Price('27.00', 'USD'), $order->getBalance());
+    $this->assertEquals(new Price('31.00', 'USD'), $order->getBalance());
 
     // Test that payments only substract total when setting to completed.
     $order->save();
@@ -309,12 +345,13 @@ class OrderTest extends CommerceKernelTestBase {
     $payment->save();
     $order = Order::load($order->id());
     $this->assertEquals(new Price('25.00', 'USD'), $order->getTotalPaid());
-    $this->assertEquals(new Price('2.00', 'USD'), $order->getBalance());
+    $this->assertEquals(new Price('6.00', 'USD'), $order->getBalance());
 
     // Test that deleted payments update the order total paid and balance.
     $payment->delete();
     $order = Order::load($order->id());
     $this->assertEquals(new Price('0.00', 'USD'), $order->getTotalPaid());
+    // finish getBalance
 
     $this->assertEquals('completed', $order->getState()->value);
 
@@ -324,6 +361,12 @@ class OrderTest extends CommerceKernelTestBase {
     $this->assertEquals('default', $order->getData('test', 'default'));
     $order->setData('test', 'value');
     $this->assertEquals('value', $order->getData('test', 'default'));
+
+    $this->assertFalse($order->isLocked());
+    $order->lock();
+    $this->assertTrue($order->isLocked());
+    $order->unlock();
+    $this->assertFalse($order->isLocked());
 
     $order->setCreatedTime(635879700);
     $this->assertEquals(635879700, $order->getCreatedTime());

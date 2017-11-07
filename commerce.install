@@ -10,7 +10,7 @@
  */
 function commerce_requirements($phase) {
   $requirements = [];
-  if ($phase == 'install') {
+  if ($phase == 'install' || $phase == 'runtime') {
     if (!extension_loaded('bcmath')) {
       $requirements['commerce'] = [
         'description' => t('Commerce requires the bcmath PHP extension.'),

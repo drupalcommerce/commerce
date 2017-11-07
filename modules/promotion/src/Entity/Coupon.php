@@ -21,6 +21,7 @@ use Drupal\Core\Entity\EntityTypeInterface;
  *     plural = "@count coupons",
  *   ),
  *   handlers = {
+ *     "event" = "Drupal\commerce_promotion\Event\CouponEvent",
  *     "list_builder" = "Drupal\commerce_promotion\CouponListBuilder",
  *     "storage" = "Drupal\commerce_promotion\CouponStorage",
  *     "access" = "Drupal\commerce_promotion\CouponAccessControlHandler",

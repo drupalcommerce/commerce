@@ -3,8 +3,7 @@
 namespace Drupal\commerce_promotion;
 
 use Drupal\commerce\CommerceContentEntityStorage;
-use Drupal\commerce_order\Entity\OrderTypeInterface;
-use Drupal\commerce_store\Entity\StoreInterface;
+use Drupal\commerce_order\Entity\OrderInterface;
 use Drupal\Component\Datetime\TimeInterface;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Database\Connection;
@@ -79,15 +78,15 @@ class PromotionStorage extends CommerceContentEntityStorage implements Promotion
   /**
    * {@inheritdoc}
    */
-  public function loadAvailable(OrderTypeInterface $order_type, StoreInterface $store) {
+  public function loadAvailable(OrderInterface $order) {
     $today = gmdate('Y-m-d', $this->time->getRequestTime());
     $query = $this->getQuery();
     $or_condition = $query->orConditionGroup()
       ->condition('end_date', $today, '>=')
       ->notExists('end_date', $today);
     $query
-      ->condition('stores', [$store->id()], 'IN')
-      ->condition('order_types', [$order_type->id()], 'IN')
+      ->condition('stores', [$order->getStoreId()], 'IN')
+      ->condition('order_types', [$order->bundle()], 'IN')
       ->condition('start_date', $today, '<=')
       ->condition('status', TRUE)
       ->condition($or_condition);

@@ -11,9 +11,17 @@ commerce.commerce_condition.plugin.order_currency:
     currencies:
       type: sequence
       label: 'Currencies'
+      orderby: value
       sequence:
         type: string
         label: 'Currency'
+
+commerce.commerce_condition.plugin.order_email:
+  type: commerce_condition_configuration
+  mapping:
+    mail:
+      type: string
+      label: 'Email'
 
 commerce.commerce_condition.plugin.order_customer_role:
   type: commerce_condition_configuration
@@ -21,6 +29,7 @@ commerce.commerce_condition.plugin.order_customer_role:
     roles:
       type: sequence
       label: 'Roles'
+      orderby: value
       sequence:
         type: string
         label: 'Role'
@@ -41,6 +50,7 @@ commerce.commerce_condition.plugin.order_store:
     stores:
       type: sequence
       label: 'Stores'
+      orderby: value
       sequence:
         type: string
         label: 'Store'

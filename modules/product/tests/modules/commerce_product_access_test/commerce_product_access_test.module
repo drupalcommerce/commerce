@@ -1,0 +1,23 @@
+<?php
+
+/**
+ * @file
+ * Module file for commerce_product_access_test.
+ */
+
+use Drupal\commerce_product\Entity\ProductVariationInterface;
+use Drupal\Core\Access\AccessResult;
+use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Session\AccountInterface;
+
+/**
+ * Implements hook_entity_access().
+ */
+function commerce_product_access_test_entity_access(EntityInterface $entity, $operation, AccountInterface $account) {
+  if ($entity instanceof ProductVariationInterface) {
+    if ($operation == 'view') {
+      return AccessResult::forbiddenIf(strpos($entity->getSku(), 'DENY') !== FALSE);
+    }
+  }
+  return AccessResult::neutral();
+}

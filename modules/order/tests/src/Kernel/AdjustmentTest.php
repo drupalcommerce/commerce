@@ -117,6 +117,7 @@ class AdjustmentTest extends CommerceKernelTestBase {
    * @covers ::getPercentage
    * @covers ::getSourceId
    * @covers ::isIncluded
+   * @covers ::isLocked
    */
   public function testAdjustmentMethods() {
     $definition = [
@@ -126,6 +127,7 @@ class AdjustmentTest extends CommerceKernelTestBase {
       'percentage' => '0.1',
       'source_id' => '1',
       'included' => TRUE,
+      'locked' => TRUE,
     ];
 
     $adjustment = new Adjustment($definition);
@@ -138,6 +140,7 @@ class AdjustmentTest extends CommerceKernelTestBase {
     $this->assertEquals('0.1', $adjustment->getPercentage());
     $this->assertEquals('1', $adjustment->getSourceId());
     $this->assertTrue($adjustment->isIncluded());
+    $this->assertTrue($adjustment->isLocked());
   }
 
 }
