@@ -286,7 +286,6 @@ class OrderTest extends CommerceKernelTestBase {
     unset($multiplied_order_item_adjustments[0]);
     $this->assertEquals(array_merge($multiplied_order_item_adjustments, $adjustments), $order->collectAdjustments());
 
-    // getBalance
     $this->assertEquals(new Price('31.00', 'USD'), $order->getTotalPrice());
     $this->assertEquals(new Price('31.00', 'USD'), $order->getBalance());
 
@@ -351,7 +350,6 @@ class OrderTest extends CommerceKernelTestBase {
     $payment->delete();
     $order = Order::load($order->id());
     $this->assertEquals(new Price('0.00', 'USD'), $order->getTotalPaid());
-    // finish getBalance
 
     $this->assertEquals('completed', $order->getState()->value);
 
