@@ -90,8 +90,7 @@ class CartOrderPlacedTest extends CommerceKernelTestBase {
     $this->installCommerceCart();
 
     $this->store = $this->createStore();
-    $customer = $this->createUser();
-    $cart_order = $this->container->get('commerce_cart.cart_provider')->createCart('default', $this->store, $customer);
+    $cart_order = $this->container->get('commerce_cart.cart_provider')->createCart('default', $this->store, $this->user);
     $this->cartManager = $this->container->get('commerce_cart.cart_manager');
     $this->cartManager->addEntity($cart_order, $this->variation);
 

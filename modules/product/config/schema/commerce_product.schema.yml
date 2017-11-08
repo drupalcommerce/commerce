@@ -16,6 +16,7 @@ commerce.commerce_condition.plugin.order_item_product_type:
     product_types:
       type: sequence
       label: 'Product types'
+      orderby: value
       sequence:
         type: string
         label: 'Product type'
@@ -26,6 +27,7 @@ commerce.commerce_condition.plugin.order_item_variation_type:
     variation_types:
       type: sequence
       label: 'Product variation types'
+      orderby: value
       sequence:
         type: string
         label: 'Product variation type'
@@ -88,6 +90,7 @@ field.formatter.settings.commerce_product_attributes_overview:
     attributes:
       type: sequence
       label: 'Attributes to render.'
+      orderby: value
       sequence:
         type: string
         label: 'Attribute ID'

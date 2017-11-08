@@ -310,7 +310,7 @@ interface OrderInterface extends ContentEntityInterface, EntityAdjustableInterfa
   public function setTotalPaid(Price $amount);
 
   /**
-   * Gets the remaining amount unpaid on the order.
+   * Gets the amount unpaid on the order.
    *
    * @return \Drupal\commerce_price\Price|null
    *   The total order amount minus the total paid, or NULL.
@@ -372,6 +372,28 @@ interface OrderInterface extends ContentEntityInterface, EntityAdjustableInterfa
    * @return $this
    */
   public function setData($key, $value);
+
+  /**
+   * Gets whether the order is locked.
+   *
+   * @return bool
+   *   TRUE if the order is locked, FALSE otherwise.
+   */
+  public function isLocked();
+
+  /**
+   * Locks the order.
+   *
+   * @return $this
+   */
+  public function lock();
+
+  /**
+   * Unlocks the order.
+   *
+   * @return $this
+   */
+  public function unlock();
 
   /**
    * Gets the order creation timestamp.

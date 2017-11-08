@@ -246,7 +246,7 @@ class UsageTest extends CommerceKernelTestBase {
     $this->assertEquals(1, $usage);
 
     $order_type = OrderType::load($this->order->bundle());
-    $valid_promotions = $this->promotionStorage->loadAvailable($order_type, $this->store);
+    $valid_promotions = $this->promotionStorage->loadAvailable($this->order);
     $this->assertEmpty($valid_promotions);
   }
 

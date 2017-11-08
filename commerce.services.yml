@@ -1,8 +1,4 @@
 services:
-  commerce.bundle_plugin_installer:
-    class: Drupal\commerce\BundlePluginInstaller
-    arguments: ['@entity_type.manager', '@entity_bundle.listener', '@field_storage_definition.listener', '@field_definition.listener']
-
   commerce.configurable_field_manager:
     class: Drupal\commerce\ConfigurableFieldManager
     arguments: ['@entity_type.manager']

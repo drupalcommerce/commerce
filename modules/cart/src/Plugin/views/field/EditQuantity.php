@@ -155,7 +155,9 @@ class EditQuantity extends FieldPluginBase {
       if ($order_item->getQuantity() != $quantity) {
         $order_item->setQuantity($quantity);
         $order = $order_item->getOrder();
-        $this->cartManager->updateOrderItem($order, $order_item);
+        $this->cartManager->updateOrderItem($order, $order_item, FALSE);
+        // Tells commerce_cart_order_item_views_form_submit() to save the order.
+        $form_state->set('quantity_updated', TRUE);
       }
     }
   }

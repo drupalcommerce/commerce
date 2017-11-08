@@ -2,10 +2,10 @@
 
 namespace Drupal\commerce_product\Entity;
 
+use Drupal\commerce\Entity\CommerceContentEntityBase;
 use Drupal\commerce\EntityHelper;
 use Drupal\commerce_price\Price;
 use Drupal\Core\Cache\Cache;
-use Drupal\Core\Entity\ContentEntityBase;
 use Drupal\Core\Entity\EntityChangedTrait;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
@@ -57,7 +57,7 @@ use Drupal\user\UserInterface;
  *   field_ui_base_route = "entity.commerce_product_variation_type.edit_form",
  * )
  */
-class ProductVariation extends ContentEntityBase implements ProductVariationInterface {
+class ProductVariation extends CommerceContentEntityBase implements ProductVariationInterface {
 
   use EntityChangedTrait;
 
@@ -91,7 +91,7 @@ class ProductVariation extends ContentEntityBase implements ProductVariationInte
    * {@inheritdoc}
    */
   public function getProduct() {
-    return $this->get('product_id')->entity;
+    return $this->getTranslatedReferencedEntity('product_id');
   }
 
   /**
@@ -292,7 +292,7 @@ class ProductVariation extends ContentEntityBase implements ProductVariationInte
       }
     }
 
-    return $attribute_values;
+    return $this->ensureTranslations($attribute_values);
   }
 
   /**
@@ -303,12 +303,7 @@ class ProductVariation extends ContentEntityBase implements ProductVariationInte
     if (!in_array($field_name, $attribute_field_names)) {
       throw new \InvalidArgumentException(sprintf('Unknown attribute field name "%s".', $field_name));
     }
-    $attribute_value = NULL;
-    $field = $this->get($field_name);
-    if (!$field->isEmpty()) {
-      $attribute_value = $field->entity;
-    }
-
+    $attribute_value = $this->getTranslatedReferencedEntity($field_name);
     return $attribute_value;
   }
 
@@ -395,11 +390,6 @@ class ProductVariation extends ContentEntityBase implements ProductVariationInte
       ->setRequired(TRUE)
       ->addConstraint('ProductVariationSku')
       ->setSetting('display_description', TRUE)
-      ->setDisplayOptions('view', [
-        'label' => 'hidden',
-        'type' => 'string',
-        'weight' => -4,
-      ])
       ->setDisplayOptions('form', [
         'type' => 'string_textfield',
         'weight' => -4,
@@ -415,11 +405,6 @@ class ProductVariation extends ContentEntityBase implements ProductVariationInte
       ->setSettings([
         'default_value' => '',
         'max_length' => 255,
-      ])
-      ->setDisplayOptions('view', [
-        'label' => 'hidden',
-        'type' => 'string',
-        'weight' => -5,
       ])
       ->setDisplayOptions('form', [
         'type' => 'string_textfield',

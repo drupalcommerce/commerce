@@ -9,6 +9,8 @@ commerce_config_entity_bundle:
       label: 'Label'
     traits:
       type: sequence
+      label: 'Traits'
+      orderby: value
       sequence:
         type: string
 
@@ -34,6 +36,7 @@ commerce.commerce_condition.plugin.entity_bundle:
     bundles:
       type: sequence
       label: 'Bundles'
+      orderby: value
       sequence:
         type: string
         label: 'Bundle'
@@ -56,6 +59,7 @@ field.widget.settings.commerce_conditions:
     entity_types:
       type: sequence
       label: 'Entity types'
+      orderby: value
       sequence:
         type: string
 

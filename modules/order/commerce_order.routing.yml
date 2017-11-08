@@ -26,6 +26,13 @@ entity.commerce_order.reassign_form:
   requirements:
     _permission: 'administer commerce_order'
 
+entity.commerce_order.unlock_form:
+  path: '/admin/commerce/orders/{commerce_order}/unlock'
+  defaults:
+    _entity_form: 'commerce_order.unlock'
+  requirements:
+    _entity_access: 'commerce_order.unlock'
+
 entity.commerce_order.user_view:
   path: '/user/{user}/orders/{commerce_order}'
   defaults:
