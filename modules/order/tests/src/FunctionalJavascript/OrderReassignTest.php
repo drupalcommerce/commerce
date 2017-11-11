@@ -3,7 +3,6 @@
 namespace Drupal\Tests\commerce_order\FunctionalJavascript;
 
 use Drupal\commerce_order\Entity\Order;
-use Drupal\commerce_store\StoreCreationTrait;
 use Drupal\Tests\commerce\Functional\CommerceBrowserTestBase;
 use Drupal\Tests\commerce\FunctionalJavascript\JavascriptTestTrait;
 
@@ -14,7 +13,6 @@ use Drupal\Tests\commerce\FunctionalJavascript\JavascriptTestTrait;
  */
 class OrderReassignTest extends CommerceBrowserTestBase {
 
-  use StoreCreationTrait;
   use JavascriptTestTrait;
 
   /**
@@ -39,14 +37,6 @@ class OrderReassignTest extends CommerceBrowserTestBase {
   }
 
   /**
-   * {@inheritdoc}
-   */
-  protected function setUp() {
-    parent::setUp();
-    $this->createStore();
-  }
-
-  /**
    * Tests the reassign form with a new user.
    */
   public function testOrderReassign() {
@@ -63,9 +53,10 @@ class OrderReassignTest extends CommerceBrowserTestBase {
       'mail' => $this->loggedInUser->getEmail(),
       'uid' => $this->loggedInUser->id(),
       'order_items' => [$order_item],
+      'store_id' => $this->store,
     ]);
 
-    $this->assertTrue($order->hasLinkTemplate('reassign-form'));
+    $this->assertNotEmpty($order->hasLinkTemplate('reassign-form'));
 
     $this->drupalGet($order->toUrl('reassign-form'));
     $this->getSession()->getPage()->fillField('customer_type', 'new');

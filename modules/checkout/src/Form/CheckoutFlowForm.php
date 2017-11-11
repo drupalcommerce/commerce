@@ -4,7 +4,6 @@ namespace Drupal\commerce_checkout\Form;
 
 use Drupal\commerce\Form\CommercePluginEntityFormBase;
 use Drupal\commerce_checkout\CheckoutFlowManager;
-use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -43,9 +42,14 @@ class CheckoutFlowForm extends CommercePluginEntityFormBase {
     $form = parent::form($form, $form_state);
     /** @var \Drupal\commerce_checkout\Entity\CheckoutFlowInterface $checkout_flow */
     $checkout_flow = $this->entity;
-    $plugins = array_map(function ($definition) {
-      return $definition['label'];
-    }, $this->pluginManager->getDefinitions());
+    $plugins = array_column($this->pluginManager->getDefinitions(), 'label', 'id');
+    asort($plugins);
+    // Use the first available plugin as the default value.
+    if (!$checkout_flow->getPluginId()) {
+      $plugin_ids = array_keys($plugins);
+      $plugin = reset($plugin_ids);
+      $checkout_flow->setPluginId($plugin);
+    }
 
     $form['#tree'] = TRUE;
     $form['#attached']['library'][] = 'commerce_checkout/admin';
@@ -64,7 +68,7 @@ class CheckoutFlowForm extends CommercePluginEntityFormBase {
       ],
     ];
     $form['plugin'] = [
-      '#type' => 'select',
+      '#type' => 'radios',
       '#title' => $this->t('Plugin'),
       '#options' => $plugins,
       '#default_value' => $checkout_flow->getPluginId(),
@@ -79,18 +83,6 @@ class CheckoutFlowForm extends CommercePluginEntityFormBase {
     }
 
     return $this->protectPluginIdElement($form);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  protected function copyFormValuesToEntity(EntityInterface $entity, array $form, FormStateInterface $form_state) {
-    /** @var \Drupal\commerce_checkout\Entity\CheckoutFlowInterface $entity */
-    // The parent method tries to initialize the plugin collection before
-    // setting the plugin.
-    $entity->setPluginId($form_state->getValue('plugin'));
-
-    parent::copyFormValuesToEntity($entity, $form, $form_state);
   }
 
   /**

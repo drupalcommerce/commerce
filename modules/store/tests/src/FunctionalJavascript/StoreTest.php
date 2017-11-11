@@ -3,7 +3,6 @@
 namespace Drupal\Tests\commerce_store\FunctionalJavascript;
 
 use Drupal\commerce_store\Entity\Store;
-use Drupal\commerce_store\StoreCreationTrait;
 use Drupal\Tests\commerce\Functional\CommerceBrowserTestBase;
 use Drupal\Tests\commerce\FunctionalJavascript\JavascriptTestTrait;
 
@@ -14,15 +13,7 @@ use Drupal\Tests\commerce\FunctionalJavascript\JavascriptTestTrait;
  */
 class StoreTest extends CommerceBrowserTestBase {
 
-  use StoreCreationTrait;
   use JavascriptTestTrait;
-
-  /**
-   * Modules to enable.
-   *
-   * @var array
-   */
-  public static $modules = ['block', 'commerce_store'];
 
   /**
    * A store type entity to use in the tests.
@@ -36,8 +27,6 @@ class StoreTest extends CommerceBrowserTestBase {
    */
   protected function getAdministratorPermissions() {
     return array_merge([
-      'administer commerce_store_type',
-      'administer commerce_store',
       'access commerce_store overview',
     ], parent::getAdministratorPermissions());
   }
@@ -46,19 +35,19 @@ class StoreTest extends CommerceBrowserTestBase {
    * Tests creating a store.
    */
   public function testCreateStore() {
-    $this->drupalGet('admin/commerce/stores');
+    $this->drupalGet('admin/commerce/config/stores');
     $this->getSession()->getPage()->clickLink('Add store');
 
     // Check the integrity of the form.
     $this->assertSession()->fieldExists('name[0][value]');
     $this->assertSession()->fieldExists('mail[0][value]');
-    $this->assertSession()->fieldExists('address[0][country_code]');
+    $this->assertSession()->fieldExists('address[0][address][country_code]');
     $this->assertSession()->fieldExists('billing_countries[]');
     $this->assertSession()->fieldExists('uid[0][target_id]');
     $this->assertSession()->fieldExists('default');
 
-    $this->getSession()->getPage()->fillField('address[0][country_code]', 'US');
-    $this->getSession()->wait(4000, 'jQuery(\'select[name="address[0][administrative_area]"]\').length > 0 && jQuery.active == 0;');
+    $this->getSession()->getPage()->fillField('address[0][address][country_code]', 'US');
+    $this->getSession()->wait(4000, 'jQuery(\'select[name="address[0][address][administrative_area]"]\').length > 0 && jQuery.active == 0;');
 
     $name = $this->randomMachineName(8);
     $edit = [
@@ -73,7 +62,7 @@ class StoreTest extends CommerceBrowserTestBase {
       'postal_code' => '94043',
     ];
     foreach ($address as $property => $value) {
-      $path = 'address[0][' . $property . ']';
+      $path = 'address[0][address][' . $property . ']';
       $edit[$path] = $value;
     }
     $this->submitForm($edit, t('Save'));
@@ -112,7 +101,7 @@ class StoreTest extends CommerceBrowserTestBase {
 
     \Drupal::service('entity_type.manager')->getStorage('commerce_store')->resetCache([$store->id()]);
     $store_exists = (bool) Store::load($store->id());
-    $this->assertFalse($store_exists, 'The new store has been deleted from the database using UI.');
+    $this->assertEmpty($store_exists, 'The new store has been deleted from the database using UI.');
   }
 
 }

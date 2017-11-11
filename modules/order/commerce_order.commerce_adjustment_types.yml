@@ -1,0 +1,19 @@
+custom:
+  label: Custom
+  has_ui: true
+  weight: 10
+
+fee:
+  label: Fee
+  has_ui: true
+  weight: 70
+
+promotion:
+  label: Promotion
+  has_ui: true
+  weight: 0
+
+tax:
+  label: Tax
+  has_ui: true
+  weight: 50

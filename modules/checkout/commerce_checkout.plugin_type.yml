@@ -1,0 +1,13 @@
+commerce_checkout.checkout_flow:
+  label: Commerce checkout flow
+  provider: commerce_checkout
+  plugin_manager_service_id: plugin.manager.commerce_checkout_flow
+  plugin_configuration_schema_id: commerce_checkout.commerce_checkout_flow.[id]
+  plugin_definition_decorator_class: Drupal\plugin\PluginDefinition\ArrayPluginDefinitionDecorator
+
+commerce_checkout.checkout_pane:
+  label: Commerce checkout pane
+  provider: commerce_checkout
+  plugin_manager_service_id: plugin.manager.commerce_checkout_pane
+  plugin_configuration_schema_id: commerce_checkout.commerce_checkout_pane.[id]
+  plugin_definition_decorator_class: Drupal\plugin\PluginDefinition\ArrayPluginDefinitionDecorator

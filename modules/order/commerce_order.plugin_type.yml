@@ -1,0 +1,5 @@
+commerce_order.adjustment_type:
+  label: Commerce adjustment type
+  provider: commerce_order
+  plugin_manager_service_id: plugin.manager.commerce_adjustment_type
+  plugin_definition_decorator_class: Drupal\plugin\PluginDefinition\ArrayPluginDefinitionDecorator

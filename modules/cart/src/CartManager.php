@@ -68,8 +68,10 @@ class CartManager implements CartManagerInterface {
       $order_item->delete();
     }
     $cart->setItems([]);
+    $cart->setAdjustments([]);
 
     $this->eventDispatcher->dispatch(CartEvents::CART_EMPTY, new CartEmptyEvent($cart, $order_items));
+    $this->resetCheckoutStep($cart);
     if ($save_cart) {
       $cart->save();
     }
@@ -80,7 +82,7 @@ class CartManager implements CartManagerInterface {
    */
   public function addEntity(OrderInterface $cart, PurchasableEntityInterface $entity, $quantity = 1, $combine = TRUE, $save_cart = TRUE) {
     $order_item = $this->createOrderItem($entity, $quantity);
-    return $this->addOrderItem($cart, $order_item, $combine);
+    return $this->addOrderItem($cart, $order_item, $combine, $save_cart);
   }
 
   /**
@@ -104,36 +106,44 @@ class CartManager implements CartManagerInterface {
     if ($combine) {
       $matching_order_item = $this->orderItemMatcher->match($order_item, $cart->getItems());
     }
-    $needs_cart_save = FALSE;
     if ($matching_order_item) {
       $new_quantity = Calculator::add($matching_order_item->getQuantity(), $quantity);
       $matching_order_item->setQuantity($new_quantity);
       $matching_order_item->save();
+      $saved_order_item = $matching_order_item;
     }
     else {
       $order_item->save();
       $cart->addItem($order_item);
-      $needs_cart_save = TRUE;
+      $saved_order_item = $order_item;
     }
 
-    $event = new CartEntityAddEvent($cart, $purchased_entity, $quantity, $order_item);
-    $this->eventDispatcher->dispatch(CartEvents::CART_ENTITY_ADD, $event);
-    if ($needs_cart_save && $save_cart) {
+    if ($purchased_entity) {
+      $event = new CartEntityAddEvent($cart, $purchased_entity, $quantity, $saved_order_item);
+      $this->eventDispatcher->dispatch(CartEvents::CART_ENTITY_ADD, $event);
+    }
+
+    $this->resetCheckoutStep($cart);
+    if ($save_cart) {
       $cart->save();
     }
 
-    return $order_item;
+    return $saved_order_item;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function updateOrderItem(OrderInterface $cart, OrderItemInterface $order_item) {
+  public function updateOrderItem(OrderInterface $cart, OrderItemInterface $order_item, $save_cart = TRUE) {
     /** @var \Drupal\commerce_order\Entity\OrderItemInterface $original_order_item */
     $original_order_item = $this->orderItemStorage->loadUnchanged($order_item->id());
     $order_item->save();
     $event = new CartOrderItemUpdateEvent($cart, $order_item, $original_order_item);
     $this->eventDispatcher->dispatch(CartEvents::CART_ORDER_ITEM_UPDATE, $event);
+    $this->resetCheckoutStep($cart);
+    if ($save_cart) {
+      $cart->save();
+    }
   }
 
   /**
@@ -143,8 +153,21 @@ class CartManager implements CartManagerInterface {
     $order_item->delete();
     $cart->removeItem($order_item);
     $this->eventDispatcher->dispatch(CartEvents::CART_ORDER_ITEM_REMOVE, new CartOrderItemRemoveEvent($cart, $order_item));
+    $this->resetCheckoutStep($cart);
     if ($save_cart) {
       $cart->save();
+    }
+  }
+
+  /**
+   * Resets the checkout step.
+   *
+   * @param \Drupal\commerce_order\Entity\OrderInterface $cart
+   *   The cart order.
+   */
+  protected function resetCheckoutStep(OrderInterface $cart) {
+    if ($cart->hasField('checkout_step')) {
+      $cart->set('checkout_step', '');
     }
   }
 

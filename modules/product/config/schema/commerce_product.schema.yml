@@ -1,13 +1,41 @@
+commerce.commerce_condition.plugin.order_item_product:
+  type: commerce_condition_configuration
+  mapping:
+    products:
+      type: sequence
+      label: 'Products'
+      sequence:
+        type: mapping
+        mapping:
+          product_id:
+            type: integer
+
+commerce.commerce_condition.plugin.order_item_product_type:
+  type: commerce_condition_configuration
+  mapping:
+    product_types:
+      type: sequence
+      label: 'Product types'
+      orderby: value
+      sequence:
+        type: string
+        label: 'Product type'
+
+commerce.commerce_condition.plugin.order_item_variation_type:
+  type: commerce_condition_configuration
+  mapping:
+    variation_types:
+      type: sequence
+      label: 'Product variation types'
+      orderby: value
+      sequence:
+        type: string
+        label: 'Product variation type'
+
 commerce_product.commerce_product_type.*:
-  type: config_entity
+  type: commerce_config_entity_bundle
   label: 'Product type'
   mapping:
-    id:
-      type: string
-      label: 'ID'
-    label:
-      type: label
-      label: 'Label'
     description:
       type: text
       label: 'Description'
@@ -19,18 +47,12 @@ commerce_product.commerce_product_type.*:
       label: 'Inject product variation fields into the rendered product'
 
 commerce_product.commerce_product_variation_type.*:
-  type: config_entity
+  type: commerce_config_entity_bundle
   label: 'Product variation type'
   mapping:
-    id:
-      type: string
-      label: 'ID'
-    label:
-      type: label
-      label: 'Label'
     orderItemType:
       type: string
-      label: 'order item type'
+      label: 'Order item type'
     generateTitle:
       type: boolean
       label: 'Generate variation titles based on attribute values'
@@ -68,6 +90,7 @@ field.formatter.settings.commerce_product_attributes_overview:
     attributes:
       type: sequence
       label: 'Attributes to render.'
+      orderby: value
       sequence:
         type: string
         label: 'Attribute ID'

@@ -7,7 +7,7 @@ use Drupal\Component\Annotation\Plugin;
 /**
  * Defines the promotion offer plugin annotation object.
  *
- * Plugin namespace: Plugin\Commerce\CommercePromotionOffer.
+ * Plugin namespace: Plugin\Commerce\PromotionOffer.
  *
  * @Annotation
  */
@@ -30,30 +30,13 @@ class CommercePromotionOffer extends Plugin {
   public $label;
 
   /**
-   * An array of context definitions describing the context used by the plugin.
+   * The offer entity type ID.
    *
-   * The array is keyed by context names.
-   *
-   * @var \Drupal\Core\Annotation\ContextDefinition[]
-   */
-  public $context = [];
-
-  /**
-   * The target entity type this action applies to.
-   *
-   * For example, this should be 'commerce_order' or 'commerce_order_item'.
+   * This is the entity type ID of the entity passed to the plugin during execution.
+   * For example: 'commerce_order'.
    *
    * @var string
    */
-  public $target_entity_type;
-
-  /**
-   * The category under which the offer should listed in the UI.
-   *
-   * @var \Drupal\Core\Annotation\Translation
-   *
-   * @ingroup plugin_translatable
-   */
-  public $category;
+  public $entity_type;
 
 }

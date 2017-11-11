@@ -15,10 +15,8 @@ interface ChainLocaleResolverInterface extends LocaleResolverInterface {
    *
    * @param \Drupal\commerce\Resolver\LocaleResolverInterface $resolver
    *   The resolver.
-   * @param int $priority
-   *   The priority.
    */
-  public function addResolver(LocaleResolverInterface $resolver, $priority);
+  public function addResolver(LocaleResolverInterface $resolver);
 
   /**
    * Gets all added resolvers.

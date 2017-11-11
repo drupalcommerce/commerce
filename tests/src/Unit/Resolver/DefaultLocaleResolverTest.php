@@ -29,7 +29,7 @@ class DefaultLocaleResolverTest extends UnitTestCase {
       ->method('getConfigOverrideLanguage')
       ->will($this->returnValue($language));
 
-    $country_context = $this->getMockBuilder('\Drupal\commerce\CountryContext')
+    $country_context = $this->getMockBuilder('\Drupal\commerce\CurrentCountry')
       ->disableOriginalConstructor()
       ->getMock();
     $country_context->expects($this->once())
@@ -58,7 +58,7 @@ class DefaultLocaleResolverTest extends UnitTestCase {
       ->method('getConfigOverrideLanguage')
       ->will($this->returnValue($language));
 
-    $country_context = $this->getMockBuilder('\Drupal\commerce\CountryContext')
+    $country_context = $this->getMockBuilder('\Drupal\commerce\CurrentCountry')
       ->disableOriginalConstructor()
       ->getMock();
 
@@ -84,7 +84,7 @@ class DefaultLocaleResolverTest extends UnitTestCase {
       ->method('getConfigOverrideLanguage')
       ->will($this->returnValue($language));
 
-    $country_context = $this->getMockBuilder('\Drupal\commerce\CountryContext')
+    $country_context = $this->getMockBuilder('\Drupal\commerce\CurrentCountry')
       ->disableOriginalConstructor()
       ->getMock();
     $country_context->expects($this->once())

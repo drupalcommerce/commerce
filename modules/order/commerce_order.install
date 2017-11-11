@@ -1,0 +1,49 @@
+<?php
+
+/**
+ * @file
+ * Install, update and uninstall functions for the Order module.
+ */
+
+use Drupal\Core\Field\BaseFieldDefinition;
+
+/**
+ * Add the 'data' field to 'commerce_order_item' entities.
+ */
+function commerce_order_update_8201() {
+  $storage_definition = BaseFieldDefinition::create('map')
+    ->setLabel(t('Data'))
+    ->setDescription(t('A serialized array of additional data.'));
+
+  $update_manager = \Drupal::entityDefinitionUpdateManager();
+  $update_manager->installFieldStorageDefinition('data', 'commerce_order_item', 'commerce_order', $storage_definition);
+}
+
+/**
+ * Add the 'overridden_unit_price' field to 'commerce_order_item' entities.
+ */
+function commerce_order_update_8202() {
+  $storage_definition = BaseFieldDefinition::create('boolean')
+    ->setLabel(t('Overridden unit price'))
+    ->setDescription(t('Whether the unit price is overridden.'))
+    ->setDefaultValue(FALSE);
+
+  $update_manager = \Drupal::entityDefinitionUpdateManager();
+  $update_manager->installFieldStorageDefinition('overridden_unit_price', 'commerce_order_item', 'commerce_order', $storage_definition);
+}
+
+/**
+ * Add the 'locked' field to 'commerce_order' entities.
+ */
+function commerce_order_update_8203() {
+  $storage_definition = BaseFieldDefinition::create('boolean')
+    ->setLabel(t('Locked'))
+    ->setSettings([
+      'on_label' => t('Yes'),
+      'off_label' => t('No'),
+    ])
+    ->setDefaultValue(FALSE);
+
+  $update_manager = \Drupal::entityDefinitionUpdateManager();
+  $update_manager->installFieldStorageDefinition('locked', 'commerce_order', 'commerce_order', $storage_definition);
+}

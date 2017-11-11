@@ -7,7 +7,7 @@ use Drupal\commerce_order\Entity\OrderInterface;
 use Drupal\commerce_order\Entity\OrderItemType;
 use Drupal\commerce_store\Entity\Store;
 use Drupal\commerce_store\Entity\StoreType;
-use Drupal\KernelTests\Core\Entity\EntityKernelTestBase;
+use Drupal\Tests\commerce\Kernel\CommerceKernelTestBase;
 
 /**
  * Tests the cart provider.
@@ -15,7 +15,7 @@ use Drupal\KernelTests\Core\Entity\EntityKernelTestBase;
  * @coversDefaultClass \Drupal\commerce_cart\CartProvider
  * @group commerce
  */
-class CartProviderTest extends EntityKernelTestBase {
+class CartProviderTest extends CommerceKernelTestBase {
 
   /**
    * Modules to enable.
@@ -23,27 +23,13 @@ class CartProviderTest extends EntityKernelTestBase {
    * @var array
    */
   public static $modules = [
-    'options',
-    'entity',
     'entity_reference_revisions',
-    'views',
-    'address',
+    'path',
     'profile',
     'state_machine',
-    'inline_entity_form',
-    'commerce',
-    'commerce_price',
-    'commerce_store',
     'commerce_product',
     'commerce_order',
   ];
-
-  /**
-   * The store.
-   *
-   * @var \Drupal\commerce_store\Entity\StoreInterface
-   */
-  protected $store;
 
   /**
    * Anonymous user.
@@ -71,9 +57,8 @@ class CartProviderTest extends EntityKernelTestBase {
    */
   protected function setUp() {
     parent::setUp();
-    $this->installSchema('system', 'router');
+
     $this->installEntitySchema('profile');
-    $this->installEntitySchema('commerce_store');
     $this->installEntitySchema('commerce_order');
     $this->installEntitySchema('commerce_order_item');
     $this->installConfig(['commerce_order']);
@@ -217,8 +202,52 @@ class CartProviderTest extends EntityKernelTestBase {
 
     $cart_provider->finalizeCart($cart);
     $cart = $this->reloadEntity($cart);
-    $this->assertFalse($cart->cart->value);
+    $this->assertEmpty($cart->cart->value);
 
+    $cart = $cart_provider->getCart('default', $this->store, $this->authenticatedUser);
+    $this->assertNull($cart);
+  }
+
+  /**
+   * Tests cart validation.
+   *
+   * @covers ::getCartIds
+   * @covers ::clearCaches
+   */
+  public function testCartValidation() {
+    $this->installCommerceCart();
+    /** @var \Drupal\commerce_cart\CartProviderInterface $cart_provider */
+    $cart_provider = $this->container->get('commerce_cart.cart_provider');
+
+    // Locked carts should not be returned.
+    $cart = $cart_provider->createCart('default', $this->store, $this->authenticatedUser);
+    $cart->lock();
+    $cart->save();
+    $cart_provider->clearCaches();
+    $cart = $cart_provider->getCart('default', $this->store, $this->authenticatedUser);
+    $this->assertNull($cart);
+
+    // Carts that are no longer carts should not be returned.
+    $cart = $cart_provider->createCart('default', $this->store, $this->authenticatedUser);
+    $cart->cart = FALSE;
+    $cart->save();
+    $cart_provider->clearCaches();
+    $cart = $cart_provider->getCart('default', $this->store, $this->authenticatedUser);
+    $this->assertNull($cart);
+
+    // Carts assigned to a different user should not be returned.
+    $cart = $cart_provider->createCart('default', $this->store, $this->authenticatedUser);
+    $cart->uid = $this->anonymousUser->id();
+    $cart->save();
+    $cart_provider->clearCaches();
+    $cart = $cart_provider->getCart('default', $this->store, $this->authenticatedUser);
+    $this->assertNull($cart);
+
+    // Canceled carts should not be returned.
+    $cart = $cart_provider->createCart('default', $this->store, $this->authenticatedUser);
+    $cart->state = 'canceled';
+    $cart->save();
+    $cart_provider->clearCaches();
     $cart = $cart_provider->getCart('default', $this->store, $this->authenticatedUser);
     $this->assertNull($cart);
   }

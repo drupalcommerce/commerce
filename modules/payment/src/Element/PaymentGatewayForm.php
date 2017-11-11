@@ -2,10 +2,11 @@
 
 namespace Drupal\commerce_payment\Element;
 
+use Drupal\commerce\Element\CommerceElementTrait;
+use Drupal\commerce\Response\NeedsRedirectException;
 use Drupal\commerce_payment\Entity\EntityWithPaymentGatewayInterface;
 use Drupal\commerce_payment\Exception\PaymentGatewayException;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\Core\Render\Element;
 use Drupal\Core\Render\Element\RenderElement;
 
 /**
@@ -27,6 +28,8 @@ use Drupal\Core\Render\Element\RenderElement;
  */
 class PaymentGatewayForm extends RenderElement {
 
+  use CommerceElementTrait;
+
   /**
    * {@inheritdoc}
    */
@@ -36,13 +39,20 @@ class PaymentGatewayForm extends RenderElement {
       '#operation' => '',
       // The entity operated on. Instance of EntityWithPaymentGatewayInterface.
       '#default_value' => NULL,
+      // The url to which the user will be redirected if an exception is thrown
+      // while building the form. If empty, the error will be shown inline.
+      '#exception_url' => '',
+      '#exception_message' => t('An error occurred while contacting the gateway. Please try again later.'),
+
       '#process' => [
+        [$class, 'attachElementSubmit'],
         [$class, 'processForm'],
       ],
       '#element_validate' => [
+        [$class, 'validateElementSubmit'],
         [$class, 'validateForm'],
       ],
-      '#element_submit' => [
+      '#commerce_element_submit' => [
         [$class, 'submitForm'],
       ],
       '#theme_wrappers' => ['container'],
@@ -62,11 +72,13 @@ class PaymentGatewayForm extends RenderElement {
    * @throws \InvalidArgumentException
    *   Thrown when the #operation or #default_value properties are empty, or
    *   when the #default_value property is not a valid entity.
+   * @throws \Drupal\commerce\Response\NeedsRedirectException
+   *   Thrown if an exception was caught, and $element['#exception_url'] is not empty.
    *
    * @return array
    *   The processed form element.
    */
-  public static function processForm($element, FormStateInterface $form_state, &$complete_form) {
+  public static function processForm(array $element, FormStateInterface $form_state, array &$complete_form) {
     if (empty($element['#operation'])) {
       throw new \InvalidArgumentException('The commerce_payment_gateway_form element requires the #operation property.');
     }
@@ -77,15 +89,26 @@ class PaymentGatewayForm extends RenderElement {
       throw new \InvalidArgumentException('The commerce_payment_gateway_form #default_value property must be a payment or a payment method entity.');
     }
     $plugin_form = static::createPluginForm($element);
-    $element = $plugin_form->buildConfigurationForm($element, $form_state);
-    // Allow the plugin form to override the page title.
-    if (isset($element['#page_title'])) {
-      $complete_form['#title'] = $element['#page_title'];
+    try {
+      $element = $plugin_form->buildConfigurationForm($element, $form_state);
+      // Allow the plugin form to override the page title.
+      if (isset($element['#page_title'])) {
+        $complete_form['#title'] = $element['#page_title'];
+      }
     }
-    // The #validate callbacks of the complete form run last.
-    // That allows executeElementSubmitHandlers() to be completely certain that
-    // the form has passed validation before proceeding.
-    $complete_form['#validate'][] = [get_class(), 'executeElementSubmitHandlers'];
+    catch (PaymentGatewayException $e) {
+      \Drupal::logger('commerce_payment')->error($e->getMessage());
+      if (!empty($element['#exception_url'])) {
+        drupal_set_message($element['#exception_message'], 'error');
+        throw new NeedsRedirectException($element['#exception_url']);
+      }
+      else {
+        $element['error'] = [
+          '#markup' => $element['#exception_message'],
+        ];
+        $complete_form['actions']['#access'] = FALSE;
+      }
+    }
 
     return $element;
   }
@@ -97,20 +120,17 @@ class PaymentGatewayForm extends RenderElement {
    *   The form element.
    * @param \Drupal\Core\Form\FormStateInterface $form_state
    *   The current state of the form.
-   *
-   * @throws \Exception
-   *   Thrown if button-level #validate handlers are detected on the parent
-   *   form, as a protection against buggy behavior.
    */
-  public static function validateForm(&$element, FormStateInterface $form_state) {
-    // Button-level #validate handlers replace the form-level ones, which means
-    // that executeElementSubmitHandlers() won't be triggered.
-    if ($handlers = $form_state->getValidateHandlers()) {
-      throw new \Exception('The commerce_payment_gateway_form element is not compatible with submit buttons that set #validate handlers');
-    }
-
+  public static function validateForm(array &$element, FormStateInterface $form_state) {
     $plugin_form = self::createPluginForm($element);
-    $plugin_form->validateConfigurationForm($element, $form_state);
+
+    try {
+      $plugin_form->validateConfigurationForm($element, $form_state);
+    }
+    catch (PaymentGatewayException $e) {
+      $error_element = $plugin_form->getErrorElement($element, $form_state);
+      $form_state->setError($error_element, $e->getMessage());
+    }
   }
 
   /**
@@ -121,7 +141,7 @@ class PaymentGatewayForm extends RenderElement {
    * @param \Drupal\Core\Form\FormStateInterface $form_state
    *   The current state of the form.
    */
-  public static function submitForm(&$element, FormStateInterface $form_state) {
+  public static function submitForm(array &$element, FormStateInterface $form_state) {
     $plugin_form = self::createPluginForm($element);
 
     try {
@@ -143,8 +163,8 @@ class PaymentGatewayForm extends RenderElement {
    * @return \Drupal\commerce_payment\PluginForm\PaymentGatewayFormInterface
    *   The plugin form.
    */
-  public static function createPluginForm($element) {
-    /** @var \Drupal\commerce\PluginForm\PluginFormFactoryInterface $plugin_form_factory */
+  public static function createPluginForm(array $element) {
+    /** @var \Drupal\Core\Plugin\PluginFormFactoryInterface $plugin_form_factory */
     $plugin_form_factory = \Drupal::service('plugin_form.factory');
     /** @var \Drupal\commerce_payment\Entity\EntityWithPaymentGatewayInterface $entity */
     $entity = $element['#default_value'];
@@ -154,40 +174,6 @@ class PaymentGatewayForm extends RenderElement {
     $plugin_form->setEntity($entity);
 
     return $plugin_form;
-  }
-
-  /**
-   * Submits elements by calling their #element_submit callbacks.
-   *
-   * Form API has no #element_submit, requiring us to simulate it by running
-   * our #element_submit handlers either in the last step of validation, or the
-   * first step of submission. In this case it's the last step of validation,
-   * allowing exceptions thrown by the plugin to be converted into form errors.
-   *
-   * @param array $element
-   *   The form element.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
-   *   The form state.
-   */
-  public static function executeElementSubmitHandlers(&$element, FormStateInterface $form_state) {
-    if (!$form_state->isSubmitted() || $form_state->hasAnyErrors()) {
-      // The form wasn't submitted (#ajax in progress) or failed validation.
-      return;
-    }
-
-    // Recurse through all children.
-    foreach (Element::children($element) as $key) {
-      if (!empty($element[$key])) {
-        static::executeElementSubmitHandlers($element[$key], $form_state);
-      }
-    }
-
-    // If there are callbacks on this level, run them.
-    if (!empty($element['#element_submit'])) {
-      foreach ($element['#element_submit'] as $callback) {
-        call_user_func_array($callback, [&$element, &$form_state]);
-      }
-    }
   }
 
 }

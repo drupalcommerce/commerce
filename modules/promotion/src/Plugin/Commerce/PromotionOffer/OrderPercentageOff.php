@@ -2,13 +2,17 @@
 
 namespace Drupal\commerce_promotion\Plugin\Commerce\PromotionOffer;
 
+use Drupal\commerce_order\Adjustment;
+use Drupal\commerce_promotion\Entity\PromotionInterface;
+use Drupal\Core\Entity\EntityInterface;
+
 /**
- * Provides a 'Order: Percentage off' condition.
+ * Provides the percentage off offer for orders.
  *
  * @CommercePromotionOffer(
- *   id = "commerce_promotion_order_percentage_off",
- *   label = @Translation("Percentage off"),
- *   target_entity_type = "commerce_order",
+ *   id = "order_percentage_off",
+ *   label = @Translation("Percentage off the order total"),
+ *   entity_type = "commerce_order",
  * )
  */
 class OrderPercentageOff extends PercentageOffBase {
@@ -16,11 +20,21 @@ class OrderPercentageOff extends PercentageOffBase {
   /**
    * {@inheritdoc}
    */
-  public function execute() {
+  public function apply(EntityInterface $entity, PromotionInterface $promotion) {
+    $this->assertEntity($entity);
     /** @var \Drupal\commerce_order\Entity\OrderInterface $order */
-    $order = $this->getTargetEntity();
-    $price_amount = $order->getTotalPrice()->multiply($this->getAmount());
-    $this->applyAdjustment($order, $price_amount);
+    $order = $entity;
+    $adjustment_amount = $order->getTotalPrice()->multiply($this->getPercentage());
+    $adjustment_amount = $this->rounder->round($adjustment_amount);
+
+    $order->addAdjustment(new Adjustment([
+      'type' => 'promotion',
+      // @todo Change to label from UI when added in #2770731.
+      'label' => t('Discount'),
+      'amount' => $adjustment_amount->multiply('-1'),
+      'percentage' => $this->getPercentage(),
+      'source_id' => $promotion->id(),
+    ]));
   }
 
 }

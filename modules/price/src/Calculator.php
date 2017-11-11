@@ -136,6 +136,71 @@ final class Calculator {
   }
 
   /**
+   * Rounds the given number.
+   *
+   * Replicates PHP's support for rounding to the nearest even/odd number
+   * even if that number is decimal ($precision > 0).
+   *
+   * @param string $number
+   *   The number.
+   * @param int $precision
+   *   The number of decimals to round to.
+   * @param int $mode
+   *   The rounding mode. One of the following constants: PHP_ROUND_HALF_UP,
+   *   PHP_ROUND_HALF_DOWN, PHP_ROUND_HALF_EVEN, PHP_ROUND_HALF_ODD.
+   *
+   * @return string
+   *   The rounded number.
+   *
+   * @throws \InvalidArgumentException
+   *   Thrown when an invalid (non-numeric or negative) precision is given.
+   */
+  public static function round($number, $precision = 0, $mode = PHP_ROUND_HALF_UP) {
+    self::assertNumberFormat($number);
+    if (!is_numeric($precision) || $precision < 0) {
+      throw new \InvalidArgumentException('The provided precision should be a positive number');
+    }
+
+    // Round the number in both directions (up/down) before choosing one.
+    $rounding_increment = bcdiv('1', pow(10, $precision), $precision);
+    if (self::compare($number, '0') == 1) {
+      $rounded_up = bcadd($number, $rounding_increment, $precision);
+    }
+    else {
+      $rounded_up = bcsub($number, $rounding_increment, $precision);
+    }
+    $rounded_down = bcsub($number, 0, $precision);
+    // The rounding direction is based on the first decimal after $precision.
+    $number_parts = explode('.', $number);
+    $decimals = !empty($number_parts[1]) ? $number_parts[1] : '0';
+    $relevant_decimal = isset($decimals[$precision]) ? $decimals[$precision] : 0;
+    if ($relevant_decimal < 5) {
+      $number = $rounded_down;
+    }
+    elseif ($relevant_decimal == 5) {
+      if ($mode == PHP_ROUND_HALF_UP) {
+        $number = $rounded_up;
+      }
+      elseif ($mode == PHP_ROUND_HALF_DOWN) {
+        $number = $rounded_down;
+      }
+      elseif ($mode == PHP_ROUND_HALF_EVEN) {
+        $integer = bcmul($rounded_up, pow(10, $precision), 0);
+        $number = bcmod($integer, '2') == 0 ? $rounded_up : $rounded_down;
+      }
+      elseif ($mode == PHP_ROUND_HALF_ODD) {
+        $integer = bcmul($rounded_up, pow(10, $precision), 0);
+        $number = bcmod($integer, '2') != 0 ? $rounded_up : $rounded_down;
+      }
+    }
+    elseif ($relevant_decimal > 5) {
+      $number = $rounded_up;
+    }
+
+    return $number;
+  }
+
+  /**
    * Compares the first number to the second number.
    *
    * @param string $first_number

@@ -1,27 +1,20 @@
 /**
  * @file
- * Styling for Commerce toolbar icons.
+ * Commerce toolbar icon styling.
  */
 
-/**
- * Bar formatting
- * Commerce includes a non-drupal cart icon called "cart.svg" that you could use instead of "drupal-cart.svg"
- */
+/* Bar styling (first row), currently unused. */
 .toolbar-bar .toolbar-icon-commerce-admin-commerce:before {
   background-image: url("../icons/bebebe/drupal-cart.svg");
 }
-
-.toolbar-bar .toolbar-icon-commerce-admin-commerce:active:before,
-.toolbar-bar .toolbar-icon-commerce-admin-commerce.active:before {
+.toolbar-bar .toolbar-icon-commerce-admin-commerce:active:before {
   background-image: url("../icons/ffffff/drupal-cart.svg");
 }
 
-/* Tray formatting */
-.toolbar .toolbar-tray .toolbar-icon.toolbar-icon-commerce-admin-commerce:before {
+/* Tray styling (second row) */
+.toolbar-tray .toolbar-icon.toolbar-icon-commerce-admin-commerce:before {
   background-image: url("../icons/787878/drupal-cart.svg");
 }
-
-.toolbar .toolbar-tray .toolbar-icon.toolbar-icon-commerce-admin-commerce:active:before,
-.toolbar .toolbar-tray .toolbar-icon.toolbar-icon-commerce-admin-commerce.active:before {
+.toolbar-tray .toolbar-icon.toolbar-icon-commerce-admin-commerce:active:before {
   background-image: url("../icons/000000/drupal-cart.svg");
 }

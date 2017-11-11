@@ -28,7 +28,7 @@ class ProductVariationTypeTest extends ProductBrowserTestBase {
    */
   public function testDefaultProductVariationType() {
     $variation_type = ProductVariationType::load('default');
-    $this->assertTrue(!empty($variation_type), 'The default product variation type is available.');
+    $this->assertNotEmpty(!empty($variation_type), 'The default product variation type is available.');
 
     $this->drupalGet('admin/commerce/config/product-variation-types');
     $rows = $this->getSession()->getPage()->find('css', 'table tbody tr');
@@ -57,7 +57,7 @@ class ProductVariationTypeTest extends ProductBrowserTestBase {
     ];
     $this->submitForm($edit, t('Save'));
     $variation_type = ProductVariationType::load($edit['id']);
-    $this->assertTrue(!empty($variation_type), 'The new product variation type has been created.');
+    $this->assertNotEmpty(!empty($variation_type), 'The new product variation type has been created.');
     $this->assertEquals($variation_type->label(), $edit['label'], 'The new product variation type has the correct label.');
     $this->assertEquals($variation_type->getOrderItemTypeId(), $edit['orderItemType'], 'The new product variation type has the correct order item type.');
   }
@@ -93,7 +93,7 @@ class ProductVariationTypeTest extends ProductBrowserTestBase {
     // a variation of that type. Right now the check is done on the form level.
     $this->drupalGet('admin/commerce/config/product-variation-types/' . $variation_type->id() . '/delete');
     $this->assertSession()->pageTextContains(
-      t('@type is used by 1 product variation on your site. You can not remove this product variation type until you have removed all of the @type product variations.', ['@type' => $variation_type->label()]),
+      t('@type is used by 1 product variation on your site. You cannot remove this product variation type until you have removed all of the @type product variations.', ['@type' => $variation_type->label()]),
       'The product variation type will not be deleted until all variations of that type are deleted.'
     );
     $this->assertSession()->pageTextNotContains(t('This action cannot be undone.'), 'The product variation type deletion confirmation form is not available');
@@ -107,7 +107,7 @@ class ProductVariationTypeTest extends ProductBrowserTestBase {
     $this->assertSession()->pageTextContains(t('This action cannot be undone.'));
     $this->getSession()->getPage()->pressButton('Delete');
     $exists = (bool) ProductVariationType::load($variation_type->id());
-    $this->assertFalse($exists, 'The new product variation type has been deleted from the database.');
+    $this->assertEmpty($exists, 'The new product variation type has been deleted from the database.');
   }
 
   /**

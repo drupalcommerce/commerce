@@ -66,7 +66,7 @@ class RemoteIdItem extends FieldItemBase {
    * {@inheritdoc}
    */
   public function isEmpty() {
-    return empty($this->provider) || empty($this->remote_id);
+    return empty($this->provider) || $this->remote_id === NULL || $this->remote_id === '';
   }
 
 }

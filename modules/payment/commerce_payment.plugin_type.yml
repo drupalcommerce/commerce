@@ -1,0 +1,17 @@
+commerce_payment.payment_gateway:
+  label: Commerce payment gateway
+  provider: commerce_payment
+  plugin_manager_service_id: plugin.manager.commerce_payment_gateway
+  plugin_definition_decorator_class: Drupal\plugin\PluginDefinition\ArrayPluginDefinitionDecorator
+
+commerce_payment.payment_method_type:
+  label: Commerce payment method type
+  provider: commerce_payment
+  plugin_manager_service_id: plugin.manager.commerce_payment_method_type
+  plugin_definition_decorator_class: Drupal\plugin\PluginDefinition\ArrayPluginDefinitionDecorator
+
+commerce_payment.payment_type:
+  label: Commerce payment type
+  provider: commerce_payment
+  plugin_manager_service_id: plugin.manager.commerce_payment_type
+  plugin_definition_decorator_class: Drupal\plugin\PluginDefinition\ArrayPluginDefinitionDecorator

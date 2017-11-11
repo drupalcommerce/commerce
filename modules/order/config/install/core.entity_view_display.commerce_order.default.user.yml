@@ -7,31 +7,43 @@ dependencies:
     - field.field.commerce_order.default.order_items
   module:
     - commerce_order
+    - commerce_price
+    - entity_reference_revisions
+    - options
 id: commerce_order.default.user
 targetEntityType: commerce_order
 bundle: default
 mode: user
 content:
   billing_profile:
-    type: entity_reference_entity_view
-    weight: 3
+    type: entity_reference_revisions_entity_view
+    weight: 0
     label: above
     settings:
       view_mode: default
-      link: false
+      link: ''
     third_party_settings: {  }
-  order_items:
-    type: commerce_order_item_table
-    weight: 4
-    settings: {  }
+  completed:
+    label: inline
+    type: timestamp
+    weight: 2
+    settings:
+      date_format: short
+      custom_date_format: ''
+      timezone: ''
     third_party_settings: {  }
-    label: hidden
   mail:
     label: inline
     type: basic_string
-    weight: 2
+    weight: 1
     settings: {  }
     third_party_settings: {  }
+  order_items:
+    type: commerce_order_item_table
+    weight: 5
+    settings: {  }
+    third_party_settings: {  }
+    label: hidden
   order_number:
     type: string
     weight: 0
@@ -42,21 +54,26 @@ content:
   placed:
     label: inline
     type: timestamp
-    weight: 1
+    weight: 3
     settings:
-      date_format: medium
+      date_format: short
       custom_date_format: ''
       timezone: ''
     third_party_settings: {  }
-  store_id:
-    type: entity_reference_label
-    weight: 0
+  state:
+    type: list_default
+    weight: 4
     label: inline
-    settings:
-      link: false
+    settings: {  }
     third_party_settings: {  }
+  total_price:
+    type: commerce_order_total_summary
+    weight: 6
+    settings: {  }
+    third_party_settings: {  }
+    label: hidden
 hidden:
+  changed: true
   ip_address: true
-  total_price: true
-  state: true
+  store_id: true
   uid: true

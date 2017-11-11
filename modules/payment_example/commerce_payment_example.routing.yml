@@ -1,0 +1,16 @@
+commerce_payment_example.dummy_redirect_post:
+  path: 'commerce_payment_example/dummy_redirect_post'
+  defaults:
+    _controller: '\Drupal\commerce_payment_example\Controller\DummyRedirectController::post'
+  options:
+    no_cache: TRUE
+  requirements:
+    _access: 'TRUE'
+commerce_payment_example.dummy_redirect_302:
+  path: 'commerce_payment_example/dummy_redirect_302'
+  defaults:
+    _controller: '\Drupal\commerce_payment_example\Controller\DummyRedirectController::on302'
+  options:
+    no_cache: TRUE
+  requirements:
+    _access: 'TRUE'

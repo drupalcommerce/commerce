@@ -8,7 +8,7 @@ use Drupal\commerce_product\Entity\ProductVariation;
 use Drupal\commerce_product\Entity\ProductVariationType;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
-use Drupal\KernelTests\KernelTestBase;
+use Drupal\Tests\commerce\Kernel\CommerceKernelTestBase;
 
 /**
  * Tests the product variation field renderer.
@@ -17,7 +17,7 @@ use Drupal\KernelTests\KernelTestBase;
  *
  * @group commerce
  */
-class ProductVariationFieldRendererTest extends KernelTestBase {
+class ProductVariationFieldRendererTest extends CommerceKernelTestBase {
 
   /**
    * The variation field injection.
@@ -46,9 +46,8 @@ class ProductVariationFieldRendererTest extends KernelTestBase {
    * @var array
    */
   public static $modules = [
-    'system', 'field', 'options', 'user', 'path', 'text',
-    'entity', 'views', 'address', 'inline_entity_form',
-    'commerce', 'commerce_price', 'commerce_store', 'commerce_product',
+    'path',
+    'commerce_product',
   ];
 
   /**
@@ -57,11 +56,8 @@ class ProductVariationFieldRendererTest extends KernelTestBase {
   protected function setUp() {
     parent::setUp();
 
-    $this->installSchema('system', 'router');
     $this->installEntitySchema('commerce_product_variation');
-    $this->installEntitySchema('commerce_product_variation_type');
     $this->installEntitySchema('commerce_product');
-    $this->installEntitySchema('commerce_product_type');
     $this->installConfig(['commerce_product']);
 
     $this->variationFieldRenderer = $this->container->get('commerce_product.variation_field_renderer');
@@ -100,8 +96,7 @@ class ProductVariationFieldRendererTest extends KernelTestBase {
     ]);
     $attribute->save();
 
-    $this->container->get('commerce_product.attribute_field_manager')
-      ->createField($attribute, $this->secondVariationType->id());
+    $this->container->get('commerce_product.attribute_field_manager')->createField($attribute, $this->secondVariationType->id());
   }
 
   /**
@@ -151,9 +146,9 @@ class ProductVariationFieldRendererTest extends KernelTestBase {
     $product_display->save();
 
     $rendered_fields = $this->variationFieldRenderer->renderFields($variation);
-    $this->assertFalse(isset($rendered_fields['status']), 'Variation status field was not rendered');
-    $this->assertTrue(isset($rendered_fields['sku']), 'Variation SKU field was rendered');
-    $this->assertTrue(isset($rendered_fields['attribute_color']), 'Variation atrribute color field was rendered');
+    $this->assertEmpty(isset($rendered_fields['status']), 'Variation status field was not rendered');
+    $this->assertNotEmpty(isset($rendered_fields['sku']), 'Variation SKU field was rendered');
+    $this->assertNotEmpty(isset($rendered_fields['attribute_color']), 'Variation atrribute color field was rendered');
     $this->assertEquals('product--variation-field--variation_sku__' . $variation->getProductId(), $rendered_fields['sku']['#ajax_replace_class']);
     $this->assertEquals('product--variation-field--variation_attribute_color__' . $variation->getProductId(), $rendered_fields['attribute_color']['#ajax_replace_class']);
 
@@ -162,7 +157,7 @@ class ProductVariationFieldRendererTest extends KernelTestBase {
     $this->render($product_build);
 
     $this->assertEmpty($this->cssSelect('.product--variation-field--variation_attribute_color__' . $variation->getProductId()));
-    $this->assertNotEmpty($this->cssSelect('.product--variation-field--variation_sku__' . $variation->getProductId()));
+    $this->assertEmpty($this->cssSelect('.product--variation-field--variation_sku__' . $variation->getProductId()));
   }
 
   /**

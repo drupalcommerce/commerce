@@ -2,7 +2,7 @@
 
 namespace Drupal\commerce_product\Entity;
 
-use Drupal\Core\Config\Entity\ConfigEntityBundleBase;
+use Drupal\commerce\Entity\CommerceBundleEntityBase;
 
 /**
  * Defines the product variation type entity class.
@@ -10,6 +10,7 @@ use Drupal\Core\Config\Entity\ConfigEntityBundleBase;
  * @ConfigEntityType(
  *   id = "commerce_product_variation_type",
  *   label = @Translation("Product variation type"),
+ *   label_collection = @Translation("Product variation types"),
  *   label_singular = @Translation("product variation type"),
  *   label_plural = @Translation("product variation types"),
  *   label_count = @PluralTranslation(
@@ -21,7 +22,7 @@ use Drupal\Core\Config\Entity\ConfigEntityBundleBase;
  *     "form" = {
  *       "add" = "Drupal\commerce_product\Form\ProductVariationTypeForm",
  *       "edit" = "Drupal\commerce_product\Form\ProductVariationTypeForm",
- *       "delete" = "Drupal\commerce_product\Form\ProductVariationTypeDeleteForm"
+ *       "delete" = "Drupal\commerce\Form\CommerceBundleEntityDeleteFormBase"
  *     },
  *     "route_provider" = {
  *       "default" = "Drupal\Core\Entity\Routing\DefaultHtmlRouteProvider",
@@ -40,6 +41,7 @@ use Drupal\Core\Config\Entity\ConfigEntityBundleBase;
  *     "label",
  *     "orderItemType",
  *     "generateTitle",
+ *     "traits",
  *   },
  *   links = {
  *     "add-form" = "/admin/commerce/config/product-variation-types/add",
@@ -49,14 +51,7 @@ use Drupal\Core\Config\Entity\ConfigEntityBundleBase;
  *   }
  * )
  */
-class ProductVariationType extends ConfigEntityBundleBase implements ProductVariationTypeInterface {
-
-  /**
-   * The product variation type ID.
-   *
-   * @var string
-   */
-  protected $id;
+class ProductVariationType extends CommerceBundleEntityBase implements ProductVariationTypeInterface {
 
   /**
    * The order item type ID.

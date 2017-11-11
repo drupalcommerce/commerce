@@ -45,12 +45,6 @@ class CurrencyForm extends EntityForm {
     /** @var \Drupal\commerce_price\Entity\CurrencyInterface $currency */
     $currency = $this->entity;
 
-    $import_url = Url::fromRoute('entity.commerce_currency.import')->toString();
-    $form['message'] = [
-      '#type' => 'markup',
-      '#markup' => $this->t('This form is only intended for creating custom currencies. Real-world currencies should be <a href=":url">imported</a>.', [':url' => $import_url]),
-    ];
-
     $form['name'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Name'),
@@ -87,14 +81,15 @@ class CurrencyForm extends EntityForm {
       '#type' => 'textfield',
       '#title' => $this->t('Symbol'),
       '#default_value' => $currency->getSymbol(),
-      '#maxlength' => 255,
+      '#maxlength' => 4,
+      '#size' => 4,
       '#required' => TRUE,
     ];
     $form['fractionDigits'] = [
       '#type' => 'number',
       '#title' => $this->t('Fraction digits'),
       '#description' => $this->t('The number of digits after the decimal sign.'),
-      '#default_value' => $currency->getFractionDigits() ?: 2,
+      '#default_value' => $currency->getFractionDigits(),
       '#min' => 0,
       '#required' => TRUE,
     ];
@@ -105,7 +100,7 @@ class CurrencyForm extends EntityForm {
   /**
    * Validates the currency code.
    */
-  public function validateCurrencyCode(array $element, FormStateInterface &$form_state, array $form) {
+  public function validateCurrencyCode(array $element, FormStateInterface $form_state, array $form) {
     $currency = $this->getEntity();
     $currency_code = $element['#value'];
     if (!preg_match('/^[A-Z]{3}$/', $currency_code)) {
@@ -122,7 +117,7 @@ class CurrencyForm extends EntityForm {
   /**
    * Validates the numeric code.
    */
-  public function validateNumericCode(array $element, FormStateInterface &$form_state, array $form) {
+  public function validateNumericCode(array $element, FormStateInterface $form_state, array $form) {
     $currency = $this->getEntity();
     $numeric_code = $element['#value'];
     if ($numeric_code && !preg_match('/^\d{3}$/i', $numeric_code)) {

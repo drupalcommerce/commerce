@@ -2,10 +2,11 @@
 
 namespace Drupal\commerce_product\Form;
 
-use Drupal\commerce_product\Entity\ProductInterface;
 use Drupal\Core\Datetime\DateFormatterInterface;
+use Drupal\Component\Datetime\TimeInterface;
 use Drupal\Core\Entity\ContentEntityForm;
 use Drupal\Core\Entity\EntityManagerInterface;
+use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Link;
 use Drupal\Core\Render\Element;
@@ -30,11 +31,15 @@ class ProductForm extends ContentEntityForm {
    *
    * @param \Drupal\Core\Entity\EntityManagerInterface $entity_manager
    *   The entity manager.
+   * @param \Drupal\Core\Entity\EntityTypeBundleInfoInterface $entity_type_bundle_info
+   *   The entity type bundle info.
+   * @param \Drupal\Component\Datetime\TimeInterface $time
+   *   The time.
    * @param \Drupal\Core\Datetime\DateFormatterInterface $date_formatter
    *   The date formatter.
    */
-  public function __construct(EntityManagerInterface $entity_manager, DateFormatterInterface $date_formatter) {
-    parent::__construct($entity_manager);
+  public function __construct(EntityManagerInterface $entity_manager, EntityTypeBundleInfoInterface $entity_type_bundle_info, TimeInterface $time, DateFormatterInterface $date_formatter) {
+    parent::__construct($entity_manager, $entity_type_bundle_info, $time);
 
     $this->dateFormatter = $date_formatter;
   }
@@ -45,6 +50,8 @@ class ProductForm extends ContentEntityForm {
   public static function create(ContainerInterface $container) {
     return new static(
       $container->get('entity.manager'),
+      $container->get('entity_type.bundle.info'),
+      $container->get('datetime.time'),
       $container->get('date.formatter')
     );
   }
@@ -77,12 +84,20 @@ class ProductForm extends ContentEntityForm {
     $form['#tree'] = TRUE;
     $form['#theme'] = ['commerce_product_form'];
     $form['#attached']['library'][] = 'commerce_product/form';
-    $form['#entity_builders']['update_status'] = [get_class($this), 'updateStatus'];
     // Changed must be sent to the client, for later overwrite error checking.
     $form['changed'] = [
       '#type' => 'hidden',
       '#default_value' => $product->getChangedTime(),
     ];
+
+    $form['footer'] = [
+      '#type' => 'container',
+      '#weight' => 99,
+      '#attributes' => [
+        'class' => ['product-form-footer'],
+      ],
+    ];
+    $form['status']['#group'] = 'footer';
 
     $last_saved = t('Not saved yet');
     if (!$product->isNew()) {
@@ -99,7 +114,7 @@ class ProductForm extends ContentEntityForm {
         '#value' => $product->isPublished() ? $this->t('Published') : $this->t('Not published'),
         '#access' => !$product->isNew(),
         '#attributes' => [
-          'class' => 'entity-meta__title',
+          'class' => ['entity-meta__title'],
         ],
       ],
       'changed' => [
@@ -186,7 +201,7 @@ class ProductForm extends ContentEntityForm {
    * @return array
    *   The modified visibility_settings element.
    */
-  public static function hideEmptyVisibilitySettings($form) {
+  public static function hideEmptyVisibilitySettings(array $form) {
     if (isset($form['stores']['widget']['target_id'])) {
       $stores_element = $form['stores']['widget']['target_id'];
       if (!Element::getVisibleChildren($stores_element)) {
@@ -198,74 +213,6 @@ class ProductForm extends ContentEntityForm {
     }
 
     return $form;
-  }
-
-  /**
-   * Entity builder: updates the product status with the submitted value.
-   *
-   * @param string $entity_type
-   *   The entity type.
-   * @param \Drupal\commerce_product\Entity\ProductInterface $product
-   *   The product updated with the submitted values.
-   * @param array $form
-   *   The complete form array.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
-   *   The current state of the form.
-   *
-   * @see \Drupal\node\NodeForm::form()
-   */
-  public static function updateStatus($entity_type, ProductInterface $product, array $form, FormStateInterface $form_state) {
-    $element = $form_state->getTriggeringElement();
-    if (isset($element['#published_status'])) {
-      $product->setPublished($element['#published_status']);
-    }
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  protected function actions(array $form, FormStateInterface $form_state) {
-    $element = parent::actions($form, $form_state);
-    /** @var \Drupal\commerce_product\Entity\ProductInterface $product */
-    $product = $this->entity;
-
-    $element['delete']['#access'] = $product->access('delete');
-    $element['delete']['#weight'] = 100;
-    // Add a "Publish" button.
-    $element['publish'] = $element['submit'];
-    $element['publish']['#published_status'] = TRUE;
-    $element['publish']['#dropbutton'] = 'save';
-    $element['publish']['#weight'] = 0;
-    // Add an "Unpublish" button.
-    $element['unpublish'] = $element['submit'];
-    $element['unpublish']['#published_status'] = FALSE;
-    $element['unpublish']['#dropbutton'] = 'save';
-    $element['unpublish']['#weight'] = 10;
-    // isNew | prev status » primary   & publish label             & unpublish label
-    // 1     | 1           » publish   & Save and publish          & Save as unpublished
-    // 1     | 0           » unpublish & Save and publish          & Save as unpublished
-    // 0     | 1           » publish   & Save and keep published   & Save and unpublish
-    // 0     | 0           » unpublish & Save and keep unpublished & Save and publish.
-    if ($product->isNew()) {
-      $element['publish']['#value'] = $this->t('Save and publish');
-      $element['unpublish']['#value'] = $this->t('Save as unpublished');
-    }
-    else {
-      $element['publish']['#value'] = $product->isPublished() ? $this->t('Save and keep published') : $this->t('Save and publish');
-      $element['unpublish']['#value'] = !$product->isPublished() ? $this->t('Save and keep unpublished') : $this->t('Save and unpublish');
-    }
-    // Set the primary button based on the published status.
-    if ($product->isPublished()) {
-      unset($element['unpublish']['#button_type']);
-    }
-    else {
-      unset($element['publish']['#button_type']);
-      $element['unpublish']['#weight'] = -10;
-    }
-    // Hide the now unneeded "Save" button.
-    $element['submit']['#access'] = FALSE;
-
-    return $element;
   }
 
   /**

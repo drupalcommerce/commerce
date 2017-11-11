@@ -5,20 +5,26 @@ dependencies:
     - commerce_order.commerce_order_type.default
     - field.field.commerce_order.default.order_items
   module:
+    - commerce_order
     - inline_entity_form
 id: commerce_order.default.default
 targetEntityType: commerce_order
 bundle: default
 mode: default
 content:
+  adjustments:
+    type: commerce_adjustment_default
+    weight: 2
+    settings: {  }
+    third_party_settings: {  }
   billing_profile:
-    type: options_select
+    type: commerce_billing_profile
     weight: 0
     settings: {  }
     third_party_settings: {  }
   order_items:
     type: inline_entity_form_complex
-    weight: 0
+    weight: 1
     settings:
       override_labels: true
       label_singular: 'order item'
@@ -26,12 +32,13 @@ content:
       allow_new: true
       match_operator: CONTAINS
       allow_existing: false
+      form_mode: default
     third_party_settings: {  }
 hidden:
-  mail: true
-  store_id: true
-  uid: true
+  created: true
   ip_address: true
+  mail: true
   order_number: true
   state: true
-  created: true
+  store_id: true
+  uid: true

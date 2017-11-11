@@ -6,3 +6,4 @@ label: Default
 description: ''
 variationType: default
 injectVariationFields: true
+traits: {  }

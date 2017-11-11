@@ -16,6 +16,7 @@ use Drupal\Core\Field\BaseFieldDefinition;
  * @ContentEntityType(
  *   id = "commerce_store",
  *   label = @Translation("Store"),
+ *   label_collection = @Translation("Stores"),
  *   label_singular = @Translation("store"),
  *   label_plural = @Translation("stores"),
  *   label_count = @PluralTranslation(
@@ -32,6 +33,7 @@ use Drupal\Core\Field\BaseFieldDefinition;
  *     "list_builder" = "Drupal\commerce_store\StoreListBuilder",
  *     "views_data" = "Drupal\views\EntityViewsData",
  *     "form" = {
+ *       "default" = "Drupal\commerce_store\Form\StoreForm",
  *       "add" = "Drupal\commerce_store\Form\StoreForm",
  *       "edit" = "Drupal\commerce_store\Form\StoreForm",
  *       "delete" = "Drupal\Core\Entity\ContentEntityDeleteForm"
@@ -61,8 +63,8 @@ use Drupal\Core\Field\BaseFieldDefinition;
  *     "add-form" = "/store/add/{commerce_store_type}",
  *     "edit-form" = "/store/{commerce_store}/edit",
  *     "delete-form" = "/store/{commerce_store}/delete",
- *     "delete-multiple-form" = "/admin/commerce/stores/delete",
- *     "collection" = "/admin/commerce/stores",
+ *     "delete-multiple-form" = "/admin/commerce/config/stores/delete",
+ *     "collection" = "/admin/commerce/config/stores",
  *   },
  *   bundle_entity_type = "commerce_store_type",
  *   field_ui_base_route = "entity.commerce_store_type.edit_form",

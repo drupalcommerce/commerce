@@ -78,7 +78,9 @@ class ContactInformation extends CheckoutPaneBase implements CheckoutPaneInterfa
    * {@inheritdoc}
    */
   public function buildPaneSummary() {
-    return $this->order->getEmail();
+    return [
+      '#plain_text' => $this->order->getEmail(),
+    ];
   }
 
   /**

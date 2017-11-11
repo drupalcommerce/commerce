@@ -5,16 +5,13 @@
  * Defines the Product entity and associated features.
  */
 
-use Drupal\Core\Access\AccessResult;
+use Drupal\commerce\BundleFieldDefinition;
+use Drupal\commerce_product\Entity\ProductTypeInterface;
 use Drupal\Core\Cache\Cache;
-use Drupal\field\Entity\FieldConfig;
-use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\Display\EntityFormDisplayInterface;
-use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
 use Drupal\Core\Render\Element;
-use Drupal\commerce_product\Entity\ProductType;
 
 /**
  * Implements hook_config_translation_info_alter().
@@ -24,7 +21,7 @@ function commerce_product_config_translation_info_alter(&$info) {
 }
 
 /**
- * Implements hook_ENTITY_TYPE_presave().
+ * Implements hook_ENTITY_TYPE_update().
  */
 function commerce_product_entity_form_display_update(EntityFormDisplayInterface $form_display) {
   // Reset the cached attribute field map when the 'default' product variation
@@ -39,28 +36,11 @@ function commerce_product_entity_form_display_update(EntityFormDisplayInterface 
  * Implements hook_ENTITY_TYPE_update().
  */
 function commerce_product_entity_view_display_update(EntityInterface $entity) {
-  // The product view uses the variation view and needs to be cleared, which doesn't happen automatically
-  // because we're editing the variation, not the product
+  // The product view uses the variation view and needs to be cleared, which doesn't
+  // happen automatically because we're editing the variation, not the product.
   if (substr($entity->getConfigTarget(), 0, 27) === 'commerce_product_variation.') {
     Cache::invalidateTags(['commerce_product_view']);
   }
-}
-
-/**
- * Implements hook_entity_access().
- */
-function commerce_product_entity_access(EntityInterface $entity, $operation, $account) {
-  // Allow published products to be viewed by all users for now.
-  // @todo Remove once we implement the full product permissions.
-  if ($operation == 'view') {
-    if ($entity->getEntityTypeId() == 'commerce_product' && $entity->isPublished()) {
-      return AccessResult::allowed();
-    }
-    elseif ($entity->getEntityTypeId() == 'commerce_product_variation' && $entity->isActive()) {
-      return AccessResult::allowed();
-    }
-  }
-  return AccessResult::neutral();
 }
 
 /**
@@ -180,44 +160,23 @@ function template_preprocess_commerce_product_attribute_value(array &$variables)
  * @param \Drupal\commerce_product\Entity\ProductTypeInterface $product_type
  *   The product type.
  */
-function commerce_product_add_stores_field($product_type) {
-  $field_storage = FieldStorageConfig::loadByName('commerce_product', 'stores');
-  $field = FieldConfig::loadByName('commerce_product', $product_type->id(), 'stores');
-  if (empty($field_storage)) {
-    $field_storage = FieldStorageConfig::create([
-      'field_name' => 'stores',
-      'entity_type' => 'commerce_product',
-      'type' => 'entity_reference',
-      'cardinality' => FieldStorageConfig::CARDINALITY_UNLIMITED,
-      'settings' => [
-        'target_type' => 'commerce_store',
-      ],
-      'locked' => TRUE,
-      'translatable' => FALSE,
-    ]);
-    $field_storage->save();
-  }
-  if (empty($field)) {
-    $field = FieldConfig::create([
-      'field_storage' => $field_storage,
-      'bundle' => $product_type->id(),
-      'label' => 'Stores',
-      'required' => TRUE,
-      'settings' => [
-        'handler' => 'default',
-        'handler_settings' => [],
-      ],
-      'translatable' => FALSE,
-    ]);
-    $field->save();
-
-    $form_display = commerce_get_entity_display('commerce_product', $product_type->id(), 'form');
-    $form_display->setComponent('stores', [
+function commerce_product_add_stores_field(ProductTypeInterface $product_type) {
+  $field_definition = BundleFieldDefinition::create('entity_reference')
+    ->setTargetEntityTypeId('commerce_product')
+    ->setTargetBundle($product_type->id())
+    ->setName('stores')
+    ->setLabel('Stores')
+    ->setCardinality(BundleFieldDefinition::CARDINALITY_UNLIMITED)
+    ->setRequired(TRUE)
+    ->setSetting('target_type', 'commerce_store')
+    ->setSetting('handler', 'default')
+    ->setDisplayOptions('form', [
       'type' => 'commerce_entity_select',
       'weight' => -10,
     ]);
-    $form_display->save();
-  }
+
+  $configurable_field_manager = \Drupal::service('commerce.configurable_field_manager');
+  $configurable_field_manager->createField($field_definition);
 }
 
 /**
@@ -228,40 +187,24 @@ function commerce_product_add_stores_field($product_type) {
  * @param string $label
  *   (optional) The label for the body instance. Defaults to 'Body'.
  */
-function commerce_product_add_body_field($product_type, $label = 'Body') {
-  $field_storage = FieldStorageConfig::loadByName('commerce_product', 'body');
-  $field = FieldConfig::loadByName('commerce_product', $product_type->id(), 'body');
-  if (empty($field_storage)) {
-    $field_storage = FieldStorageConfig::create([
-      'field_name' => 'body',
-      'entity_type' => 'commerce_product',
-      'type' => 'text_with_summary',
-    ]);
-    $field_storage->save();
-  }
-  if (empty($field)) {
-    $field = FieldConfig::create([
-      'field_storage' => $field_storage,
-      'bundle' => $product_type->id(),
-      'label' => $label,
-      'settings' => ['display_summary' => FALSE],
-    ]);
-    $field->save();
-
-    $view_display = commerce_get_entity_display('commerce_product', $product_type->id(), 'view');
-    $view_display->setComponent('body', [
+function commerce_product_add_body_field(ProductTypeInterface $product_type, $label = 'Body') {
+  $field_definition = BundleFieldDefinition::create('text_with_summary')
+    ->setTargetEntityTypeId('commerce_product')
+    ->setTargetBundle($product_type->id())
+    ->setName('body')
+    ->setLabel($label)
+    ->setSetting('display_summary', FALSE)
+    ->setDisplayOptions('form', [
+      'type' => 'text_textarea_with_summary',
+      'weight' => 1,
+    ])
+    ->setDisplayOptions('view', [
       'label' => 'hidden',
       'type' => 'text_default',
     ]);
-    $view_display->save();
 
-    $form_display = commerce_get_entity_display('commerce_product', $product_type->id(), 'form');
-    $form_display->setComponent('body', [
-      'type' => 'text_textarea_with_summary',
-      'weight' => 1,
-    ]);
-    $form_display->save();
-  }
+  $configurable_field_manager = \Drupal::service('commerce.configurable_field_manager');
+  $configurable_field_manager->createField($field_definition, FALSE);
 }
 
 /**
@@ -273,50 +216,22 @@ function commerce_product_add_body_field($product_type, $label = 'Body') {
  * @param \Drupal\commerce_product\Entity\ProductTypeInterface $product_type
  *   The product type.
  */
-function commerce_product_add_variations_field($product_type) {
-  $field_storage = FieldStorageConfig::loadByName('commerce_product', 'variations');
-  $field = FieldConfig::loadByName('commerce_product', $product_type->id(), 'variations');
-  if (empty($field_storage)) {
-    $field_storage = FieldStorageConfig::create([
-      'field_name' => 'variations',
-      'entity_type' => 'commerce_product',
-      'type' => 'entity_reference',
-      'cardinality' => FieldStorageConfig::CARDINALITY_UNLIMITED,
-      'settings' => [
-        'target_type' => 'commerce_product_variation',
+function commerce_product_add_variations_field(ProductTypeInterface $product_type) {
+  $field_definition = BundleFieldDefinition::create('entity_reference')
+    ->setTargetEntityTypeId('commerce_product')
+    ->setTargetBundle($product_type->id())
+    ->setName('variations')
+    ->setLabel('Variations')
+    ->setCardinality(BundleFieldDefinition::CARDINALITY_UNLIMITED)
+    ->setRequired(TRUE)
+    ->setSetting('target_type', 'commerce_product_variation')
+    ->setSetting('handler', 'default')
+    ->setSetting('handler_settings', [
+      'target_bundles' => [
+        $product_type->getVariationTypeId(),
       ],
-      'locked' => TRUE,
-      'translatable' => FALSE,
-    ]);
-    $field_storage->save();
-  }
-  if (empty($field)) {
-    $field = FieldConfig::create([
-      'field_storage' => $field_storage,
-      'bundle' => $product_type->id(),
-      'label' => 'Variations',
-      'required' => TRUE,
-      'settings' => [
-        'handler' => 'default',
-        'handler_settings' => [
-          'target_bundles' => [
-            $product_type->getVariationTypeId(),
-          ],
-        ],
-      ],
-      'translatable' => FALSE,
-    ]);
-    $field->save();
-
-    $view_display = commerce_get_entity_display('commerce_product', $product_type->id(), 'view');
-    $view_display->setComponent('variations', [
-      'type' => 'commerce_add_to_cart',
-      'weight' => 10,
-    ]);
-    $view_display->save();
-
-    $form_display = commerce_get_entity_display('commerce_product', $product_type->id(), 'form');
-    $form_display->setComponent('variations', [
+    ])
+    ->setDisplayOptions('form', [
       'type' => 'inline_entity_form_complex',
       'weight' => 10,
       'settings' => [
@@ -324,9 +239,14 @@ function commerce_product_add_variations_field($product_type) {
         'label_singular' => 'variation',
         'label_plural' => 'variations',
       ],
+    ])
+    ->setDisplayOptions('view', [
+      'type' => 'commerce_add_to_cart',
+      'weight' => 10,
     ]);
-    $form_display->save();
-  }
+
+  $configurable_field_manager = \Drupal::service('commerce.configurable_field_manager');
+  $configurable_field_manager->createField($field_definition);
 }
 
 /**

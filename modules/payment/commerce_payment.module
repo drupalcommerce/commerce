@@ -5,11 +5,13 @@
  * Provides payment functionality.
  */
 
+use Drupal\commerce_payment\Plugin\Commerce\PaymentGateway\HasPaymentInstructionsInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Render\Element;
+use Drupal\Core\Url;
 
 /**
  * Implements hook_commerce_checkout_pane_info_alter().
@@ -27,16 +29,33 @@ function commerce_payment_entity_base_field_info(EntityTypeInterface $entity_typ
     $fields['payment_gateway'] = BaseFieldDefinition::create('entity_reference')
       ->setLabel(t('Payment gateway'))
       ->setDescription(t('The payment gateway.'))
-      ->setRequired(TRUE)
       ->setSetting('target_type', 'commerce_payment_gateway');
 
     $fields['payment_method'] = BaseFieldDefinition::create('entity_reference')
       ->setLabel(t('Payment method'))
       ->setDescription(t('The payment method.'))
-      ->setRequired(TRUE)
       ->setSetting('target_type', 'commerce_payment_method');
 
     return $fields;
+  }
+}
+
+/**
+ * Implements hook_entity_operation().
+ */
+function commerce_payment_entity_operation(EntityInterface $entity) {
+  if ($entity->getEntityTypeId() === 'commerce_order') {
+    if (\Drupal::currentUser()->hasPermission('administer commerce_payment')) {
+      $operations = [];
+      $operations['payments'] = [
+        'title' => t('Payments'),
+        'url' => Url::fromRoute('entity.commerce_payment.collection', [
+          'commerce_order' => $entity->id(),
+        ]),
+        'weight' => 50,
+      ];
+      return $operations;
+    }
   }
 }
 
@@ -95,5 +114,58 @@ function template_preprocess_commerce_payment_method(array &$variables) {
   ];
   foreach (Element::children($variables['elements']) as $key) {
     $variables['payment_method'][$key] = $variables['elements'][$key];
+  }
+}
+
+/**
+ * Implements hook_preprocess_commerce_order().
+ */
+function commerce_payment_preprocess_commerce_order(&$variables) {
+  /** @var Drupal\commerce_order\Entity\OrderInterface $order */
+  $order = $variables['elements']['#commerce_order'];
+  if (!$order->get('payment_method')->isEmpty()) {
+    $variables['payment_method'] = [
+      '#markup' => $order->get('payment_method')->first()->entity->label(),
+    ];
+  }
+}
+
+/**
+ * Implements hook_preprocess_commerce_checkout_completion_message().
+ */
+function commerce_payment_preprocess_commerce_checkout_completion_message(&$variables) {
+  /** @var Drupal\commerce_order\Entity\OrderInterface $order */
+  $order = $variables['order_entity'];
+  if ($order->get('payment_gateway')->isEmpty()) {
+    return;
+  }
+
+  /** @var \Drupal\commerce_payment\Entity\PaymentGatewayInterface $payment_gateway */
+  $payment_gateway = $order->get('payment_gateway')->entity;
+  /** @var \Drupal\commerce_payment\Plugin\Commerce\PaymentGateway\HasPaymentInstructionsInterface $payment_gateway_plugin */
+  $payment_gateway_plugin = $payment_gateway->getPlugin();
+  if ($payment_gateway_plugin instanceof HasPaymentInstructionsInterface) {
+    $payment_storage = \Drupal::entityTypeManager()->getStorage('commerce_payment');
+    $payments = $payment_storage->loadMultipleByOrder($order);
+    $payments = array_filter($payments, function ($payment) use ($payment_gateway) {
+      return $payment->getPaymentGatewayId() == $payment_gateway->id();
+    });
+    $payment = reset($payments);
+    if ($payment) {
+      $variables['payment_instructions'] = $payment_gateway_plugin->buildPaymentInstructions($payment);
+    }
+  }
+}
+
+/**
+ * Implements hook_preprocess_commerce_order_receipt().
+ */
+function commerce_payment_preprocess_commerce_order_receipt(&$variables) {
+  /** @var Drupal\commerce_order\Entity\OrderInterface $order */
+  $order = $variables['order_entity'];
+  if (!$order->get('payment_method')->isEmpty()) {
+    $variables['payment_method'] = [
+      '#markup' => $order->get('payment_method')->first()->entity->label(),
+    ];
   }
 }

@@ -17,7 +17,7 @@ content:
   address:
     type: address_default
     weight: 0
-    label: above
+    label: hidden
     settings: {  }
     third_party_settings: {  }
 hidden: {  }

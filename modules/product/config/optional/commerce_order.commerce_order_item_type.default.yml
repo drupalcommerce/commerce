@@ -8,3 +8,4 @@ label: 'Default'
 id: default
 purchasableEntityType: commerce_product_variation
 orderType: default
+traits: {  }

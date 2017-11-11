@@ -2,16 +2,18 @@
 
 namespace Drupal\commerce_checkout\Controller;
 
+use Drupal\commerce_cart\CartSession;
 use Drupal\commerce_cart\CartSessionInterface;
 use Drupal\commerce_checkout\CheckoutOrderManagerInterface;
 use Drupal\Core\Access\AccessResult;
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 use Drupal\Core\DependencyInjection\DependencySerializationTrait;
 use Drupal\Core\Form\FormBuilderInterface;
-use Drupal\Core\Form\FormState;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Session\AccountInterface;
+use Drupal\Core\Url;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 
 /**
  * Provides the checkout form page.
@@ -74,15 +76,22 @@ class CheckoutController implements ContainerInjectionInterface {
    * @param \Drupal\Core\Routing\RouteMatchInterface $route_match
    *   The route match.
    *
-   * @return array
+   * @return array|\Symfony\Component\HttpFoundation\RedirectResponse
    *   The render form.
    */
   public function formPage(RouteMatchInterface $route_match) {
     /** @var \Drupal\commerce_order\Entity\OrderInterface $order */
     $order = $route_match->getParameter('commerce_order');
+    $requested_step_id = $route_match->getParameter('step');
+    $step_id = $this->checkoutOrderManager->getCheckoutStepId($order, $requested_step_id);
+    if ($requested_step_id != $step_id) {
+      $url = Url::fromRoute('commerce_checkout.form', ['commerce_order' => $order->id(), 'step' => $step_id]);
+      return new RedirectResponse($url->toString());
+    }
     $checkout_flow = $this->checkoutOrderManager->getCheckoutFlow($order);
-    $form_state = new FormState();
-    return $this->formBuilder->buildForm($checkout_flow->getPlugin(), $form_state);
+    $checkout_flow_plugin = $checkout_flow->getPlugin();
+
+    return $this->formBuilder->getForm($checkout_flow_plugin, $step_id);
   }
 
   /**
@@ -99,13 +108,18 @@ class CheckoutController implements ContainerInjectionInterface {
   public function checkAccess(RouteMatchInterface $route_match, AccountInterface $account) {
     /** @var \Drupal\commerce_order\Entity\OrderInterface $order */
     $order = $route_match->getParameter('commerce_order');
+    if ($order->getState()->value == 'canceled') {
+      return AccessResult::forbidden()->addCacheableDependency($order);
+    }
 
     // The user can checkout only their own non-empty orders.
     if ($account->isAuthenticated()) {
       $customer_check = $account->id() == $order->getCustomerId();
     }
     else {
-      $customer_check = $this->cartSession->hasCartId($order->id());
+      $active_cart = $this->cartSession->hasCartId($order->id(), CartSession::ACTIVE);
+      $completed_cart = $this->cartSession->hasCartId($order->id(), CartSession::COMPLETED);
+      $customer_check = $active_cart || $completed_cart;
     }
 
     $access = AccessResult::allowedIf($customer_check)

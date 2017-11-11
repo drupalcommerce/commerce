@@ -1,3 +1,46 @@
+commerce_config_entity_bundle:
+  type: config_entity
+  mapping:
+    id:
+      type: string
+      label: 'ID'
+    label:
+      type: label
+      label: 'Label'
+    traits:
+      type: sequence
+      label: 'Traits'
+      orderby: value
+      sequence:
+        type: string
+
+commerce_condition:
+  type: mapping
+  label: 'Condition'
+  mapping:
+    plugin:
+      type: string
+      label: 'Plugin'
+    configuration:
+      type: commerce.commerce_condition.plugin.[%parent.plugin]
+
+commerce.commerce_condition.plugin.*:
+  type: commerce_condition_configuration
+
+commerce_condition_configuration:
+  type: mapping
+
+commerce.commerce_condition.plugin.entity_bundle:
+  type: commerce_condition_configuration
+  mapping:
+    bundles:
+      type: sequence
+      label: 'Bundles'
+      orderby: value
+      sequence:
+        type: string
+        label: 'Bundle'
+
 field.value.commerce_remote_id:
  type: mapping
  label: 'Default value'
@@ -9,10 +52,24 @@ field.value.commerce_remote_id:
      type: string
      label: 'Remote ID'
 
+field.widget.settings.commerce_conditions:
+  type: mapping
+  label: 'Conditions widget settings'
+  mapping:
+    entity_types:
+      type: sequence
+      label: 'Entity types'
+      orderby: value
+      sequence:
+        type: string
+
 field.widget.settings.commerce_entity_select:
   type: mapping
   label: 'Entity select widget settings'
   mapping:
+    hide_single_entity:
+      type: boolean
+      label: 'Hide if there''s only one entity'
     autocomplete_threshold:
       type: integer
       label: 'Autocomplete threshold'
@@ -22,16 +79,6 @@ field.widget.settings.commerce_entity_select:
     autocomplete_placeholder:
       type: string
       label: 'Autocomplete placeholder'
-
-field.field_settings.commerce_plugin_item:*:
-  type: mapping
-  label: 'Plugin item field settings'
-  mapping:
-    categories:
-      type: sequence
-      label: 'Categories'
-      sequence:
-        - type: string
 
 views.argument_validator.commerce_current_user:
   type: mapping

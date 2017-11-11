@@ -5,4 +5,3 @@ commerce_cart.page:
     _title: 'Shopping cart'
   requirements:
     _permission: 'access cart'
-

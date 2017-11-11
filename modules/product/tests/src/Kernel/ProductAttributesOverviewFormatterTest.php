@@ -7,14 +7,14 @@ use Drupal\commerce_product\Entity\ProductAttribute;
 use Drupal\commerce_product\Entity\ProductAttributeValue;
 use Drupal\commerce_product\Entity\ProductVariation;
 use Drupal\Core\Entity\Entity\EntityViewMode;
-use Drupal\KernelTests\KernelTestBase;
+use Drupal\Tests\commerce\Kernel\CommerceKernelTestBase;
 
 /**
- * Tests using the "commerce_product_attributes_overview" formatter.
+ * Tests the "commerce_product_attributes_overview" formatter.
  *
  * @group commerce
  */
-class ProductAttributesOverviewFormatterTest extends KernelTestBase {
+class ProductAttributesOverviewFormatterTest extends CommerceKernelTestBase {
 
   /**
    * @var \Drupal\commerce_product\Entity\ProductInterface
@@ -41,9 +41,9 @@ class ProductAttributesOverviewFormatterTest extends KernelTestBase {
    *
    * @var array
    */
-  public static $modules = ['system', 'field', 'options', 'user', 'path', 'text',
-    'entity', 'views', 'address', 'inline_entity_form', 'commerce',
-    'commerce_price', 'commerce_store', 'commerce_product',
+  public static $modules = [
+    'path',
+    'commerce_product',
   ];
 
   /**
@@ -51,16 +51,12 @@ class ProductAttributesOverviewFormatterTest extends KernelTestBase {
    */
   protected function setUp() {
     parent::setUp();
-    $this->installSchema('system', 'router');
-    $this->installEntitySchema('user');
+
     $this->installEntitySchema('commerce_product_attribute');
     $this->installEntitySchema('commerce_product_attribute_value');
     $this->installEntitySchema('commerce_product_variation');
-    $this->installEntitySchema('commerce_product_variation_type');
     $this->installEntitySchema('commerce_product');
-    $this->installEntitySchema('commerce_product_type');
     $this->installConfig(['commerce_product']);
-    $this->container->get('commerce_price.currency_importer')->import('USD');
 
     $this->productDefaultDisplay = commerce_get_entity_display('commerce_product', 'default', 'view');
     $this->attributeDefaultDisplay = commerce_get_entity_display('commerce_product_attribute_value', 'color', 'view');

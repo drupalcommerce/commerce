@@ -7,14 +7,14 @@ use Drupal\commerce_price\Price;
 use Drupal\entity_test\Entity\EntityTest;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
-use Drupal\KernelTests\Core\Entity\EntityKernelTestBase;
+use Drupal\Tests\commerce\Kernel\CommerceKernelTestBase;
 
 /**
  * Tests the adjustment field.
  *
  * @group commerce
  */
-class AdjustmentItemTest extends EntityKernelTestBase {
+class AdjustmentItemTest extends CommerceKernelTestBase {
 
   /**
    * The test entity.
@@ -27,8 +27,9 @@ class AdjustmentItemTest extends EntityKernelTestBase {
    * {@inheritdoc}
    */
   public static $modules = [
-    'commerce',
-    'commerce_price',
+    'entity_reference_revisions',
+    'profile',
+    'state_machine',
     'commerce_order',
   ];
 
@@ -67,15 +68,16 @@ class AdjustmentItemTest extends EntityKernelTestBase {
     /** @var \Drupal\Core\Field\FieldItemListInterface $adjustment_item_list */
     $adjustment_item_list = $this->testEntity->test_adjustments;
     $adjustment_item_list->appendItem(new Adjustment([
-      'type' => 'discount',
+      'type' => 'custom',
       'label' => '10% off',
       'amount' => new Price('-1.00', 'USD'),
+      'percentage' => '0.1',
       'source_id' => '1',
     ]));
 
     /** @var \Drupal\commerce_order\Adjustment $adjustment */
     $adjustment = $adjustment_item_list->first()->value;
-    $this->assertEquals('discount', $adjustment->getType());
+    $this->assertEquals('custom', $adjustment->getType());
     $this->assertEquals('10% off', $adjustment->getLabel());
     $this->assertEquals('-1.00', $adjustment->getAmount()->getNumber());
     $this->assertEquals('USD', $adjustment->getAmount()->getCurrencyCode());

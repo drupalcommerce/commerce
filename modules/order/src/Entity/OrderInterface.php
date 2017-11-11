@@ -14,6 +14,11 @@ use Drupal\user\UserInterface;
  */
 interface OrderInterface extends ContentEntityInterface, EntityAdjustableInterface, EntityChangedInterface {
 
+  // Refresh states.
+  const REFRESH_ON_LOAD = 'refresh_on_load';
+  const REFRESH_ON_SAVE = 'refresh_on_save';
+  const REFRESH_SKIP = 'refresh_skip';
+
   /**
    * Gets the order number.
    *
@@ -216,7 +221,51 @@ interface OrderInterface extends ContentEntityInterface, EntityAdjustableInterfa
   public function hasItem(OrderItemInterface $order_item);
 
   /**
+   * Removes all adjustments that belong to the order.
+   *
+   * This includes both order and order item adjustments, with the exception
+   * of adjustments added via the UI.
+   *
+   * @return $this
+   */
+  public function clearAdjustments();
+
+  /**
+   * Collects all adjustments that belong to the order.
+   *
+   * Unlike getAdjustments() which returns only order adjustments,
+   * this method returns both order and order item adjustments.
+   *
+   * Important:
+   * The returned order item adjustments are multiplied by quantity,
+   * so that they can be safely added to the order adjustments.
+   *
+   * @return \Drupal\commerce_order\Adjustment[]
+   *   The adjustments.
+   */
+  public function collectAdjustments();
+
+  /**
+   * Gets the order subtotal price.
+   *
+   * Represents a sum of all order item totals.
+   *
+   * @return \Drupal\commerce_price\Price|null
+   *   The order subtotal price, or NULL.
+   */
+  public function getSubtotalPrice();
+
+  /**
+   * Recalculates the order total price.
+   *
+   * @return $this
+   */
+  public function recalculateTotalPrice();
+
+  /**
    * Gets the order total price.
+   *
+   * Represents a sum of all order item totals along with adjustments.
    *
    * @return \Drupal\commerce_price\Price|null
    *   The order total price, or NULL.
@@ -232,24 +281,74 @@ interface OrderInterface extends ContentEntityInterface, EntityAdjustableInterfa
   public function getState();
 
   /**
-   * Gets the order data.
+   * Gets the order refresh state.
    *
-   * Used to store temporary data during order processing (i.e. checkout).
-   *
-   * @return array
-   *   The order data.
+   * @return string|null
+   *   The refresh state, if set. One of the following order constants:
+   *   REFRESH_ON_LOAD: The order should be refreshed when it is next loaded.
+   *   REFRESH_ON_SAVE: The order should be refreshed before it is saved.
+   *   REFRESH_SKIP: The order should not be refreshed for now.
    */
-  public function getData();
+  public function getRefreshState();
 
   /**
-   * Sets the order data.
+   * Sets the order refresh state.
    *
-   * @param array $data
-   *   The order data.
+   * @param string $refresh_state
+   *   The order refresh state.
    *
    * @return $this
    */
-  public function setData($data);
+  public function setRefreshState($refresh_state);
+
+  /**
+   * Gets an order data value with the given key.
+   *
+   * Used to store temporary data during order processing (i.e. checkout).
+   *
+   * @param string $key
+   *   The key.
+   * @param mixed $default
+   *   The default value.
+   *
+   * @return mixed
+   *   The value.
+   */
+  public function getData($key, $default = NULL);
+
+  /**
+   * Sets an order data value with the given key.
+   *
+   * @param string $key
+   *   The key.
+   * @param mixed $value
+   *   The value.
+   *
+   * @return $this
+   */
+  public function setData($key, $value);
+
+  /**
+   * Gets whether the order is locked.
+   *
+   * @return bool
+   *   TRUE if the order is locked, FALSE otherwise.
+   */
+  public function isLocked();
+
+  /**
+   * Locks the order.
+   *
+   * @return $this
+   */
+  public function lock();
+
+  /**
+   * Unlocks the order.
+   *
+   * @return $this
+   */
+  public function unlock();
 
   /**
    * Gets the order creation timestamp.

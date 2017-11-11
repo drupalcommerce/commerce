@@ -3,14 +3,25 @@
 namespace Drupal\commerce_checkout\Plugin\Commerce\CheckoutPane;
 
 use Drupal\commerce_checkout\Plugin\Commerce\CheckoutFlow\CheckoutFlowInterface;
+use Drupal\commerce_order\Entity\OrderInterface;
 use Drupal\Component\Utility\NestedArray;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Plugin\PluginBase;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Provides the base checkout pane class.
  */
-abstract class CheckoutPaneBase extends PluginBase implements CheckoutPaneInterface {
+abstract class CheckoutPaneBase extends PluginBase implements CheckoutPaneInterface, ContainerFactoryPluginInterface {
+
+  /**
+   * The entity type manager.
+   *
+   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   */
+  protected $entityTypeManager;
 
   /**
    * The parent checkout flow.
@@ -37,13 +48,29 @@ abstract class CheckoutPaneBase extends PluginBase implements CheckoutPaneInterf
    *   The plugin implementation definition.
    * @param \Drupal\commerce_checkout\Plugin\Commerce\CheckoutFlow\CheckoutFlowInterface $checkout_flow
    *   The parent checkout flow.
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   *   The entity type manager.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, CheckoutFlowInterface $checkout_flow) {
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, CheckoutFlowInterface $checkout_flow, EntityTypeManagerInterface $entity_type_manager) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
 
     $this->checkoutFlow = $checkout_flow;
     $this->order = $checkout_flow->getOrder();
     $this->setConfiguration($configuration);
+    $this->entityTypeManager = $entity_type_manager;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition, CheckoutFlowInterface $checkout_flow = NULL) {
+    return new static(
+      $configuration,
+      $plugin_id,
+      $plugin_definition,
+      $checkout_flow,
+      $container->get('entity_type.manager')
+    );
   }
 
   /**
@@ -74,15 +101,16 @@ abstract class CheckoutPaneBase extends PluginBase implements CheckoutPaneInterf
    */
   public function defaultConfiguration() {
     $available_steps = array_keys($this->checkoutFlow->getSteps());
+    $available_steps[] = '_sidebar';
     $default_step = $this->pluginDefinition['default_step'];
-    if (!in_array($default_step, $available_steps)) {
+    if (!$default_step || !in_array($default_step, $available_steps)) {
       // The specified default step isn't available on the parent checkout flow.
       $default_step = '_disabled';
     }
 
     return [
       'step' => $default_step,
-      'weight' => 0,
+      'weight' => 10,
     ];
   }
 
@@ -90,7 +118,7 @@ abstract class CheckoutPaneBase extends PluginBase implements CheckoutPaneInterf
    * {@inheritdoc}
    */
   public function buildConfigurationSummary() {
-    return [];
+    return '';
   }
 
   /**
@@ -113,6 +141,14 @@ abstract class CheckoutPaneBase extends PluginBase implements CheckoutPaneInterf
   /**
    * {@inheritdoc}
    */
+  public function setOrder(OrderInterface $order) {
+    $this->order = $order;
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function getId() {
     return $this->pluginId;
   }
@@ -127,8 +163,8 @@ abstract class CheckoutPaneBase extends PluginBase implements CheckoutPaneInterf
   /**
    * {@inheritdoc}
    */
-  public function getAdminLabel() {
-    return $this->pluginDefinition['admin_label'];
+  public function getDisplayLabel() {
+    return $this->pluginDefinition['display_label'];
   }
 
   /**

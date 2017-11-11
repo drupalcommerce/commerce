@@ -4,6 +4,7 @@ namespace Drupal\Tests\commerce_price\Functional;
 
 use Drupal\commerce_price\Entity\Currency;
 use Drupal\Tests\commerce\Functional\CommerceBrowserTestBase;
+use Drupal\Core\Url;
 
 /**
  * Tests the currency UI.
@@ -13,14 +14,27 @@ use Drupal\Tests\commerce\Functional\CommerceBrowserTestBase;
 class CurrencyTest extends CommerceBrowserTestBase {
 
   /**
+   * Tests the initial currency creation.
+   */
+  public function testInitialCurrency() {
+    // We are expecting commerce_price_install() to import 'USD'.
+    $currency = Currency::load('USD');
+    $this->assertNotEmpty($currency);
+  }
+
+  /**
    * Tests importing a currency.
    */
   public function testCurrencyImport() {
-    $this->drupalGet('admin/commerce/config/currency/import');
+    $this->drupalGet('admin/commerce/config/currencies/add');
     $edit = [
       'currency_codes[]' => ['CHF'],
     ];
-    $this->submitForm($edit, 'Import');
+    $this->submitForm($edit, 'Add');
+
+    $url = Url::fromRoute('entity.commerce_currency.collection');
+    $this->assertEquals($this->getUrl(), $this->getAbsoluteUrl($url->toString()));
+
     $currency = Currency::load('CHF');
     $this->assertEquals('CHF', $currency->getCurrencyCode());
     $this->assertEquals('Swiss Franc', $currency->getName());
@@ -30,11 +44,11 @@ class CurrencyTest extends CommerceBrowserTestBase {
   }
 
   /**
-   * Tests creating a currency.
+   * Tests adding a currency.
    */
   public function testCurrencyCreation() {
-    $this->drupalGet('admin/commerce/config/currency');
-    $this->getSession()->getPage()->clickLink('Add currency');
+    $this->drupalGet('admin/commerce/config/currencies');
+    $this->getSession()->getPage()->clickLink('Add custom currency');
     $edit = [
       'name' => 'Test currency',
       'currencyCode' => 'XXX',
@@ -64,7 +78,7 @@ class CurrencyTest extends CommerceBrowserTestBase {
       'symbol' => '§',
       'fractionDigits' => 2,
     ]);
-    $this->drupalGet('admin/commerce/config/currency/XXX');
+    $this->drupalGet('admin/commerce/config/currencies/XXX');
 
     $edit = [
       'name' => 'Test currency2',
@@ -88,13 +102,13 @@ class CurrencyTest extends CommerceBrowserTestBase {
       'symbol' => '§',
       'fractionDigits' => 2,
     ]);
-    $this->drupalGet('admin/commerce/config/currency/' . $currency->id() . '/delete');
+    $this->drupalGet('admin/commerce/config/currencies/' . $currency->id() . '/delete');
     $this->assertSession()->pageTextContains(t("Are you sure you want to delete the currency @currency?", ['@currency' => $currency->getName()]));
     $this->assertSession()->pageTextContains(t('This action cannot be undone.'));
     $this->submitForm([], 'Delete');
 
     $currency_exists = (bool) Currency::load($currency->id());
-    $this->assertFalse($currency_exists, 'The currency has been deleted from the database.');
+    $this->assertEmpty($currency_exists, 'The currency has been deleted from the database.');
   }
 
 }

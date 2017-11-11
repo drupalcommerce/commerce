@@ -125,12 +125,33 @@ class PriceDefaultFormatter extends FormatterBase implements ContainerFactoryPlu
   /**
    * {@inheritdoc}
    */
+  public function settingsSummary() {
+    $summary = [];
+    if ($this->getSetting('strip_trailing_zeroes')) {
+      $summary[] = $this->t('Strip trailing zeroes after the decimal point.');
+    }
+    else {
+      $summary[] = $this->t('Do not strip trailing zeroes after the decimal point.');
+    }
+    if ($this->getSetting('display_currency_code')) {
+      $summary[] = $this->t('Display the currency code instead of the currency symbol.');
+    }
+    else {
+      $summary[] = $this->t('Display the currency symbol.');
+    }
+
+    return $summary;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function viewElements(FieldItemListInterface $items, $langcode) {
     $currency_codes = [];
     foreach ($items as $delta => $item) {
       $currency_codes[] = $item->currency_code;
     }
-    $currencies = $this->currencyStorage->loadMultiple($currency_codes);
+    $currencies = $currency_codes ? $this->currencyStorage->loadMultiple($currency_codes) : [];
 
     $elements = [];
     foreach ($items as $delta => $item) {

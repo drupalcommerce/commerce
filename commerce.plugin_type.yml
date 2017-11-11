@@ -1,0 +1,11 @@
+commerce.condition:
+  label: Commerce condition
+  provider: commerce
+  plugin_manager_service_id: plugin.manager.commerce_condition
+  plugin_definition_decorator_class: Drupal\plugin\PluginDefinition\ArrayPluginDefinitionDecorator
+
+commerce.entity_trait:
+  label: Commerce entity trait
+  provider: commerce
+  plugin_manager_service_id: plugin.manager.commerce_entity_trait
+  plugin_definition_decorator_class: Drupal\plugin\PluginDefinition\ArrayPluginDefinitionDecorator

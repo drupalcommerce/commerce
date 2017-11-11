@@ -36,20 +36,20 @@ class ProductVariationTitleGenerationTest extends ProductBrowserTestBase {
    */
   public function testTitleGenerationSetting() {
     /** @var \Drupal\Core\Field\BaseFieldDefinition[] $field_definitions */
-    $this->assertFalse($this->variationType->shouldGenerateTitle());
+    $this->assertEmpty($this->variationType->shouldGenerateTitle());
     $field_definitions = \Drupal::service('entity_field.manager')->getFieldDefinitions('commerce_product_variation', $this->variationType->id());
-    $this->assertTrue($field_definitions['title']->isRequired());
+    $this->assertNotEmpty($field_definitions['title']->isRequired());
 
     // Enable generation.
     $this->variationType->setGenerateTitle(TRUE);
     $this->variationType->save();
     /** @var \Drupal\commerce_product\Entity\ProductVariationTypeInterface $variation_type */
     $variation_type = ProductVariationType::load($this->variationType->id());
-    $this->assertTrue($variation_type->shouldGenerateTitle());
+    $this->assertNotEmpty($variation_type->shouldGenerateTitle());
 
     /** @var \Drupal\Core\Field\BaseFieldDefinition[] $field_definitions */
     $field_definitions = \Drupal::service('entity_field.manager')->getFieldDefinitions('commerce_product_variation', $this->variationType->id());
-    $this->assertFalse($field_definitions['title']->isRequired());
+    $this->assertEmpty($field_definitions['title']->isRequired());
   }
 
   /**
@@ -67,7 +67,7 @@ class ProductVariationTitleGenerationTest extends ProductBrowserTestBase {
       'title' => 'My product',
       'variations' => [$variation],
     ]);
-    $this->assertTrue(empty($variation->getTitle()));
+    $this->assertNotEmpty(empty($variation->getTitle()));
 
     $this->variationType->setGenerateTitle(TRUE);
     $this->variationType->save();

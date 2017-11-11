@@ -2,12 +2,29 @@
 
 namespace Drupal\commerce_promotion\Entity;
 
+use Drupal\commerce_order\Entity\OrderInterface;
 use Drupal\Core\Entity\ContentEntityInterface;
 
 /**
  * Provides an interface for defining coupon entities.
  */
 interface CouponInterface extends ContentEntityInterface {
+
+  /**
+   * Gets the parent promotion.
+   *
+   * @return \Drupal\commerce_promotion\Entity\PromotionInterface|null
+   *   The promotion entity, or null.
+   */
+  public function getPromotion();
+
+  /**
+   * Gets the parent promotion ID.
+   *
+   * @return int|null
+   *   The promotion ID, or null.
+   */
+  public function getPromotionId();
 
   /**
    * Gets the coupon code.
@@ -23,28 +40,61 @@ interface CouponInterface extends ContentEntityInterface {
    * @param string $code
    *   The coupon code.
    *
-   * @return \Drupal\commerce_promotion\Entity\CouponInterface
-   *   The coupon.
+   * @return $this
    */
   public function setCode($code);
 
   /**
-   * Returns the coupon status indicator.
+   * Gets the coupon usage limit.
    *
-   * @return bool
-   *   TRUE if the coupon is active.
+   * Represents the maximum number of times the coupon can be used.
+   * 0 for unlimited.
+   *
+   * @return int
+   *   The coupon usage limit.
    */
-  public function isActive();
+  public function getUsageLimit();
 
   /**
-   * Sets the status of a coupon.
+   * Sets the coupon usage limit.
    *
-   * @param bool $active
-   *   TRUE to make coupon active, FALSE to set it to inactive.
+   * @param int $usage_limit
+   *   The coupon usage limit.
    *
-   * @return \Drupal\commerce_promotion\Entity\CouponInterface
-   *   The coupon.
+   * @return $this
    */
-  public function setActive($active);
+  public function setUsageLimit($usage_limit);
+
+  /**
+   * Gets whether the coupon is enabled.
+   *
+   * @return bool
+   *   TRUE if the coupon is enabled, FALSE otherwise.
+   */
+  public function isEnabled();
+
+  /**
+   * Sets whether the coupon is enabled.
+   *
+   * @param bool $enabled
+   *   Whether the coupon is enabled.
+   *
+   * @return $this
+   */
+  public function setEnabled($enabled);
+
+  /**
+   * Checks whether the coupon is available for the given order.
+   *
+   * Ensures that the parent promotion is available, the coupon
+   * is enabled, and the usage limits are respected.
+   *
+   * @param \Drupal\commerce_order\Entity\OrderInterface $order
+   *   The order.
+   *
+   * @return bool
+   *   TRUE if coupon is available, FALSE otherwise.
+   */
+  public function available(OrderInterface $order);
 
 }

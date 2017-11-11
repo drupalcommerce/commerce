@@ -1,0 +1,29 @@
+cart_entity_added:
+  category: commerce_cart
+  label: 'Added to cart'
+  template: '<p><em>{{ purchased_entity_label }}</em> added to the cart.</p>'
+cart_item_removed:
+  category: commerce_cart
+  label: 'Removed from cart'
+  template: '<p><em>{{ purchased_entity_label }}</em> removed from the cart.</p>'
+
+order_placed:
+  category: commerce_order
+  label: 'Order placed'
+  template: '<p>The order was placed.</p>'
+order_validated:
+  category: commerce_order
+  label: 'Order validated'
+  template: '<p>The order was validated.</p>'
+order_fulfilled:
+  category: commerce_order
+  label: 'Order fulfilled'
+  template: '<p>The order was fulfilled.</p>'
+order_canceled:
+  category: commerce_order
+  label: 'Order canceled'
+  template: '<p>The order was canceled.</p>'
+order_assigned:
+  category: commerce_order
+  label: 'Order assigned'
+  template: '<p>The order was assigned to {{ user }}.</p>'

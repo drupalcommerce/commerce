@@ -1,0 +1,21 @@
+/**
+ * @file
+ * Default styles for the order total summary.
+ */
+
+.order-total-line {
+  padding: 0 10px;
+  text-align: right;
+}
+.order-total-line__total {
+  padding-top: 5px;
+  font-weight: bold;
+}
+.order-total-line-label {
+  display: inline-block;
+}
+.order-total-line-value {
+  display: inline-block;
+  width: 80px;
+  text-align: right;
+}

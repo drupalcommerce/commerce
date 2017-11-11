@@ -4,7 +4,7 @@ namespace Drupal\Tests\commerce_product\Kernel;
 
 use Drupal\commerce_product\Entity\ProductAttribute;
 use Drupal\commerce_product\Entity\ProductVariationType;
-use Drupal\KernelTests\KernelTestBase;
+use Drupal\Tests\commerce\Kernel\CommerceKernelTestBase;
 
 /**
  * Tests the attribute field manager.
@@ -13,7 +13,7 @@ use Drupal\KernelTests\KernelTestBase;
  *
  * @group commerce
  */
-class ProductAttributeFieldManagerTest extends KernelTestBase {
+class ProductAttributeFieldManagerTest extends CommerceKernelTestBase {
 
   /**
    * The attribute field manager.
@@ -27,9 +27,9 @@ class ProductAttributeFieldManagerTest extends KernelTestBase {
    *
    * @var array
    */
-  public static $modules = ['system', 'field', 'options', 'user', 'path', 'text',
-    'entity', 'views', 'address', 'inline_entity_form', 'commerce',
-    'commerce_price', 'commerce_store', 'commerce_product',
+  public static $modules = [
+    'path',
+    'commerce_product',
   ];
 
   /**
@@ -38,14 +38,10 @@ class ProductAttributeFieldManagerTest extends KernelTestBase {
   protected function setUp() {
     parent::setUp();
 
-    $this->installSchema('system', 'router');
-    $this->installEntitySchema('user');
     $this->installEntitySchema('commerce_product_attribute');
     $this->installEntitySchema('commerce_product_attribute_value');
     $this->installEntitySchema('commerce_product_variation');
-    $this->installEntitySchema('commerce_product_variation_type');
     $this->installEntitySchema('commerce_product');
-    $this->installEntitySchema('commerce_product_type');
 
     $this->attributeFieldManager = $this->container->get('commerce_product.attribute_field_manager');
 

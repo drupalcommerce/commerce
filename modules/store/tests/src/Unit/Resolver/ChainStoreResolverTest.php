@@ -65,7 +65,7 @@ class ChainStoreResolverTest extends UnitTestCase {
     ];
     arsort($resolvers, SORT_NUMERIC);
     foreach ($resolvers as $id => $priority) {
-      $this->resolver->addResolver($container->get($id), $priority);
+      $this->resolver->addResolver($container->get($id));
     }
 
     $result = $this->resolver->resolve();

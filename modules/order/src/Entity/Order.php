@@ -2,10 +2,9 @@
 
 namespace Drupal\commerce_order\Entity;
 
+use Drupal\commerce\Entity\CommerceContentEntityBase;
 use Drupal\commerce_order\Adjustment;
-use Drupal\commerce_price\Price;
 use Drupal\commerce_store\Entity\StoreInterface;
-use Drupal\Core\Entity\ContentEntityBase;
 use Drupal\Core\Entity\EntityChangedTrait;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
@@ -19,6 +18,7 @@ use Drupal\profile\Entity\ProfileInterface;
  * @ContentEntityType(
  *   id = "commerce_order",
  *   label = @Translation("Order"),
+ *   label_collection = @Translation("Orders"),
  *   label_singular = @Translation("order"),
  *   label_plural = @Translation("orders"),
  *   label_count = @PluralTranslation(
@@ -37,10 +37,11 @@ use Drupal\profile\Entity\ProfileInterface;
  *       "default" = "Drupal\commerce_order\Form\OrderForm",
  *       "add" = "Drupal\commerce_order\Form\OrderForm",
  *       "edit" = "Drupal\commerce_order\Form\OrderForm",
- *       "delete" = "Drupal\Core\Entity\ContentEntityDeleteForm"
+ *       "delete" = "Drupal\Core\Entity\ContentEntityDeleteForm",
+ *       "unlock" = "Drupal\commerce_order\Form\OrderUnlockForm",
  *     },
  *     "route_provider" = {
- *       "default" = "Drupal\Core\Entity\Routing\DefaultHtmlRouteProvider",
+ *       "default" = "Drupal\commerce_order\OrderRouteProvider",
  *       "delete-multiple" = "Drupal\entity\Routing\DeleteMultipleRouteProvider",
  *     },
  *   },
@@ -60,13 +61,14 @@ use Drupal\profile\Entity\ProfileInterface;
  *     "delete-form" = "/admin/commerce/orders/{commerce_order}/delete",
  *     "delete-multiple-form" = "/admin/commerce/orders/delete",
  *     "reassign-form" = "/admin/commerce/orders/{commerce_order}/reassign",
+ *     "unlock-form" = "/admin/commerce/orders/{commerce_order}/unlock",
  *     "collection" = "/admin/commerce/orders"
  *   },
  *   bundle_entity_type = "commerce_order_type",
  *   field_ui_base_route = "entity.commerce_order_type.edit_form"
  * )
  */
-class Order extends ContentEntityBase implements OrderInterface {
+class Order extends CommerceContentEntityBase implements OrderInterface {
 
   use EntityChangedTrait;
 
@@ -89,7 +91,7 @@ class Order extends ContentEntityBase implements OrderInterface {
    * {@inheritdoc}
    */
   public function getStore() {
-    return $this->get('store_id')->entity;
+    return $this->getTranslatedReferencedEntity('store_id');
   }
 
   /**
@@ -298,6 +300,90 @@ class Order extends ContentEntityBase implements OrderInterface {
   /**
    * {@inheritdoc}
    */
+  public function clearAdjustments() {
+    $locked_callback = function ($adjustment) {
+      /** @var \Drupal\commerce_order\Adjustment $adjustment */
+      return $adjustment->isLocked();
+    };
+    // Remove all unlocked adjustments.
+    foreach ($this->getItems() as $order_item) {
+      $adjustments = array_filter($order_item->getAdjustments(), $locked_callback);
+      $order_item->setAdjustments($adjustments);
+    }
+    $adjustments = array_filter($this->getAdjustments(), $locked_callback);
+    $this->setAdjustments($adjustments);
+
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function collectAdjustments() {
+    $adjustments = [];
+    foreach ($this->getItems() as $order_item) {
+      foreach ($order_item->getAdjustments() as $adjustment) {
+        // Order item adjustments apply to the unit price, they
+        // must be multiplied by quantity before they are used.
+        $multiplied_adjustment = new Adjustment([
+          'type' => $adjustment->getType(),
+          'label' => $adjustment->getLabel(),
+          'amount' => $adjustment->getAmount()->multiply($order_item->getQuantity()),
+          'percentage' => $adjustment->getPercentage(),
+          'source_id' => $adjustment->getSourceId(),
+          'included' => $adjustment->isIncluded(),
+          'locked' => $adjustment->isLocked(),
+        ]);
+        $adjustments[] = $multiplied_adjustment;
+      }
+    }
+    foreach ($this->getAdjustments() as $adjustment) {
+      $adjustments[] = $adjustment;
+    }
+
+    return $adjustments;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getSubtotalPrice() {
+    /** @var \Drupal\commerce_price\Price $subtotal_price */
+    $subtotal_price = NULL;
+    if ($this->hasItems()) {
+      foreach ($this->getItems() as $order_item) {
+        $order_item_total = $order_item->getTotalPrice();
+        $subtotal_price = $subtotal_price ? $subtotal_price->add($order_item_total) : $order_item_total;
+      }
+    }
+    return $subtotal_price;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function recalculateTotalPrice() {
+    /** @var \Drupal\commerce_price\Price $total_price */
+    $total_price = NULL;
+    if ($this->hasItems()) {
+      foreach ($this->getItems() as $order_item) {
+        $order_item_total = $order_item->getTotalPrice();
+        $total_price = $total_price ? $total_price->add($order_item_total) : $order_item_total;
+      }
+      foreach ($this->collectAdjustments() as $adjustment) {
+        if (!$adjustment->isIncluded()) {
+          $total_price = $total_price->add($adjustment->getAmount());
+        }
+      }
+    }
+    $this->total_price = $total_price;
+
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function getTotalPrice() {
     if (!$this->get('total_price')->isEmpty()) {
       return $this->get('total_price')->first()->toPrice();
@@ -314,15 +400,56 @@ class Order extends ContentEntityBase implements OrderInterface {
   /**
    * {@inheritdoc}
    */
-  public function getData() {
-    return $this->get('data')->first()->getValue();
+  public function getRefreshState() {
+    return $this->getData('refresh_state');
   }
 
   /**
    * {@inheritdoc}
    */
-  public function setData($data) {
-    $this->set('data', [$data]);
+  public function setRefreshState($refresh_state) {
+    return $this->setData('refresh_state', $refresh_state);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getData($key, $default = NULL) {
+    $data = [];
+    if (!$this->get('data')->isEmpty()) {
+      $data = $this->get('data')->first()->getValue();
+    }
+    return isset($data[$key]) ? $data[$key] : $default;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setData($key, $value) {
+    $this->get('data')->__set($key, $value);
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function isLocked() {
+    return !empty($this->get('locked')->value);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function lock() {
+    $this->set('locked', TRUE);
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function unlock() {
+    $this->set('locked', FALSE);
     return $this;
   }
 
@@ -381,67 +508,23 @@ class Order extends ContentEntityBase implements OrderInterface {
       if (!$this->getIpAddress()) {
         $this->setIpAddress(\Drupal::request()->getClientIp());
       }
+    }
 
-      if (!$this->getEmail() && $customer = $this->getCustomer()) {
-        $this->setEmail($customer->getEmail());
+    if (!$this->getEmail() && $customer = $this->getCustomer()) {
+      $this->setEmail($customer->getEmail());
+    }
+
+    // Maintain the completed timestamp.
+    $state = $this->getState()->value;
+    $original_state = isset($this->original) ? $this->original->getState()->value : '';
+    if ($state == 'completed' && $original_state != 'completed') {
+      if (empty($this->getCompletedTime())) {
+        $this->setCompletedTime(\Drupal::time()->getRequestTime());
       }
     }
-
-    $this->recalculateTotalPrice();
-  }
-
-  /**
-   * Recalculates the order item total price.
-   */
-  protected function recalculateTotalPrice() {
-    $total_price = $this->getTotalPrice();
-    if ($total_price) {
-      $currency_code = $total_price->getCurrencyCode();
-    }
-    else {
-      $currency_code = $this->initializeCurrencyCode();
-      if (!$currency_code) {
-        // The order object is not complete enough to have a total price yet.
-        return;
-      }
-    }
-
-    $total_price = new Price('0', $currency_code);
-    foreach ($this->getItems() as $order_item) {
-      $total_price = $total_price->add($order_item->getTotalPrice());
-      foreach ($order_item->getAdjustments() as $adjustment) {
-        $adjustment_total = $adjustment->getAmount()->multiply($order_item->getQuantity());
-        $total_price = $total_price->add($adjustment_total);
-      }
-    }
-    foreach ($this->getAdjustments() as $adjustment) {
-      $total_price = $total_price->add($adjustment->getAmount());
-    }
-    $this->total_price = $total_price;
-  }
-
-  /**
-   * Initializes the order currency code.
-   *
-   * Takes the currency of the first order item if found.
-   * Otherwise it falls back to the store's default currency.
-   *
-   * @return string|null
-   *   The currency code, or NULL if the order is in an incomplete state
-   *   (no order items, no store).
-   */
-  protected function initializeCurrencyCode() {
-    if ($this->hasItems()) {
-      $order_items = $this->getItems();
-      $first_order_item = reset($order_items);
-      /** @var \Drupal\commerce_price\Price $unit_price */
-      $unit_price = $first_order_item->getUnitPrice();
-      if ($unit_price) {
-        return $unit_price->getCurrencyCode();
-      }
-    }
-    if ($store = $this->getStore()) {
-      return $store->getDefaultCurrencyCode();
+    // Refresh draft orders on every save.
+    if ($this->getState()->value == 'draft' && empty($this->getRefreshState())) {
+      $this->setRefreshState(self::REFRESH_ON_SAVE);
     }
   }
 
@@ -450,12 +533,6 @@ class Order extends ContentEntityBase implements OrderInterface {
    */
   public function postSave(EntityStorageInterface $storage, $update = TRUE) {
     parent::postSave($storage, $update);
-
-    // If no order number has been set explicitly, set it to the order ID.
-    if (!$this->getOrderNumber()) {
-      $this->setOrderNumber($this->id());
-      $this->save();
-    }
 
     // Ensure there's a back-reference on each order item.
     foreach ($this->getItems() as $order_item) {
@@ -470,6 +547,8 @@ class Order extends ContentEntityBase implements OrderInterface {
    * {@inheritdoc}
    */
   public static function postDelete(EntityStorageInterface $storage, array $entities) {
+    parent::postDelete($storage, $entities);
+
     // Delete the order items of a deleted order.
     $order_items = [];
     /** @var \Drupal\commerce_order\Entity\OrderInterface $entity */
@@ -510,8 +589,8 @@ class Order extends ContentEntityBase implements OrderInterface {
       ->setDisplayConfigurable('view', TRUE);
 
     $fields['uid'] = BaseFieldDefinition::create('entity_reference')
-      ->setLabel(t('Owner'))
-      ->setDescription(t('The order owner.'))
+      ->setLabel(t('Customer'))
+      ->setDescription(t('The customer.'))
       ->setSetting('target_type', 'user')
       ->setSetting('handler', 'default')
       ->setDefaultValueCallback('Drupal\commerce_order\Entity\Order::getCurrentUserId')
@@ -555,14 +634,14 @@ class Order extends ContentEntityBase implements OrderInterface {
       ->setDisplayConfigurable('view', TRUE);
 
     $fields['billing_profile'] = BaseFieldDefinition::create('entity_reference_revisions')
-      ->setLabel(t('Billing profile'))
+      ->setLabel(t('Billing information'))
       ->setDescription(t('Billing profile'))
       ->setSetting('target_type', 'profile')
       ->setSetting('handler', 'default')
       ->setSetting('handler_settings', ['target_bundles' => ['customer']])
       ->setTranslatable(TRUE)
       ->setDisplayOptions('form', [
-        'type' => 'options_select',
+        'type' => 'commerce_billing_profile',
         'weight' => 0,
         'settings' => [],
       ])
@@ -577,13 +656,18 @@ class Order extends ContentEntityBase implements OrderInterface {
         'type' => 'commerce_adjustment_default',
         'weight' => 0,
       ])
-      ->setDisplayConfigurable('form', FALSE)
+      ->setDisplayConfigurable('form', TRUE)
       ->setDisplayConfigurable('view', FALSE);
 
     $fields['total_price'] = BaseFieldDefinition::create('commerce_price')
       ->setLabel(t('Total price'))
       ->setDescription(t('The total price of the order.'))
       ->setReadOnly(TRUE)
+      ->setDisplayOptions('view', [
+        'label' => 'hidden',
+        'type' => 'commerce_order_total_summary',
+        'weight' => 0,
+      ])
       ->setDisplayConfigurable('form', FALSE)
       ->setDisplayConfigurable('view', TRUE);
 
@@ -594,8 +678,8 @@ class Order extends ContentEntityBase implements OrderInterface {
       ->setSetting('max_length', 255)
       ->setDisplayOptions('view', [
         'label' => 'hidden',
-        'type' => 'list_default',
-        'weight' => 0,
+        'type' => 'state_transition_form',
+        'weight' => 10,
       ])
       ->setDisplayConfigurable('form', TRUE)
       ->setDisplayConfigurable('view', TRUE)
@@ -605,13 +689,22 @@ class Order extends ContentEntityBase implements OrderInterface {
       ->setLabel(t('Data'))
       ->setDescription(t('A serialized array of additional data.'));
 
+    $fields['locked'] = BaseFieldDefinition::create('boolean')
+      ->setLabel(t('Locked'))
+      ->setSettings([
+        'on_label' => t('Yes'),
+        'off_label' => t('No'),
+      ])
+      ->setDefaultValue(FALSE);
+
     $fields['created'] = BaseFieldDefinition::create('created')
       ->setLabel(t('Created'))
       ->setDescription(t('The time when the order was created.'));
 
     $fields['changed'] = BaseFieldDefinition::create('changed')
       ->setLabel(t('Changed'))
-      ->setDescription(t('The time when the order was last edited.'));
+      ->setDescription(t('The time when the order was last edited.'))
+      ->setDisplayConfigurable('view', TRUE);
 
     $fields['placed'] = BaseFieldDefinition::create('timestamp')
       ->setLabel(t('Placed'))

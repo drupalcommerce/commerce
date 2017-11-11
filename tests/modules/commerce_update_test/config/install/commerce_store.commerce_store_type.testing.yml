@@ -3,4 +3,5 @@ status: true
 dependencies: {  }
 id: testing
 label: Testing
-description: null
+description: ''
+traits: {  }

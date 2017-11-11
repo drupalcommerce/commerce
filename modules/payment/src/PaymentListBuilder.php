@@ -8,6 +8,7 @@ use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityListBuilder;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
+use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Url;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -24,6 +25,13 @@ class PaymentListBuilder extends EntityListBuilder {
   protected $numberFormatter;
 
   /**
+   * The current route match.
+   *
+   * @var \Drupal\Core\Routing\RouteMatchInterface
+   */
+  protected $routeMatch;
+
+  /**
    * {@inheritdoc}
    */
   protected $entitiesKey = 'payments';
@@ -37,11 +45,14 @@ class PaymentListBuilder extends EntityListBuilder {
    *   The entity storage class.
    * @param \Drupal\commerce_price\NumberFormatterFactoryInterface $number_formatter_factory
    *   The number formatter factory.
+   * @param \Drupal\Core\Routing\RouteMatchInterface $route_match
+   *   The current route match.
    */
-  public function __construct(EntityTypeInterface $entity_type, EntityStorageInterface $storage, NumberFormatterFactoryInterface $number_formatter_factory) {
+  public function __construct(EntityTypeInterface $entity_type, EntityStorageInterface $storage, NumberFormatterFactoryInterface $number_formatter_factory, RouteMatchInterface $route_match) {
     parent::__construct($entity_type, $storage);
 
     $this->numberFormatter = $number_formatter_factory->createInstance();
+    $this->routeMatch = $route_match;
   }
 
   /**
@@ -51,7 +62,8 @@ class PaymentListBuilder extends EntityListBuilder {
     return new static(
       $entity_type,
       $container->get('entity.manager')->getStorage($entity_type->id()),
-      $container->get('commerce_price.number_formatter_factory')
+      $container->get('commerce_price.number_formatter_factory'),
+      $container->get('current_route_match')
     );
   }
 
@@ -65,19 +77,9 @@ class PaymentListBuilder extends EntityListBuilder {
   /**
    * {@inheritdoc}
    */
-  protected function getEntityIds() {
-    /** @var \Drupal\Core\Routing\RouteMatchInterface $route */
-    $route = \Drupal::service('current_route_match');
-    $order = $route->getParameter('commerce_order');
-
-    $query = $this->getStorage()->getQuery()
-      ->condition('order_id', $order)
-      ->sort('payment_id');
-    // Only add the pager if a limit is specified.
-    if ($this->limit) {
-      $query->pager($this->limit);
-    }
-    return $query->execute();
+  public function load() {
+    $order = $this->routeMatch->getParameter('commerce_order');
+    return $this->storage->loadMultipleByOrder($order);
   }
 
   /**
@@ -138,7 +140,7 @@ class PaymentListBuilder extends EntityListBuilder {
     }
 
     $row['label'] = $formatted_amount;
-    $row['remote_id'] = $entity->getRemoteId();
+    $row['remote_id'] = $entity->getRemoteId() ?: $this->t('N/A');
     $row['state'] = $entity->getState()->getLabel();
 
     return $row + parent::buildRow($entity);

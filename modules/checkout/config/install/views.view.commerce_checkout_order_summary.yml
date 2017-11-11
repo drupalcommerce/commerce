@@ -3,6 +3,7 @@ status: true
 dependencies:
   enforced:
     module:
+      - commerce_checkout
       - commerce_order
   module:
     - commerce_order

@@ -11,6 +11,7 @@ use Drupal\Core\Entity\EntityStorageInterface;
  * @ConfigEntityType(
  *   id = "commerce_product_attribute",
  *   label = @Translation("Product attribute"),
+ *   label_collection = @Translation("Product attributes"),
  *   label_singular = @Translation("product attribute"),
  *   label_plural = @Translation("product attributes"),
  *   label_count = @PluralTranslation(
@@ -79,7 +80,7 @@ class ProductAttribute extends ConfigEntityBundleBase implements ProductAttribut
    */
   public function getValues() {
     $storage = $this->entityTypeManager()->getStorage('commerce_product_attribute_value');
-    return $storage->loadByAttribute($this->id());
+    return $storage->loadMultipleByAttribute($this->id());
   }
 
   /**

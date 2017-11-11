@@ -3,6 +3,7 @@
 namespace Drupal\commerce_order;
 
 use Drupal\commerce\AvailabilityManagerInterface;
+use Drupal\commerce\Context;
 use Drupal\commerce_order\Entity\OrderInterface;
 
 /**
@@ -31,10 +32,12 @@ class AvailabilityOrderProcessor implements OrderProcessorInterface {
    * {@inheritdoc}
    */
   public function process(OrderInterface $order) {
+    // @todo Get $context as an argument to process().
+    $context = new Context($order->getCustomer(), $order->getStore());
     foreach ($order->getItems() as $order_item) {
       $purchased_entity = $order_item->getPurchasedEntity();
       if ($purchased_entity) {
-        $available = $this->availabilityManager->check($order_item->getPurchasedEntity(), $order_item->getQuantity());
+        $available = $this->availabilityManager->check($purchased_entity, $order_item->getQuantity(), $context);
         if (!$available) {
           $order->removeItem($order_item);
           $order_item->delete();

@@ -31,10 +31,10 @@ class AvailabilityManager implements AvailabilityManagerInterface {
   /**
    * {@inheritdoc}
    */
-  public function check(PurchasableEntityInterface $entity, $quantity = 1) {
+  public function check(PurchasableEntityInterface $entity, $quantity, Context $context) {
     foreach ($this->checkers as $checker) {
       if ($checker->applies($entity)) {
-        $result = $checker->check($entity, $quantity);
+        $result = $checker->check($entity, $quantity, $context);
         if ($result === FALSE) {
           return FALSE;
         }

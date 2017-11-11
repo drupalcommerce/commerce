@@ -4,6 +4,7 @@ namespace Drupal\commerce_cart\Plugin\Block;
 
 use Drupal\commerce_cart\CartProviderInterface;
 use Drupal\Core\Block\BlockBase;
+use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\FormStateInterface;
@@ -158,9 +159,7 @@ class CartBlock extends BlockBase implements ContainerFactoryPluginInterface {
       '#content' => $cart_views,
       '#links' => $links,
       '#cache' => [
-        'contexts' => $cachable_metadata->getCacheContexts(),
-        'tags' => $cachable_metadata->getCacheTags(),
-        'max-age' => $cachable_metadata->getCacheMaxAge(),
+        'contexts' => ['cart'],
       ],
     ];
   }
@@ -206,11 +205,25 @@ class CartBlock extends BlockBase implements ContainerFactoryPluginInterface {
 
   /**
    * {@inheritdoc}
-   *
-   * @todo Find proper cache tags to make this cacheable
    */
-  public function getCacheMaxAge() {
-    return 0;
+  public function getCacheContexts() {
+    return Cache::mergeContexts(parent::getCacheContexts(), ['cart']);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getCacheTags() {
+    $cache_tags = parent::getCacheTags();
+    $cart_cache_tags = [];
+
+    /** @var \Drupal\commerce_order\Entity\OrderInterface[] $carts */
+    $carts = $this->cartProvider->getCarts();
+    foreach ($carts as $cart) {
+      // Add tags for all carts regardless items or cart flag.
+      $cart_cache_tags = Cache::mergeTags($cart_cache_tags, $cart->getCacheTags());
+    }
+    return Cache::mergeTags($cache_tags, $cart_cache_tags);
   }
 
 }

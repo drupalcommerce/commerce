@@ -70,6 +70,16 @@ final class Price {
   }
 
   /**
+   * Gets the array representation of the price.
+   *
+   * @return array
+   *   The array representation of the price.
+   */
+  public function toArray() {
+    return ['number' => $this->number, 'currency_code' => $this->currencyCode];
+  }
+
+  /**
    * Converts the current price to the given currency.
    *
    * @param string $currency_code

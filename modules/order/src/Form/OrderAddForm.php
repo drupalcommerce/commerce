@@ -2,7 +2,7 @@
 
 namespace Drupal\commerce_order\Form;
 
-use \Drupal\Core\Datetime\DrupalDateTime;
+use Drupal\Core\Datetime\DrupalDateTime;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;

@@ -10,6 +10,8 @@ language: php
 
 sudo: false
 
+dist: precise
+
 php:
   - 7
   - 5.6
@@ -40,7 +42,7 @@ env:
 
     # The environment to use, supported are: drupal-7, drupal-8
     - DRUPAL_TI_ENVIRONMENT="drupal-8"
-    - DRUPAL_TI_CORE_BRANCH="8.2.x"
+    - DRUPAL_TI_CORE_BRANCH="8.4.x"
 
     # Drupal specific variables.
     - DRUPAL_TI_DB="drupal_travis_db"
@@ -50,7 +52,8 @@ env:
     - DRUPAL_TI_WEBSERVER_PORT="8080"
 
     # Simpletest specific commandline arguments, the DRUPAL_TI_SIMPLETEST_GROUP is appended at the end.
-    - DRUPAL_TI_SIMPLETEST_ARGS="--verbose --color --concurrency 4 --url $DRUPAL_TI_WEBSERVER_URL:$DRUPAL_TI_WEBSERVER_PORT --types Simpletest"
+    - DRUPAL_TI_SIMPLETEST_ARGS="--verbose --color --concurrency 20 --url $DRUPAL_TI_WEBSERVER_URL:$DRUPAL_TI_WEBSERVER_PORT --types Simpletest,PHPUnit-Unit,PHPUnit-Kernel,PHPUnit-Functional"
+    - DRUPAL_TI_SIMPLETEST_JS_ARGS="--verbose --color --concurrency 1 --url $DRUPAL_TI_WEBSERVER_URL:$DRUPAL_TI_WEBSERVER_PORT --types PHPUnit-FunctionalJavascript"
 
     # === Behat specific variables.
     # This is relative to $TRAVIS_BUILD_DIR
@@ -88,7 +91,7 @@ env:
   matrix:
     # [[[ SELECT ANY OR MORE OPTIONS ]]]
     #- DRUPAL_TI_RUNNERS="phpunit"
-    - DRUPAL_TI_RUNNERS="phpunit-core"
+    - DRUPAL_TI_RUNNERS="simpletest"
     #- DRUPAL_TI_RUNNERS="behat"
     #- DRUPAL_TI_RUNNERS="phpunit simpletest behat"
 
@@ -102,9 +105,8 @@ before_install:
   - phpenv config-rm xdebug.ini || true
   # Add the oauth token to prevent GitHub timeouts.
   - git config --global github.accesstoken $GITHUB_OAUTH_TOKEN
-  - composer self-update
   - composer global require "hirak/prestissimo:^0.3"
-  - composer global require "lionsad/drupal_ti:dev-master"
+  - composer global require "lionsad/drupal_ti:dev-master#396d11d200005eb68491d24170da0a98ae7f51b3"
   - composer global require "squizlabs/php_codesniffer:2.*"
   - composer global require "drupal/coder:8.2.*"
   - phpcs --config-set installed_paths $HOME/.composer/vendor/drupal/coder/coder_sniffer
@@ -127,7 +129,9 @@ script:
   - phpcs --standard=phpcs.xml modules -s
   - phpcs --standard=phpcs.xml tests -s
   - phpcs --standard=phpcs.xml commerce.module
+
   - drupal-ti script
+  - drupal-ti --include ".travis-simpletest-js.sh"
 
 after_script:
   - drupal-ti after_script

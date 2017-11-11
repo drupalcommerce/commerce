@@ -25,6 +25,7 @@ class EntitySelectWidget extends WidgetBase {
    */
   public static function defaultSettings() {
     return [
+      'hide_single_entity' => TRUE,
       'autocomplete_threshold' => 7,
       'autocomplete_size' => 60,
       'autocomplete_placeholder' => '',
@@ -36,6 +37,12 @@ class EntitySelectWidget extends WidgetBase {
    */
   public function settingsForm(array $form, FormStateInterface $formState) {
     $element = [];
+    $element['hide_single_entity'] = [
+      '#type' => 'checkbox',
+      '#title' => t("Hide if there's only one available entity."),
+      '#default_value' => $this->getSetting('hide_single_entity'),
+      '#access' => $this->fieldDefinition->isRequired(),
+    ];
     $element['autocomplete_threshold'] = [
       '#type' => 'number',
       '#title' => $this->t('Autocomplete threshold'),
@@ -67,11 +74,21 @@ class EntitySelectWidget extends WidgetBase {
    */
   public function settingsSummary() {
     $summary = [];
-    $summary[] = $this->t('Autocomplete threshold: @threshold entities.', ['@threshold' => $this->getSetting('autocomplete_threshold')]);
-    $summary[] = $this->t('Autocomplete size: @size characters', ['@size' => $this->getSetting('autocomplete_size')]);
+    $hide_single_entity = $this->getSetting('hide_single_entity');
+    if ($this->fieldDefinition->isRequired() && $hide_single_entity) {
+      $summary[] = $this->t("Hide if there's only one available entity");
+    }
+    $summary[] = $this->t('Autocomplete threshold: @threshold entities.', [
+      '@threshold' => $this->getSetting('autocomplete_threshold'),
+    ]);
+    $summary[] = $this->t('Autocomplete size: @size characters', [
+      '@size' => $this->getSetting('autocomplete_size'),
+    ]);
     $placeholder = $this->getSetting('autocomplete_placeholder');
     if (!empty($placeholder)) {
-      $summary[] = $this->t('Autocomplete placeholder: @placeholder', ['@placeholder' => $placeholder]);
+      $summary[] = $this->t('Autocomplete placeholder: @placeholder', [
+        '@placeholder' => $placeholder,
+      ]);
     }
     else {
       $summary[] = $this->t('No autocomplete placeholder');
@@ -99,6 +116,7 @@ class EntitySelectWidget extends WidgetBase {
       '#target_type' => $this->getFieldSetting('target_type'),
       '#multiple' => $multiple,
       '#default_value' => $default_value,
+      '#hide_single_entity' => $settings['hide_single_entity'],
       '#autocomplete_threshold' => $settings['autocomplete_threshold'],
       '#autocomplete_size' => $settings['autocomplete_size'],
       '#autocomplete_placeholder' => $settings['autocomplete_placeholder'],

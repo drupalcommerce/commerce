@@ -5,7 +5,7 @@ package: Commerce
 core: 8.x
 dependencies:
   - commerce
-  - commerce_price
+  - commerce:commerce_price
   - options
 config_devel:
   install:

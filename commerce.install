@@ -1,0 +1,23 @@
+<?php
+
+/**
+ * @file
+ * Contains install and update functions for Commerce.
+ */
+
+/**
+ * Implements hook_requirements().
+ */
+function commerce_requirements($phase) {
+  $requirements = [];
+  if ($phase == 'install' || $phase == 'runtime') {
+    if (!extension_loaded('bcmath')) {
+      $requirements['commerce'] = [
+        'description' => t('Commerce requires the bcmath PHP extension.'),
+        'severity' => REQUIREMENT_ERROR,
+      ];
+    }
+  }
+
+  return $requirements;
+}

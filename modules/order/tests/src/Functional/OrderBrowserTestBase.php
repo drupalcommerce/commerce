@@ -2,15 +2,12 @@
 
 namespace Drupal\Tests\commerce_order\Functional;
 
-use Drupal\commerce_store\StoreCreationTrait;
 use Drupal\Tests\commerce\Functional\CommerceBrowserTestBase;
 
 /**
  * Defines base class for commerce_order test cases.
  */
 abstract class OrderBrowserTestBase extends CommerceBrowserTestBase {
-
-  use StoreCreationTrait;
 
   /**
    * The variation to test against.
@@ -20,13 +17,6 @@ abstract class OrderBrowserTestBase extends CommerceBrowserTestBase {
   protected $variation;
 
   /**
-   * The store to test against.
-   *
-   * @var \Drupal\commerce_store\Entity\Store
-   */
-  protected $store;
-
-  /**
    * Modules to enable.
    *
    * @var array
@@ -34,6 +24,7 @@ abstract class OrderBrowserTestBase extends CommerceBrowserTestBase {
   public static $modules = [
     'commerce_product',
     'commerce_order',
+    'commerce_order_test',
     'inline_entity_form',
   ];
 
@@ -53,9 +44,6 @@ abstract class OrderBrowserTestBase extends CommerceBrowserTestBase {
    */
   protected function setUp() {
     parent::setUp();
-
-    // Create a store.
-    $this->store = $this->createStore();
 
     // Create a product variation.
     $this->variation = $this->createEntity('commerce_product_variation', [

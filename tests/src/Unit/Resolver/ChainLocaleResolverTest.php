@@ -65,7 +65,7 @@ class ChainLocaleResolverTest extends UnitTestCase {
     ];
     arsort($resolvers, SORT_NUMERIC);
     foreach ($resolvers as $id => $priority) {
-      $this->chainLocaleResolver->addResolver($container->get($id), $priority);
+      $this->chainLocaleResolver->addResolver($container->get($id));
     }
 
     $result = $this->chainLocaleResolver->resolve();

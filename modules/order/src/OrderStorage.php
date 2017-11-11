@@ -3,6 +3,8 @@
 namespace Drupal\commerce_order;
 
 use Drupal\commerce\CommerceContentEntityStorage;
+use Drupal\commerce_order\Entity\OrderInterface;
+use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Database\Connection;
@@ -17,11 +19,18 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 class OrderStorage extends CommerceContentEntityStorage {
 
   /**
-   * The order refresh process.
+   * The order refresh.
    *
    * @var \Drupal\commerce_order\OrderRefreshInterface
    */
   protected $orderRefresh;
+
+  /**
+   * Whether the order refresh should be skipped.
+   *
+   * @var bool
+   */
+  protected $skipRefresh = FALSE;
 
   /**
    * Constructs a new OrderStorage object.
@@ -64,10 +73,46 @@ class OrderStorage extends CommerceContentEntityStorage {
   /**
    * {@inheritdoc}
    */
+  public function loadUnchanged($id) {
+    // This method is used by the entity save process, triggering an order
+    // refresh would cause a save-within-a-save.
+    $this->skipRefresh = TRUE;
+    $unchanged_order = parent::loadUnchanged($id);
+    $this->skipRefresh = FALSE;
+    return $unchanged_order;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function doPreSave(EntityInterface $entity) {
+    $id = parent::doPreSave($entity);
+    /** @var \Drupal\commerce_order\Entity\OrderInterface $entity */
+    if ($entity->getRefreshState() == OrderInterface::REFRESH_ON_SAVE) {
+      $this->orderRefresh->refresh($entity);
+    }
+    // Only the REFRESH_ON_LOAD state needs to be persisted on the entity.
+    if ($entity->getRefreshState() != OrderInterface::REFRESH_ON_LOAD) {
+      $entity->setRefreshState(NULL);
+    }
+    $entity->recalculateTotalPrice();
+
+    return $id;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   protected function postLoad(array &$entities) {
-    foreach ($entities as $entity) {
-      if ($this->orderRefresh->needsRefresh($entity)) {
-        $this->orderRefresh->refresh($entity);
+    if (!$this->skipRefresh) {
+      /** @var \Drupal\commerce_order\Entity\OrderInterface[] $entities */
+      foreach ($entities as $entity) {
+        $explicitly_requested = $entity->getRefreshState() == OrderInterface::REFRESH_ON_LOAD;
+        if ($explicitly_requested || $this->orderRefresh->shouldRefresh($entity)) {
+          // Reuse the doPostLoad logic.
+          $entity->setRefreshState(OrderInterface::REFRESH_ON_SAVE);
+          $entity->save();
+        }
       }
     }
 

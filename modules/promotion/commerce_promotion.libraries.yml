@@ -1,0 +1,5 @@
+form:
+  version: VERSION
+  css:
+    theme:
+      css/promotion.form.css: {}

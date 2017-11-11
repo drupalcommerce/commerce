@@ -6,8 +6,8 @@ use Drupal\commerce_order\Entity\OrderItemType;
 use Drupal\commerce_payment\Entity\PaymentGateway;
 use Drupal\commerce_payment\Entity\PaymentMethod;
 use Drupal\commerce_payment\Plugin\Commerce\PaymentMethodType\CreditCard;
-use Drupal\KernelTests\Core\Entity\EntityKernelTestBase;
 use Drupal\profile\Entity\Profile;
+use Drupal\Tests\commerce\Kernel\CommerceKernelTestBase;
 
 /**
  * Tests the payment method entity.
@@ -16,7 +16,7 @@ use Drupal\profile\Entity\Profile;
  *
  * @group commerce
  */
-class PaymentMethodTest extends EntityKernelTestBase {
+class PaymentMethodTest extends CommerceKernelTestBase {
 
   /**
    * A sample user.
@@ -31,17 +31,9 @@ class PaymentMethodTest extends EntityKernelTestBase {
    * @var array
    */
   public static $modules = [
-    'options',
-    'entity',
     'entity_reference_revisions',
-    'views',
-    'address',
     'profile',
     'state_machine',
-    'inline_entity_form',
-    'commerce',
-    'commerce_price',
-    'commerce_store',
     'commerce_product',
     'commerce_order',
     'commerce_payment',
@@ -55,11 +47,9 @@ class PaymentMethodTest extends EntityKernelTestBase {
     parent::setUp();
 
     $this->installEntitySchema('profile');
-    $this->installEntitySchema('commerce_store');
     $this->installEntitySchema('commerce_order');
     $this->installEntitySchema('commerce_order_item');
-    $this->installEntitySchema('commerce_payment');
-    $this->installConfig('commerce_store');
+    $this->installEntitySchema('commerce_payment_method');
     $this->installConfig('commerce_order');
     $this->installConfig('commerce_payment');
 
@@ -83,6 +73,7 @@ class PaymentMethodTest extends EntityKernelTestBase {
   /**
    * @covers ::getType
    * @covers ::getPaymentGatewayId
+   * @covers ::getPaymentGatewayMode
    * @covers ::getOwner
    * @covers ::setOwner
    * @covers ::getOwnerId
@@ -114,9 +105,11 @@ class PaymentMethodTest extends EntityKernelTestBase {
       'type' => 'credit_card',
       'payment_gateway' => 'example',
     ]);
+    $payment_method->save();
 
     $this->assertInstanceOf(CreditCard::class, $payment_method->getType());
     $this->assertEquals('example', $payment_method->getPaymentGatewayId());
+    $this->assertEquals('test', $payment_method->getPaymentGatewayMode());
 
     $payment_method->setOwner($this->user);
     $this->assertEquals($this->user, $payment_method->getOwner());
@@ -133,17 +126,17 @@ class PaymentMethodTest extends EntityKernelTestBase {
     $payment_method->setBillingProfile($profile);
     $this->assertEquals($profile, $payment_method->getBillingProfile());
 
-    $this->assertTrue($payment_method->isReusable());
+    $this->assertNotEmpty($payment_method->isReusable());
     $payment_method->setReusable(FALSE);
-    $this->assertFalse($payment_method->isReusable());
+    $this->assertEmpty($payment_method->isReusable());
 
-    $this->assertFalse($payment_method->isDefault());
+    $this->assertEmpty($payment_method->isDefault());
     $payment_method->setDefault(TRUE);
-    $this->assertTrue($payment_method->isDefault());
+    $this->assertNotEmpty($payment_method->isDefault());
 
-    $this->assertFalse($payment_method->isExpired());
+    $this->assertEmpty($payment_method->isExpired());
     $payment_method->setExpiresTime(635879700);
-    $this->assertTrue($payment_method->isExpired());
+    $this->assertNotEmpty($payment_method->isExpired());
     $this->assertEquals(635879700, $payment_method->getExpiresTime());
 
     $payment_method->setCreatedTime(635879700);

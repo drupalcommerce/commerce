@@ -1,0 +1,8 @@
+name: Commerce Log
+type: module
+description: 'Provides activity logs for Commerce entities.'
+package: Commerce
+core: 8.x
+dependencies:
+  - commerce
+  - user

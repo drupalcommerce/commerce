@@ -16,12 +16,49 @@ services:
 
   commerce_order.order_refresh:
     class: Drupal\commerce_order\OrderRefresh
-    arguments: ['@entity_type.manager', '@commerce_price.chain_price_resolver', '@current_user']
+    arguments: ['@entity_type.manager', '@commerce_price.chain_price_resolver', '@current_user', '@datetime.time']
     tags:
-      - { name: service_collector, call: addProcessor, tag: commerce_order.order_refresh_processor }
+      - { name: service_collector, call: addProcessor, tag: commerce_order.order_processor }
 
-  commerce_order.availabitity_order_refresh_processor:
+  commerce_order.availability_order_processor:
     class: Drupal\commerce_order\AvailabilityOrderProcessor
     arguments: ['@commerce.availability_manager']
     tags:
-      - { name: commerce_order.order_refresh_processor, priority: 100 }
+      - { name: commerce_order.order_processor, priority: 100 }
+
+  commerce_order.profile_label_subscriber:
+    class: Drupal\commerce_order\EventSubscriber\ProfileLabelSubscriber
+    arguments: ['@entity_type.manager']
+    tags:
+      - { name: event_subscriber }
+
+  commerce_order.timestamp_event_subscriber:
+    class: Drupal\commerce_order\EventSubscriber\TimestampEventSubscriber
+    arguments: ['@entity_type.manager']
+    tags:
+      - { name: event_subscriber }
+
+  commerce_order.order_number_subscriber:
+    class: Drupal\commerce_order\EventSubscriber\OrderNumberSubscriber
+    tags:
+      - { name: event_subscriber }
+
+  commerce_order.order_receipt_subscriber:
+    class: Drupal\commerce_order\EventSubscriber\OrderReceiptSubscriber
+    arguments: ['@entity_type.manager', '@language_manager', '@plugin.manager.mail', '@commerce_order.order_total_summary', '@renderer']
+    tags:
+      - { name: 'event_subscriber' }
+
+  plugin.manager.commerce_adjustment_type:
+    class: Drupal\commerce_order\AdjustmentTypeManager
+    arguments: ['@module_handler', '@cache.discovery']
+
+  commerce_order.order_total_summary:
+    class: Drupal\commerce_order\OrderTotalSummary
+    arguments: ['@plugin.manager.commerce_adjustment_type']
+
+  commerce_order.order_store_resolver:
+    class: Drupal\commerce_order\Resolver\OrderStoreResolver
+    arguments: ['@current_route_match']
+    tags:
+      - { name: commerce_store.store_resolver, priority: 100 }

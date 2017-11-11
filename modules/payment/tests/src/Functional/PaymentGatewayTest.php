@@ -37,18 +37,14 @@ class PaymentGatewayTest extends CommerceBrowserTestBase {
     $this->assertSession()->addressEquals('admin/commerce/config/payment-gateways/add');
 
     $values = [
-      'id' => 'example',
       'label' => 'Example',
-      'plugin' => 'example_onsite',
-    ];
-    $this->submitForm($values, 'Save');
-    $this->assertSession()->addressEquals('admin/commerce/config/payment-gateways/manage/example');
-    $this->assertSession()->responseContains('Saved');
-
-    $values += [
-      'configuration[api_key]' => 'bunny',
-      'configuration[mode]' => 'test',
+      'plugin' => 'example_offsite_redirect',
+      'configuration[example_offsite_redirect][redirect_method]' => 'post',
+      'configuration[example_offsite_redirect][mode]' => 'test',
       'status' => '1',
+      // Setting the 'id' can fail if focus switches to another field.
+      // This is a bug in the machine name JS that can be reproduced manually.
+      'id' => 'example',
     ];
     $this->submitForm($values, 'Save');
     $this->assertSession()->addressEquals('admin/commerce/config/payment-gateways');
@@ -58,12 +54,14 @@ class PaymentGatewayTest extends CommerceBrowserTestBase {
     $payment_gateway = PaymentGateway::load('example');
     $this->assertEquals('example', $payment_gateway->id());
     $this->assertEquals('Example', $payment_gateway->label());
-    $this->assertEquals('example_onsite', $payment_gateway->getPluginId());
+    $this->assertEquals('example_offsite_redirect', $payment_gateway->getPluginId());
+    $this->assertEmpty($payment_gateway->getConditions());
+    $this->assertEquals('AND', $payment_gateway->getConditionOperator());
     $this->assertEquals(TRUE, $payment_gateway->status());
     $payment_gateway_plugin = $payment_gateway->getPlugin();
     $this->assertEquals('test', $payment_gateway_plugin->getMode());
     $configuration = $payment_gateway_plugin->getConfiguration();
-    $this->assertEquals('bunny', $configuration['api_key']);
+    $this->assertEquals('post', $configuration['redirect_method']);
   }
 
   /**
@@ -73,15 +71,16 @@ class PaymentGatewayTest extends CommerceBrowserTestBase {
     $values = [
       'id' => 'edit_example',
       'label' => 'Edit example',
-      'plugin' => 'example_onsite',
-      'status' => TRUE,
+      'plugin' => 'example_offsite_redirect',
+      'status' => 0,
     ];
     $payment_gateway = $this->createEntity('commerce_payment_gateway', $values);
 
     $this->drupalGet('admin/commerce/config/payment-gateways/manage/' . $payment_gateway->id());
     $values += [
-      'configuration[api_key]' => 'donkey',
-      'configuration[mode]' => 'live',
+      'configuration[example_offsite_redirect][redirect_method]' => 'get',
+      'configuration[example_offsite_redirect][mode]' => 'live',
+      'conditionOperator' => 'OR',
     ];
     $this->submitForm($values, 'Save');
 
@@ -89,12 +88,14 @@ class PaymentGatewayTest extends CommerceBrowserTestBase {
     $payment_gateway = PaymentGateway::load('edit_example');
     $this->assertEquals('edit_example', $payment_gateway->id());
     $this->assertEquals('Edit example', $payment_gateway->label());
-    $this->assertEquals('example_onsite', $payment_gateway->getPluginId());
-    $this->assertEquals(TRUE, $payment_gateway->status());
+    $this->assertEquals('example_offsite_redirect', $payment_gateway->getPluginId());
+    $this->assertEmpty($payment_gateway->getConditions());
+    $this->assertEquals('OR', $payment_gateway->getConditionOperator());
+    $this->assertEquals(FALSE, $payment_gateway->status());
     $payment_gateway_plugin = $payment_gateway->getPlugin();
     $this->assertEquals('live', $payment_gateway_plugin->getMode());
     $configuration = $payment_gateway_plugin->getConfiguration();
-    $this->assertEquals('donkey', $configuration['api_key']);
+    $this->assertEquals('get', $configuration['redirect_method']);
   }
 
   /**
@@ -104,14 +105,14 @@ class PaymentGatewayTest extends CommerceBrowserTestBase {
     $payment_gateway = $this->createEntity('commerce_payment_gateway', [
       'id' => 'for_deletion',
       'label' => 'For deletion',
-      'plugin' => 'example_onsite',
+      'plugin' => 'example_offsite_redirect',
     ]);
     $this->drupalGet('admin/commerce/config/payment-gateways/manage/' . $payment_gateway->id() . '/delete');
     $this->submitForm([], 'Delete');
     $this->assertSession()->addressEquals('admin/commerce/config/payment-gateways');
 
     $payment_gateway_exists = (bool) PaymentGateway::load('for_deletion');
-    $this->assertFalse($payment_gateway_exists, 'The payment gateway has been deleted from the database.');
+    $this->assertEmpty($payment_gateway_exists, 'The payment gateway has been deleted from the database.');
   }
 
 }

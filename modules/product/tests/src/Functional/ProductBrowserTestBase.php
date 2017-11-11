@@ -3,7 +3,6 @@
 namespace Drupal\Tests\commerce_product\Functional;
 
 use Drupal\field\Tests\EntityReference\EntityReferenceTestTrait;
-use Drupal\commerce_store\StoreCreationTrait;
 use Drupal\Tests\commerce\Functional\CommerceBrowserTestBase;
 
 /**
@@ -12,7 +11,6 @@ use Drupal\Tests\commerce\Functional\CommerceBrowserTestBase;
 abstract class ProductBrowserTestBase extends CommerceBrowserTestBase {
 
   use EntityReferenceTestTrait;
-  use StoreCreationTrait;
 
   /**
    * Modules to enable.
@@ -20,7 +18,6 @@ abstract class ProductBrowserTestBase extends CommerceBrowserTestBase {
    * @var array
    */
   public static $modules = [
-    'commerce_store',
     'commerce_product',
     'commerce_order',
     'field_ui',
@@ -31,7 +28,7 @@ abstract class ProductBrowserTestBase extends CommerceBrowserTestBase {
   /**
    * The product to test against.
    *
-   * @var \Drupal\commerce_product\Entity\ProductInterface[]
+   * @var \Drupal\commerce_product\Entity\ProductInterface
    */
   protected $product;
 
@@ -62,8 +59,8 @@ abstract class ProductBrowserTestBase extends CommerceBrowserTestBase {
   protected function setUp() {
     parent::setUp();
 
-    $this->stores = [];
-    for ($i = 0; $i < 3; $i++) {
+    $this->stores = [$this->store];
+    for ($i = 0; $i < 2; $i++) {
       $this->stores[] = $this->createStore();
     }
   }

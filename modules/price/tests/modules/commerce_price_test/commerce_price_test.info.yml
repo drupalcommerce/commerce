@@ -1,6 +1,5 @@
-name: Commerce Test
+name: Commerce Price Test
 type: module
-description: Contains various non-specific things needed in tests.
 package: Testing
 core: 8.x
 dependencies:

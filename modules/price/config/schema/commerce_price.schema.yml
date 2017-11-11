@@ -18,6 +18,28 @@ commerce_price.commerce_currency.*:
       type: integer
       label: 'Fraction digits'
 
+field.value.commerce_price:
+  type: mapping
+  label: 'Price'
+  mapping:
+    number:
+      type: string
+      label: 'Number'
+    currency_code:
+      type: string
+      label: 'Currency code'
+
+field.field_settings.commerce_price:
+  type: mapping
+  label: 'Price field settings'
+  mapping:
+    available_currencies:
+      type: sequence
+      label: 'Available currencies'
+      orderby: value
+      sequence:
+        type: string
+
 field.formatter.settings.commerce_price_default:
   type: mapping
   label: 'Default price formatter settings'

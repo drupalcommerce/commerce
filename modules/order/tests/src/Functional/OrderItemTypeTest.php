@@ -80,7 +80,7 @@ class OrderItemTypeTest extends OrderBrowserTestBase {
     $this->assertSession()->pageTextContains(t('This action cannot be undone.'));
     $this->submitForm([], t('Delete'));
     $order_item_type_exists = (bool) OrderItemType::load($order_item_type->id());
-    $this->assertFalse($order_item_type_exists, 'The order item type has been deleted form the database.');
+    $this->assertEmpty($order_item_type_exists, 'The order item type has been deleted form the database.');
   }
 
 }

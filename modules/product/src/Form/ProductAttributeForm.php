@@ -2,12 +2,41 @@
 
 namespace Drupal\commerce_product\Form;
 
+use Drupal\commerce\EntityHelper;
+use Drupal\commerce_product\ProductAttributeFieldManagerInterface;
 use Drupal\Component\Utility\Html;
 use Drupal\Core\Entity\BundleEntityFormBase;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Form\FormStateInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class ProductAttributeForm extends BundleEntityFormBase {
+
+  /**
+   * The attribute field manager.
+   *
+   * @var \Drupal\commerce_product\ProductAttributeFieldManagerInterface
+   */
+  protected $attributeFieldManager;
+
+  /**
+   * Constructs a new ProductAttributeForm object.
+   *
+   * @param \Drupal\commerce_product\ProductAttributeFieldManagerInterface $attribute_field_manager
+   *   The attribute field manager.
+   */
+  public function __construct(ProductAttributeFieldManagerInterface $attribute_field_manager) {
+    $this->attributeFieldManager = $attribute_field_manager;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container) {
+    return new static(
+      $container->get('commerce_product.attribute_field_manager')
+    );
+  }
 
   /**
    * {@inheritdoc}
@@ -45,6 +74,43 @@ class ProductAttributeForm extends BundleEntityFormBase {
       ],
       '#default_value' => $attribute->getElementType(),
     ];
+
+    // Allow the attribute to be assigned to a product variaton type.
+    $form['original_variation_types'] = [
+      '#type' => 'value',
+      '#value' => [],
+    ];
+    $form['variation_types'] = [
+      '#type' => 'checkboxes',
+      '#title' => $this->t('Product variation types'),
+    ];
+    $attribute_field_map = $this->attributeFieldManager->getFieldMap();
+    $variation_type_storage = $this->entityTypeManager->getStorage('commerce_product_variation_type');
+    $variation_types = $variation_type_storage->loadMultiple();
+    $disabled_variation_types = [];
+    foreach ($variation_types as $variation_type) {
+      $variation_type_id = $variation_type->id();
+      $form['variation_types']['#options'][$variation_type_id] = $variation_type->label();
+
+      if (!$attribute->isNew() && isset($attribute_field_map[$variation_type_id])) {
+        $used_attributes = array_column($attribute_field_map[$variation_type_id], 'attribute_id');
+        if (in_array($attribute->id(), $used_attributes)) {
+          $form['original_variation_types']['#value'][$variation_type_id] = $variation_type_id;
+          $form['variation_types']['#default_value'][$variation_type_id] = $variation_type_id;
+          if (!$this->attributeFieldManager->canDeleteField($attribute, $variation_type_id)) {
+            $form['variation_types'][$variation_type_id] = [
+              '#disabled' => TRUE,
+            ];
+            $disabled_variation_types[] = $variation_type_id;
+          }
+        }
+      }
+    }
+    $form['disabled_variation_types'] = [
+      '#type' => 'value',
+      '#value' => $disabled_variation_types,
+    ];
+
     if ($this->moduleHandler->moduleExists('content_translation')) {
       $enabled = TRUE;
       if (!$attribute->isNew()) {
@@ -84,9 +150,7 @@ class ProductAttributeForm extends BundleEntityFormBase {
     $user_input = $form_state->getUserInput();
     // Reorder the values by name, if requested.
     if ($form_state->get('reset_alphabetical')) {
-      $value_names = array_map(function ($value) {
-        return $value->label();
-      }, $values);
+      $value_names = EntityHelper::extractLabels($values);
       asort($value_names);
       foreach (array_keys($value_names) as $weight => $id) {
         $values[$id]->setWeight($weight);
@@ -311,6 +375,24 @@ class ProductAttributeForm extends BundleEntityFormBase {
    */
   public function save(array $form, FormStateInterface $form_state) {
     $status = $this->entity->save();
+
+    $original_variation_types = $form_state->getValue('original_variation_types', []);
+    $variation_types = array_filter($form_state->getValue('variation_types', []));
+    $disabled_variation_types = $form_state->getValue('disabled_variation_types', []);
+    $variation_types = array_unique(array_merge($disabled_variation_types, $variation_types));
+    $selected_variation_types = array_diff($variation_types, $original_variation_types);
+    $unselected_variation_types = array_diff($original_variation_types, $variation_types);
+    if ($selected_variation_types) {
+      foreach ($selected_variation_types as $selected_variation_type) {
+        $this->attributeFieldManager->createField($this->entity, $selected_variation_type);
+      }
+    }
+    if ($unselected_variation_types) {
+      foreach ($unselected_variation_types as $unselected_variation_type) {
+        $this->attributeFieldManager->deleteField($this->entity, $unselected_variation_type);
+      }
+    }
+
     if ($this->moduleHandler->moduleExists('content_translation')) {
       $translation_manager = \Drupal::service('content_translation.manager');
       // Logic from content_translation_language_configuration_element_submit().

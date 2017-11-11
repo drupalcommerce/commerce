@@ -2,7 +2,7 @@
 
 namespace Drupal\commerce_order\Entity;
 
-use Drupal\Core\Config\Entity\ConfigEntityBundleBase;
+use Drupal\commerce\Entity\CommerceBundleEntityBase;
 
 /**
  * Defines the order item type entity class.
@@ -10,6 +10,7 @@ use Drupal\Core\Config\Entity\ConfigEntityBundleBase;
  * @ConfigEntityType(
  *   id = "commerce_order_item_type",
  *   label = @Translation("Order item type"),
+ *   label_collection = @Translation("Order item types"),
  *   label_singular = @Translation("order item type"),
  *   label_plural = @Translation("order item types"),
  *   label_count = @PluralTranslation(
@@ -20,7 +21,7 @@ use Drupal\Core\Config\Entity\ConfigEntityBundleBase;
  *     "form" = {
  *       "add" = "Drupal\commerce_order\Form\OrderItemTypeForm",
  *       "edit" = "Drupal\commerce_order\Form\OrderItemTypeForm",
- *       "delete" = "Drupal\commerce_order\Form\OrderItemTypeDeleteForm"
+ *       "delete" = "Drupal\commerce\Form\CommerceBundleEntityDeleteFormBase"
  *     },
  *     "route_provider" = {
  *       "default" = "Drupal\Core\Entity\Routing\DefaultHtmlRouteProvider",
@@ -39,7 +40,8 @@ use Drupal\Core\Config\Entity\ConfigEntityBundleBase;
  *     "label",
  *     "id",
  *     "purchasableEntityType",
- *     "orderType"
+ *     "orderType",
+ *     "traits",
  *   },
  *   links = {
  *     "add-form" = "/admin/commerce/config/order-item-types/add",
@@ -49,21 +51,7 @@ use Drupal\Core\Config\Entity\ConfigEntityBundleBase;
  *   }
  * )
  */
-class OrderItemType extends ConfigEntityBundleBase implements OrderItemTypeInterface {
-
-  /**
-   * The order item type ID.
-   *
-   * @var string
-   */
-  protected $id;
-
-  /**
-   * The order item type label.
-   *
-   * @var string
-   */
-  protected $label;
+class OrderItemType extends CommerceBundleEntityBase implements OrderItemTypeInterface {
 
   /**
    * The purchasable entity type ID.

@@ -2,9 +2,8 @@
 
 namespace Drupal\Tests\commerce_cart\Kernel;
 
-use Drupal\commerce_store\StoreCreationTrait;
 use Drupal\Component\Render\FormattableMarkup;
-use Drupal\KernelTests\Core\Entity\EntityKernelTestBase;
+use Drupal\Tests\commerce\Kernel\CommerceKernelTestBase;
 
 /**
  * Tests the unsetting of the cart flag when order is placed.
@@ -12,9 +11,9 @@ use Drupal\KernelTests\Core\Entity\EntityKernelTestBase;
  * @covers \Drupal\commerce_cart\CartProvider::finalizeCart()
  * @group commerce
  */
-class CartOrderPlacedTest extends EntityKernelTestBase {
+class CartOrderPlacedTest extends CommerceKernelTestBase {
 
-  use StoreCreationTrait;
+  use CartManagerTestTrait;
 
   /**
    * The variation to test against.
@@ -22,13 +21,6 @@ class CartOrderPlacedTest extends EntityKernelTestBase {
    * @var \Drupal\commerce_product\Entity\ProductVariation
    */
   protected $variation;
-
-  /**
-   * The store to test against.
-   *
-   * @var \Drupal\commerce_store\Entity\Store
-   */
-  protected $store;
 
   /**
    * The cart manager.
@@ -43,18 +35,10 @@ class CartOrderPlacedTest extends EntityKernelTestBase {
    * @var array
    */
   public static $modules = [
-    'path',
-    'options',
-    'entity',
     'entity_reference_revisions',
-    'views',
-    'address',
+    'path',
     'profile',
     'state_machine',
-    'inline_entity_form',
-    'commerce',
-    'commerce_price',
-    'commerce_store',
     'commerce_product',
     'commerce_order',
   ];
@@ -66,12 +50,10 @@ class CartOrderPlacedTest extends EntityKernelTestBase {
     parent::setUp();
 
     $this->installEntitySchema('profile');
-    $this->installEntitySchema('commerce_store');
     $this->installEntitySchema('commerce_product');
     $this->installEntitySchema('commerce_product_variation');
     $this->installEntitySchema('commerce_order');
     $this->installEntitySchema('commerce_order_item');
-    $this->installConfig('commerce_store');
     $this->installConfig('commerce_order');
     $this->installConfig('commerce_product');
     $this->createUser();
@@ -97,36 +79,32 @@ class CartOrderPlacedTest extends EntityKernelTestBase {
     $this->reloadEntity($this->variation);
     $this->variation->save();
 
+    // Create a user to use for orders.
+    $this->user = $this->createUser();
   }
 
   /**
    * Tests that a draft order is no longer a cart once placed.
    */
   public function testCartOrderPlaced() {
-    // Do to issues with hook_entity_bundle_create, we need to run this here
-    // and can't put commerce_cart in $modules.
-    // See https://www.drupal.org/node/2711645
-    // @todo patch core so it doesn't explode in Kernel tests.
-    $this->enableModules(['commerce_cart']);
-    $this->installConfig('commerce_cart');
-    $this->container->get('entity.definition_update_manager')->applyUpdates();
+    $this->installCommerceCart();
 
     $this->store = $this->createStore();
-    $cart_order = $this->container->get('commerce_cart.cart_provider')->createCart('default', $this->store);
+    $cart_order = $this->container->get('commerce_cart.cart_provider')->createCart('default', $this->store, $this->user);
     $this->cartManager = $this->container->get('commerce_cart.cart_manager');
     $this->cartManager->addEntity($cart_order, $this->variation);
 
-    $this->assertTrue($cart_order->cart->value);
+    $this->assertNotEmpty($cart_order->cart->value);
 
     $workflow = $cart_order->getState()->getWorkflow();
     $cart_order->getState()->applyTransition($workflow->getTransition('place'));
     $cart_order->save();
 
     $cart_order = $this->reloadEntity($cart_order);
-    $this->assertFalse($cart_order->cart->value);
+    $this->assertEmpty($cart_order->cart->value);
 
     // We should be able to create a new cart and not get an exception.
-    $new_cart_order = $this->container->get('commerce_cart.cart_provider')->createCart('default', $this->store);
+    $new_cart_order = $this->container->get('commerce_cart.cart_provider')->createCart('default', $this->store, $this->user);
     $this->assertNotEquals($cart_order->id(), $new_cart_order->id());
   }
 

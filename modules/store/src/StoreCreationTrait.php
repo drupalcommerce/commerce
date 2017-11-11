@@ -30,13 +30,12 @@ trait StoreCreationTrait {
    *   The store currency code.
    *
    * @return \Drupal\commerce_store\Entity\StoreInterface
-   *    The store.
+   *   The store.
    */
-  protected function createStore($name = NULL, $mail = NULL, $type = 'online', $default = FALSE, $country = 'US', $currency = 'USD') {
+  protected function createStore($name = NULL, $mail = NULL, $type = 'online', $default = TRUE, $country = 'US', $currency = 'USD') {
     if (!$name) {
       $name = $this->randomMachineName(8);
     }
-
     if (!$mail) {
       $mail = \Drupal::currentUser()->getEmail();
     }

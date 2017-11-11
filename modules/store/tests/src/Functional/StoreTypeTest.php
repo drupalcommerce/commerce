@@ -3,8 +3,6 @@
 namespace Drupal\Tests\commerce_store\Functional;
 
 use Drupal\commerce_store\Entity\StoreType;
-use Drupal\commerce_store\StoreCreationTrait;
-use Drupal\simpletest\BlockCreationTrait;
 use Drupal\Tests\commerce\Functional\CommerceBrowserTestBase;
 
 /**
@@ -14,43 +12,13 @@ use Drupal\Tests\commerce\Functional\CommerceBrowserTestBase;
  */
 class StoreTypeTest extends CommerceBrowserTestBase {
 
-  use BlockCreationTrait;
-  use StoreCreationTrait;
-
-  /**
-   * Modules to enable.
-   *
-   * @var array
-   */
-  public static $modules = ['block', 'commerce_store'];
-
-  /**
-   * {@inheritdoc}
-   */
-  protected function setUp() {
-    parent::setUp();
-
-    $this->placeBlock('local_tasks_block');
-    $this->placeBlock('page_title_block');
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  protected function getAdministratorPermissions() {
-    return array_merge([
-      'administer commerce_store_type',
-      'administer commerce_store',
-    ], parent::getAdministratorPermissions());
-  }
-
   /**
    * Tests if the default Store Type was created.
    */
   public function testDefaultStoreType() {
     $this->drupalGet('admin/commerce/config/store-types');
     $store_types = StoreType::loadMultiple();
-    $this->assertTrue(isset($store_types['online']), 'The online store type is available');
+    $this->assertNotEmpty(isset($store_types['online']), 'The online store type is available');
 
     $store_type = StoreType::load('online');
     $this->assertEquals($store_type, $store_types['online'], 'The correct store type is loaded');
@@ -92,7 +60,7 @@ class StoreTypeTest extends CommerceBrowserTestBase {
       'label' => $title,
     ]);
     $type_exists = (bool) StoreType::load($type->id());
-    $this->assertTrue($type_exists, 'The new store type has been created in the database.');
+    $this->assertNotEmpty($type_exists, 'The new store type has been created in the database.');
 
     // Create a store type through the form.
     $this->drupalGet('admin/commerce/config/store-types/add');
@@ -102,7 +70,7 @@ class StoreTypeTest extends CommerceBrowserTestBase {
     ];
     $this->submitForm($edit, 'Save');
     $type_exists = (bool) StoreType::load($edit['id']);
-    $this->assertTrue($type_exists, 'The new store type has been created in the database.');
+    $this->assertNotEmpty($type_exists, 'The new store type has been created in the database.');
   }
 
   /**
@@ -140,7 +108,7 @@ class StoreTypeTest extends CommerceBrowserTestBase {
 
     // Try to delete the store type.
     $this->drupalGet('admin/commerce/config/store-types/' . $type->id() . '/delete');
-    $this->assertSession()->pageTextContains(t('@type is used by 1 store on your site. You can not remove this store type until you have removed all of the @type stores.', ['@type' => $type->label()]));
+    $this->assertSession()->pageTextContains(t('@type is used by 1 store on your site. You cannot remove this store type until you have removed all of the @type stores.', ['@type' => $type->label()]));
     $this->assertSession()->pageTextNotContains('This action cannot be undone.');
     $this->assertSession()->pageTextNotContains('The store type deletion confirmation form is not available');
 
@@ -152,7 +120,7 @@ class StoreTypeTest extends CommerceBrowserTestBase {
     $this->assertSession()->pageTextContains('This action cannot be undone.');
     $this->submitForm([], 'Delete');
     $type_exists = (bool) StoreType::load($type->id());
-    $this->assertFalse($type_exists, 'The new store type has been deleted from the database.');
+    $this->assertEmpty($type_exists, 'The new store type has been deleted from the database.');
   }
 
 }

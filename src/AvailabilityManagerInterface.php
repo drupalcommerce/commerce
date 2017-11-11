@@ -37,10 +37,12 @@ interface AvailabilityManagerInterface {
    *   The purchasable entity.
    * @param int $quantity
    *   The quantity.
+   * @param \Drupal\commerce\Context $context
+   *   The context.
    *
    * @return bool
    *   TRUE if the purchasable entity is available, FALSE otherwise.
    */
-  public function check(PurchasableEntityInterface $entity, $quantity = 1);
+  public function check(PurchasableEntityInterface $entity, $quantity, Context $context);
 
 }

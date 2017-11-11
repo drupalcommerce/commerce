@@ -28,9 +28,6 @@ commerce_checkout.commerce_checkout_flow.plugin.*:
     display_checkout_progress:
       type: boolean
       label: 'Display checkout progress'
-    order_summary_view:
-      type: string
-      label: 'Order summary view'
 
 commerce_checkout.commerce_checkout_flow.plugin.multistep_default:
   type: commerce_checkout_flow_with_panes_configuration
@@ -53,13 +50,6 @@ commerce_checkout_flow_with_panes_configuration:
 commerce_checkout.commerce_checkout_pane.*:
   type: commerce_checkout_pane_configuration
 
-commerce_checkout.commerce_checkout_pane.completion_message:
-  type: commerce_checkout_pane_configuration
-  mapping:
-    message:
-      type: text
-      label: 'Message'
-
 commerce_checkout.commerce_checkout_pane.contact_information:
   type: commerce_checkout_pane_configuration
   mapping:
@@ -76,6 +66,13 @@ commerce_checkout.commerce_checkout_pane.login:
     allow_registration:
       type: boolean
       label: 'Allow registration'
+
+commerce_checkout.commerce_checkout_pane.order_summary:
+  type: commerce_checkout_pane_configuration
+  mapping:
+    view:
+      type: string
+      label: 'View'
 
 commerce_checkout_pane_configuration:
   type: mapping

@@ -19,6 +19,17 @@ interface PaymentInterface extends ContentEntityInterface, EntityWithPaymentGate
   public function getType();
 
   /**
+   * Gets the payment gateway mode.
+   *
+   * A payment gateway in "live" mode can't manipulate payments created while
+   * it was in "test" mode, and vice-versa.
+   *
+   * @return string
+   *   The payment gateway mode.
+   */
+  public function getPaymentGatewayMode();
+
+  /**
    * Gets the payment method.
    *
    * @return \Drupal\commerce_payment\Entity\PaymentMethodInterface|null
@@ -141,25 +152,14 @@ interface PaymentInterface extends ContentEntityInterface, EntityWithPaymentGate
   public function getState();
 
   /**
-   * Gets whether this is a test payment.
+   * Sets the payment state.
    *
-   * Test payments are created while the payment gateway is in a test mode,
-   * and can be deleted at any time.
-   *
-   * @return bool
-   *   TRUE if this is a test payment, FALSE otherwise.
-   */
-  public function isTest();
-
-  /**
-   * Sets whether this is a test payment.
-   *
-   * @param bool $test
-   *   The test flag.
+   * @param string $state_id
+   *   The new state ID.
    *
    * @return $this
    */
-  public function setTest($test);
+  public function setState($state_id);
 
   /**
    * Gets the payment authorization timestamp.
@@ -180,39 +180,49 @@ interface PaymentInterface extends ContentEntityInterface, EntityWithPaymentGate
   public function setAuthorizedTime($timestamp);
 
   /**
-   * Gets the payment authorization expiration timestamp.
+   * Gets whether the payment has expired.
    *
-   * @return int
-   *   The payment authorization expiration timestamp.
+   * @return bool
+   *   TRUE if the payment has expired, FALSE otherwise.
    */
-  public function getAuthorizationExpiresTime();
+  public function isExpired();
 
   /**
-   * Sets the payment authorization expiration timestamp.
+   * Gets the payment expiration timestamp.
+   *
+   * Marks the time after which the payment can no longer be completed.
+   *
+   * @return int
+   *   The payment expiration timestamp.
+   */
+  public function getExpiresTime();
+
+  /**
+   * Sets the payment expiration timestamp.
    *
    * @param int $timestamp
-   *   The payment authorization expiration timestamp.
+   *   The payment expiration timestamp.
    *
    * @return $this
    */
-  public function setAuthorizationExpiresTime($timestamp);
+  public function setExpiresTime($timestamp);
 
   /**
-   * Gets the payment capture timestamp.
+   * Gets the payment completed timestamp.
    *
    * @return int
-   *   The payment capture timestamp.
+   *   The payment completed timestamp.
    */
-  public function getCapturedTime();
+  public function getCompletedTime();
 
   /**
-   * Sets the payment capture timestamp.
+   * Sets the payment completed timestamp.
    *
    * @param int $timestamp
-   *   The payment capture timestamp.
+   *   The payment completed timestamp.
    *
    * @return $this
    */
-  public function setCapturedTime($timestamp);
+  public function setCompletedTime($timestamp);
 
 }

@@ -2,6 +2,7 @@
 
 namespace Drupal\commerce_payment\PluginForm;
 
+use Drupal\commerce_price\Price;
 use Drupal\Core\Form\FormStateInterface;
 
 class PaymentCaptureForm extends PaymentGatewayFormBase {
@@ -17,7 +18,7 @@ class PaymentCaptureForm extends PaymentGatewayFormBase {
     $form['amount'] = [
       '#type' => 'commerce_price',
       '#title' => t('Amount'),
-      '#default_value' => $payment->getAmount(),
+      '#default_value' => $payment->getAmount()->toArray(),
       '#required' => TRUE,
     ];
 
@@ -28,11 +29,13 @@ class PaymentCaptureForm extends PaymentGatewayFormBase {
    * {@inheritdoc}
    */
   public function submitConfigurationForm(array &$form, FormStateInterface $form_state) {
+    $values = $form_state->getValue($form['#parents']);
+    $amount = new Price($values['amount']['number'], $values['amount']['currency_code']);
     /** @var \Drupal\commerce_payment\Entity\PaymentInterface $payment */
     $payment = $this->entity;
     /** @var \Drupal\commerce_payment\Plugin\Commerce\PaymentGateway\SupportsAuthorizationsInterface $payment_gateway_plugin */
     $payment_gateway_plugin = $this->plugin;
-    $payment_gateway_plugin->capturePayment($payment, $form['amount']['#value']);
+    $payment_gateway_plugin->capturePayment($payment, $amount);
   }
 
 }

@@ -17,12 +17,14 @@ class UninstallTest extends BrowserTestBase {
   public static $modules = [
     'commerce',
     'commerce_price',
+    'commerce_log',
     'commerce_store',
     'commerce_product',
     'commerce_order',
     'commerce_cart',
     'commerce_checkout',
     'commerce_payment',
+    'commerce_tax',
   ];
 
   /**

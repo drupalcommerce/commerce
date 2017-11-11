@@ -5,6 +5,7 @@ namespace Drupal\commerce_price\Plugin\Field\FieldType;
 use Drupal\commerce_price\Price;
 use Drupal\Core\Field\FieldItemBase;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
+use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\TypedData\DataDefinition;
 
 /**
@@ -39,6 +40,13 @@ class PriceItem extends FieldItemBase {
   /**
    * {@inheritdoc}
    */
+  public static function mainPropertyName() {
+    return NULL;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public static function schema(FieldStorageDefinitionInterface $field_definition) {
     return [
       'columns' => [
@@ -60,6 +68,36 @@ class PriceItem extends FieldItemBase {
   /**
    * {@inheritdoc}
    */
+  public static function defaultFieldSettings() {
+    return [
+      'available_currencies' => [],
+    ] + parent::defaultFieldSettings();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function fieldSettingsForm(array $form, FormStateInterface $form_state) {
+    $currencies = \Drupal::entityTypeManager()->getStorage('commerce_currency')->loadMultiple();
+    $currency_codes = array_keys($currencies);
+
+    $element = [];
+    $element['available_currencies'] = [
+      '#type' => count($currency_codes) < 10 ? 'checkboxes' : 'select',
+      '#title' => $this->t('Available currencies'),
+      '#description' => $this->t('If no currencies are selected, all currencies will be available.'),
+      '#options' => array_combine($currency_codes, $currency_codes),
+      '#default_value' => $this->getSetting('available_currencies'),
+      '#multiple' => TRUE,
+      '#size' => 5,
+    ];
+
+    return $element;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function getConstraints() {
     $manager = \Drupal::typedDataManager()->getValidationConstraintManager();
     $constraints = parent::getConstraints();
@@ -70,6 +108,8 @@ class PriceItem extends FieldItemBase {
         ],
       ],
     ]);
+    $available_currencies = $this->getSetting('available_currencies');
+    $constraints[] = $manager->create('Currency', ['availableCurrencies' => $available_currencies]);
 
     return $constraints;
   }

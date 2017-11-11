@@ -1,14 +1,14 @@
 services:
-  commerce.bundle_plugin_installer:
-    class: Drupal\commerce\BundlePluginInstaller
-    arguments: ['@entity_type.manager', '@entity_bundle.listener', '@field_storage_definition.listener', '@field_definition.listener']
+  commerce.configurable_field_manager:
+    class: Drupal\commerce\ConfigurableFieldManager
+    arguments: ['@entity_type.manager']
 
   commerce.credentials_check_flood:
     class: Drupal\commerce\CredentialsCheckFlood
     arguments: ['@flood', '@entity_type.manager', '@config.factory']
 
-  commerce.country_context:
-    class: Drupal\commerce\CountryContext
+  commerce.current_country:
+    class: Drupal\commerce\CurrentCountry
     arguments: ['@request_stack', '@commerce.chain_country_resolver']
 
   commerce.chain_country_resolver:
@@ -22,8 +22,8 @@ services:
     tags:
       - { name: commerce.country_resolver, priority: -100 }
 
-  commerce.locale_context:
-    class: Drupal\commerce\LocaleContext
+  commerce.current_locale:
+    class: Drupal\commerce\CurrentLocale
     arguments: ['@request_stack', '@commerce.chain_locale_resolver']
 
   commerce.chain_locale_resolver:
@@ -33,7 +33,7 @@ services:
 
   commerce.default_locale_resolver:
     class: Drupal\commerce\Resolver\DefaultLocaleResolver
-    arguments: ['@language_manager', '@commerce.country_context']
+    arguments: ['@language_manager', '@commerce.current_country']
     tags:
       - { name: commerce.locale_resolver, priority: -100 }
 
@@ -46,8 +46,21 @@ services:
     class: Drupal\commerce\Config\ConfigUpdater
     arguments: ['@entity_type.manager', '@config.storage', '@config.factory']
 
+  commerce.twig_extension:
+    class: Drupal\commerce\TwigExtension\CommerceTwigExtension
+    tags:
+      - { name: twig.extension }
+
   cache_context.country:
     class: Drupal\commerce\Cache\Context\CountryCacheContext
-    arguments: ['@commerce.country_context']
+    arguments: ['@commerce.current_country']
     tags:
       - { name: cache.context}
+
+  plugin.manager.commerce_condition:
+    class: Drupal\commerce\ConditionManager
+    arguments: ['@container.namespaces', '@cache.discovery', '@module_handler', '@entity_type.manager', '@event_dispatcher']
+
+  plugin.manager.commerce_entity_trait:
+    class: Drupal\commerce\EntityTraitManager
+    arguments: ['@container.namespaces', '@cache.discovery', '@module_handler', '@commerce.configurable_field_manager']

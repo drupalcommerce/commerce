@@ -1,0 +1,22 @@
+<?php
+
+/**
+ * @file
+ * Provides activity logs for Commerce entities.
+ */
+
+/**
+ * Implements hook_preprocess_commerce_order().
+ */
+function commerce_log_preprocess_commerce_order(&$variables) {
+  /** @var \Drupal\commerce_order\Entity\OrderInterface $order */
+  $order = $variables['elements']['#commerce_order'];
+  $variables['order']['activity'] = [
+    '#type' => 'view',
+    '#name' => 'commerce_activity',
+    '#display_id' => 'default',
+    '#arguments' => [$order->id(), 'commerce_order'],
+    '#embed' => TRUE,
+    '#title' => t('Order activity'),
+  ];
+}

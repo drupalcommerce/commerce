@@ -4,8 +4,7 @@ namespace Drupal\Tests\commerce_product\Kernel\Entity;
 
 use Drupal\commerce_product\Entity\ProductVariation;
 use Drupal\commerce_product\Entity\Product;
-use Drupal\commerce_store\Entity\Store;
-use Drupal\KernelTests\Core\Entity\EntityKernelTestBase;
+use Drupal\Tests\commerce\Kernel\CommerceKernelTestBase;
 
 /**
  * Tests the Product entity.
@@ -14,7 +13,7 @@ use Drupal\KernelTests\Core\Entity\EntityKernelTestBase;
  *
  * @group commerce
  */
-class ProductTest extends EntityKernelTestBase {
+class ProductTest extends CommerceKernelTestBase {
 
   /**
    * Modules to enable.
@@ -22,25 +21,9 @@ class ProductTest extends EntityKernelTestBase {
    * @var array
    */
   public static $modules = [
-    'options',
     'path',
-    'entity',
-    'entity',
-    'address',
-    'views',
-    'inline_entity_form',
-    'commerce',
-    'commerce_price',
-    'commerce_store',
     'commerce_product',
   ];
-
-  /**
-   * A sample store.
-   *
-   * @var \Drupal\commerce_store\Entity\StoreInterface
-   */
-  protected $store;
 
   /**
    * A sample user.
@@ -56,19 +39,8 @@ class ProductTest extends EntityKernelTestBase {
     parent::setUp();
 
     $this->installEntitySchema('commerce_product_variation');
-    $this->installEntitySchema('commerce_product_variation_type');
     $this->installEntitySchema('commerce_product');
-    $this->installEntitySchema('commerce_product_type');
-    $this->installEntitySchema('commerce_store');
     $this->installConfig(['commerce_product']);
-    $this->installConfig(['commerce_store']);
-
-    $store = Store::create([
-      'type' => 'default',
-      'name' => 'Sample store',
-    ]);
-    $store->save();
-    $this->store = $this->reloadEntity($store);
 
     $user = $this->createUser();
     $this->user = $this->reloadEntity($user);
@@ -77,8 +49,6 @@ class ProductTest extends EntityKernelTestBase {
   /**
    * @covers ::getTitle
    * @covers ::setTitle
-   * @covers ::isPublished
-   * @covers ::setPublished
    * @covers ::getCreatedTime
    * @covers ::setCreatedTime
    * @covers ::getStores
@@ -98,10 +68,6 @@ class ProductTest extends EntityKernelTestBase {
 
     $product->setTitle('My title');
     $this->assertEquals('My title', $product->getTitle());
-
-    $this->assertEquals(TRUE, $product->isPublished());
-    $product->setPublished(FALSE);
-    $this->assertEquals(FALSE, $product->isPublished());
 
     $product->setCreatedTime(635879700);
     $this->assertEquals(635879700, $product->getCreatedTime());
@@ -162,20 +128,20 @@ class ProductTest extends EntityKernelTestBase {
     $variation2 = ProductVariation::load($variation2->id());
 
     $variations = [$variation1, $variation2];
-    $this->assertFalse($product->hasVariations());
+    $this->assertEmpty($product->hasVariations());
     $product->setVariations($variations);
-    $this->assertTrue($product->hasVariations());
+    $this->assertNotEmpty($product->hasVariations());
     $variations_match = $variations == $product->getVariations();
-    $this->assertTrue($variations_match);
+    $this->assertNotEmpty($variations_match);
     $variation_ids = [$variation1->id(), $variation2->id()];
     $variation_ids_match = $variation_ids == $product->getVariationIds();
-    $this->assertTrue($variation_ids_match);
+    $this->assertNotEmpty($variation_ids_match);
 
-    $this->assertTrue($product->hasVariation($variation1));
+    $this->assertNotEmpty($product->hasVariation($variation1));
     $product->removeVariation($variation1);
-    $this->assertFalse($product->hasVariation($variation1));
+    $this->assertEmpty($product->hasVariation($variation1));
     $product->addVariation($variation1);
-    $this->assertTrue($product->hasVariation($variation1));
+    $this->assertNotEmpty($product->hasVariation($variation1));
 
     $this->assertEquals($product->getDefaultVariation(), $variation2);
     $this->assertNotEquals($product->getDefaultVariation(), $variation1);

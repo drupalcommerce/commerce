@@ -4,23 +4,23 @@ namespace Drupal\Tests\commerce_product\Kernel;
 
 use Drupal\commerce_product\Entity\ProductAttribute;
 use Drupal\commerce_product\Entity\ProductAttributeValue;
-use Drupal\KernelTests\Core\Entity\EntityKernelTestBase;
+use Drupal\Tests\commerce\Kernel\CommerceKernelTestBase;
 
 /**
  * Tests the product attribute value storage.
  *
  * @group commerce
  */
-class ProductAttributeValueStorageTest extends EntityKernelTestBase {
+class ProductAttributeValueStorageTest extends CommerceKernelTestBase {
 
   /**
    * Modules to enable.
    *
    * @var array
    */
-  public static $modules = ['system', 'field', 'options', 'user', 'path',
-    'text', 'entity', 'filter', 'entity_test', 'commerce', 'commerce_price',
-    'commerce_store', 'commerce_product', 'views', 'address', 'inline_entity_form',
+  public static $modules = [
+    'path',
+    'commerce_product',
   ];
 
   /**
@@ -34,9 +34,9 @@ class ProductAttributeValueStorageTest extends EntityKernelTestBase {
   }
 
   /**
-   * Tests loadByAttribute()
+   * Tests loadMultipleByAttribute()
    */
-  public function testLoadByAttribute() {
+  public function testLoadMultipleByAttribute() {
     $color_attribute = ProductAttribute::create([
       'id' => 'color',
       'label' => 'Color',
@@ -67,7 +67,7 @@ class ProductAttributeValueStorageTest extends EntityKernelTestBase {
     /** @var \Drupal\commerce_product\ProductAttributeValueStorageInterface $attribute_value_storage */
     $attribute_value_storage = \Drupal::service('entity_type.manager')->getStorage('commerce_product_attribute_value');
     /** @var \Drupal\commerce_product\Entity\ProductAttributeValueInterface[] $attribute_values */
-    $attribute_values = $attribute_value_storage->loadByAttribute('color');
+    $attribute_values = $attribute_value_storage->loadMultipleByAttribute('color');
 
     $value = array_shift($attribute_values);
     $this->assertEquals('Cyan', $value->getName());

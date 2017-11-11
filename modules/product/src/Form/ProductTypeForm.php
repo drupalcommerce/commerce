@@ -2,7 +2,9 @@
 
 namespace Drupal\commerce_product\Form;
 
-use Drupal\Core\Entity\BundleEntityFormBase;
+use Drupal\commerce\EntityHelper;
+use Drupal\commerce\EntityTraitManagerInterface;
+use Drupal\commerce\Form\CommerceBundleEntityFormBase;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Entity\EntityFieldManagerInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
@@ -10,7 +12,7 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\language\Entity\ContentLanguageSettings;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
-class ProductTypeForm extends BundleEntityFormBase {
+class ProductTypeForm extends CommerceBundleEntityFormBase {
 
   /**
    * The variation type storage.
@@ -29,12 +31,16 @@ class ProductTypeForm extends BundleEntityFormBase {
   /**
    * Creates a new ProductTypeForm object.
    *
+   * @param \Drupal\commerce\EntityTraitManagerInterface $trait_manager
+   *   The entity trait manager.
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
    * @param \Drupal\Core\Entity\EntityFieldManagerInterface $entity_field_manager
    *   The entity field manager.
    */
-  public function __construct(EntityTypeManagerInterface $entity_type_manager, EntityFieldManagerInterface $entity_field_manager) {
+  public function __construct(EntityTraitManagerInterface $trait_manager, EntityTypeManagerInterface $entity_type_manager, EntityFieldManagerInterface $entity_field_manager) {
+    parent::__construct($trait_manager);
+
     $this->variationTypeStorage = $entity_type_manager->getStorage('commerce_product_variation_type');
     $this->entityFieldManager = $entity_field_manager;
   }
@@ -44,6 +50,7 @@ class ProductTypeForm extends BundleEntityFormBase {
    */
   public static function create(ContainerInterface $container) {
     return new static(
+      $container->get('plugin.manager.commerce_entity_trait'),
       $container->get('entity_type.manager'),
       $container->get('entity_field.manager')
     );
@@ -57,9 +64,6 @@ class ProductTypeForm extends BundleEntityFormBase {
     /** @var \Drupal\commerce_product\Entity\ProductTypeInterface $product_type */
     $product_type = $this->entity;
     $variation_types = $this->variationTypeStorage->loadMultiple();
-    $variation_types = array_map(function ($variation_type) {
-      return $variation_type->label();
-    }, $variation_types);
     // Create an empty product to get the default status value.
     // @todo Clean up once https://www.drupal.org/node/2318187 is fixed.
     if ($this->operation == 'add') {
@@ -94,7 +98,7 @@ class ProductTypeForm extends BundleEntityFormBase {
       '#type' => 'select',
       '#title' => $this->t('Product variation type'),
       '#default_value' => $product_type->getVariationTypeId(),
-      '#options' => $variation_types,
+      '#options' => EntityHelper::extractLabels($variation_types),
       '#required' => TRUE,
       '#disabled' => !$product_type->isNew(),
     ];
@@ -108,6 +112,7 @@ class ProductTypeForm extends BundleEntityFormBase {
       '#title' => t('Publish new products of this type by default.'),
       '#default_value' => $product->isPublished(),
     ];
+    $form = $this->buildTraitForm($form, $form_state);
 
     if ($this->moduleHandler->moduleExists('language')) {
       $form['language'] = [
@@ -132,6 +137,13 @@ class ProductTypeForm extends BundleEntityFormBase {
   /**
    * {@inheritdoc}
    */
+  public function validateForm(array &$form, FormStateInterface $form_state) {
+    $this->validateTraitForm($form, $form_state);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function save(array $form, FormStateInterface $form_state) {
     $status = $this->entity->save();
     // Update the default value of the status field.
@@ -142,6 +154,7 @@ class ProductTypeForm extends BundleEntityFormBase {
       $fields['status']->getConfig($this->entity->id())->setDefaultValue($value)->save();
       $this->entityFieldManager->clearCachedFieldDefinitions();
     }
+    $this->submitTraitForm($form, $form_state);
 
     drupal_set_message($this->t('The product type %label has been successfully saved.', ['%label' => $this->entity->label()]));
     $form_state->setRedirect('entity.commerce_product_type.collection');

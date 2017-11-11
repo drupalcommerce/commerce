@@ -12,7 +12,7 @@ class ProductAttributeValueStorage extends CommerceContentEntityStorage implemen
   /**
    * {@inheritdoc}
    */
-  public function loadByAttribute($attribute_id) {
+  public function loadMultipleByAttribute($attribute_id) {
     $entity_query = $this->getQuery();
     $entity_query->condition('attribute', $attribute_id);
     $entity_query->sort('weight');

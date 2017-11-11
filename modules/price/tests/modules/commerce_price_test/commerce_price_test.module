@@ -1,0 +1,42 @@
+<?php
+
+/**
+ * @file
+ * Test module for Price.
+ */
+
+use Drupal\commerce_price\Price;
+
+/**
+ * Implements hook_theme().
+ */
+function commerce_price_test_theme($existing, $type, $theme, $path) {
+  return [
+    'working_commerce_price' => [
+      'template' => 'commerce-price-test-price-filter',
+      'variables' => [
+        // Correct keys.
+        'price' => [
+          'number' => '9.99',
+          'currency_code' => 'USD',
+        ],
+      ],
+    ],
+    'broken_commerce_price' => [
+      'template' => 'commerce-price-test-price-filter',
+      'variables' => [
+        // Incorrect keys.
+        'price' => [
+          'numb' => '9.99',
+          'currency_cod' => 'USD',
+        ],
+      ],
+    ],
+    'commerce_price_object' => [
+      'template' => 'commerce-price-test-price-filter',
+      'variables' => [
+        'price' => new Price('9.99', 'USD'),
+      ],
+    ],
+  ];
+}

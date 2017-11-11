@@ -56,8 +56,7 @@ class CurrencyImportForm extends FormBase {
     else {
       $form['currency_codes'] = [
         '#type' => 'select',
-        '#title' => $this->t('Currencies'),
-        '#required' => TRUE,
+        '#title' => $this->t('Available currencies'),
         '#options' => $currencies,
         '#multiple' => TRUE,
         '#size' => 10,
@@ -67,7 +66,7 @@ class CurrencyImportForm extends FormBase {
         '#type' => 'submit',
         '#button_type' => 'primary',
         '#name' => 'import',
-        '#value' => $this->t('Import'),
+        '#value' => $this->t('Add'),
         '#submit' => ['::submitForm'],
       ];
     }
@@ -84,7 +83,7 @@ class CurrencyImportForm extends FormBase {
       $this->importer->import($currency_code);
     }
     drupal_set_message($this->t('Imported the selected currencies.'));
-    $form_state->setRebuild();
+    $form_state->setRedirect('entity.commerce_currency.collection');
   }
 
 }

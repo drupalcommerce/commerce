@@ -5,6 +5,8 @@
  * Provides a UI for managing promotions.
  */
 
+use Drupal\Core\Entity\EntityTypeInterface;
+use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\Element;
 
@@ -17,6 +19,9 @@ function commerce_promotion_theme() {
       'render element' => 'elements',
     ],
     'commerce_promotion_form' => [
+      'render element' => 'form',
+    ],
+    'commerce_coupon_redemption_form' => [
       'render element' => 'form',
     ],
   ];
@@ -48,5 +53,48 @@ function template_preprocess_commerce_promotion(array &$variables) {
   $variables['promotion'] = [];
   foreach (Element::children($variables['elements']) as $key) {
     $variables['promotion'][$key] = $variables['elements'][$key];
+  }
+}
+
+/**
+ * Implements hook_field_widget_form_alter().
+ */
+function commerce_promotion_field_widget_form_alter(&$element, FormStateInterface $form_state, $context) {
+  /** @var \Drupal\Core\Field\BaseFieldDefinition $field_definition */
+  $field_definition = $context['items']->getFieldDefinition();
+  $field_name = $field_definition->getName();
+  $entity_type = $field_definition->getTargetEntityTypeId();
+  $widget_name = $context['widget']->getPluginId();
+  if ($field_name == 'condition_operator' && $entity_type == 'commerce_promotion' && $widget_name == 'options_buttons') {
+    // Hide the label.
+    $element['#title_display'] = 'invisible';
+  }
+}
+
+/**
+ * Implements hook_entity_base_field_info().
+ */
+function commerce_promotion_entity_base_field_info(EntityTypeInterface $entity_type) {
+  if ($entity_type->id() == 'commerce_order') {
+    $fields['coupons'] = BaseFieldDefinition::create('entity_reference')
+      ->setLabel(t('Coupons'))
+      ->setDescription(t('Coupons which have been applied to order.'))
+      ->setCardinality(BaseFieldDefinition::CARDINALITY_UNLIMITED)
+      ->setRequired(FALSE)
+      ->setSetting('target_type', 'commerce_promotion_coupon')
+      ->setSetting('handler', 'default')
+      ->setTranslatable(FALSE)
+      ->setDisplayOptions('form', [
+        'type' => 'entity_reference_autocomplete',
+        'weight' => 5,
+        'settings' => [
+          'match_operator' => 'CONTAINS',
+          'size' => '60',
+          'autocomplete_type' => 'tags',
+          'placeholder' => '',
+        ],
+      ]);
+
+    return $fields;
   }
 }

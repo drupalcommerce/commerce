@@ -1,6 +1,6 @@
 order_default:
   id: order_default
-  group: order
+  group: commerce_order
   label: 'Default'
   states:
     draft:
@@ -21,7 +21,7 @@ order_default:
 
 order_default_validation:
   id: order_default_validation
-  group: order
+  group: commerce_order
   label: 'Default, with validation'
   states:
     draft:
@@ -48,7 +48,7 @@ order_default_validation:
 
 order_fulfillment:
   id: order_fulfillment
-  group: order
+  group: commerce_order
   label: 'Fulfillment'
   states:
     draft:
@@ -75,7 +75,7 @@ order_fulfillment:
 
 order_fulfillment_validation:
   id: order_fulfillment_validation
-  group: order
+  group: commerce_order
   label: 'Fulfillment, with validation'
   states:
     draft:

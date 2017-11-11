@@ -1,0 +1,21 @@
+<?php
+
+/**
+ * @file
+ * Test module for Cart.
+ */
+
+use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Entity\EntityMalformedException;
+
+/**
+ * Implements hook_ENTITY_TYPE_update().
+ *
+ * Checks that no entity save-within-a-save has occurred (which results in
+ * $entity->original being empty).
+ */
+function commerce_cart_test_commerce_order_update(EntityInterface $entity) {
+  if (!$entity->isNew() && empty($entity->original)) {
+    throw new EntityMalformedException('$entity->original not found');
+  }
+}

@@ -3,12 +3,35 @@
 namespace Drupal\commerce_payment;
 
 use Drupal\commerce\CommerceContentEntityStorage;
+use Drupal\commerce_order\Entity\OrderInterface;
 use Drupal\Core\Entity\EntityStorageException;
 
 /**
  * Defines the payment storage.
  */
-class PaymentStorage extends CommerceContentEntityStorage {
+class PaymentStorage extends CommerceContentEntityStorage implements PaymentStorageInterface {
+
+  /**
+   * {@inheritdoc}
+   */
+  public function loadByRemoteId($remote_id) {
+    $payments = $this->loadByProperties(['remote_id' => $remote_id]);
+    $payment = reset($payments);
+
+    return $payment ?: NULL;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function loadMultipleByOrder(OrderInterface $order) {
+    $query = $this->getQuery()
+      ->condition('order_id', $order->id())
+      ->sort('payment_id');
+    $result = $query->execute();
+
+    return $result ? $this->loadMultiple($result) : [];
+  }
 
   /**
    * {@inheritdoc}

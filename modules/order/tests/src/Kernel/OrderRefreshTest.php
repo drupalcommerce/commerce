@@ -2,28 +2,24 @@
 
 namespace Drupal\Tests\commerce_order\Kernel;
 
+use Drupal\Component\Datetime\TimeInterface;
 use Drupal\commerce_order\Entity\Order;
 use Drupal\commerce_order\Entity\OrderType;
+use Drupal\commerce_order\OrderRefresh;
 use Drupal\commerce_price\Price;
 use Drupal\commerce_product\Entity\Product;
 use Drupal\commerce_product\Entity\ProductVariation;
-use Drupal\commerce_store\Entity\Store;
-use Drupal\KernelTests\Core\Entity\EntityKernelTestBase;
+use Drupal\commerce_product\Entity\ProductVariationType;
+use Drupal\Core\Session\AnonymousUserSession;
 use Drupal\profile\Entity\Profile;
+use Drupal\Tests\commerce\Kernel\CommerceKernelTestBase;
 
 /**
  * Tests the order refresh process.
  *
  * @group commerce
  */
-class OrderRefreshTest extends EntityKernelTestBase {
-
-  /**
-   * The order refresh.
-   *
-   * @var \Drupal\commerce_order\OrderRefreshInterface
-   */
-  protected $orderRefresh;
+class OrderRefreshTest extends CommerceKernelTestBase {
 
   /**
    * A sample user.
@@ -31,13 +27,6 @@ class OrderRefreshTest extends EntityKernelTestBase {
    * @var \Drupal\user\UserInterface
    */
   protected $user;
-
-  /**
-   * A sample store.
-   *
-   * @var \Drupal\commerce_store\Entity\StoreInterface
-   */
-  protected $store;
 
   /**
    * A sample order.
@@ -75,12 +64,13 @@ class OrderRefreshTest extends EntityKernelTestBase {
    * @var array
    */
   public static $modules = [
-    'system', 'field', 'options', 'user', 'entity',
-    'entity_reference_revisions', 'path',
-    'views', 'address', 'profile', 'state_machine',
-    'inline_entity_form', 'commerce', 'commerce_price',
-    'commerce_store', 'commerce_product',
-    'commerce_order', 'commerce_test',
+    'entity_reference_revisions',
+    'path',
+    'profile',
+    'state_machine',
+    'commerce_product',
+    'commerce_order',
+    'commerce_test',
   ];
 
   /**
@@ -88,31 +78,23 @@ class OrderRefreshTest extends EntityKernelTestBase {
    */
   protected function setUp() {
     parent::setUp();
-    $this->installSchema('system', 'router');
-    $this->installEntitySchema('user');
+
     $this->installEntitySchema('profile');
-    $this->installEntitySchema('commerce_store');
     $this->installEntitySchema('commerce_order');
     $this->installEntitySchema('commerce_order_item');
     $this->installEntitySchema('commerce_product');
     $this->installEntitySchema('commerce_product_variation');
     $this->installConfig(['commerce_product', 'commerce_order']);
 
-    $this->orderRefresh = $this->container->get('commerce_order.order_refresh');
-
     $user = $this->createUser();
     $this->user = $this->reloadEntity($user);
 
-    $this->orderItemStorage = $this->container->get('entity_type.manager')
-      ->getStorage('commerce_order_item');
+    $this->orderItemStorage = $this->container->get('entity_type.manager')->getStorage('commerce_order_item');
 
-    $store = Store::create([
-      'type' => 'default',
-      'name' => 'Sample store',
-      'default_currency' => 'USD',
-    ]);
-    $store->save();
-    $this->store = $this->reloadEntity($store);
+    // Turn off title generation to allow explicit values to be used.
+    $variation_type = ProductVariationType::load('default');
+    $variation_type->setGenerateTitle(FALSE);
+    $variation_type->save();
 
     $product = Product::create([
       'type' => 'default',
@@ -130,8 +112,6 @@ class OrderRefreshTest extends EntityKernelTestBase {
     $variation1->save();
     $product->addVariation($variation1)->save();
     $this->variation1 = $this->reloadEntity($variation1);
-    // Save variation again to generate its title.
-    $variation1->save();
 
     $variation2 = ProductVariation::create([
       'type' => 'default',
@@ -143,8 +123,6 @@ class OrderRefreshTest extends EntityKernelTestBase {
     $variation2->save();
     $product->addVariation($variation2)->save();
     $this->variation2 = $this->reloadEntity($variation2);
-    // Save variation again to generate its title.
-    $variation2->save();
 
     $profile = Profile::create([
       'type' => 'customer',
@@ -157,7 +135,7 @@ class OrderRefreshTest extends EntityKernelTestBase {
       'type' => 'default',
       'state' => 'draft',
       'mail' => $this->user->getEmail(),
-      'uid' => 0,
+      'uid' => $this->user->id(),
       'ip_address' => '127.0.0.1',
       'order_number' => '6',
       'billing_profile' => $profile,
@@ -168,113 +146,164 @@ class OrderRefreshTest extends EntityKernelTestBase {
   }
 
   /**
-   * Tests the "needsRefresh" method and refresh settings.
-   *
-   * @group failing
+   * Tests the shouldRefresh() logic.
    */
-  public function testOrderCanRefresh() {
-    $order_item = $this->orderItemStorage->createFromPurchasableEntity($this->variation2, [
-      'unit_price' => new Price('2.00', 'USD'),
-    ]);
-    $order_item->save();
-    $order_item = $this->reloadEntity($order_item);
-    $this->order->addItem($order_item);
-    $this->order->save();
-
-    $this->assertFalse($this->orderRefresh->needsRefresh($this->order));
+  public function testShouldRefresh() {
+    $order_refresh = $this->createOrderRefresh(time() + 3600);
 
     $order_type = OrderType::load($this->order->bundle());
-    $order_type->setRefreshFrequency(1)->save();
-
-    sleep(1);
-    $this->assertTrue($this->orderRefresh->needsRefresh($this->order));
-
     $order_type->setRefreshMode(OrderType::REFRESH_CUSTOMER)->save();
+    // Order does not belong to the current user.
+    $this->container->get('current_user')->setAccount(new AnonymousUserSession());
+    $this->assertEmpty($order_refresh->shouldRefresh($this->order));
+    // Order belongs to the current user.
     $this->container->get('current_user')->setAccount($this->user);
+    $this->assertNotEmpty($order_refresh->shouldRefresh($this->order));
 
-    sleep(1);
-    $this->assertFalse($this->orderRefresh->needsRefresh($this->order));
-    $this->order->setCustomer($this->user);
-    $this->assertTrue($this->orderRefresh->needsRefresh($this->order));
-
-    sleep(1);
-    $workflow = $this->order->getState()->getWorkflow();
-    $this->order->getState()->applyTransition($workflow->getTransition('place'));
-    $this->order->save();
-    $this->assertFalse($this->orderRefresh->needsRefresh($this->order));
+    // Order should be refreshed for any user.
+    $this->container->get('current_user')->setAccount(new AnonymousUserSession());
+    $order_type = OrderType::load($this->order->bundle());
+    $order_type->setRefreshMode(OrderType::REFRESH_ALWAYS)->save();
+    $this->assertNotEmpty($order_refresh->shouldRefresh($this->order));
   }
 
   /**
-   * Tests that an order item's title is updated based on product changes.
+   * Tests the needsRefresh() logic.
    */
-  public function testOrderItemTitleUpdate() {
-    $order_item = $this->orderItemStorage->createFromPurchasableEntity($this->variation2, [
-      'unit_price' => new Price('2.00', 'USD'),
-    ]);
-    $order_item->save();
-    $order_item = $this->reloadEntity($order_item);
+  public function testNeedsRefresh() {
+    $order_refresh = $this->createOrderRefresh();
+    // Non-draft order.
+    $this->order->state = 'completed';
+    $this->assertEmpty($order_refresh->needsRefresh($this->order));
+    $this->order->state = 'draft';
 
-    $this->assertEquals($order_item->label(), 'Default testing product');
-    $this->order->addItem($order_item);
-    $this->order->save();
+    // Day-change, under refresh frequency.
+    $order_refresh = $this->createOrderRefresh(mktime(0, 1, 0, 2, 24, 2016));
+    $this->order->setChangedTime(mktime(23, 59, 59, 2, 23, 2016));
+    $this->assertNotEmpty($order_refresh->needsRefresh($this->order));
 
-    $this->variation2->getProduct()->setTitle('Changed title')->save();
-    $this->variation2->save();
-    $this->orderRefresh->refresh($this->order);
+    // Under refresh frequency.
+    $order_refresh = $this->createOrderRefresh(mktime(23, 12, 0, 2, 24, 2016));
+    $this->order->setChangedTime(mktime(23, 11, 0, 2, 24, 2016));
+    $this->assertEmpty($order_refresh->needsRefresh($this->order));
 
-    $this->variation2 = $this->reloadEntity($this->variation2);
-    $order_item = $this->reloadEntity($order_item);
-
-    $this->assertEquals($order_item->label(), 'Changed title');
+    // Over refresh frequency.
+    $order_refresh = $this->createOrderRefresh(mktime(23, 10, 0, 2, 24, 2016));
+    $this->order->setChangedTime(mktime(23, 0, 0, 2, 24, 2016));
+    $this->assertNotEmpty($order_refresh->needsRefresh($this->order));
   }
 
   /**
-   * Tests that an order item's unit price is set and updated on refresh.
+   * Tests that the order item title and unit price are kept up to date.
    */
-  public function testUnitPriceRefresh() {
-    /** @var \Drupal\commerce_order\Entity\OrderItemInterface $order_item */
+  public function testOrderItemRefresh() {
+    $order_refresh = $this->createOrderRefresh();
     $order_item = $this->orderItemStorage->createFromPurchasableEntity($this->variation2);
     $order_item->save();
-    $order_item = $this->reloadEntity($order_item);
-
     $this->order->addItem($order_item);
+    $this->order->setRefreshState(Order::REFRESH_SKIP);
     $this->order->save();
-    $this->orderRefresh->refresh($this->order);
+
+    $this->assertEquals($order_item->label(), $this->variation2->getTitle());
+    $this->assertEquals($order_item->getUnitPrice(), $this->variation2->getPrice());
+
+    $this->variation2->setTitle('Changed title');
+    $this->variation2->setPrice(new Price('12.00', 'USD'));
+    $this->variation2->save();
+    $order_refresh->refresh($this->order);
+    /** @var \Drupal\commerce_order\Entity\OrderItemInterface $order_item */
     $order_item = $this->reloadEntity($order_item);
 
-    $this->assertEquals($this->variation2->getPrice(), $order_item->getUnitPrice());
+    $this->assertEquals($order_item->label(), $this->variation2->getTitle());
+    $this->assertEquals($order_item->getUnitPrice(), $this->variation2->getPrice());
 
-    $this->variation2->setPrice(new Price('12.00', 'USD'))->save();
-
-    $this->orderRefresh->refresh($this->order);
+    // Confirm that overridden unit prices stay untouched.
+    $unit_price = new Price('15.00', 'USD');
+    $order_item->setUnitPrice($unit_price, TRUE);
+    $this->variation2->setTitle('Changed title2');
+    $this->variation2->setPrice(new Price('16.00', 'USD'));
+    $this->variation2->save();
+    $order_refresh->refresh($this->order);
+    /** @var \Drupal\commerce_order\Entity\OrderItemInterface $order_item */
     $order_item = $this->reloadEntity($order_item);
 
-    $this->assertEquals($this->variation2->getPrice(), $order_item->getUnitPrice());
+    $this->assertEquals($this->variation2->getTitle(), $order_item->label());
+    $this->assertEquals($unit_price, $order_item->getUnitPrice());
   }
 
   /**
    * Tests the order refresh, with the availability processor.
    */
-  public function testAvailabilityOrderRefr() {
-    $order_item = $this->orderItemStorage->createFromPurchasableEntity($this->variation1, [
-      'unit_price' => new Price('2.00', 'USD'),
-    ]);
+  public function testAvailabilityOrderRefresh() {
+    $order_refresh = $this->createOrderRefresh();
+    $order_item = $this->orderItemStorage->createFromPurchasableEntity($this->variation1);
     $order_item->save();
-    $order_item = $this->reloadEntity($order_item);
-
-    $another_order_item = $this->orderItemStorage->createFromPurchasableEntity($this->variation2, [
-      'unit_price' => new Price('3.00', 'USD'),
-      'quantity' => '2',
-
-    ]);
+    $another_order_item = $this->orderItemStorage->createFromPurchasableEntity($this->variation2);
     $another_order_item->save();
-    $another_order_item = $this->reloadEntity($another_order_item);
 
-    $this->order->setItems([$order_item, $another_order_item])->save();
+    $this->order->setItems([$order_item, $another_order_item]);
+    $this->order->setRefreshState(Order::REFRESH_SKIP);
+    $this->order->save();
     $this->assertEquals(2, count($this->order->getItems()));
 
-    $this->orderRefresh->refresh($this->order);
+    $order_refresh->refresh($this->order);
     $this->assertEquals(1, count($this->order->getItems()));
+  }
+
+  /**
+   * Tests the order refresh invoking by the order storage.
+   */
+  public function testStorage() {
+    // Confirm that REFRESH_ON_SAVE happens by default.
+    $order_item = $this->orderItemStorage->createFromPurchasableEntity($this->variation1);
+    $order_item->save();
+    $another_order_item = $this->orderItemStorage->createFromPurchasableEntity($this->variation2);
+    $another_order_item->save();
+    $this->order->setItems([$order_item, $another_order_item]);
+    $this->order->save();
+    $this->assertEquals(1, count($this->order->getItems()));
+    $this->assertNull($this->order->getRefreshState());
+
+    // Test REFRESH_ON_LOAD.
+    $old_title = $this->variation2->getTitle();
+    $this->variation2->setTitle('Changed title');
+    $this->variation2->save();
+    $this->order->setRefreshState(Order::REFRESH_ON_LOAD);
+    $this->order->save();
+    $another_order_item = $this->reloadEntity($another_order_item);
+    $this->assertEquals(Order::REFRESH_ON_LOAD, $this->order->getRefreshState());
+    $this->assertEquals($old_title, $another_order_item->getTitle());
+
+    sleep(1);
+    $old_changed_time = $this->order->getChangedTime();
+    $this->order = $this->reloadEntity($this->order);
+    $another_order_item = $this->reloadEntity($another_order_item);
+    $this->assertNotEquals($old_changed_time, $this->order->getChangedTime());
+    $this->assertEquals('Changed title', $another_order_item->getTitle());
+    $this->assertNull($this->order->getRefreshState());
+  }
+
+  /**
+   * Creates an OrderRefresh instance with the given current time.
+   *
+   * @param int $current_time
+   *   The current time as a UNIX timestamp. Defaults to time().
+   *
+   * @return \Drupal\commerce_order\OrderRefreshInterface
+   *   The order refresh.
+   */
+  protected function createOrderRefresh($current_time = NULL) {
+    $current_time = $current_time ?: time();
+    $entity_type_manager = $this->container->get('entity_type.manager');
+    $chain_price_resolver = $this->container->get('commerce_price.chain_price_resolver');
+    $user = $this->container->get('current_user');
+    $time = $this->prophesize(TimeInterface::class);
+    $time->getCurrentTime()->willReturn($current_time);
+    $time = $time->reveal();
+    $order_refresh = new OrderRefresh($entity_type_manager, $chain_price_resolver, $user, $time);
+    $order_refresh->addProcessor($this->container->get('commerce_order.availability_order_processor'));
+
+    return $order_refresh;
   }
 
 }

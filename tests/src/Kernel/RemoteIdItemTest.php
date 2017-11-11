@@ -5,20 +5,18 @@ namespace Drupal\Tests\commerce\Kernel;
 use Drupal\entity_test\Entity\EntityTest;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
-use Drupal\KernelTests\Core\Entity\EntityKernelTestBase;
 
 /**
  * Tests the 'commerce_remote_id' field type.
  *
  * @group commerce
  */
-class RemoteIdItemTest extends EntityKernelTestBase {
+class RemoteIdItemTest extends CommerceKernelTestBase {
 
   /**
    * {@inheritdoc}
    */
   public static $modules = [
-    'commerce',
     'commerce_test',
   ];
 
@@ -57,7 +55,7 @@ class RemoteIdItemTest extends EntityKernelTestBase {
     $entity = $this->reloadEntity($entity);
 
     $this->assertEquals('123', $entity->test_remote_id->getByProvider('braintree'));
-    $this->assertEquals(NULL, $entity->test_remote_id->getByProvider('stripe'));
+    $this->assertNull($entity->test_remote_id->getByProvider('stripe'));
 
     $entity->test_remote_id->setByProvider('braintree', '456');
     $entity->test_remote_id->setByProvider('stripe', '789');
@@ -65,7 +63,7 @@ class RemoteIdItemTest extends EntityKernelTestBase {
     $entity = $this->reloadEntity($entity);
 
     $this->assertEquals('456', $entity->test_remote_id->getByProvider('braintree'));
-    $this->assertEquals(NULL, $entity->test_remote_id->getByProvider('stripe'));
+    $this->assertNull($entity->test_remote_id->getByProvider('stripe'));
   }
 
 }

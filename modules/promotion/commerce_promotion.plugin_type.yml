@@ -1,0 +1,5 @@
+commerce_promotion.promotion_offer:
+  label: Commerce promotion offer
+  provider: commerce_promotion
+  plugin_manager_service_id: plugin.manager.commerce_promotion_offer
+  plugin_definition_decorator_class: Drupal\plugin\PluginDefinition\ArrayPluginDefinitionDecorator

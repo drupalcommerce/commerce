@@ -33,7 +33,7 @@ class AddToCartFormTest extends CartBrowserTestBase {
     \Drupal::entityTypeManager()->getStorage('commerce_order_item')->resetCache();
     $this->cart = Order::load($this->cart->id());
     $order_items = $this->cart->getItems();
-    $this->assertTrue(count($order_items) == 1, 'No additional order items were created');
+    $this->assertNotEmpty(count($order_items) == 1, 'No additional order items were created');
     $this->assertOrderItemInOrder($this->variation, $order_items[0], 2);
   }
 
@@ -52,7 +52,7 @@ class AddToCartFormTest extends CartBrowserTestBase {
     $cart = Order::load($cart_id);
 
     $this->assertEquals(0, $cart->getCustomerId());
-    $this->assertTrue($cart->hasItems());
+    $this->assertNotEmpty($cart->hasItems());
 
     $this->drupalLogin($this->adminUser);
     \Drupal::entityTypeManager()->getStorage('commerce_order')->resetCache();
@@ -74,7 +74,7 @@ class AddToCartFormTest extends CartBrowserTestBase {
 
     $variation1 = $this->createEntity('commerce_product_variation', [
       'type' => 'default',
-      'sku' => $this->randomMachineName(),
+      'sku' => 'not-canonical',
       'price' => [
         'number' => '5.00',
         'currency_code' => 'USD',

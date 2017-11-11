@@ -34,7 +34,7 @@ interface ProductVariationFieldRendererInterface {
    *   The view mode.
    *
    * @return array
-   *    Array of render arrays, keyed by field name.
+   *   Array of render arrays, keyed by field name.
    */
   public function renderFields(ProductVariationInterface $variation, $view_mode = 'default');
 
@@ -65,7 +65,7 @@ interface ProductVariationFieldRendererInterface {
    *       Defaults to 0.
    *
    * @return array
-   *    The render array.
+   *   The render array.
    */
   public function renderField($field_name, ProductVariationInterface $variation, $display_options = []);
 

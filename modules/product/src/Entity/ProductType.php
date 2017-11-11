@@ -2,7 +2,7 @@
 
 namespace Drupal\commerce_product\Entity;
 
-use Drupal\Core\Config\Entity\ConfigEntityBundleBase;
+use Drupal\commerce\Entity\CommerceBundleEntityBase;
 
 /**
  * Defines the product type entity class.
@@ -10,6 +10,7 @@ use Drupal\Core\Config\Entity\ConfigEntityBundleBase;
  * @ConfigEntityType(
  *   id = "commerce_product_type",
  *   label = @Translation("Product type"),
+ *   label_collection = @Translation("Product types"),
  *   label_singular = @Translation("product type"),
  *   label_plural = @Translation("product types"),
  *   label_count = @PluralTranslation(
@@ -21,7 +22,7 @@ use Drupal\Core\Config\Entity\ConfigEntityBundleBase;
  *     "form" = {
  *       "add" = "Drupal\commerce_product\Form\ProductTypeForm",
  *       "edit" = "Drupal\commerce_product\Form\ProductTypeForm",
- *       "delete" = "Drupal\commerce_product\Form\ProductTypeDeleteForm"
+ *       "delete" = "Drupal\commerce\Form\CommerceBundleEntityDeleteFormBase"
  *     },
  *     "route_provider" = {
  *       "default" = "Drupal\Core\Entity\Routing\DefaultHtmlRouteProvider",
@@ -41,6 +42,7 @@ use Drupal\Core\Config\Entity\ConfigEntityBundleBase;
  *     "description",
  *     "variationType",
  *     "injectVariationFields",
+ *     "traits",
  *   },
  *   links = {
  *     "add-form" = "/admin/commerce/config/product-types/add",
@@ -50,21 +52,7 @@ use Drupal\Core\Config\Entity\ConfigEntityBundleBase;
  *   }
  * )
  */
-class ProductType extends ConfigEntityBundleBase implements ProductTypeInterface {
-
-  /**
-   * The product type ID.
-   *
-   * @var string
-   */
-  protected $id;
-
-  /**
-   * The product type label.
-   *
-   * @var string
-   */
-  protected $label;
+class ProductType extends CommerceBundleEntityBase implements ProductTypeInterface {
 
   /**
    * The product type description.

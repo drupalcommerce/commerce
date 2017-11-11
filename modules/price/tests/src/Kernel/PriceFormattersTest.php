@@ -4,14 +4,17 @@ namespace Drupal\Tests\commerce_price\Kernel;
 
 use Drupal\commerce_price\Price;
 use Drupal\commerce_product\Entity\ProductVariation;
-use Drupal\KernelTests\KernelTestBase;
+use Drupal\commerce_store\StoreCreationTrait;
+use Drupal\Tests\commerce\Kernel\CommerceKernelTestBase;
 
 /**
  * Tests price formatters provided by Price module.
  *
  * @group commerce
  */
-class PriceFormattersTest extends KernelTestBase {
+class PriceFormattersTest extends CommerceKernelTestBase {
+
+  use StoreCreationTrait;
 
   /**
    * Modules to enable.
@@ -20,10 +23,10 @@ class PriceFormattersTest extends KernelTestBase {
    *
    * @todo should commerce_test provide a simplistic PurchasableEntity?
    */
-  public static $modules = ['system', 'field', 'options', 'user', 'path', 'text',
-    'entity', 'views', 'address', 'inline_entity_form', 'commerce',
-    'commerce_price', 'commerce_store', 'commerce_product',
+  public static $modules = [
+    'path',
     'commerce_price_test',
+    'commerce_product',
   ];
 
   /**
@@ -51,16 +54,13 @@ class PriceFormattersTest extends KernelTestBase {
    */
   protected function setUp() {
     parent::setUp();
-    $this->installSchema('system', 'router');
-    $this->installEntitySchema('user');
+
     $this->installEntitySchema('commerce_product_attribute');
     $this->installEntitySchema('commerce_product_attribute_value');
     $this->installEntitySchema('commerce_product_variation');
-    $this->installEntitySchema('commerce_product_variation_type');
     $this->installEntitySchema('commerce_product');
-    $this->installEntitySchema('commerce_product_type');
     $this->installConfig(['commerce_product']);
-    $this->container->get('commerce_price.currency_importer')->import('USD');
+
     $this->productVariationDefaultDisplay = commerce_get_entity_display('commerce_product_variation', 'default', 'view');
     $this->productVariationViewBuilder = $this->container->get('entity_type.manager')->getViewBuilder('commerce_product_variation');
 

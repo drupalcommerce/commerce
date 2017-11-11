@@ -9,3 +9,12 @@ payment_method_icons:
   css:
     theme:
       css/commerce_payment.payment_method_icons.css: {}
+
+offsite_redirect:
+  version: VERSION
+  js:
+    js/offsite-redirect.js: {}
+  dependencies:
+    - core/jquery
+    - core/drupal
+    - core/drupalSettings

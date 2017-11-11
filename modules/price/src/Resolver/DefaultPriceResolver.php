@@ -2,6 +2,7 @@
 
 namespace Drupal\commerce_price\Resolver;
 
+use Drupal\commerce\Context;
 use Drupal\commerce\PurchasableEntityInterface;
 
 /**
@@ -12,7 +13,7 @@ class DefaultPriceResolver implements PriceResolverInterface {
   /**
    * {@inheritdoc}
    */
-  public function resolve(PurchasableEntityInterface $entity, $quantity = 1) {
+  public function resolve(PurchasableEntityInterface $entity, $quantity, Context $context) {
     return $entity->getPrice();
   }
 
