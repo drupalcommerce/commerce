@@ -2,7 +2,7 @@
 
 namespace Drupal\Tests\commerce\Kernel;
 
-use Drupal\commerce\BundleFieldDefinition;
+use Drupal\entity\BundleFieldDefinition;
 use Drupal\entity_test\Entity\EntityTest;
 use Drupal\field\Entity\FieldConfig;
 

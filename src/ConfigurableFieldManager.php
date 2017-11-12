@@ -5,6 +5,7 @@ namespace Drupal\commerce;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
+use Drupal\entity\BundleFieldDefinition;
 
 class ConfigurableFieldManager implements ConfigurableFieldManagerInterface {
 
