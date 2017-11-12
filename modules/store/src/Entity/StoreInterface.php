@@ -6,11 +6,12 @@ use Drupal\address\AddressInterface;
 use Drupal\commerce_price\Entity\CurrencyInterface;
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\user\EntityOwnerInterface;
+use Drupal\Core\Entity\EntityPublishedInterface;
 
 /**
  * Defines the interface for stores.
  */
-interface StoreInterface extends ContentEntityInterface, EntityOwnerInterface {
+interface StoreInterface extends ContentEntityInterface, EntityOwnerInterface, EntityPublishedInterface {
 
   /**
    * Gets the store name.

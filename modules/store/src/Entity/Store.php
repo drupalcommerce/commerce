@@ -2,6 +2,7 @@
 
 namespace Drupal\commerce_store\Entity;
 
+use Drupal\Core\Entity\EntityPublishedTrait;
 use CommerceGuys\Addressing\AddressFormat\AddressField;
 use Drupal\address\AddressInterface;
 use Drupal\commerce_price\Entity\CurrencyInterface;
@@ -55,7 +56,8 @@ use Drupal\Core\Field\BaseFieldDefinition;
  *     "bundle" = "type",
  *     "label" = "name",
  *     "langcode" = "langcode",
- *     "uuid" = "uuid"
+ *     "uuid" = "uuid",
+ *     "published" = "status"
  *   },
  *   links = {
  *     "canonical" = "/store/{commerce_store}",
@@ -71,6 +73,8 @@ use Drupal\Core\Field\BaseFieldDefinition;
  * )
  */
 class Store extends ContentEntityBase implements StoreInterface {
+
+  use EntityPublishedTrait;
 
   /**
    * {@inheritdoc}
@@ -203,6 +207,7 @@ class Store extends ContentEntityBase implements StoreInterface {
    */
   public static function baseFieldDefinitions(EntityTypeInterface $entity_type) {
     $fields = parent::baseFieldDefinitions($entity_type);
+    $fields += static::publishedBaseFieldDefinitions($entity_type);
 
     $fields['type'] = BaseFieldDefinition::create('entity_reference')
       ->setLabel(t('Type'))
@@ -295,6 +300,17 @@ class Store extends ContentEntityBase implements StoreInterface {
         'weight' => 4,
       ])
       ->setDisplayConfigurable('view', TRUE)
+      ->setDisplayConfigurable('form', TRUE);
+
+    $fields['status']
+      ->setLabel(t('Published'))
+      ->setDisplayOptions('form', [
+        'type' => 'boolean_checkbox',
+        'settings' => [
+          'display_label' => TRUE,
+        ],
+        'weight' => 90,
+      ])
       ->setDisplayConfigurable('form', TRUE);
 
     return $fields;

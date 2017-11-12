@@ -133,6 +133,7 @@ class CreateStoreCommand extends Command {
         'country_code' => $country_code,
       ],
       'default_currency' => $currency_code,
+      'status' => 1,
     ];
     $store = $store_storage->create($values);
     $store->save();
