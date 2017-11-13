@@ -15,14 +15,14 @@ use Symfony\Component\HttpFoundation\Request;
  *
  * @group commerce
  */
-class ProductVariationStorageMultilingualTest extends CommerceKernelTestBase {
+class ProductVariationRepositoryTest extends CommerceKernelTestBase {
 
   /**
    * The product variation storage.
    *
-   * @var \Drupal\commerce_product\ProductVariationStorageInterface
+   * @var \Drupal\commerce_product\ProductVariationRepositoryInterface
    */
-  protected $variationStorage;
+  protected $variationRepository;
 
   /**
    * The language manager.
@@ -74,7 +74,7 @@ class ProductVariationStorageMultilingualTest extends CommerceKernelTestBase {
     $this->installEntitySchema('commerce_product');
     $this->installConfig(['commerce_product']);
 
-    $this->variationStorage = $this->container->get('entity_type.manager')->getStorage('commerce_product_variation');
+    $this->variationRepository = $this->container->get('commerce_product.variation_repository');
     $this->languageManager = $this->container->get('language_manager');
     $this->languageDefault = $this->container->get('language.default');
 
@@ -133,7 +133,7 @@ class ProductVariationStorageMultilingualTest extends CommerceKernelTestBase {
    */
   public function testLoadBySkuFr() {
     $this->languageDefault->set($this->languageManager->getLanguage('fr'));
-    $result = $this->variationStorage->loadBySku($this->testSku);
+    $result = $this->variationRepository->loadBySku($this->testSku);
     $this->assertEquals('Variation française', $result->label());
   }
 
@@ -142,7 +142,7 @@ class ProductVariationStorageMultilingualTest extends CommerceKernelTestBase {
    */
   public function testLoadBySkuSr() {
     $this->languageDefault->set($this->languageManager->getLanguage('sr'));
-    $result = $this->variationStorage->loadBySku($this->testSku);
+    $result = $this->variationRepository->loadBySku($this->testSku);
     $this->assertEquals('Srpska varijacija', $result->label());
   }
 
@@ -151,7 +151,7 @@ class ProductVariationStorageMultilingualTest extends CommerceKernelTestBase {
    */
   public function testLoadBySkuDe() {
     $this->languageDefault->set($this->languageManager->getLanguage('de'));
-    $result = $this->variationStorage->loadBySku($this->testSku);
+    $result = $this->variationRepository->loadBySku($this->testSku);
     $this->assertEquals('English variation', $result->label());
   }
 
@@ -159,11 +159,11 @@ class ProductVariationStorageMultilingualTest extends CommerceKernelTestBase {
    * Tests loadEnabled() method.
    */
   public function testLoadEnabled() {
-    $enabled = $this->variationStorage->loadEnabled($this->product);
+    $enabled = $this->variationRepository->loadEnabled($this->product);
     $enabled_variation = reset($enabled);
     $this->assertEquals($enabled_variation->language()->getId(), 'en');
 
-    $enabled = $this->variationStorage->loadEnabled($this->product->getTranslation('fr'));
+    $enabled = $this->variationRepository->loadEnabled($this->product->getTranslation('fr'));
     $enabled_variation = reset($enabled);
     $this->assertEquals($enabled_variation->language()->getId(), 'fr');
   }
@@ -179,7 +179,7 @@ class ProductVariationStorageMultilingualTest extends CommerceKernelTestBase {
     ]);
     // Push the request to the request stack so `current_route_match` works.
     $this->container->get('request_stack')->push($request);
-    $context_variation = $this->variationStorage->loadFromContext($product);
+    $context_variation = $this->variationRepository->loadFromContext($product);
     $this->assertEquals($context_variation->language()->getId(), 'sr');
   }
 
