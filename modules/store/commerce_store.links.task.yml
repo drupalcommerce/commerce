@@ -10,7 +10,7 @@ entity.commerce_store.collection:
 
 entity.commerce_store.edit_form:
   route_name: entity.commerce_store.edit_form
-  base_route: entity.commerce_store.edit_form
+  base_route: entity.commerce_store.canonical
   title: Edit
 
 entity.commerce_store_type.collection:
@@ -22,3 +22,4 @@ entity.commerce_store_type.edit_form:
   route_name: entity.commerce_store_type.edit_form
   base_route: entity.commerce_store_type.edit_form
   title: Edit
+
