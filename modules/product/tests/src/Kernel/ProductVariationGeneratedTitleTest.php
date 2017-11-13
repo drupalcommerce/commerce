@@ -137,4 +137,53 @@ class ProductVariationGeneratedTitleTest extends CommerceKernelTestBase {
     $this->assertEquals($variation->label(), sprintf('%s - %s', $product->label(), $color_black->label()));
   }
 
+  /**
+   * Tests that creating a new variation creates a translated title.
+   */
+  public function testMultilingualTitle() {
+    $this->container->get('content_translation.manager')
+      ->setEnabled('commerce_product_variation', $this->variationType->id(), TRUE);
+    $this->container->get('content_translation.manager')
+      ->setEnabled('commerce_product', $this->productType->id(), TRUE);
+    $this->container->get('content_translation.manager')
+      ->setEnabled('commerce_product_attribute_value', $this->attribute->id(), TRUE);
+    /** @var \Drupal\commerce_product\Entity\ProductVariationInterface $variation */
+    $variation = ProductVariation::create([
+      'type' => $this->variationType->id(),
+    ]);
+    $variation->save();
+    $this->assertNull($variation->label());
+    $product = Product::create([
+      'type' => $this->productType->id(),
+      'title' => 'My Super Product',
+      'variations' => [$variation],
+    ]);
+    $product->addTranslation('fr', [
+      'title' => 'Mon super produit',
+    ]);
+    $product->save();
+    // Generating a translation of the variation should create a title which
+    // has the product's translated title.
+    $translation = $variation->addTranslation('fr', []);
+    $translation->save();
+    $this->assertEquals($product->getTranslation('fr')->label(), $variation->getTranslation('fr')->label());
+    // Verify translated attributes are used in the generated title.
+    $color_black = ProductAttributeValue::create([
+      'attribute' => $this->attribute->id(),
+      'name' => 'Black',
+      'weight' => 3,
+    ]);
+    $color_black->save();
+    $color_black->addTranslation('fr', [
+      'name' => 'Noir',
+    ]);
+    $color_black->save();
+    /** @var \Drupal\commerce_product\Entity\ProductVariationInterface $variation */
+    $variation = $this->reloadEntity($variation);
+    $variation->get('attribute_color')->setValue($color_black);
+    $variation->save();
+    $variation->getTranslation('fr')->save();
+    $this->assertEquals($variation->getTranslation('fr')->label(), sprintf('%s - %s', $product->getTranslation('fr')->label(), $color_black->getTranslation('fr')->label()));
+  }
+
 }
