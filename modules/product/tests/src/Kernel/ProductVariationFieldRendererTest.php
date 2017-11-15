@@ -222,7 +222,6 @@ class ProductVariationFieldRendererTest extends CommerceKernelTestBase {
       'attribute_color' => $blue->id(),
       'status' => 1,
     ]);
-    $variation1->addTranslation('fr');
     $variation1->save();
     $variation2 = ProductVariation::create([
       'type' => $this->secondVariationType->id(),
@@ -230,7 +229,6 @@ class ProductVariationFieldRendererTest extends CommerceKernelTestBase {
       'attribute_color' => $black->id(),
       'status' => 1,
     ]);
-    $variation2->addTranslation('fr');
     $variation2->save();
     $product = Product::create([
       'type' => 'default',
@@ -241,6 +239,11 @@ class ProductVariationFieldRendererTest extends CommerceKernelTestBase {
       'title' => 'Mon super produit',
     ]);
     $product->save();
+
+    $variation1->addTranslation('fr', [])->save();
+    $variation2->addTranslation('fr', [])->save();
+    $this->assertEquals('Mon super produit - Bleu', $variation1->getTranslation('fr')->label());
+    $this->assertEquals('Mon super produit - Noir', $variation2->getTranslation('fr')->label());
 
     $product_display = commerce_get_entity_display('commerce_product_variation', $this->secondVariationType->id(), 'view');
     $product_display->setComponent('attribute_color', [
@@ -254,7 +257,7 @@ class ProductVariationFieldRendererTest extends CommerceKernelTestBase {
     $product_display->save();
 
     // Make sure loadFromContext does not return the default variation, which is
-    // tested and ensured to return translated variation from product entity.
+    // always translated via ::getDefaultVariation on the product entity.
     $request = Request::create('');
     $request->query->add([
       'v' => $variation2->id(),
