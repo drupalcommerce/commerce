@@ -9,7 +9,6 @@ use Drupal\commerce_product\Event\ProductEvents;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Entity\EntityManagerInterface;
-use Drupal\Core\Entity\EntityRepositoryInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -29,13 +28,6 @@ class ProductVariationStorage extends CommerceContentEntityStorage implements Pr
   protected $requestStack;
 
   /**
-   * The entity repository.
-   *
-   * @var \Drupal\Core\Entity\EntityRepositoryInterface
-   */
-  protected $entityRepository;
-
-  /**
    * Constructs a new ProductVariationStorage object.
    *
    * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
@@ -52,14 +44,11 @@ class ProductVariationStorage extends CommerceContentEntityStorage implements Pr
    *   The event dispatcher.
    * @param \Symfony\Component\HttpFoundation\RequestStack $request_stack
    *   The request stack.
-   * @param \Drupal\Core\Entity\EntityRepositoryInterface $entity_repository
-   *   The entity repository.
    */
-  public function __construct(EntityTypeInterface $entity_type, Connection $database, EntityManagerInterface $entity_manager, CacheBackendInterface $cache, LanguageManagerInterface $language_manager, EventDispatcherInterface $event_dispatcher, RequestStack $request_stack, EntityRepositoryInterface $entity_repository) {
+  public function __construct(EntityTypeInterface $entity_type, Connection $database, EntityManagerInterface $entity_manager, CacheBackendInterface $cache, LanguageManagerInterface $language_manager, EventDispatcherInterface $event_dispatcher, RequestStack $request_stack) {
     parent::__construct($entity_type, $database, $entity_manager, $cache, $language_manager, $event_dispatcher);
 
     $this->requestStack = $request_stack;
-    $this->entityRepository = $entity_repository;
   }
 
   /**
@@ -73,8 +62,7 @@ class ProductVariationStorage extends CommerceContentEntityStorage implements Pr
       $container->get('cache.entity'),
       $container->get('language_manager'),
       $container->get('event_dispatcher'),
-      $container->get('request_stack'),
-      $container->get('entity.repository')
+      $container->get('request_stack')
     );
   }
 
@@ -85,7 +73,7 @@ class ProductVariationStorage extends CommerceContentEntityStorage implements Pr
     $variations = $this->loadByProperties(['sku' => $sku]);
     $variation = reset($variations);
 
-    return $variation ? $this->entityRepository->getTranslationFromContext($variation) : NULL;
+    return $variation ?: NULL;
   }
 
   /**
@@ -93,13 +81,12 @@ class ProductVariationStorage extends CommerceContentEntityStorage implements Pr
    */
   public function loadFromContext(ProductInterface $product) {
     $current_request = $this->requestStack->getCurrentRequest();
-    $langcode = $product->language()->getId();
     if ($variation_id = $current_request->query->get('v')) {
       if (in_array($variation_id, $product->getVariationIds())) {
         /** @var \Drupal\commerce_product\Entity\ProductVariationInterface $variation */
         $variation = $this->load($variation_id);
         if ($variation->isActive() && $variation->access('view')) {
-          return $this->entityRepository->getTranslationFromContext($variation, $langcode);
+          return $variation;
         }
       }
     }
@@ -111,8 +98,8 @@ class ProductVariationStorage extends CommerceContentEntityStorage implements Pr
    */
   public function loadEnabled(ProductInterface $product) {
     $ids = [];
-    foreach ($product->getVariationIds() as $variation_id) {
-      $ids[$variation_id] = $variation_id;
+    foreach ($product->variations as $variation) {
+      $ids[$variation->target_id] = $variation->target_id;
     }
     // Speed up loading by filtering out the IDs of disabled variations.
     $query = $this->getQuery()
@@ -128,14 +115,6 @@ class ProductVariationStorage extends CommerceContentEntityStorage implements Pr
 
     /** @var \Drupal\commerce_product\Entity\ProductVariationInterface $enabled_variation */
     $enabled_variations = $this->loadMultiple($result);
-
-    if ($product->isTranslatable()) {
-      $langcode = $product->language()->getId();
-      foreach ($enabled_variations as $index => $enabled_variation) {
-        $enabled_variations[$index] = $this->entityRepository->getTranslationFromContext($enabled_variation, $langcode);
-      }
-    }
-
     // Allow modules to apply own filtering (based on date, stock, etc).
     $event = new FilterVariationsEvent($product, $enabled_variations);
     $this->eventDispatcher->dispatch(ProductEvents::FILTER_VARIATIONS, $event);
