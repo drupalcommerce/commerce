@@ -147,7 +147,6 @@ class ProductVariationGeneratedTitleTest extends CommerceKernelTestBase {
       ->setEnabled('commerce_product', $this->productType->id(), TRUE);
     $this->container->get('content_translation.manager')
       ->setEnabled('commerce_product_attribute_value', $this->attribute->id(), TRUE);
-
     /** @var \Drupal\commerce_product\Entity\ProductVariationInterface $variation */
     $variation = ProductVariation::create([
       'type' => $this->variationType->id(),
@@ -163,14 +162,11 @@ class ProductVariationGeneratedTitleTest extends CommerceKernelTestBase {
       'title' => 'Mon super produit',
     ]);
     $product->save();
-
     // Generating a translation of the variation should create a title which
     // has the product's translated title.
     $translation = $variation->addTranslation('fr', []);
     $translation->save();
-
     $this->assertEquals($product->getTranslation('fr')->label(), $variation->getTranslation('fr')->label());
-
     // Verify translated attributes are used in the generated title.
     $color_black = ProductAttributeValue::create([
       'attribute' => $this->attribute->id(),
@@ -182,7 +178,6 @@ class ProductVariationGeneratedTitleTest extends CommerceKernelTestBase {
       'name' => 'Noir',
     ]);
     $color_black->save();
-
     /** @var \Drupal\commerce_product\Entity\ProductVariationInterface $variation */
     $variation = $this->reloadEntity($variation);
     $variation->get('attribute_color')->setValue($color_black);
