@@ -75,7 +75,6 @@ class ProductViewBuilder extends EntityViewBuilder {
     if ($product_type->shouldInjectVariationFields() && $entity->getDefaultVariation()) {
       $variation = $variation_storage->loadFromContext($entity);
       $variation = $this->entityRepository->getTranslationFromContext($variation, $entity->language()->getId());
-      print PHP_EOL . $variation->language()->getId() . PHP_EOL;
       $attribute_field_names = $variation->getAttributeFieldNames();
       $rendered_fields = $this->variationFieldRenderer->renderFields($variation, $view_mode);
       foreach ($rendered_fields as $field_name => $rendered_field) {
