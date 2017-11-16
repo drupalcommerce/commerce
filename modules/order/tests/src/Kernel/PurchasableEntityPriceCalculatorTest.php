@@ -123,6 +123,9 @@ class PurchasableEntityPriceCalculatorTest extends CommerceKernelTestBase {
     $this->priceCalculator = $this->container->get('commerce_order.purchasable_entity_price_calculator');
   }
 
+  /**
+   * Tests the purchased entity calculator.
+   */
   public function testCalculation() {
     $calculated = $this->priceCalculator->calculate($this->variation, 1);
     $this->assertEquals(new Price('12.00', 'USD'), $calculated['original']);
@@ -144,6 +147,67 @@ class PurchasableEntityPriceCalculatorTest extends CommerceKernelTestBase {
     $calculated = $this->priceCalculator->calculate($this->variation, 1, ['promotion', 'test_adjustment_type']);
     $this->assertEquals(new Price('12.00', 'USD'), $calculated['original']);
     $this->assertEquals(new Price('8.00', 'USD'), $calculated['calculated']);
+  }
+
+  /**
+   * Tests output of the calculated price formatter.
+   */
+  public function testCalculatedPriceOutput() {
+    $variation_display = commerce_get_entity_display('commerce_product_variation', 'default', 'view');
+    $variation_display->setComponent('price', [
+      'label' => 'above',
+      'type' => 'commerce_price_calculated',
+      'settings' => []
+    ]);
+    $variation_display->save();
+
+    $this->renderVariation();
+    $this->assertEscaped('$12.00');
+
+    $variation_display->setComponent('price', [
+      'label' => 'above',
+      'type' => 'commerce_price_calculated',
+      'settings' => [
+        'adjustment_types' => [
+          'promotion',
+        ]
+      ]
+    ]);
+    $variation_display->save();
+    $this->renderVariation();
+    $this->assertEscaped('$6.00');
+
+    $variation_display->setComponent('price', [
+      'label' => 'above',
+      'type' => 'commerce_price_calculated',
+      'settings' => [
+        'adjustment_types' => [
+          'test_adjustment_type',
+        ]
+      ]
+    ]);
+    $variation_display->save();
+    $this->renderVariation();
+    $this->assertEscaped('$14.00');
+
+    $variation_display->setComponent('price', [
+      'label' => 'above',
+      'type' => 'commerce_price_calculated',
+      'settings' => [
+        'adjustment_types' => [
+          'test_adjustment_type', 'promotion'
+        ]
+      ]
+    ]);
+    $variation_display->save();
+    $this->renderVariation();
+    $this->assertEscaped('$8.00');
+  }
+
+  protected function renderVariation() {
+    $variation_view_builder = $this->container->get('entity_type.manager')->getViewBuilder('commerce_product_variation');
+    $variation_build = $variation_view_builder->view($this->variation);
+    $this->render($variation_build);
   }
 
 }

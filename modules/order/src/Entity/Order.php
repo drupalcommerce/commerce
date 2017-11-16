@@ -122,11 +122,6 @@ class Order extends CommerceContentEntityBase implements OrderInterface {
    * {@inheritdoc}
    */
   public function getCustomer() {
-    // @todo Having issues with this in Kernel test.
-    // Why do anonymous orders not explode when target_id == 0?!?
-    if ($this->get('uid')->isEmpty() || $this->get('uid')->target_id === 0) {
-      return User::getAnonymousUser();
-    }
     return $this->get('uid')->entity;
   }
 

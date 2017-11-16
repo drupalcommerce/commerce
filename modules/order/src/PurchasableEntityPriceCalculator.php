@@ -104,8 +104,6 @@ class PurchasableEntityPriceCalculator implements PurchasableEntityPriceCalculat
       ];
     }
 
-    $types = $this->adjustmentTypeManager->getDefinitions();
-
     $order_item = $this->orderItemStorage->createFromPurchasableEntity($purchasable_entity);
     $order_item->setUnitPrice($resolved_price);
     $order_type_id = $this->orderTypeResolver->resolve($order_item);
@@ -119,15 +117,27 @@ class PurchasableEntityPriceCalculator implements PurchasableEntityPriceCalculat
     $order_item->order_id = $order;
 
     foreach ($this->processors as $processor) {
+      if ($processor instanceof AvailabilityOrderProcessor) {
+        // @todo this is an issue we need to work around.
+        // We need a method on order processors to deem if they provide
+        // adjustments. However, that would break BC. Maybe we just need a new
+        // service tag?
+        continue;
+      }
       $processor->process($order);
     }
 
     $calculated_price = $order_item->getUnitPrice();
+    $types = $this->adjustmentTypeManager->getDefinitions();
     $adjustments = [];
     foreach ($order_item->getAdjustments() as $adjustment) {
       if (!in_array($adjustment->getType(), $adjustment_types)) {
         continue;
       }
+      if ($adjustment->isIncluded()) {
+        continue;
+      }
+
       $calculated_price = $calculated_price->add($adjustment->getAmount());
 
       $type = $adjustment->getType();
@@ -141,6 +151,7 @@ class PurchasableEntityPriceCalculator implements PurchasableEntityPriceCalculat
         // type and source ID are combined.
         $key = $type . '_' . $source_id;
       }
+
       if (empty($adjustments[$key])) {
         $adjustments[$key] = [
           'type' => $type,
