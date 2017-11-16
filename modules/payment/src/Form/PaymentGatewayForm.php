@@ -130,10 +130,10 @@ class PaymentGatewayForm extends CommercePluginEntityFormBase {
       '#type' => 'radios',
       '#title' => $this->t('Status'),
       '#options' => [
-        FALSE => $this->t('Disabled'),
-        TRUE  => $this->t('Enabled'),
+        0 => $this->t('Disabled'),
+        1  => $this->t('Enabled'),
       ],
-      '#default_value' => $gateway->status(),
+      '#default_value' => (int) $gateway->status(),
     ];
 
     return $this->protectPluginIdElement($form);

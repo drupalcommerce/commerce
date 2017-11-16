@@ -63,12 +63,6 @@ services:
     tags:
       - { name: commerce_store.store_resolver, priority: 100 }
 
-  commerce_order.normalizer.adjustment:
-    class: Drupal\commerce_order\Normalizer\AdjustmentNormalizer
-    tags:
-    # This normalizer must just be higher than serializer.normalizer.typed_data, so setting priority as 0 here.
-      - { name: normalizer, priority: 0}
-
   commerce_order.purchasable_entity_price_calculator:
     class: Drupal\commerce_order\PurchasableEntityPriceCalculator
     arguments: ['@entity_type.manager', '@commerce_store.current_store', '@current_user', '@commerce_order.chain_order_type_resolver', '@commerce_price.chain_price_resolver', '@plugin.manager.commerce_adjustment_type']
