@@ -6,6 +6,8 @@ use Drupal\commerce_price\Price;
 use Drupal\commerce_product\Entity\Product;
 use Drupal\commerce_product\Entity\ProductVariation;
 use Drupal\commerce_promotion\Entity\Promotion;
+use Drupal\commerce_tax\Entity\TaxType;
+use Drupal\commerce_tax\Plugin\Commerce\TaxType\Custom;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Session\AnonymousUserSession;
 use Drupal\Tests\commerce\Kernel\CommerceKernelTestBase;
@@ -44,6 +46,7 @@ class PurchasableEntityPriceCalculatorTest extends CommerceKernelTestBase {
     'state_machine',
     'commerce_product',
     'commerce_promotion',
+    'commerce_tax',
     'commerce_order',
     'commerce_order_test',
   ];
@@ -62,6 +65,7 @@ class PurchasableEntityPriceCalculatorTest extends CommerceKernelTestBase {
     $this->installEntitySchema('commerce_promotion');
     $this->installConfig(['commerce_product', 'commerce_order']);
 
+    // Create a plugin to ensure a promotion adjustment is returned.
     $promotion = Promotion::create([
       'name' => 'Promotion 1',
       'order_types' => ['default'],
@@ -75,6 +79,28 @@ class PurchasableEntityPriceCalculatorTest extends CommerceKernelTestBase {
       ],
     ]);
     $promotion->save();
+
+    // Create a custom tax plugin (ensures mocked order integrity.)
+    // The default store is US-WI, so imagine that the US has VAT.
+    TaxType::create([
+      'id' => 'us_vat',
+      'label' => 'US VAT',
+      'plugin' => 'custom',
+      'configuration' => [
+        'display_inclusive' => TRUE,
+        'rates' => [
+          [
+            'id' => 'standard',
+            'label' => 'Standard',
+            'percentage' => '0.2',
+          ],
+        ],
+        'territories' => [
+          ['country_code' => 'US', 'administrative_area' => 'WI'],
+          ['country_code' => 'US', 'administrative_area' => 'SC'],
+        ],
+      ],
+    ])->save();
 
     $product = Product::create([
       'type' => 'default',

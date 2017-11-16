@@ -167,7 +167,7 @@ class PriceCalculatedFormatter extends PriceDefaultFormatter implements Containe
   public function settingsSummary() {
     $summary = parent::settingsSummary();
 
-    $adjustment_types = $this->getSetting('adjustment_types');
+    $adjustment_types = array_filter($this->getSetting('adjustment_types'));
     if (empty($adjustment_types)) {
       $summary[] = $this->t('No included adjustment types');
     }
@@ -194,7 +194,10 @@ class PriceCalculatedFormatter extends PriceDefaultFormatter implements Containe
       $purchasable_entity = $items->getEntity();
       $calculated_price = $this->priceCalculator->calculate($purchasable_entity, 1, $this->getSetting('adjustment_types'));
       $number = $calculated_price['calculated']->getNumber();
+      /** @var \Drupal\commerce_price\Entity\CurrencyInterface $currency */
       $currency = $this->currencyStorage->load($calculated_price['calculated']->getCurrencyCode());
+      $this->numberFormatter->setMinimumFractionDigits($currency->getFractionDigits());
+      $this->numberFormatter->setMaximumFractionDigits($currency->getFractionDigits());
 
       $elements[$delta] = [
         '#markup' => $this->numberFormatter->formatCurrency($number, $currency),

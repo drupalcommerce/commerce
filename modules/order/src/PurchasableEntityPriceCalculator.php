@@ -116,6 +116,7 @@ class PurchasableEntityPriceCalculator implements PurchasableEntityPriceCalculat
       'uid' => $this->currentUser->id(),
     ]);
     $order->addItem($order_item);
+    $order_item->order_id = $order;
 
     foreach ($this->processors as $processor) {
       $processor->process($order);
