@@ -7,6 +7,7 @@ use Drupal\commerce_product\Entity\ProductAttribute;
 use Drupal\commerce_product\Entity\ProductAttributeValue;
 use Drupal\commerce_product\Entity\ProductVariation;
 use Drupal\commerce_product\Entity\ProductVariationType;
+use Drupal\Core\Language\LanguageInterface;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\language\Entity\ConfigurableLanguage;
@@ -67,6 +68,10 @@ class ProductVariationFieldRendererTest extends CommerceKernelTestBase {
     $this->installConfig(['commerce_product']);
 
     ConfigurableLanguage::createFromLangcode('fr')->save();
+    // We must have two languages installed. Otherwise it is not considered
+    // multilingual because `en` is not installed as a configurable language.
+    // @see \Drupal\language\ConfigurableLanguageManager::isMultilingual
+    ConfigurableLanguage::createFromLangcode('de')->save();
 
     $this->variationFieldRenderer = $this->container->get('commerce_product.variation_field_renderer');
 
@@ -186,6 +191,8 @@ class ProductVariationFieldRendererTest extends CommerceKernelTestBase {
    *
    * @covers ::renderFields
    * @covers ::renderField
+   *
+   * @group debug
    */
   public function testRenderFieldsMultilingual() {
     $this->secondVariationType->setGenerateTitle(TRUE);
@@ -269,7 +276,7 @@ class ProductVariationFieldRendererTest extends CommerceKernelTestBase {
     $this->config('system.site')->set('default_langcode', 'fr')->save();
 
     $product_view_builder = $this->container->get('entity_type.manager')->getViewBuilder('commerce_product');
-    $product_build = $product_view_builder->view($product->getTranslation('fr'));
+    $product_build = $product_view_builder->view($product);
     $this->render($product_build);
 
     $this->assertEscaped('Mon super produit');
