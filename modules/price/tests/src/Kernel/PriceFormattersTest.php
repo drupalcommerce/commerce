@@ -102,25 +102,4 @@ class PriceFormattersTest extends CommerceKernelTestBase {
     $this->assertText('$12.00');
   }
 
-  /**
-   * Tests the calculated price formatter.
-   */
-  public function testCalculatedFormatter() {
-    $this->productVariationDefaultDisplay->setComponent('price', [
-      'type' => 'commerce_price_calculated',
-      'settings' => [],
-    ]);
-    $this->productVariationDefaultDisplay->save();
-
-    $build = $this->productVariationViewBuilder->viewField($this->variation1->price, 'default');
-    $this->render($build);
-
-    $this->assertText('$12.00');
-
-    $build = $this->productVariationViewBuilder->viewField($this->variation2->price, 'default');
-    $this->render($build);
-
-    $this->assertText('$9.00');
-  }
-
 }
