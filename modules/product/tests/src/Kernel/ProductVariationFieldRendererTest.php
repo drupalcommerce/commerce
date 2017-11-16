@@ -7,7 +7,6 @@ use Drupal\commerce_product\Entity\ProductAttribute;
 use Drupal\commerce_product\Entity\ProductAttributeValue;
 use Drupal\commerce_product\Entity\ProductVariation;
 use Drupal\commerce_product\Entity\ProductVariationType;
-use Drupal\Core\Language\LanguageInterface;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\language\Entity\ConfigurableLanguage;
@@ -191,8 +190,6 @@ class ProductVariationFieldRendererTest extends CommerceKernelTestBase {
    *
    * @covers ::renderFields
    * @covers ::renderField
-   *
-   * @group debug
    */
   public function testRenderFieldsMultilingual() {
     $this->secondVariationType->setGenerateTitle(TRUE);
