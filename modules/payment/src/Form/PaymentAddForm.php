@@ -163,14 +163,17 @@ class PaymentAddForm extends FormBase implements ContainerInjectionInterface {
             [get_class($this), 'clearValue'],
           ],
         ];
+        $form['actions']['submit'] = [
+          '#type' => 'submit',
+          '#value' => $this->t('Continue'),
+          '#button_type' => 'primary',
+        ];
       }
       else {
         $form['payment_method'] = [
           '#type' => 'markup',
           '#markup' => $this->t('There are no reusable payment methods available for the selected gateway.'),
         ];
-        // Don't allow the form to be submitted.
-        return $form;
       }
     }
     else {
@@ -191,11 +194,9 @@ class PaymentAddForm extends FormBase implements ContainerInjectionInterface {
         ],
       ];
     }
-
-    $form['actions']['submit'] = [
+    $form['actions']['add_payment_method'] = [
       '#type' => 'submit',
-      '#value' => $this->t('Continue'),
-      '#button_type' => 'primary',
+      '#value' => $this->t('Add payment method'),
     ];
 
     return $form;
@@ -296,7 +297,8 @@ class PaymentAddForm extends FormBase implements ContainerInjectionInterface {
   public function submitForm(array &$form, FormStateInterface $form_state) {
     $step = $form_state->get('step');
     if ($step == 'payment_gateway') {
-      $nextStep = $this->order->getCustomerId() ? 'payment' : 'payment_method';
+      $add_payment_method = $form_state->getTriggeringElement()['#id'] === 'edit-actions-add-payment-method';
+      $nextStep = $add_payment_method ? 'payment_method' : 'payment';
       $form_state->set('step', $nextStep);
       $form_state->setRebuild(TRUE);
     }
