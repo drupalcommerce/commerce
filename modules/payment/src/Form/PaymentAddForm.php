@@ -3,7 +3,6 @@
 namespace Drupal\commerce_payment\Form;
 
 use Drupal\commerce\EntityHelper;
-use Drupal\commerce_payment\Entity\Payment;
 use Drupal\commerce_payment\Plugin\Commerce\PaymentGateway\OffsitePaymentGatewayInterface;
 use Drupal\commerce_payment\Plugin\Commerce\PaymentGateway\SupportsStoredPaymentMethodsInterface;
 use Drupal\Component\Utility\Html;
@@ -152,6 +151,7 @@ class PaymentAddForm extends FormBase implements ContainerInjectionInterface {
             $selected_payment_method = $payment_method;
           }
         }
+
         $form['payment_method'] = [
           '#type' => 'radios',
           '#title' => $this->t('Payment method'),
@@ -161,12 +161,6 @@ class PaymentAddForm extends FormBase implements ContainerInjectionInterface {
           '#after_build' => [
             [get_class($this), 'clearValue'],
           ],
-        ];
-      }
-      else {
-        $form['payment_method'] = [
-          '#type' => 'markup',
-          '#markup' => $this->t('There are no reusable payment methods available for the selected gateway.'),
         ];
       }
       $form['actions']['add_payment_method'] = [
@@ -202,7 +196,7 @@ class PaymentAddForm extends FormBase implements ContainerInjectionInterface {
       }
     }
 
-    $form['actions']['#weight'] = 10;
+    $form['actions']['#type'] = 'actions';
     $form['actions']['submit'] = [
       '#type' => 'submit',
       '#value' => $this->t('Continue'),
@@ -308,9 +302,13 @@ class PaymentAddForm extends FormBase implements ContainerInjectionInterface {
   public function submitForm(array &$form, FormStateInterface $form_state) {
     $step = $form_state->get('step');
     if ($step == 'payment_gateway') {
-      $add_payment_method = $form_state->getTriggeringElement()['#id'] === 'edit-actions-add-payment-method';
-      $nextStep = $add_payment_method ? 'payment_method' : 'payment';
-      $form_state->set('step', $nextStep);
+      if ($form_state->getTriggeringElement()['#id'] === 'edit-actions-add-payment-method') {
+        $next_step = 'payment_method';
+      }
+      else {
+        $next_step = 'payment';
+      }
+      $form_state->set('step', $next_step);
       $form_state->setRebuild(TRUE);
     }
     elseif ($step == 'payment_method') {
