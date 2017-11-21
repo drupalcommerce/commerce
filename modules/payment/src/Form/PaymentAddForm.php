@@ -197,11 +197,13 @@ class PaymentAddForm extends FormBase implements ContainerInjectionInterface {
     }
 
     $form['actions']['#type'] = 'actions';
-    $form['actions']['submit'] = [
-      '#type' => 'submit',
-      '#value' => $this->t('Continue'),
-      '#button_type' => 'primary',
-    ];
+    if ($payment_method_options) {
+      $form['actions']['submit'] = [
+        '#type' => 'submit',
+        '#value' => $this->t('Continue'),
+        '#button_type' => 'primary',
+      ];
+    }
 
     return $form;
   }
@@ -238,7 +240,8 @@ class PaymentAddForm extends FormBase implements ContainerInjectionInterface {
    * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
    */
   protected function buildPaymentMethodForm(array $form, FormStateInterface $form_state) {
-    $payment_method = $this->entityTypeManager->getStorage('commerce_payment_method')->create([
+    $payment_method_storage = $this->entityTypeManager->getStorage('commerce_payment_method');
+    $payment_method = $payment_method_storage->create([
       'type' => $form_state->getValue('payment_method_type'),
       'payment_gateway' => $form_state->getValue('payment_gateway'),
       'uid' => $this->order->getCustomerId(),
@@ -247,6 +250,7 @@ class PaymentAddForm extends FormBase implements ContainerInjectionInterface {
       '#type' => 'commerce_payment_gateway_form',
       '#operation' => 'add-payment-method',
       '#default_value' => $payment_method,
+      '#parents' => array_merge($form['#parents'], ['add_payment_method']),
     ];
 
     $form['actions']['#type'] = 'actions';
@@ -311,10 +315,10 @@ class PaymentAddForm extends FormBase implements ContainerInjectionInterface {
       $form_state->setRebuild(TRUE);
     }
     elseif ($step == 'payment_method') {
-      /** @var \Drupal\commerce_payment\Entity\PaymentMethodInterface $method */
-      $method = $form_state->getValue(['payment_information', 'add_payment_method']);
-      $form_state->setValue('payment_method', $method);
-      $form_state->setValue('payment_gateway', $method->getPaymentGatewayId());
+      /** @var \Drupal\commerce_payment\Entity\PaymentMethodInterface $payment_method */
+      $payment_method = $form_state->getValue('add_payment_method');
+      $form_state->setValue('payment_method', $payment_method);
+      $form_state->setValue('payment_gateway', $payment_method->getPaymentGatewayId());
       $form_state->set('step', 'payment');
       $form_state->setRebuild(TRUE);
     }
