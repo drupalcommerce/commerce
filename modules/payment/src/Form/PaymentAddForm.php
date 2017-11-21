@@ -238,7 +238,7 @@ class PaymentAddForm extends FormBase implements ContainerInjectionInterface {
   protected function buildPaymentMethodForm(array $form, FormStateInterface $form_state) {
     $payment_method = $this->entityTypeManager
       ->getStorage('commerce_payment_method')->create([
-        'type' => $form_state->get('payment_method_type'),
+        'type' => $form_state->getValue('payment_method_type'),
         'payment_gateway' => $form_state->getValue('payment_gateway'),
         'uid' => $this->order->getCustomerId(),
       ]);
