@@ -176,29 +176,30 @@ class PaymentAddForm extends FormBase implements ContainerInjectionInterface {
       ];
     }
 
-    $methodTypes = $selected_payment_gateway->getPlugin()->getPaymentMethodTypes();
-    if (count($methodTypes) == 1) {
-      $form['payment_method_type'] = [
-        '#type' => 'value',
-        '#value' => reset($methodTypes)->getPluginId(),
-      ];
-    }
-    else {
-      /** @var \Drupal\commerce_payment\Plugin\Commerce\PaymentMethodType\PaymentMethodTypeInterface[] $methodTypes */
-      $method_type_options = [];
-      foreach ($methodTypes as $methodType) {
-        $method_type_options[$methodType->getPluginId()] = $methodType->getLabel();
+    if ($methodTypes = $selected_payment_gateway->getPlugin()->getPaymentMethodTypes()) {
+      if (count($methodTypes) == 1) {
+        $form['payment_method_type'] = [
+          '#type' => 'value',
+          '#value' => reset($methodTypes)->getPluginId(),
+        ];
       }
-      $form['payment_method_type'] = [
-        '#type' => 'radios',
-        '#title' => $this->t('Payment type'),
-        '#options' => $method_type_options,
-        '#default_value' => reset($methodTypes)->getPluginId(),
-        '#required' => TRUE,
-        '#after_build' => [
-          [get_class($this), 'clearValue'],
-        ],
-      ];
+      else {
+        /** @var \Drupal\commerce_payment\Plugin\Commerce\PaymentMethodType\PaymentMethodTypeInterface[] $methodTypes */
+        $method_type_options = [];
+        foreach ($methodTypes as $methodType) {
+          $method_type_options[$methodType->getPluginId()] = $methodType->getLabel();
+        }
+        $form['payment_method_type'] = [
+          '#type' => 'radios',
+          '#title' => $this->t('Payment type'),
+          '#options' => $method_type_options,
+          '#default_value' => reset($methodTypes)->getPluginId(),
+          '#required' => TRUE,
+          '#after_build' => [
+            [get_class($this), 'clearValue'],
+          ],
+        ];
+      }
     }
 
     $form['actions']['#weight'] = 10;
