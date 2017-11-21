@@ -234,29 +234,28 @@ class PaymentAddForm extends FormBase implements ContainerInjectionInterface {
    *
    * @return array
    *   The built form.
+   *
+   * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
    */
   protected function buildPaymentMethodForm(array $form, FormStateInterface $form_state) {
-    $payment_method = $this->entityTypeManager
-      ->getStorage('commerce_payment_method')->create([
-        'type' => $form_state->getValue('payment_method_type'),
-        'payment_gateway' => $form_state->getValue('payment_gateway'),
-        'uid' => $this->order->getCustomerId(),
-      ]);
-    // Array keys mirror checkout panes to aid in gateway compatibility.
-    $form['contact_information']['email'] = [
-      '#type' => 'hidden',
-      '#value' => $this->order->getEmail(),
-    ];
-    $form['payment_information']['add_payment_method'] = [
+    $payment_method = $this->entityTypeManager->getStorage('commerce_payment_method')->create([
+      'type' => $form_state->getValue('payment_method_type'),
+      'payment_gateway' => $form_state->getValue('payment_gateway'),
+      'uid' => $this->order->getCustomerId(),
+    ]);
+    $form['add_payment_method'] = [
       '#type' => 'commerce_payment_gateway_form',
       '#operation' => 'add-payment-method',
       '#default_value' => $payment_method,
     ];
+
+    $form['actions']['#type'] = 'actions';
     $form['actions']['submit'] = [
       '#type' => 'submit',
       '#value' => $this->t('Continue'),
       '#button_type' => 'primary',
     ];
+
     return $form;
   }
 
