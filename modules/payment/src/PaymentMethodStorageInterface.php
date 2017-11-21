@@ -2,6 +2,7 @@
 
 namespace Drupal\commerce_payment;
 
+use Drupal\commerce_order\Entity\OrderInterface;
 use Drupal\commerce_payment\Entity\PaymentGatewayInterface;
 use Drupal\Core\Entity\ContentEntityStorageInterface;
 use Drupal\user\UserInterface;
@@ -27,5 +28,18 @@ interface PaymentMethodStorageInterface extends ContentEntityStorageInterface {
    *   The reusable payment methods.
    */
   public function loadReusable(UserInterface $account, PaymentGatewayInterface $payment_gateway, array $billing_countries = []);
+
+  /**
+   * Loads the order's stored payment methods for the given payment gateway.
+   *
+   * @param \Drupal\commerce_order\Entity\OrderInterface $order
+   *   The order.
+   * @param \Drupal\commerce_payment\Entity\PaymentGatewayInterface $payment_gateway
+   *   The payment gateway.
+   *
+   * @return \Drupal\commerce_payment\Entity\PaymentMethodInterface[]
+   *   The stored payment methods.
+   */
+  public function loadForOrder(OrderInterface $order, PaymentGatewayInterface $payment_gateway);
 
 }
