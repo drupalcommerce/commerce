@@ -252,7 +252,6 @@ class PaymentAddForm extends FormBase implements ContainerInjectionInterface {
       '#type' => 'commerce_payment_gateway_form',
       '#operation' => 'add-payment-method',
       '#default_value' => $payment_method,
-      '#parents' => array_merge($form['#parents'], ['add_payment_method']),
     ];
 
     $form['actions']['#type'] = 'actions';
