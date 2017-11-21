@@ -170,24 +170,24 @@ class PaymentAddForm extends FormBase implements ContainerInjectionInterface {
       ];
     }
 
-    if ($methodTypes = $selected_payment_gateway->getPlugin()->getPaymentMethodTypes()) {
-      if (count($methodTypes) == 1) {
+    if ($payment_method_types = $selected_payment_gateway->getPlugin()->getPaymentMethodTypes()) {
+      /** @var \Drupal\commerce_payment\Plugin\Commerce\PaymentMethodType\PaymentMethodTypeInterface[] $payment_method_types */
+      if (count($payment_method_types) == 1) {
         $form['payment_method_type'] = [
           '#type' => 'value',
-          '#value' => reset($methodTypes)->getPluginId(),
+          '#value' => reset($payment_method_types)->getPluginId(),
         ];
       }
       else {
-        /** @var \Drupal\commerce_payment\Plugin\Commerce\PaymentMethodType\PaymentMethodTypeInterface[] $methodTypes */
         $method_type_options = [];
-        foreach ($methodTypes as $methodType) {
-          $method_type_options[$methodType->getPluginId()] = $methodType->getLabel();
+        foreach ($payment_method_types as $type) {
+          $method_type_options[$type->getPluginId()] = $type->getLabel();
         }
         $form['payment_method_type'] = [
           '#type' => 'radios',
           '#title' => $this->t('Payment type'),
           '#options' => $method_type_options,
-          '#default_value' => reset($methodTypes)->getPluginId(),
+          '#default_value' => reset($payment_method_types)->getPluginId(),
           '#required' => TRUE,
           '#after_build' => [
             [get_class($this), 'clearValue'],
@@ -238,7 +238,7 @@ class PaymentAddForm extends FormBase implements ContainerInjectionInterface {
   protected function buildPaymentMethodForm(array $form, FormStateInterface $form_state) {
     $payment_method = $this->entityTypeManager
       ->getStorage('commerce_payment_method')->create([
-        'type' => 'credit_card',
+        'type' => $form_state->get('payment_method_type'),
         'payment_gateway' => $form_state->getValue('payment_gateway'),
         'uid' => $this->order->getCustomerId(),
       ]);
