@@ -137,16 +137,20 @@ class PaymentAddForm extends FormBase implements ContainerInjectionInterface {
       ],
     ];
 
+    $payment_method_options = [];
     if ($selected_payment_gateway->getPlugin() instanceof SupportsStoredPaymentMethodsInterface) {
       /** @var \Drupal\commerce_payment\PaymentMethodStorageInterface $payment_method_storage */
       $payment_method_storage = $this->entityTypeManager->getStorage('commerce_payment_method');
       $billing_countries = $this->order->getStore()->getBillingCountries();
-      $reusable_payment_methods = $payment_method_storage->loadReusable($this->order->getCustomer(), $selected_payment_gateway, $billing_countries);
-      $order_payment_methods = $payment_method_storage->loadForOrder($this->order, $selected_payment_gateway);
-      $payment_methods = $reusable_payment_methods + $order_payment_methods;
+      $payment_methods = [];
+      if ($this->order->getCustomerId()) {
+        $payment_methods += $payment_method_storage->loadReusable($this->order->getCustomer(), $selected_payment_gateway, $billing_countries);
+      }
+      if ($this->order->getBillingProfile()) {
+        $payment_methods += $payment_method_storage->loadForProfile($this->order->getBillingProfile(), $selected_payment_gateway);
+      }
       if (!empty($payment_methods)) {
         $selected_payment_method = reset($payment_methods);
-        $payment_method_options = [];
         foreach ($payment_methods as $id => $payment_method) {
           $payment_method_options[$id] = $payment_method->label();
           if ($payment_method->isDefault()) {
