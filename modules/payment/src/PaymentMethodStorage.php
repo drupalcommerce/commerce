@@ -3,7 +3,6 @@
 namespace Drupal\commerce_payment;
 
 use Drupal\commerce\CommerceContentEntityStorage;
-use Drupal\commerce_order\Entity\OrderInterface;
 use Drupal\commerce_payment\Entity\PaymentGatewayInterface;
 use Drupal\commerce_payment\Plugin\Commerce\PaymentGateway\SupportsStoredPaymentMethodsInterface;
 use Drupal\Component\Datetime\TimeInterface;
@@ -13,6 +12,7 @@ use Drupal\Core\Entity\EntityManagerInterface;
 use Drupal\Core\Entity\EntityStorageException;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
+use Drupal\profile\Entity\ProfileInterface;
 use Drupal\user\UserInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -80,11 +80,14 @@ class PaymentMethodStorage extends CommerceContentEntityStorage implements Payme
       return [];
     }
 
-    $query = $this->getQuery()
+    $query = $this->getQuery();
+    $query
       ->condition('uid', $account->id())
       ->condition('payment_gateway', $payment_gateway->id())
       ->condition('reusable', TRUE)
-      ->condition('expires', $this->time->getRequestTime(), '>')
+      ->condition($query->orConditionGroup()
+        ->condition('expires', $this->time->getRequestTime(), '>')
+        ->condition('expires', 0))
       ->sort('created', 'DESC');
     $result = $query->execute();
     if (empty($result)) {
@@ -115,14 +118,14 @@ class PaymentMethodStorage extends CommerceContentEntityStorage implements Payme
   /**
    * {@inheritdoc}
    */
-  public function loadForOrder(OrderInterface $order, PaymentGatewayInterface $payment_gateway) {
+  public function loadForProfile(ProfileInterface $profile, PaymentGatewayInterface $payment_gateway) {
     if (!($payment_gateway->getPlugin() instanceof SupportsStoredPaymentMethodsInterface)) {
       return [];
     }
 
     $query = $this->getQuery();
     $query
-      ->condition('billing_profile.target_id', $order->getBillingProfile()->id())
+      ->condition('billing_profile.target_id', $profile->id())
       ->condition('payment_gateway', $payment_gateway->id())
       ->condition($query->orConditionGroup()
         ->condition('expires', $this->time->getRequestTime(), '>')
