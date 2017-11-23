@@ -203,12 +203,15 @@ class PaymentAddForm extends FormBase implements ContainerInjectionInterface {
     }
 
     $form['actions']['#type'] = 'actions';
-    if ($payment_method_options) {
-      $form['actions']['submit'] = [
-        '#type' => 'submit',
-        '#value' => $this->t('Continue'),
-        '#button_type' => 'primary',
-      ];
+    $form['actions']['submit'] = [
+      '#type' => 'submit',
+      '#value' => $this->t('Continue'),
+      '#button_type' => 'primary',
+    ];
+
+    // Hide 'Continue' button if no stored payment method is available.
+    if (empty($payment_method_options) && $selected_payment_gateway->getPlugin() instanceof SupportsStoredPaymentMethodsInterface) {
+      $form['actions']['submit']['#access'] = FALSE;
     }
 
     return $form;
