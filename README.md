@@ -1,6 +1,4 @@
-<p align="center">
-  <img src="https://drupalcommerce.org/sites/default/files/dclogo_stacked_2c_on_white.png" alt="Drupal Commerce" />  
-</p>
+![Drupal Commerce](https://drupalcommerce.org/sites/default/files/dclogo_stacked_2c_on_white.png "Drupal Commerce logo")
 
 Drupal Commerce
 ===============
