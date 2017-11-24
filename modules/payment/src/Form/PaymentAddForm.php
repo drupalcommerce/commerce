@@ -76,11 +76,18 @@ class PaymentAddForm extends FormBase implements ContainerInjectionInterface {
     $step = $form_state->get('step');
     $step = $step ?: 'payment_gateway';
     $form_state->set('step', $step);
-    if ($step == 'payment_gateway') {
-      $form = $this->buildPaymentGatewayForm($form, $form_state);
-    }
-    elseif ($step == 'payment') {
-      $form = $this->buildPaymentForm($form, $form_state);
+    switch ($step) {
+      case 'payment_gateway':
+        $form = $this->buildPaymentGatewayForm($form, $form_state);
+        break;
+
+      case 'payment_method':
+        $form = $this->buildPaymentMethodForm($form, $form_state);
+        break;
+
+      case 'payment':
+        $form = $this->buildPaymentForm($form, $form_state);
+        break;
     }
 
     return $form;
@@ -98,13 +105,6 @@ class PaymentAddForm extends FormBase implements ContainerInjectionInterface {
    *   The built form.
    */
   protected function buildPaymentGatewayForm(array $form, FormStateInterface $form_state) {
-    // @todo
-    // Support adding payments to anonymous orders, by adding support for
-    // creating payment methods directly on this form.
-    if (!$this->order->getCustomerId()) {
-      throw new AccessDeniedHttpException();
-    }
-
     /** @var \Drupal\commerce_payment\PaymentGatewayStorageInterface $payment_gateway_storage */
     $payment_gateway_storage = $this->entityTypeManager->getStorage('commerce_payment_gateway');
     $payment_gateways = $payment_gateway_storage->loadMultipleForOrder($this->order);
@@ -137,14 +137,20 @@ class PaymentAddForm extends FormBase implements ContainerInjectionInterface {
       ],
     ];
 
+    $payment_method_options = [];
     if ($selected_payment_gateway->getPlugin() instanceof SupportsStoredPaymentMethodsInterface) {
       /** @var \Drupal\commerce_payment\PaymentMethodStorageInterface $payment_method_storage */
       $payment_method_storage = $this->entityTypeManager->getStorage('commerce_payment_method');
       $billing_countries = $this->order->getStore()->getBillingCountries();
-      $payment_methods = $payment_method_storage->loadReusable($this->order->getCustomer(), $selected_payment_gateway, $billing_countries);
+      $payment_methods = [];
+      if ($this->order->getCustomerId()) {
+        $payment_methods += $payment_method_storage->loadReusable($this->order->getCustomer(), $selected_payment_gateway, $billing_countries);
+      }
+      if ($this->order->getBillingProfile()) {
+        $payment_methods += $payment_method_storage->loadForProfile($this->order->getBillingProfile(), $selected_payment_gateway);
+      }
       if (!empty($payment_methods)) {
         $selected_payment_method = reset($payment_methods);
-        $payment_method_options = [];
         foreach ($payment_methods as $id => $payment_method) {
           $payment_method_options[$id] = $payment_method->label();
           if ($payment_method->isDefault()) {
@@ -163,21 +169,50 @@ class PaymentAddForm extends FormBase implements ContainerInjectionInterface {
           ],
         ];
       }
-      else {
-        $form['payment_method'] = [
-          '#type' => 'markup',
-          '#markup' => $this->t('There are no reusable payment methods available for the selected gateway.'),
+      $form['actions']['add_payment_method'] = [
+        '#type' => 'submit',
+        '#value' => $this->t('Add payment method'),
+        '#weight' => 10,
+      ];
+    }
+
+    if ($payment_method_types = $selected_payment_gateway->getPlugin()->getPaymentMethodTypes()) {
+      /** @var \Drupal\commerce_payment\Plugin\Commerce\PaymentMethodType\PaymentMethodTypeInterface[] $payment_method_types */
+      if (count($payment_method_types) == 1) {
+        $form['payment_method_type'] = [
+          '#type' => 'value',
+          '#value' => reset($payment_method_types)->getPluginId(),
         ];
-        // Don't allow the form to be submitted.
-        return $form;
+      }
+      else {
+        $method_type_options = [];
+        foreach ($payment_method_types as $type) {
+          $method_type_options[$type->getPluginId()] = $type->getLabel();
+        }
+        $form['payment_method_type'] = [
+          '#type' => 'radios',
+          '#title' => $this->t('Payment type'),
+          '#options' => $method_type_options,
+          '#default_value' => reset($payment_method_types)->getPluginId(),
+          '#required' => TRUE,
+          '#after_build' => [
+            [get_class($this), 'clearValue'],
+          ],
+        ];
       }
     }
 
+    $form['actions']['#type'] = 'actions';
     $form['actions']['submit'] = [
       '#type' => 'submit',
       '#value' => $this->t('Continue'),
       '#button_type' => 'primary',
     ];
+
+    // Hide 'Continue' button if no stored payment method is available.
+    if (empty($payment_method_options) && $selected_payment_gateway->getPlugin() instanceof SupportsStoredPaymentMethodsInterface) {
+      $form['actions']['submit']['#access'] = FALSE;
+    }
 
     return $form;
   }
@@ -198,6 +233,42 @@ class PaymentAddForm extends FormBase implements ContainerInjectionInterface {
       unset($user_input['payment_method']);
     }
     return $element;
+  }
+
+  /**
+   * Build a payment method creation form.
+   *
+   * @param array $form
+   *   The parent form.
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   *   The current state of the complete form.
+   *
+   * @return array
+   *   The built form.
+   *
+   * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
+   */
+  protected function buildPaymentMethodForm(array $form, FormStateInterface $form_state) {
+    $payment_method_storage = $this->entityTypeManager->getStorage('commerce_payment_method');
+    $payment_method = $payment_method_storage->create([
+      'type' => $form_state->getValue('payment_method_type'),
+      'payment_gateway' => $form_state->getValue('payment_gateway'),
+      'uid' => $this->order->getCustomerId(),
+    ]);
+    $form['add_payment_method'] = [
+      '#type' => 'commerce_payment_gateway_form',
+      '#operation' => 'add-payment-method',
+      '#default_value' => $payment_method,
+    ];
+
+    $form['actions']['#type'] = 'actions';
+    $form['actions']['submit'] = [
+      '#type' => 'submit',
+      '#value' => $this->t('Continue'),
+      '#button_type' => 'primary',
+    ];
+
+    return $form;
   }
 
   /**
@@ -242,6 +313,20 @@ class PaymentAddForm extends FormBase implements ContainerInjectionInterface {
   public function submitForm(array &$form, FormStateInterface $form_state) {
     $step = $form_state->get('step');
     if ($step == 'payment_gateway') {
+      if ($form_state->getTriggeringElement()['#id'] === 'edit-actions-add-payment-method') {
+        $next_step = 'payment_method';
+      }
+      else {
+        $next_step = 'payment';
+      }
+      $form_state->set('step', $next_step);
+      $form_state->setRebuild(TRUE);
+    }
+    elseif ($step == 'payment_method') {
+      /** @var \Drupal\commerce_payment\Entity\PaymentMethodInterface $payment_method */
+      $payment_method = $form_state->getValue('add_payment_method');
+      $form_state->setValue('payment_method', $payment_method);
+      $form_state->setValue('payment_gateway', $payment_method->getPaymentGatewayId());
       $form_state->set('step', 'payment');
       $form_state->setRebuild(TRUE);
     }
