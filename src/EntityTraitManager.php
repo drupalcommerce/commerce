@@ -101,6 +101,12 @@ class EntityTraitManager extends DefaultPluginManager implements EntityTraitMana
       $field_definition->setName($field_name);
 
       $this->configurableFieldManager->createField($field_definition);
+
+    }
+    // Traits may also pass mode definitions for fields they did not contribute.
+    foreach ($trait->buildDisplayModes() as $field_name => $definition) {
+      $this->configurableFieldManager
+        ->configureFieldDisplayModes($field_name, $entity_type_id, $bundle, $definition);
     }
   }
 

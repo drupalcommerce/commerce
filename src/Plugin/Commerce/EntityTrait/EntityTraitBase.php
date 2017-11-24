@@ -30,4 +30,11 @@ abstract class EntityTraitBase extends PluginBase implements EntityTraitInterfac
     // Entity traits are not required to provide fields.
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function buildDisplayModes() {
+    // Entity traits are not required to provide additional display modes.
+  }
+
 }

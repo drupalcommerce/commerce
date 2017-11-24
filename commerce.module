@@ -80,6 +80,8 @@ function commerce_field_widget_form_alter(&$element, FormStateInterface $form_st
  *   The bundle.
  * @param string $display_context
  *   The display context ('view' or 'form').
+ * @param string $mode
+ *   The display mode, defaults to 'default'
  *
  * @throws \InvalidArgumentException
  *   Thrown when an invalid display context is provided.
@@ -87,18 +89,18 @@ function commerce_field_widget_form_alter(&$element, FormStateInterface $form_st
  * @return \Drupal\Core\Entity\Display\EntityDisplayInterface
  *   The entity display.
  */
-function commerce_get_entity_display($entity_type, $bundle, $display_context) {
+function commerce_get_entity_display($entity_type, $bundle, $display_context, $mode = 'default') {
   if (!in_array($display_context, ['view', 'form'])) {
     throw new \InvalidArgumentException(sprintf('Invalid display_context %s passed to _commerce_product_get_display().', $display_context));
   }
 
   $storage = \Drupal::entityTypeManager()->getStorage('entity_' . $display_context . '_display');
-  $display = $storage->load($entity_type . '.' . $bundle . '.default');
+  $display = $storage->load($entity_type . '.' . $bundle . '.' . $mode);
   if (!$display) {
     $display = $storage->create([
       'targetEntityType' => $entity_type,
       'bundle' => $bundle,
-      'mode' => 'default',
+      'mode' => $mode,
       'status' => TRUE,
     ]);
   }
