@@ -95,7 +95,7 @@ class EntityTraitManager extends DefaultPluginManager implements EntityTraitMana
   public function installTrait(EntityTraitInterface $trait, $entity_type_id, $bundle) {
     // The fields provided by an entity trait are maintained as locked
     // configurable fields, for simplicity.
-    foreach ($trait->buildFieldDefinitions() as $field_name => $field_definition) {
+    foreach ($trait->buildFieldDefinitions($entity_type_id) as $field_name => $field_definition) {
       $field_definition->setTargetEntityTypeId($entity_type_id);
       $field_definition->setTargetBundle($bundle);
       $field_definition->setName($field_name);
@@ -108,7 +108,7 @@ class EntityTraitManager extends DefaultPluginManager implements EntityTraitMana
    * {@inheritdoc}
    */
   public function canUninstallTrait(EntityTraitInterface $trait, $entity_type_id, $bundle) {
-    foreach ($trait->buildFieldDefinitions() as $field_name => $field_definition) {
+    foreach ($trait->buildFieldDefinitions($entity_type_id) as $field_name => $field_definition) {
       $field_definition->setTargetEntityTypeId($entity_type_id);
       $field_definition->setTargetBundle($bundle);
       $field_definition->setName($field_name);
@@ -124,7 +124,7 @@ class EntityTraitManager extends DefaultPluginManager implements EntityTraitMana
    * {@inheritdoc}
    */
   public function uninstallTrait(EntityTraitInterface $trait, $entity_type_id, $bundle) {
-    foreach ($trait->buildFieldDefinitions() as $field_name => $field_definition) {
+    foreach ($trait->buildFieldDefinitions($entity_type_id) as $field_name => $field_definition) {
       $field_definition->setTargetEntityTypeId($entity_type_id);
       $field_definition->setTargetBundle($bundle);
       $field_definition->setName($field_name);
