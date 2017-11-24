@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="https://drupalcommerce.org/sites/default/files/dclogo_stacked_2c_on_white.png" alt="Drupal Commerce" />  
+</p>
+
 Drupal Commerce
 ===============
 [![Build Status](https://travis-ci.org/drupalcommerce/commerce.svg?branch=8.x-2.x)](https://travis-ci.org/drupalcommerce/commerce)
