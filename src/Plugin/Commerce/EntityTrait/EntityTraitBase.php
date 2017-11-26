@@ -28,6 +28,7 @@ abstract class EntityTraitBase extends PluginBase implements EntityTraitInterfac
    */
   public function buildFieldDefinitions() {
     // Entity traits are not required to provide fields.
+    return [];
   }
 
   /**
@@ -35,6 +36,7 @@ abstract class EntityTraitBase extends PluginBase implements EntityTraitInterfac
    */
   public function buildDisplayModes() {
     // Entity traits are not required to provide additional display modes.
+    return [];
   }
 
 }
