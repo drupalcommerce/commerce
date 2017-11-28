@@ -62,6 +62,10 @@ class OrderAdminTest extends OrderBrowserTestBase {
     $this->assertSession()->buttonExists('Create order item');
     $entity = $this->variation->getSku() . ' (' . $this->variation->id() . ')';
 
+    // Test that commerce_order_test_field_widget_form_alter() has the expected
+    // outcome.
+    $this->assertSame([], \Drupal::state()->get("commerce_order_test_field_widget_form_alter"));
+
     $checkbox = $this->getSession()->getPage()->findField('Override the unit price');
     if ($checkbox) {
       $checkbox->check();
