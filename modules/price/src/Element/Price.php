@@ -113,8 +113,9 @@ class Price extends FormElement {
       '#max_fraction_digits' => 6,
       '#min' => $element['#allow_negative'] ? NULL : 0,
     ];
-    unset($element['#size']);
-    unset($element['#maxlength']);
+    if (isset($element['#ajax'])) {
+      $element['number']['#ajax'] = $element['#ajax'];
+    }
 
     if (count($currency_codes) == 1) {
       $last_visible_element = 'number';
@@ -135,11 +136,18 @@ class Price extends FormElement {
         '#title_display' => 'invisible',
         '#field_suffix' => '',
       ];
+      if (isset($element['#ajax'])) {
+        $element['currency_code']['#ajax'] = $element['#ajax'];
+      }
     }
     // Add the help text if specified.
     if (!empty($element['#description'])) {
       $element[$last_visible_element]['#field_suffix'] .= '<div class="description">' . $element['#description'] . '</div>';
     }
+    // Remove the keys that were transfered to child elements.
+    unset($element['#size']);
+    unset($element['#maxlength']);
+    unset($element['#ajax']);
 
     return $element;
   }
