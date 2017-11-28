@@ -72,6 +72,7 @@ class AdjustmentDefaultWidget extends WidgetBase {
       '#type' => 'textfield',
       '#title' => $this->t('Label'),
       '#default_value' => ($adjustment) ? $adjustment->getLabel() : '',
+      '#required' => TRUE,
     ];
     $element['definition']['amount'] = [
       '#type' => 'commerce_price',
@@ -99,6 +100,12 @@ class AdjustmentDefaultWidget extends WidgetBase {
   public function massageFormValues(array $values, array $form, FormStateInterface $form_state) {
     foreach ($values as $key => $value) {
       if ($value['type'] == '_none') {
+        continue;
+      }
+      // The method can be called with invalid or incomplete data, in
+      // preparation for validation. Passing such data to the Adjustment
+      // object would result in an exception.
+      if (empty($value['definition']['label'])) {
         continue;
       }
 
