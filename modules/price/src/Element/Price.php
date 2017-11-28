@@ -103,6 +103,7 @@ class Price extends FormElement {
     $element['number'] = [
       '#type' => 'commerce_number',
       '#title' => $element['#title'],
+      '#title_display' => $element['#title_display'],
       '#default_value' => $default_value ? $default_value['number'] : NULL,
       '#required' => $element['#required'],
       '#size' => $element['#size'],
