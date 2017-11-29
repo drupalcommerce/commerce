@@ -16,6 +16,7 @@ use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Plugin\PluginBase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Drupal\commerce_tax\TaxNumber;
 
 /**
  * Provides the base class for tax types.
@@ -259,6 +260,25 @@ abstract class TaxTypeBase extends PluginBase implements TaxTypeInterface, Conta
     }
 
     return $this->storeProfiles[$store_id];
+  }
+
+
+  /**
+   * {@inheritdoc}
+   */
+  public function isPossibleTaxNumber(TaxNumber $tax_number) {
+    // Unless specifically implemented no number is a possible tax number for
+    // a certain tax type.
+    return FALSE;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function isValidTaxNumber(TaxNumber $tax_number) {
+    // Unless specifically implemented no number is a valid tax number for
+    // a certain tax type.
+    return FALSE;
   }
 
 }
