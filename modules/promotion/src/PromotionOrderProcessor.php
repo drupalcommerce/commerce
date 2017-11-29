@@ -22,13 +22,6 @@ class PromotionOrderProcessor implements OrderProcessorInterface {
   protected $promotionStorage;
 
   /**
-   * The order type storage.
-   *
-   * @var \Drupal\Core\Entity\EntityStorageInterface
-   */
-  protected $orderTypeStorage;
-
-  /**
    * Constructs a new PromotionOrderProcessor object.
    *
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
@@ -36,7 +29,6 @@ class PromotionOrderProcessor implements OrderProcessorInterface {
    */
   public function __construct(EntityTypeManagerInterface $entity_type_manager) {
     $this->promotionStorage = $entity_type_manager->getStorage('commerce_promotion');
-    $this->orderTypeStorage = $entity_type_manager->getStorage('commerce_order_type');
   }
 
   /**

@@ -292,7 +292,7 @@ class EuropeanUnionVat extends LocalTaxTypeBase {
         // Germany without Heligoland and Büsingen.
         ['country_code' => 'DE', 'excluded_postal_codes' => '27498, 78266'],
         // Austria (Jungholz and Mittelberg).
-        ['country_code' => 'AT', 'excluded_postal_codes' => '6691, 6991:6993'],
+        ['country_code' => 'AT', 'included_postal_codes' => '6691, 6991:6993'],
       ],
       'rates' => [
         [

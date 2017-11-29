@@ -121,11 +121,11 @@ class PaymentMethodAddForm extends PaymentGatewayFormBase {
     }
     catch (DeclineException $e) {
       \Drupal::logger('commerce_payment')->warning($e->getMessage());
-      throw new DeclineException('We encountered an error processing your payment method. Please verify your details and try again.');
+      throw new DeclineException(t('We encountered an error processing your payment method. Please verify your details and try again.'));
     }
     catch (PaymentGatewayException $e) {
       \Drupal::logger('commerce_payment')->error($e->getMessage());
-      throw new PaymentGatewayException('We encountered an unexpected error processing your payment method. Please try again later.');
+      throw new PaymentGatewayException(t('We encountered an unexpected error processing your payment method. Please try again later.'));
     }
   }
 

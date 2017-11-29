@@ -47,3 +47,18 @@ function commerce_payment_update_8201() {
     ->setDisplayConfigurable('view', TRUE);
   $entity_definition_update->installFieldStorageDefinition('completed', 'commerce_payment', 'commerce_payment', $storage_definition);
 }
+
+/**
+ * Make payment_gateway and payment_method order fields optional.
+ */
+function commerce_payment_update_8202() {
+  $entity_definition_update = \Drupal::entityDefinitionUpdateManager();
+
+  $field_definition = $entity_definition_update->getFieldStorageDefinition('payment_gateway', 'commerce_order');
+  $field_definition->setRequired(FALSE);
+  $entity_definition_update->updateFieldStorageDefinition($field_definition);
+
+  $field_definition = $entity_definition_update->getFieldStorageDefinition('payment_method', 'commerce_order');
+  $field_definition->setRequired(FALSE);
+  $entity_definition_update->updateFieldStorageDefinition($field_definition);
+}

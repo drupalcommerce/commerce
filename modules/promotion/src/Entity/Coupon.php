@@ -21,12 +21,18 @@ use Drupal\Core\Entity\EntityTypeInterface;
  *     plural = "@count coupons",
  *   ),
  *   handlers = {
+ *     "event" = "Drupal\commerce_promotion\Event\CouponEvent",
+ *     "list_builder" = "Drupal\commerce_promotion\CouponListBuilder",
  *     "storage" = "Drupal\commerce_promotion\CouponStorage",
+ *     "access" = "Drupal\commerce_promotion\CouponAccessControlHandler",
  *     "views_data" = "Drupal\views\EntityViewsData",
  *     "form" = {
- *       "add" = "Drupal\Core\Entity\ContentEntityForm",
- *       "edit" = "Drupal\Core\Entity\ContentEntityForm",
+ *       "add" = "Drupal\commerce_promotion\Form\CouponForm",
+ *       "edit" = "Drupal\commerce_promotion\Form\CouponForm",
  *       "delete" = "Drupal\Core\Entity\ContentEntityDeleteForm"
+ *     },
+ *     "route_provider" = {
+ *       "default" = "Drupal\commerce_promotion\CouponRouteProvider",
  *     },
  *   },
  *   base_table = "commerce_promotion_coupon",
@@ -37,9 +43,24 @@ use Drupal\Core\Entity\EntityTypeInterface;
  *     "uuid" = "uuid",
  *     "status" = "status",
  *   },
+ *   links = {
+ *     "add-form" = "/promotion/{commerce_promotion}/coupons/add",
+ *     "edit-form" = "/promotion/{commerce_promotion}/coupons/{commerce_promotion_coupon}/edit",
+ *     "delete-form" = "/promotion/{commerce_promotion}/coupons/{commerce_promotion_coupon}/delete",
+ *     "collection" = "/promotion/{commerce_promotion}/coupons",
+ *   },
  * )
  */
 class Coupon extends ContentEntityBase implements CouponInterface {
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function urlRouteParameters($rel) {
+    $uri_route_parameters = parent::urlRouteParameters($rel);
+    $uri_route_parameters['commerce_promotion'] = $this->getPromotionId();
+    return $uri_route_parameters;
+  }
 
   /**
    * {@inheritdoc}
@@ -119,6 +140,20 @@ class Coupon extends ContentEntityBase implements CouponInterface {
     }
 
     return TRUE;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function postSave(EntityStorageInterface $storage, $update = TRUE) {
+    parent::postSave($storage, $update);
+
+    // Ensure there's a reference on each promotion.
+    $promotion = $this->getPromotion();
+    if ($promotion && !$promotion->hasCoupon($this)) {
+      $promotion->addCoupon($this);
+      $promotion->save();
+    }
   }
 
   /**

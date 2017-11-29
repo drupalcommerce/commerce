@@ -26,6 +26,10 @@ class OrderTypeTest extends OrderBrowserTestBase {
    * Tests creating an order Type programaticaly and through the add form.
    */
   public function testCreateOrderType() {
+    // Remove the default order type to be able to test creating the
+    // order_items field anew.
+    OrderType::load('default')->delete();
+
     // Create an order type programmaticaly.
     $type = $this->createEntity('commerce_order_type', [
       'id' => 'kitten',
@@ -48,6 +52,10 @@ class OrderTypeTest extends OrderBrowserTestBase {
 
     $type_exists = (bool) OrderType::load($values['id']);
     $this->assertNotEmpty($type_exists, 'The new order type has been created in the database.');
+
+    // Testing the target type of the order_items field.
+    $settings = $this->config('field.storage.commerce_order.order_items')->get('settings');
+    $this->assertEquals('commerce_order_item', $settings['target_type'], t('Order item field target type is correct.'));
   }
 
   /**
@@ -69,7 +77,7 @@ class OrderTypeTest extends OrderBrowserTestBase {
   }
 
   /**
-   * Tests deleting an order Type programmaticaly and through the form.
+   * Tests deleting an order Type through the form.
    */
   public function testDeleteOrderType() {
     // Create an order type programmaticaly.

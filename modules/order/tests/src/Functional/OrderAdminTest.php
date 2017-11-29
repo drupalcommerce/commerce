@@ -62,6 +62,10 @@ class OrderAdminTest extends OrderBrowserTestBase {
     $this->assertSession()->buttonExists('Create order item');
     $entity = $this->variation->getSku() . ' (' . $this->variation->id() . ')';
 
+    // Test that commerce_order_test_field_widget_form_alter() has the expected
+    // outcome.
+    $this->assertSame([], \Drupal::state()->get("commerce_order_test_field_widget_form_alter"));
+
     $checkbox = $this->getSession()->getPage()->findField('Override the unit price');
     if ($checkbox) {
       $checkbox->check();
@@ -95,11 +99,14 @@ class OrderAdminTest extends OrderBrowserTestBase {
       'billing_profile[0][profile][address][0][address][locality]' => 'Mountain View',
       'billing_profile[0][profile][address][0][address][administrative_area]' => 'CA',
       'adjustments[0][type]' => 'custom',
-      'adjustments[0][definition][label]' => 'Test fee',
+      'adjustments[0][definition][label]' => '',
       'adjustments[0][definition][amount][number]' => '2.00',
     ];
     $this->submitForm($edit, 'Save');
-
+    $this->assertSession()->pageTextContains('Label field is required.');
+    $edit['adjustments[0][definition][label]'] = 'Test fee';
+    $this->submitForm($edit, 'Save');
+    $this->drupalGet('/admin/commerce/orders');
     $order_number = $this->getSession()->getPage()->find('css', 'tr td.views-field-order-number');
     $this->assertEquals(1, count($order_number), 'Order exists in the table.');
 
@@ -164,6 +171,29 @@ class OrderAdminTest extends OrderBrowserTestBase {
     \Drupal::service('entity_type.manager')->getStorage('commerce_order')->resetCache([$order->id()]);
     $order_exists = (bool) Order::load($order->id());
     $this->assertEmpty($order_exists, 'The order has been deleted from the database.');
+  }
+
+  /**
+   * Tests unlocking an order.
+   */
+  public function testUnlockOrder() {
+    $order = $this->createEntity('commerce_order', [
+      'type' => 'default',
+      'mail' => $this->loggedInUser->getEmail(),
+      'uid' => $this->loggedInUser,
+      'store_id' => $this->store,
+      'locked' => TRUE,
+    ]);
+    $this->drupalGet($order->toUrl('unlock-form'));
+    $this->assertSession()->statusCodeEquals(200);
+    $this->assertSession()->pageTextContains(t('Are you sure you want to unlock the order @label?', [
+      '@label' => $order->label(),
+    ]));
+    $this->submitForm([], t('Unlock'));
+
+    \Drupal::service('entity_type.manager')->getStorage('commerce_order')->resetCache([$order->id()]);
+    $order = Order::load($order->id());
+    $this->assertFalse($order->isLocked());
   }
 
   /**

@@ -3,10 +3,11 @@
 namespace Drupal\commerce_promotion\Entity;
 
 use Drupal\commerce\ConditionGroup;
+use Drupal\commerce\Entity\CommerceContentEntityBase;
+use Drupal\commerce\Plugin\Commerce\Condition\ConditionInterface;
 use Drupal\commerce_order\Entity\OrderInterface;
 use Drupal\commerce_promotion\Plugin\Commerce\PromotionOffer\PromotionOfferInterface;
 use Drupal\Core\Datetime\DrupalDateTime;
-use Drupal\Core\Entity\ContentEntityBase;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
@@ -65,7 +66,7 @@ use Drupal\Core\Field\BaseFieldDefinition;
  *   },
  * )
  */
-class Promotion extends ContentEntityBase implements PromotionInterface {
+class Promotion extends CommerceContentEntityBase implements PromotionInterface {
 
   /**
    * {@inheritdoc}
@@ -135,7 +136,7 @@ class Promotion extends ContentEntityBase implements PromotionInterface {
    * {@inheritdoc}
    */
   public function getStores() {
-    return $this->get('stores')->referencedEntities();
+    return $this->getTranslatedReferencedEntities('stores');
   }
 
   /**
@@ -195,6 +196,22 @@ class Promotion extends ContentEntityBase implements PromotionInterface {
       $conditions[] = $field_item->getTargetInstance();
     }
     return $conditions;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setConditions(array $conditions) {
+    $this->set('conditions', []);
+    foreach ($conditions as $condition) {
+      if ($condition instanceof ConditionInterface) {
+        $this->get('conditions')->appendItem([
+          'target_plugin_id' => $condition->getPluginId(),
+          'target_plugin_configuration' => $condition->getConfiguration(),
+        ]);
+      }
+    }
+    return $this;
   }
 
   /**
@@ -628,17 +645,7 @@ class Promotion extends ContentEntityBase implements PromotionInterface {
       ->setCardinality(BaseFieldDefinition::CARDINALITY_UNLIMITED)
       ->setRequired(FALSE)
       ->setSetting('target_type', 'commerce_promotion_coupon')
-      ->setSetting('handler', 'default')
-      ->setTranslatable(TRUE)
-      ->setDisplayOptions('form', [
-        'type' => 'inline_entity_form_complex',
-        'weight' => 10,
-        'settings' => [
-          'override_labels' => TRUE,
-          'label_singular' => 'coupon',
-          'label_plural' => 'coupons',
-        ],
-      ]);
+      ->setSetting('handler', 'default');
 
     $fields['usage_limit'] = BaseFieldDefinition::create('integer')
       ->setLabel(t('Usage limit'))

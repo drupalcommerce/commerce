@@ -115,6 +115,16 @@ interface PromotionInterface extends ContentEntityInterface, EntityStoresInterfa
   public function getConditions();
 
   /**
+   * Sets the conditions.
+   *
+   * @param \Drupal\commerce\Plugin\Commerce\Condition\ConditionInterface[] $conditions
+   *   The conditions.
+   *
+   * @return $this
+   */
+  public function setConditions(array $conditions);
+
+  /**
    * Gets the condition operator.
    *
    * @return string

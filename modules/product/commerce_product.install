@@ -5,6 +5,18 @@
  * Install, update and uninstall functions for the Product module.
  */
 
+use Drupal\Core\Field\BaseFieldDefinition;
+use Drupal\Core\Session\AccountInterface;
+
+/**
+ * Implements hook_install().
+ */
+function commerce_product_install() {
+  // Allow all roles to view published products.
+  user_role_grant_permissions(AccountInterface::ANONYMOUS_ROLE, ['view commerce_product']);
+  user_role_grant_permissions(AccountInterface::AUTHENTICATED_ROLE, ['view commerce_product']);
+}
+
 /**
  * Change the path field to computed.
  */
@@ -31,4 +43,29 @@ function commerce_product_update_8202() {
   unset($keys['status']);
   $entity_type->set('entity_keys', $keys);
   $definition_update_manager->updateEntityType($entity_type);
+}
+
+/**
+ * Update the 'status' field.
+ */
+function commerce_product_update_8203() {
+  $definition_update_manager = \Drupal::entityDefinitionUpdateManager();
+
+  $storage_definition = BaseFieldDefinition::create('boolean')
+    ->setName('status')
+    ->setTargetEntityTypeId('commerce_product')
+    ->setLabel(t('Published'))
+    ->setRevisionable(TRUE)
+    ->setTranslatable(TRUE)
+    ->setDefaultValue(TRUE)
+    ->setDisplayOptions('form', [
+      'type' => 'boolean_checkbox',
+      'settings' => [
+        'display_label' => TRUE,
+      ],
+      'weight' => 90,
+    ])
+    ->setDisplayConfigurable('form', TRUE);
+
+  $definition_update_manager->updateFieldStorageDefinition($storage_definition);
 }

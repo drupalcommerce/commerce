@@ -15,7 +15,6 @@ use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityManagerInterface;
 use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\Core\Link;
 use Drupal\Core\Session\AccountInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -209,11 +208,6 @@ class AddToCartForm extends ContentEntityForm implements AddToCartFormInterface 
     $this->cartManager->addOrderItem($cart, $order_item, $form_state->get(['settings', 'combine']));
     // Other submit handlers might need the cart ID.
     $form_state->set('cart_id', $cart->id());
-
-    drupal_set_message($this->t('@entity added to @cart-link.', [
-      '@entity' => $purchased_entity->label(),
-      '@cart-link' => Link::createFromRoute($this->t('your cart', [], ['context' => 'cart link']), 'commerce_cart.page')->toString(),
-    ]));
   }
 
   /**
