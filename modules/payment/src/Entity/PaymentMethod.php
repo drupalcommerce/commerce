@@ -30,6 +30,7 @@ use Drupal\profile\Entity\ProfileInterface;
  *     "access" = "Drupal\commerce_payment\PaymentMethodAccessControlHandler",
  *     "list_builder" = "Drupal\commerce_payment\PaymentMethodListBuilder",
  *     "storage" = "Drupal\commerce_payment\PaymentMethodStorage",
+ *     "storage_schema" = "Drupal\commerce\CommerceContentEntityStorageSchema",
  *     "form" = {
  *       "edit" = "Drupal\commerce_payment\Form\PaymentMethodEditForm",
  *       "delete" = "Drupal\commerce_payment\Form\PaymentMethodDeleteForm"
@@ -41,6 +42,9 @@ use Drupal\profile\Entity\ProfileInterface;
  *   base_table = "commerce_payment_method",
  *   admin_permission = "administer commerce_payment_method",
  *   fieldable = TRUE,
+ *   field_indexes = {
+ *     "remote_id" = {"remote_id"}
+ *   },
  *   entity_keys = {
  *     "id" = "method_id",
  *     "uuid" = "uuid",

@@ -30,6 +30,7 @@ use Drupal\user\UserInterface;
  *   handlers = {
  *     "event" = "Drupal\commerce_product\Event\ProductVariationEvent",
  *     "storage" = "Drupal\commerce_product\ProductVariationStorage",
+ *     "storage_schema" = "Drupal\commerce\CommerceContentEntityStorageSchema",
  *     "access" = "Drupal\commerce\EmbeddedEntityAccessControlHandler",
  *     "view_builder" = "Drupal\Core\Entity\EntityViewBuilder",
  *     "views_data" = "Drupal\views\EntityViewsData",
@@ -41,6 +42,9 @@ use Drupal\user\UserInterface;
  *   },
  *   admin_permission = "administer commerce_product",
  *   fieldable = TRUE,
+ *   field_indexes = {
+ *     "sku" = {"sku"}
+ *   },
  *   translatable = TRUE,
  *   content_translation_ui_skip = TRUE,
  *   base_table = "commerce_product_variation",
