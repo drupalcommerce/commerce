@@ -57,6 +57,12 @@ class AdjustmentDefaultWidget extends WidgetBase {
       '#type' => 'value',
       '#value' => empty($source_id) ? 'custom' : $source_id,
     ];
+    // If this is being added through the UI, the adjustment should be locked.
+    // UI added adjustments need to be locked to persist after an order refresh.
+    $element['locked'] = [
+      '#type' => 'value',
+      '#value' => ($adjustment) ? $adjustment->isLocked() : TRUE,
+    ];
 
     $states_selector_name = $this->fieldDefinition->getName() . "[$delta][type]";
     $element['definition'] = [
@@ -115,6 +121,7 @@ class AdjustmentDefaultWidget extends WidgetBase {
         'amount' => new Price($value['definition']['amount']['number'], $value['definition']['amount']['currency_code']),
         'source_id' => $value['source_id'],
         'included' => $value['definition']['included'],
+        'locked' => $value['locked'],
       ]);
     }
     return $values;

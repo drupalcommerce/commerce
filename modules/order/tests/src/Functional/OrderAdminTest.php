@@ -98,7 +98,8 @@ class OrderAdminTest extends OrderBrowserTestBase {
       'billing_profile[0][profile][address][0][address][postal_code]' => '94043',
       'billing_profile[0][profile][address][0][address][locality]' => 'Mountain View',
       'billing_profile[0][profile][address][0][address][administrative_area]' => 'CA',
-      'adjustments[0][type]' => 'custom',
+      // Use an adjustment that is not locked by default.
+      'adjustments[0][type]' => 'fee',
       'adjustments[0][definition][label]' => '',
       'adjustments[0][definition][amount][number]' => '2.00',
     ];
@@ -113,6 +114,7 @@ class OrderAdminTest extends OrderBrowserTestBase {
     $order = Order::load(1);
     $this->assertEquals(1, count($order->getItems()));
     $this->assertEquals(new Price('5.33', 'USD'), $order->getTotalPrice());
+    $this->assertCount(1, $order->getAdjustments());
   }
 
   /**
