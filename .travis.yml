@@ -13,9 +13,8 @@ sudo: false
 dist: precise
 
 php:
-  - 7
-  - 5.6
-  - 5.5
+  - 7.1
+  - 7.0
 
 branches:
   except:

@@ -43,6 +43,13 @@ class PriceElementTest extends CommerceBrowserTestBase {
     ];
     $this->submitForm($edit, 'Submit');
     $this->assertSession()->pageTextContains('The number is "10.99" and the currency code is "USD".');
+
+    // Ensure that the form titles are displayed as expected.
+    $elements = $this->xpath('//input[@id="edit-amount-hidden-title-number"]/preceding-sibling::label[@for="edit-amount-hidden-title-number" and contains(@class, "visually-hidden")]');
+    $this->assertTrue(isset($elements[0]), 'Label preceding field and label class is visually-hidden.');
+
+    $elements = $this->xpath('//input[@id="edit-amount-number"]/preceding-sibling::label[@for="edit-amount-number" and not(contains(@class, "visually-hidden"))]');
+    $this->assertTrue(isset($elements[0]), 'Label preceding field and label class is not visually visually-hidden.');
   }
 
   /**
