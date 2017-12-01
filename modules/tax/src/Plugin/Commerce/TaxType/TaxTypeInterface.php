@@ -69,7 +69,7 @@ interface TaxTypeInterface extends ConfigurablePluginInterface, PluginFormInterf
    * @return bool
    *   TRUE if the tax number is relevant for this tax type.
    */
-  public function isPossibleTaxNumber(TaxNumber $tax_number);
+  public function isPossibleTaxNumber(TaxNumber $tax_number, String $country_code);
 
   /**
    * Checks if a tax number is valid for a local tax type.
@@ -77,6 +77,6 @@ interface TaxTypeInterface extends ConfigurablePluginInterface, PluginFormInterf
    * @return bool
    *   TRUE if the tax number is valid and verified for this tax type.
    */
-  public function isValidTaxNumber(TaxNumber $tax_number);
+  public function isValidTaxNumber(TaxNumber $tax_number, String $country_code);
 
 }

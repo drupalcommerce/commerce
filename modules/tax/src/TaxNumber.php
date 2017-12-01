@@ -37,13 +37,13 @@ class TaxNumber {
    * Checks if the basic format of the id has (obvious) errors.
    */
   public function isValidFormat() {
+    // As the number formats differ wildly internationally it will be hard
+    // to find a common ruleset to validate basic formatting.
+    if (strlen($this->tax_number) < 2) {
+      return FALSE;
+    }
 
-  }
-
-  public function getCountryCode() {
-    $tax_id_country_code = mb_substr($this->getTaxNumber(), 0, 2);
-
-    return $tax_id_country_code;
+    return TRUE;
   }
 
 }

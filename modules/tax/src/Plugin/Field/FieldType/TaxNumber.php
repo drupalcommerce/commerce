@@ -31,9 +31,8 @@ class TaxNumber extends FieldItemBase {
   public static function propertyDefinitions(FieldStorageDefinitionInterface $field_definition) {
     // Prevent early t() calls by using the TranslatableMarkup.
     $properties['value'] = DataDefinition::create('string')
-      ->setLabel(new TranslatableMarkup('Text value'))
-      ->setSetting('case_sensitive', FALSE)
-      ->addConstraint('VatNumberConstraint')
+      ->setLabel(t('Text value'))
+      ->addConstraint('VatNumber')
       ->setRequired(TRUE);
 
     return $properties;
@@ -47,7 +46,7 @@ class TaxNumber extends FieldItemBase {
       'columns' => [
         'value' => [
           'type' => 'varchar',
-          'binary' => FALSE,
+          'length' => self::MAX_LENGTH
         ],
       ],
     ];

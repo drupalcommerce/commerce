@@ -12,6 +12,7 @@ use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 
 
 /**
@@ -22,11 +23,11 @@ class VatNumberConstraintValidator extends ConstraintValidator implements Contai
   use StringTranslationTrait;
 
   /**
-   * The tax type manager.
+   * The entity type manager.
    *
-   * @var \Drupal\commerce_tax\TaxTypeManager
+   * @var \Drupal\Core\Entity\EntityTypeManagerInterface|null
    */
-  protected $taxTypeManager;
+  protected $entityTypeManager;
 
   /**
    * Constructs a new CountryConstraintValidator object.
@@ -34,15 +35,15 @@ class VatNumberConstraintValidator extends ConstraintValidator implements Contai
    * @param \CommerceGuys\Addressing\Country\CountryRepositoryInterface $country_repository
    *   The country repository.
    */
-  public function __construct(TaxTypeManager $tax_type_manager) {
-    $this->taxTypeManager = $tax_type_manager;
+  public function __construct(EntityTypeManagerInterface $entity_type_manager) {
+    $this->entityTypeManager = $entity_type_manager;
   }
 
   /**
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container) {
-    return new static($container->get('plugin.manager.commerce_tax_type'));
+    return new static($container->get('entity_type.manager'));
   }
 
   /**
@@ -70,17 +71,14 @@ class VatNumberConstraintValidator extends ConstraintValidator implements Contai
         ->first() : FALSE;
 
       $address_country_code = $address instanceof AddressItem ? $address->getCountryCode() : NULL;
-
-      if ($tax_number->getCountryCode() != $address_country_code) {
-        $this->context->addViolation($constraint->incorrectFormat);
-      }
     }
 
-    // Check the tax number against tax type validation.
-    foreach ($this->taxTypeManager->getDefinitions() as $taxType) {
-      // @TODO: Check if structure even halfway right.
-      if ($taxType->isPossibleTaxNumber($tax_number)) {
-        if (!$taxType->isValidTaxNumber($tax_number)) {
+    // Check if the tax number is valid for the chosen country.
+    foreach ($this->entityTypeManager->getStorage('commerce_tax_type')->loadMultiple() as $tax_type) {
+      $tax_type_plugin = $tax_type->getPlugin();
+
+      if ($tax_type_plugin->isPossibleTaxNumber($tax_number, $address_country_code)) {
+        if (!$tax_type_plugin->isValidTaxNumber($tax_number, $address_country_code)) {
           $this->context->addViolation($constraint->vatNotValid);
         }
       }

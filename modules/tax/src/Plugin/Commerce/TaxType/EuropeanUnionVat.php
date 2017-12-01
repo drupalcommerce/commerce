@@ -22,6 +22,15 @@ class EuropeanUnionVat extends LocalTaxTypeBase {
   /**
    * {@inheritdoc}
    */
+  public function defaultConfiguration() {
+    return [
+        'validate_vies' => FALSE,
+      ] + parent::defaultConfiguration();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function buildConfigurationForm(array $form, FormStateInterface $form_state) {
     $form = parent::buildConfigurationForm($form, $form_state);
     $form['rates'] = $this->buildRateSummary();
@@ -36,6 +45,16 @@ class EuropeanUnionVat extends LocalTaxTypeBase {
     ];
 
     return $form;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function submitConfigurationForm(array &$form, FormStateInterface $form_state) {
+    parent::submitConfigurationForm($form, $form_state);
+
+    $values = $form_state->getValue($form['#parents']);
+    $this->configuration['validate_vies'] = $values['validate_vies'];
   }
 
   /**
@@ -1149,9 +1168,14 @@ class EuropeanUnionVat extends LocalTaxTypeBase {
   /**
    * {@inheritdoc}
    */
-  public function isPossibleTaxNumber(TaxNumber $tax_number) {
+  public function isPossibleTaxNumber(TaxNumber $tax_number, String $country_code) {
+    // Exception for greece as they don't use their ISO country code.
+    $possible_country_codes = $this->getZonesCountryCodes();
+    unset($possible_country_codes['GR']);
+    $possible_country_codes['EL'] = 'EL';
+
     // Only a possibly valid number if we are allowed to check against vies.
-    if ($this->configuration['validate_vies'] && $tax_number->isValidFormat() && in_array($tax_number->getCountryCode(), $this->getZonesCountryCodes())) {
+    if ($tax_number->isValidFormat() && in_array($country_code, $possible_country_codes)) {
       return TRUE;
     }
 
@@ -1161,14 +1185,22 @@ class EuropeanUnionVat extends LocalTaxTypeBase {
   /**
    * {@inheritdoc}
    */
-  public function isValidTaxNumber(TaxNumber $tax_number) {
+  public function isValidTaxNumber(TaxNumber $tax_number, String $country_code) {
+    // If no soap extension is loaded we can't check the validity.
+    if (!extension_loaded('soap')) {
+      return FALSE;
+    }
+
     // Check if tax number has valid format.
-    if ($this->isPossibleTaxNumber()) {
+    if ($this->isPossibleTaxNumber($tax_number, $country_code)) {
+      // Only the part without the country code gets checked.
+      $tax_number_country = mb_substr($tax_number->getTaxNumber(), 2);
+
       try {
         $client = new \SoapClient("http://ec.europa.eu/taxation_customs/vies/checkVatService.wsdl");
         $response = $client->checkVat([
-          'countryCode' => $tax_number->getCountryCode(),
-          'vatNumber' => $tax_number->getTaxNumber(),
+          'countryCode' => $country_code,
+          'vatNumber' => $tax_number_country,
         ]);
 
         if ($response->valid) {

@@ -381,7 +381,7 @@ abstract class LocalTaxTypeBase extends TaxTypeBase implements LocalTaxTypeInter
     // Collect country codes from zones.
     foreach ($this->getZones() as $zone_id =>$zone) {
       foreach ($zone->getTerritories() as $territory) {
-        $country_codes[] = $territory->getCountryCode();
+        $country_codes[$territory->getCountryCode()] = $territory->getCountryCode();
       }
     }
 

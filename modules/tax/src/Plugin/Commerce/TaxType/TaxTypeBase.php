@@ -266,7 +266,7 @@ abstract class TaxTypeBase extends PluginBase implements TaxTypeInterface, Conta
   /**
    * {@inheritdoc}
    */
-  public function isPossibleTaxNumber(TaxNumber $tax_number) {
+  public function isPossibleTaxNumber(TaxNumber $tax_number, String $country_code) {
     // Unless specifically implemented no number is a possible tax number for
     // a certain tax type.
     return FALSE;
@@ -275,7 +275,7 @@ abstract class TaxTypeBase extends PluginBase implements TaxTypeInterface, Conta
   /**
    * {@inheritdoc}
    */
-  public function isValidTaxNumber(TaxNumber $tax_number) {
+  public function isValidTaxNumber(TaxNumber $tax_number, String $country_code) {
     // Unless specifically implemented no number is a valid tax number for
     // a certain tax type.
     return FALSE;
