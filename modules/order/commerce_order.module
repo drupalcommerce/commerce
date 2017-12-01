@@ -5,7 +5,7 @@
  * Defines the Order entity and associated features.
  */
 
-use Drupal\commerce\BundleFieldDefinition;
+use Drupal\entity\BundleFieldDefinition;
 use Drupal\commerce_order\Entity\OrderTypeInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\Element;
