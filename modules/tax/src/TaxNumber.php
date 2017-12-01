@@ -20,15 +20,28 @@ class TaxNumber {
    * Constructs a tax number object.
    *
    * @param String $tax_number
+   *   The tax number string.
    */
   public function __construct(String $tax_number) {
     $this->tax_number = $tax_number;
   }
 
+  /**
+   * Returns the tax number.
+   *
+   * @return string
+   *   The tax number string.
+   */
   public function getTaxNumber() {
     return $this->tax_number;
   }
 
+  /**
+   * Sets the tax number.
+   *
+   * @param String $tax_number
+   *   The tax number string.
+   */
   public function setTaxNumber(String $tax_number) {
     $this->tax_number = $tax_number;
   }
