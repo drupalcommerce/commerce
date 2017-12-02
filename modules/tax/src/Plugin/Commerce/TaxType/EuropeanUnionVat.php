@@ -511,7 +511,7 @@ class EuropeanUnionVat extends LocalTaxTypeBase {
     ]);
     $zones['gb'] = new TaxZone([
       'id' => 'gb',
-      'label' => $this->t('Great Britain'),
+      'label' => $this->t('United Kingdom'),
       'display_label' => $labels['vat'],
       'territories' => [
         ['country_code' => 'GB'],
