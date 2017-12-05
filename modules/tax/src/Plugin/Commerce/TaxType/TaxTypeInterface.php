@@ -7,7 +7,6 @@ use Drupal\Component\Plugin\ConfigurablePluginInterface;
 use Drupal\Component\Plugin\DerivativeInspectionInterface;
 use Drupal\Component\Plugin\PluginInspectionInterface;
 use Drupal\Core\Plugin\PluginFormInterface;
-use Drupal\commerce_tax\TaxNumber;
 
 /**
  * Defines the base interface for tax types.
@@ -62,21 +61,5 @@ interface TaxTypeInterface extends ConfigurablePluginInterface, PluginFormInterf
    *   The order.
    */
   public function apply(OrderInterface $order);
-
-  /**
-   * Checks if a tax number is possibly valid for a local tax type.
-   *
-   * @return bool
-   *   TRUE if the tax number is relevant for this tax type.
-   */
-  public function isPossibleTaxNumber(TaxNumber $tax_number, String $country_code);
-
-  /**
-   * Checks if a tax number is valid for a local tax type.
-   *
-   * @return bool
-   *   TRUE if the tax number is valid and verified for this tax type.
-   */
-  public function isValidTaxNumber(TaxNumber $tax_number, String $country_code);
 
 }

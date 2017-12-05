@@ -32,13 +32,6 @@ commerce_tax_type_configuration:
       type: boolean
       label: 'Display taxes of this type inclusive in product prices'
 
-commerce_tax.commerce_tax_type.plugin.european_union_vat:
-  type: commerce_tax_type_configuration
-  mapping:
-    validate_vies:
-      type: boolean
-      label: 'Validate vat number with vies'
-
 commerce_tax.commerce_tax_type.plugin.custom:
   type: commerce_tax_type_configuration
   mapping:

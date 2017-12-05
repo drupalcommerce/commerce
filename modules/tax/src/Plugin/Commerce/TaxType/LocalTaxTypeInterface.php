@@ -26,12 +26,4 @@ interface LocalTaxTypeInterface extends TaxTypeInterface {
    */
   public function getZones();
 
-  /**
-   * Gets the country codes of tax zone territories.
-   *
-   * @return String[]
-   *   The country codes of all zone territories.
-   */
-  public function getZonesCountryCodes();
-
 }
