@@ -78,7 +78,6 @@ class AdjustmentDefaultWidget extends WidgetBase {
       '#type' => 'textfield',
       '#title' => $this->t('Label'),
       '#default_value' => ($adjustment) ? $adjustment->getLabel() : '',
-      '#required' => TRUE,
     ];
     $element['definition']['amount'] = [
       '#type' => 'commerce_price',
@@ -112,6 +111,7 @@ class AdjustmentDefaultWidget extends WidgetBase {
       // preparation for validation. Passing such data to the Adjustment
       // object would result in an exception.
       if (empty($value['definition']['label'])) {
+        $form_state->setErrorByName('label', $this->t('The adjustment label field is required.'));
         continue;
       }
 
