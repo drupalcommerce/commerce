@@ -67,6 +67,12 @@ class EuropeanUnionVat extends LocalTaxTypeBase {
     $taxable_type = $this->getTaxableType($order_item);
     $year = $this->getCalculationDate($order)->format('Y');
     $is_digital = $taxable_type == TaxableType::DIGITAL_GOODS && $year >= 2015;
+
+    // Since the point of origin for the taxation of events is neither the
+    // store nor the customer tax zone, but the country the event is held,
+    // we need to resolve an address of the event itself.
+    $is_event = $taxable_type == TaxableType::EVENTS;
+
     $resolved_zones = [];
     if (empty($store_zones) && !empty($store_registration_zones)) {
       // The store is not in the EU but is registered to collect VAT.
@@ -80,6 +86,61 @@ class EuropeanUnionVat extends LocalTaxTypeBase {
       // Intra-community supply (B2B).
       $ic_zone = $this->getIcZone();
       $resolved_zones = [$ic_zone];
+    }
+    elseif ($is_event) {
+      // Conferences, exhibitions or trainings will use the zone of the
+      // address where the event is held.
+      // http://www.vatlive.com/eu-vat-rules
+      $product = $order_item->getPurchasedEntity()->getProduct();
+      $product_type = $this->entityTypeManager->getStorage('commerce_product_type')->load($product->bundle());
+
+      // If no address can be determined, tax based on customer address.
+      $resolved_zones = $customer_zones;
+
+      // Set zones based on event.
+      if ($property_path = $product_type->getThirdPartySetting('commerce_tax', 'event_tax_address_property_path')) {
+        $property_path_parts = explode('|', $property_path);
+
+        $event_address = NULL;
+
+        // If field is directly on the product entity.
+        if (count($property_path_parts) == 1) {
+          $event_address = $product->$property_path_parts[0]->first();
+        }
+        // If field is on referenced entity we will use our poor-mans
+        // property path.
+        else {
+          $current_element = $product;
+
+          for ($i = 0; $i < count($property_path_parts); $i++) {
+            $field_name = $property_path_parts[$i];
+
+            if ($current_element->$field_name && !$current_element->$field_name->isEmpty()) {
+              // If its not the last element it is an entity reference.
+              if ($i != count($property_path_parts) - 1) {
+                $current_element = $current_element->$field_name->entity;
+              }
+              // Last element is the address field.
+              else {
+                $event_address = $current_element->$field_name->first();
+              }
+            }
+            else {
+              break;
+            }
+          }
+        }
+
+        // If we found an event address use this as the tax origin.
+        if ($event_address) {
+          $event_zones = array_filter($zones, function ($zone) use ($event_address) {
+            /** @var \Drupal\commerce_tax\TaxZone $zone */
+            return $zone->match($event_address);
+          });
+
+          $resolved_zones = $event_zones;
+        }
+      }
     }
     elseif ($is_digital) {
       $resolved_zones = $customer_zones;
