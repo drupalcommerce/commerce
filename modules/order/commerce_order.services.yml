@@ -34,7 +34,7 @@ services:
 
   commerce_order.timestamp_event_subscriber:
     class: Drupal\commerce_order\EventSubscriber\TimestampEventSubscriber
-    arguments: ['@entity_type.manager']
+    arguments: ['@entity_type.manager', '@datetime.time']
     tags:
       - { name: event_subscriber }
 
