@@ -6,6 +6,7 @@ use Drupal\commerce_product\Entity\ProductVariationInterface;
 use Drupal\commerce_product\ProductAttributeFieldManagerInterface;
 use Drupal\Component\Utility\Html;
 use Drupal\Component\Utility\NestedArray;
+use Drupal\Core\Entity\EntityRepositoryInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FieldItemListInterface;
@@ -55,11 +56,13 @@ class ProductVariationAttributesWidget extends ProductVariationWidgetBase implem
    *   Any third party settings.
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
+   * @param \Drupal\Core\Entity\EntityRepositoryInterface $entity_repository
+   *   The entity repository.
    * @param \Drupal\commerce_product\ProductAttributeFieldManagerInterface $attribute_field_manager
    *   The attribute field manager.
    */
-  public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, array $third_party_settings, EntityTypeManagerInterface $entity_type_manager, ProductAttributeFieldManagerInterface $attribute_field_manager) {
-    parent::__construct($plugin_id, $plugin_definition, $field_definition, $settings, $third_party_settings, $entity_type_manager);
+  public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, array $third_party_settings, EntityTypeManagerInterface $entity_type_manager, EntityRepositoryInterface $entity_repository, ProductAttributeFieldManagerInterface $attribute_field_manager) {
+    parent::__construct($plugin_id, $plugin_definition, $field_definition, $settings, $third_party_settings, $entity_type_manager, $entity_repository);
 
     $this->attributeFieldManager = $attribute_field_manager;
     $this->attributeStorage = $entity_type_manager->getStorage('commerce_product_attribute');
@@ -76,6 +79,7 @@ class ProductVariationAttributesWidget extends ProductVariationWidgetBase implem
       $configuration['settings'],
       $configuration['third_party_settings'],
       $container->get('entity_type.manager'),
+      $container->get('entity.repository'),
       $container->get('commerce_product.attribute_field_manager')
     );
   }
@@ -86,7 +90,7 @@ class ProductVariationAttributesWidget extends ProductVariationWidgetBase implem
   public function formElement(FieldItemListInterface $items, $delta, array $element, array &$form, FormStateInterface $form_state) {
     /** @var \Drupal\commerce_product\Entity\ProductInterface $product */
     $product = $form_state->get('product');
-    $variations = $this->variationStorage->loadEnabled($product);
+    $variations = $this->loadEnabledVariations($product);
     if (count($variations) === 0) {
       // Nothing to purchase, tell the parent form to hide itself.
       $form_state->set('hide_form', TRUE);
@@ -141,6 +145,7 @@ class ProductVariationAttributesWidget extends ProductVariationWidgetBase implem
         }
       }
     }
+
     $element['variation'] = [
       '#type' => 'value',
       '#value' => $selected_variation->id(),
@@ -264,10 +269,12 @@ class ProductVariationAttributesWidget extends ProductVariationWidgetBase implem
       $field = $field_definitions[$field_name];
       /** @var \Drupal\commerce_product\Entity\ProductAttributeInterface $attribute */
       $attribute = $this->attributeStorage->load($attribute_ids[$index]);
+      // Make sure we have translation for attribute.
+      $attribute = $this->entityRepository->getTranslationFromContext($attribute, $selected_variation->language()->getId());
 
       $attributes[$field_name] = [
         'field_name' => $field_name,
-        'title' => $field->getLabel(),
+        'title' => $attribute->label(),
         'required' => $field->isRequired(),
         'element_type' => $attribute->getElementType(),
       ];
