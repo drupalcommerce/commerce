@@ -22,7 +22,7 @@ class OrderCurrencyTest extends UnitTestCase {
     ], 'order_currency', ['entity_type' => 'commerce_order']);
     $order = $this->prophesize(OrderInterface::class);
     $order->getEntityTypeId()->willReturn('commerce_order');
-    $order->getTotalPrice()->willReturn(NULL);
+    $order->getTotalPrice()->willReturn(new Price(0, 'USD'));
     $order = $order->reveal();
 
     $this->assertFalse($condition->evaluate($order));

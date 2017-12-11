@@ -16,7 +16,9 @@ interface OrderInterface extends ContentEntityInterface, EntityAdjustableInterfa
 
   // Refresh states.
   const REFRESH_ON_LOAD = 'refresh_on_load';
+
   const REFRESH_ON_SAVE = 'refresh_on_save';
+
   const REFRESH_SKIP = 'refresh_skip';
 
   /**
@@ -250,8 +252,8 @@ interface OrderInterface extends ContentEntityInterface, EntityAdjustableInterfa
    *
    * Represents a sum of all order item totals.
    *
-   * @return \Drupal\commerce_price\Price|null
-   *   The order subtotal price, or NULL.
+   * @return \Drupal\commerce_price\Price
+   *   The order subtotal price.
    */
   public function getSubtotalPrice();
 
@@ -267,8 +269,8 @@ interface OrderInterface extends ContentEntityInterface, EntityAdjustableInterfa
    *
    * Represents a sum of all order item totals along with adjustments.
    *
-   * @return \Drupal\commerce_price\Price|null
-   *   The order total price, or NULL.
+   * @return \Drupal\commerce_price\Price
+   *   The order total price.
    */
   public function getTotalPrice();
 

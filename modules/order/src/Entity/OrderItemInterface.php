@@ -136,8 +136,8 @@ interface OrderItemInterface extends ContentEntityInterface, EntityAdjustableInt
   /**
    * Gets the order item total price.
    *
-   * @return \Drupal\commerce_price\Price|null
-   *   The order item total price, or NULL.
+   * @return \Drupal\commerce_price\Price
+   *   The order item total price.
    */
   public function getTotalPrice();
 

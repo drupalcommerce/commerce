@@ -349,7 +349,7 @@ class Order extends CommerceContentEntityBase implements OrderInterface {
    */
   public function getSubtotalPrice() {
     /** @var \Drupal\commerce_price\Price $subtotal_price */
-    $subtotal_price = NULL;
+    $subtotal_price = $this->getZeroPriceObject();
     if ($this->hasItems()) {
       foreach ($this->getItems() as $order_item) {
         $order_item_total = $order_item->getTotalPrice();
@@ -364,7 +364,7 @@ class Order extends CommerceContentEntityBase implements OrderInterface {
    */
   public function recalculateTotalPrice() {
     /** @var \Drupal\commerce_price\Price $total_price */
-    $total_price = NULL;
+    $total_price = $this->getZeroPriceObject();
     if ($this->hasItems()) {
       foreach ($this->getItems() as $order_item) {
         $order_item_total = $order_item->getTotalPrice();
@@ -388,6 +388,7 @@ class Order extends CommerceContentEntityBase implements OrderInterface {
     if (!$this->get('total_price')->isEmpty()) {
       return $this->get('total_price')->first()->toPrice();
     }
+    return $this->getZeroPriceObject();
   }
 
   /**
@@ -755,4 +756,13 @@ class Order extends CommerceContentEntityBase implements OrderInterface {
     return $workflow;
   }
 
+  /**
+   * Gets the zero price object.
+   *
+   * @return \Drupal\commerce_price\Price
+   *   A price object with amount 0.
+   */
+  private function getZeroPriceObject() {
+    return new Price(0, $this->getStore()->getDefaultCurrencyCode());
+  }
 }
