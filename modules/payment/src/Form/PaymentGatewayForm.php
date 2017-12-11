@@ -2,13 +2,13 @@
 
 namespace Drupal\commerce_payment\Form;
 
-use Drupal\commerce\Form\CommercePluginEntityFormBase;
 use Drupal\commerce_payment\PaymentGatewayManager;
 use Drupal\Component\Utility\Html;
+use Drupal\Core\Entity\EntityForm;
 use Drupal\Core\Form\FormStateInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
-class PaymentGatewayForm extends CommercePluginEntityFormBase {
+class PaymentGatewayForm extends EntityForm {
 
   /**
    * The payment gateway plugin manager.
@@ -90,6 +90,7 @@ class PaymentGatewayForm extends CommercePluginEntityFormBase {
       '#machine_name' => [
         'exists' => '\Drupal\commerce_payment\Entity\PaymentGateway::load',
       ],
+      '#disabled' => !$gateway->isNew(),
     ];
     $form['plugin'] = [
       '#type' => 'radios',
@@ -136,7 +137,7 @@ class PaymentGatewayForm extends CommercePluginEntityFormBase {
       '#default_value' => (int) $gateway->status(),
     ];
 
-    return $this->protectPluginIdElement($form);
+    return $form;
   }
 
   /**

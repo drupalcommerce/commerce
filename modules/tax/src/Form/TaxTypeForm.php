@@ -2,13 +2,13 @@
 
 namespace Drupal\commerce_tax\Form;
 
-use Drupal\commerce\Form\CommercePluginEntityFormBase;
 use Drupal\commerce_tax\TaxTypeManager;
 use Drupal\Component\Utility\Html;
+use Drupal\Core\Entity\EntityForm;
 use Drupal\Core\Form\FormStateInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
-class TaxTypeForm extends CommercePluginEntityFormBase {
+class TaxTypeForm extends EntityForm {
 
   /**
    * The tax type plugin manager.
@@ -79,6 +79,7 @@ class TaxTypeForm extends CommercePluginEntityFormBase {
       '#machine_name' => [
         'exists' => '\Drupal\commerce_tax\Entity\TaxType::load',
       ],
+      '#disabled' => !$type->isNew(),
     ];
     $form['plugin'] = [
       '#type' => 'radios',
@@ -105,7 +106,7 @@ class TaxTypeForm extends CommercePluginEntityFormBase {
       '#default_value' => $type->status(),
     ];
 
-    return $this->protectPluginIdElement($form);
+    return $form;
   }
 
   /**
