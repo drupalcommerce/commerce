@@ -22,4 +22,18 @@ class TaxNumberConstraint extends Constraint {
    */
   public $incorrectFormat = "The format of the specified tax number is not recognized.";
 
+  /**
+   * Violation message.
+   *
+   * @var string
+   */
+  public $countryNotMatching = "Country code on billing address and VAT number Country code not matching.";
+
+  /**
+   * Violation message.
+   *
+   * @var string
+   */
+  public $notValid = "Your VAT number is not valid.";
+
 }

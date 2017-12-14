@@ -116,7 +116,7 @@ abstract class LocalTaxTypeBase extends TaxTypeBase implements LocalTaxTypeInter
       // A negative adjustment is added with the difference, and optionally
       // applied to the unit price in the TaxOrderProcessor.
       $negate = FALSE;
-      if (!$rates && $prices_include_tax && $matches_store_address) {
+      if ($this->negativeRateIsApplicable($rates, $prices_include_tax, $matches_store_address)) {
         // The price difference is calculated using the store's default tax
         // type, but only if no other tax type added its own tax.
         // For example, a 12 EUR price with 20% EU VAT gets a -2 EUR
@@ -283,6 +283,23 @@ abstract class LocalTaxTypeBase extends TaxTypeBase implements LocalTaxTypeInter
   }
 
   /**
+   * Checks whether a possible negative default store rate should be applied.
+   *
+   * @param $rates
+   * @param $prices_include_tax
+   * @param $matches_store_address
+   *
+   * @return bool
+   */
+  protected function negativeRateIsApplicable($rates, $prices_include_tax, $matches_store_address) {
+    if (!$rates && $prices_include_tax && $matches_store_address) {
+      return TRUE;
+    }
+
+    return FALSE;
+  }
+
+  /**
    * Builds the summary of all available tax rates.
    *
    * @return array
@@ -362,5 +379,28 @@ abstract class LocalTaxTypeBase extends TaxTypeBase implements LocalTaxTypeInter
    *   The tax zones.
    */
   abstract protected function buildZones();
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getExternalZones() {
+    return [];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getZonesCountryCodes() {
+    $country_codes = [];
+
+    // Collect country codes from zones.
+    foreach ($this->getZones() as $zone_id =>$zone) {
+      foreach ($zone->getTerritories() as $territory) {
+        $country_codes[$territory->getCountryCode()] = $territory->getCountryCode();
+      }
+    }
+
+    return $country_codes;
+  }
 
 }

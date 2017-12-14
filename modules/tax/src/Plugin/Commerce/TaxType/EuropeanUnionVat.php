@@ -21,13 +21,39 @@ class EuropeanUnionVat extends LocalTaxTypeBase {
   /**
    * {@inheritdoc}
    */
+  public function defaultConfiguration() {
+    return [
+        'validate_vies' => FALSE,
+      ] + parent::defaultConfiguration();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function buildConfigurationForm(array $form, FormStateInterface $form_state) {
     $form = parent::buildConfigurationForm($form, $form_state);
     $form['rates'] = $this->buildRateSummary();
     // Replace the phrase "tax rates" with "VAT rates" to be more precise.
     $form['rates']['#markup'] = $this->t('The following VAT rates are provided:');
 
+    $form['validate_vies'] = [
+      '#type' => 'checkbox',
+      '#title' => t('Validate tax numbers against VIES'),
+      '#description' => t('Tax numbers will be checked against VIES.'),
+      '#default_value' => $this->configuration['validate_vies'],
+    ];
+
     return $form;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function submitConfigurationForm(array &$form, FormStateInterface $form_state) {
+    parent::submitConfigurationForm($form, $form_state);
+
+    $values = $form_state->getValue($form['#parents']);
+    $this->configuration['validate_vies'] = $values['validate_vies'];
   }
 
   /**
@@ -97,6 +123,18 @@ class EuropeanUnionVat extends LocalTaxTypeBase {
     }
 
     return $resolved_zones;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function negativeRateIsApplicable($rates, $prices_include_tax, $matches_store_address) {
+    $ic_rate = $this->getIcZone();
+    if ((!$rates || (count($rates) == 1 && array_key_exists($ic_rate->getId(), $rates))) && $prices_include_tax && $matches_store_address) {
+      return TRUE;
+    }
+
+    return FALSE;
   }
 
   /**
@@ -1091,6 +1129,8 @@ class EuropeanUnionVat extends LocalTaxTypeBase {
         ],
       ],
     ]);
+    // Add special ic zone.
+    $zones['ic'] = $this->getIcZone();
 
     return $zones;
   }
@@ -1122,6 +1162,108 @@ class EuropeanUnionVat extends LocalTaxTypeBase {
         ],
       ],
     ]);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getExternalZones() {
+    // @todo: We should get this from the SwissVat Tax type to avoid duplication.
+    $zones = [];
+    $zones['ch'] = new TaxZone([
+      'id' => 'ch',
+      'label' => $this->t('Switzerland'),
+      'display_label' => $this->t('VAT'),
+      'territories' => [
+        ['country_code' => 'CH'],
+        ['country_code' => 'LI'],
+        // Büsingen.
+        ['country_code' => 'DE', 'included_postal_codes' => '78266'],
+        // Lake Lugano.
+        ['country_code' => 'IT', 'included_postal_codes' => '22060'],
+      ],
+      'rates' => [
+        [
+          'id' => 'standard',
+          'label' => $this->t('Standard'),
+          'percentages' => [
+            ['number' => '0.08', 'start_date' => '2011-01-01'],
+          ],
+          'default' => TRUE,
+        ],
+        [
+          'id' => 'hotel',
+          'label' => $this->t('Hotel'),
+          'percentages' => [
+            ['number' => '0.038', 'start_date' => '2011-01-01'],
+          ],
+        ],
+        [
+          'id' => 'reduced',
+          'label' => $this->t('Reduced'),
+          'percentages' => [
+            ['number' => '0.025', 'start_date' => '2011-01-01'],
+          ],
+        ],
+      ],
+    ]);
+
+    return $zones;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function isValidTaxNumberFormat(TaxNumber $tax_number, $country_code) {
+    // Exception for greece as they don't use their ISO country code.
+    $possible_country_codes = $this->getZonesCountryCodes();
+
+    // Only a possibly valid number if we are allowed to check against vies.
+    if ($tax_number->isValidFormat() && in_array($country_code, $possible_country_codes)) {
+      unset($possible_country_codes['GR']);
+      $possible_country_codes['EL'] = 'EL';
+
+      // The first two chars of eu vat numbers have to be the country code.
+      $tax_number_country_code = strtoupper(substr($tax_number->getTaxNumber(), 0, 2));
+      if (in_array($tax_number_country_code, $possible_country_codes)) {
+        return TRUE;
+      }
+    }
+
+    return FALSE;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function isValidTaxNumber(TaxNumber $tax_number, $country_code) {
+    // Check if tax number has valid format.
+    if ($this->isValidTaxNumberFormat($tax_number, $country_code)) {
+      // If no soap extension is loaded we can't check the validity.
+      if (!extension_loaded('soap')) {
+        return FALSE;
+      }
+
+      // Only the part without the country code gets checked.
+      $tax_number_country = mb_substr($tax_number->getTaxNumber(), 2);
+
+      try {
+        $client = new \SoapClient("http://ec.europa.eu/taxation_customs/vies/checkVatService.wsdl");
+        $response = $client->checkVat([
+          'countryCode' => $country_code,
+          'vatNumber' => $tax_number_country,
+        ]);
+
+        if ($response->valid) {
+          return TRUE;
+        }
+      }
+      catch (\SoapFault $e) {
+        watchdog_exception('vat_number', $e);
+      }
+    }
+
+    return FALSE;
   }
 
 }

@@ -62,4 +62,20 @@ interface TaxTypeInterface extends ConfigurablePluginInterface, PluginFormInterf
    */
   public function apply(OrderInterface $order);
 
+  /**
+   * Checks if the tax number format is valid for this tax type.
+   *
+   * @return bool
+   *   TRUE if the tax number format is valid for this tax type.
+   */
+  public function isValidTaxNumberFormat(TaxNumber $tax_number, $country_code);
+
+  /**
+   * Checks if a tax number is valid for a local tax type.
+   *
+   * @return bool
+   *   TRUE if the tax number is valid and verified for this tax type.
+   */
+  public function isValidTaxNumber(TaxNumber $tax_number, $country_code);
+
 }

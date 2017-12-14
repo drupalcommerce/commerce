@@ -261,4 +261,22 @@ abstract class TaxTypeBase extends PluginBase implements TaxTypeInterface, Conta
     return $this->storeProfiles[$store_id];
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function isValidTaxNumberFormat(TaxNumber $tax_number, $country_code) {
+    // Unless specifically implemented no number has the correct format for
+    // a certain tax type.
+    return FALSE;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function isValidTaxNumber(TaxNumber $tax_number, $country_code) {
+    // Unless specifically implemented no number is a valid tax number for
+    // a certain tax type.
+    return FALSE;
+  }
+
 }
