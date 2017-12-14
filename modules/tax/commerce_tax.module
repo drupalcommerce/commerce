@@ -92,3 +92,101 @@ function commerce_tax_order_item_type_form_submit($form, FormStateInterface $for
   $order_item_type->setThirdPartySetting('commerce_tax', 'taxable_type', $settings['taxable_type']);
   $order_item_type->save();
 }
+
+/**
+ * Implements hook_form_FORM_ID_alter() for 'commerce_product_type_form'.
+ */
+function commerce_tax_form_commerce_product_type_form_alter(array &$form, FormStateInterface $form_state) {
+  /** @var \Drupal\commerce_product\Entity\ProductInterface $order_item_type */
+  $product_type = $form_state->getFormObject()->getEntity();
+
+  $form['commerce_tax'] = [
+    '#type' => 'container',
+    '#weight' => 5,
+  ];
+
+  $options = _commerce_tax_get_addressfield_options('commerce_product', $product_type->id());
+
+  if (!empty($options)) {
+    $form['commerce_tax']['event_tax_address_property_path'] = [
+      '#type' => 'select',
+      '#title' => t('Select address field'),
+      '#description' => t('Select the address field that should be used if product is taxed as an event.'),
+      '#default_value' => $product_type->getThirdPartySetting('commerce_tax', 'event_tax_address_property_path'),
+      '#empty_value' => '',
+      '#options' => $options
+    ];
+  }
+  else {
+    $form['commerce_tax']['info'] = [
+      '#markup' => t('No address fields available on this entity bundle. Create an address field on this entity to enable taxation as event.'),
+    ];
+  }
+
+  $form['actions']['submit']['#submit'][] = 'commerce_tax_product_type_form_submit';
+}
+
+/**
+ * Submission handler for commerce_tax_form_commerce_order_item_type_form_alter().
+ */
+function commerce_tax_product_type_form_submit(array $form, FormStateInterface $form_state) {
+  /** @var \Drupal\commerce_order\Entity\OrderTypeInterface $order_item_type */
+  $product_type = $form_state->getFormObject()->getEntity();
+  $property_path = $form_state->getValue('event_tax_address_property_path');
+  $product_type->setThirdPartySetting('commerce_tax', 'event_tax_address_property_path', $property_path);
+  $product_type->save();
+}
+
+function _commerce_tax_get_addressfield_options($entity_type_id, $entity_bundle_name, $limit_recursion = FALSE) {
+  $field_names = [];
+
+  // Check if entity type is even fieldable.
+  $class = \Drupal::entityTypeManager()
+    ->getDefinition($entity_type_id)
+    ->getOriginalClass();
+
+  if (!is_a($class, 'Drupal\Core\Entity\FieldableEntityInterface', TRUE)) {
+    return [];
+  }
+
+  foreach (\Drupal::service('entity_field.manager')->getFieldDefinitions($entity_type_id , $entity_bundle_name) as $field_name => $field_definition) {
+    if ($field_definition->getType() == 'address') {
+      $field_names[$field_name] = $field_definition->getLabel();
+    }
+    else if (!$limit_recursion && $field_definition->getType() == 'entity_reference') {
+      $reference_field_options = [];
+
+      // We want to be able to map address fields which are part of a reference.
+      $target_entity_type = $field_definition->getSetting('target_type');
+
+      // Use target bundles defined in the handler settings if available.
+      if ($target_bundles = $field_definition->getSetting('handler_settings')) {
+        $target_bundles = $target_bundles['target_bundles'];
+      }
+      // Load all bundles if not restricted.
+      else {
+        $product_type_definitions = \Drupal::service('entity_type.bundle.info')->getBundleInfo($target_entity_type);
+
+        foreach ($product_type_definitions as $product_type_id => $product_type_definition) {
+          $target_bundles[$product_type_id] = $product_type_definition['label'];
+        }
+      }
+
+      // Get addressfield options for all target bundles.
+      foreach ($target_bundles as $target_bundle) {
+        $target_field_options = _commerce_tax_get_addressfield_options($target_entity_type, $target_bundle, TRUE);
+        $reference_field_options = array_merge($reference_field_options, $target_field_options);
+      }
+
+      // Add labels and id of reference field.
+      $processed_reference_field_options = [];
+      foreach ($reference_field_options as $reference_field_name => $reference_field_option) {
+        $processed_reference_field_options[$field_name . '|' . $reference_field_name] = $field_definition->getLabel() . ' → ' . $reference_field_option;
+      }
+
+      $field_names += $processed_reference_field_options;
+    }
+  }
+
+  return $field_names;
+}

@@ -68,3 +68,11 @@ commerce_tax.commerce_tax_type.plugin.custom:
       label: 'Territories'
       sequence:
         type: address_zone_territory
+
+commerce_product.commerce_product.*.third_party.commerce_tax:
+  type: mapping
+  label: 'Tax address settings'
+  mapping:
+    event_tax_address_property_path:
+      type: string
+      label: 'Property path to address field'
