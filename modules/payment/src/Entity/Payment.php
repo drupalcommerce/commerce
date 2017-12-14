@@ -258,6 +258,13 @@ class Payment extends ContentEntityBase implements PaymentInterface {
   /**
    * {@inheritdoc}
    */
+  public function isCompleted() {
+    return !$this->get('completed')->isEmpty();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function getCompletedTime() {
     return $this->get('completed')->value;
   }
