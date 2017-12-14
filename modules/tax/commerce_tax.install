@@ -1,0 +1,13 @@
+<?php
+
+/**
+ * @file
+ * Install, update and uninstall functions for the commerce_tax module.
+ */
+
+/**
+ * Ensure that the post_update function is triggered.
+ */
+function commerce_tax_update_8201() {
+  // Do nothing.
+}
