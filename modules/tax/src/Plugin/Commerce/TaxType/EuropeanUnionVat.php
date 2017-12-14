@@ -7,6 +7,7 @@ use Drupal\commerce_tax\TaxableType;
 use Drupal\commerce_tax\TaxZone;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\profile\Entity\ProfileInterface;
+use Drupal\commerce_tax\TaxNumber;
 
 /**
  * Provides the European Union VAT tax type.
@@ -1223,6 +1224,7 @@ class EuropeanUnionVat extends LocalTaxTypeBase {
     return new TaxZone([
       'id' => 'ic',
       'label' => $this->t('Intra-Community Supply'),
+      'display_label' => $this->t('Intra-Community Supply'),
       'territories' => [
         // This territory won't match, but it doesn't need to.
         ['country_code' => 'EU'],
