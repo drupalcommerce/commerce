@@ -8,7 +8,6 @@ use Drupal\commerce_tax\TaxZone;
 use Drupal\commerce_tax\TaxNumber;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\profile\Entity\ProfileInterface;
-use Drupal\commerce_tax\TaxNumber;
 
 /**
  * Provides the European Union VAT tax type.
