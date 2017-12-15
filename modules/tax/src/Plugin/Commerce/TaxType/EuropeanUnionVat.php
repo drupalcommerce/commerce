@@ -5,6 +5,7 @@ namespace Drupal\commerce_tax\Plugin\Commerce\TaxType;
 use Drupal\commerce_order\Entity\OrderItemInterface;
 use Drupal\commerce_tax\TaxableType;
 use Drupal\commerce_tax\TaxZone;
+use Drupal\commerce_tax\TaxNumber;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\profile\Entity\ProfileInterface;
 

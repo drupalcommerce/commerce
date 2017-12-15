@@ -8,6 +8,7 @@ use Drupal\commerce_store\Entity\StoreInterface;
 use Drupal\commerce_tax\Event\TaxEvents;
 use Drupal\commerce_tax\Event\CustomerProfileEvent;
 use Drupal\commerce_tax\TaxableType;
+use Drupal\commerce_tax\TaxNumber;
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Datetime\DrupalDateTime;
