@@ -1,0 +1,11 @@
+<table>
+    <tbody>
+    {% for order_item in order_entity.getItems %}
+        <tr>
+            <td>{{ order_item.getQuantity|number_format }} x</td>
+            <td>{{ order_item.label }}</td>
+            <td>{{ order_item.getTotalPrice|commerce_price_format }}</td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>

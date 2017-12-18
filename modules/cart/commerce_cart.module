@@ -35,6 +35,11 @@ function commerce_cart_theme($existing, $type, $theme, $path) {
         'links' => [],
       ],
     ],
+    'commerce_cart_order_items_table' => [
+      'variables' => [
+        'order_entity' => NULL,
+      ],
+    ],
     'commerce_cart_empty_page' => [
       'render element' => 'element',
     ],
@@ -205,11 +210,22 @@ function commerce_cart_form_commerce_order_type_form_alter(array &$form, FormSta
     '#options' => $available_form_views,
     '#default_value' => $cart_form_view,
   ];
+  $form['commerce_cart']['cart_block_use_view'] = [
+    '#type' => 'checkbox',
+    '#title' => t('Use a View to display the cart block contents'),
+    '#description' => t('Overrides the cart block contents with the output of a View.'),
+    '#default_value' => !empty($cart_block_view),
+  ];
   $form['commerce_cart']['cart_block_view'] = [
     '#type' => 'select',
     '#title' => t('Shopping cart block view'),
     '#options' => $available_block_views,
     '#default_value' => $cart_block_view,
+    '#states' => [
+      'visible' => [
+        ':input[name="commerce_cart[cart_block_use_view]"]' => ['checked' => TRUE],
+      ],
+    ],
   ];
 
   $form['actions']['submit']['#submit'][] = 'commerce_cart_order_type_form_submit';
@@ -251,7 +267,10 @@ function commerce_cart_order_type_form_submit($form, FormStateInterface $form_st
   $order_type = $form_state->getFormObject()->getEntity();
   $settings = &$form_state->getValue('commerce_cart');
   $order_type->setThirdPartySetting('commerce_cart', 'cart_form_view', $settings['cart_form_view']);
-  $order_type->setThirdPartySetting('commerce_cart', 'cart_block_view', $settings['cart_block_view']);
+  $order_type->setThirdPartySetting('commerce_cart', 'cart_block_view', FALSE);
+  if ($settings['cart_block_use_view']) {
+    $order_type->setThirdPartySetting('commerce_cart', 'cart_block_view', $settings['cart_block_view']);
+  }
   $order_type->save();
 }
 
