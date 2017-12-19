@@ -195,6 +195,7 @@ class OrderItem extends CommerceContentEntityBase implements OrderItemInterface 
     if (!$this->get('total_price')->isEmpty()) {
       return $this->get('total_price')->first()->toPrice();
     }
+    return $this->getZeroPriceObject();
   }
 
   /**

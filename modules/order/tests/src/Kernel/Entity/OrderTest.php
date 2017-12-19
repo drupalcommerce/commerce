@@ -314,7 +314,10 @@ class OrderTest extends CommerceKernelTestBase {
     $order->save();
 
     // The order currency should match the currency of the first order item.
-    $this->assertNull($order->getTotalPrice());
+    $total_price = $order->getTotalPrice();
+    $this->assertNotNull($total_price);
+    $this->assertTrue($total_price->isZero());
+
     $order->addItem($usd_order_item);
     $this->assertEquals($usd_order_item->getTotalPrice(), $order->getTotalPrice());
 
