@@ -104,7 +104,7 @@ class OrderAdminTest extends OrderBrowserTestBase {
       'adjustments[0][definition][amount][number]' => '2.00',
     ];
     $this->submitForm($edit, 'Save');
-    $this->assertSession()->pageTextContains('Label field is required.');
+    $this->assertSession()->pageTextContains('The adjustment label field is required.');
     $edit['adjustments[0][definition][label]'] = 'Test fee';
     $this->submitForm($edit, 'Save');
     $this->drupalGet('/admin/commerce/orders');
@@ -115,6 +115,63 @@ class OrderAdminTest extends OrderBrowserTestBase {
     $this->assertEquals(1, count($order->getItems()));
     $this->assertEquals(new Price('5.33', 'USD'), $order->getTotalPrice());
     $this->assertCount(1, $order->getAdjustments());
+  }
+
+  /**
+   * Tests a basic version of the order creation as it should work as well.
+   */
+  public function testCreateOrderWorksWithoutAdjustment() {
+    // Create an order through the add form.
+    $this->drupalGet('/admin/commerce/orders');
+    $this->getSession()->getPage()->clickLink('Create a new order');
+    $user = $this->loggedInUser->getAccountName() . ' (' . $this->loggedInUser->id() . ')';
+    $edit = [
+      'customer_type' => 'existing',
+      'uid' => $user,
+    ];
+    $this->submitForm($edit, t('Create'));
+    $edit = [
+      'billing_profile[0][profile][address][0][address][given_name]' => 'John',
+      'billing_profile[0][profile][address][0][address][family_name]' => 'Smith',
+      'billing_profile[0][profile][address][0][address][address_line1]' => '123 street',
+      'billing_profile[0][profile][address][0][address][postal_code]' => '94043',
+      'billing_profile[0][profile][address][0][address][locality]' => 'Mountain View',
+      'billing_profile[0][profile][address][0][address][administrative_area]' => 'CA',
+    ];
+    $this->submitForm($edit, 'Save');
+
+    $this->assertSession()->pageTextNotContains('Label field is required.');
+    // Also our custom error message should not appear.
+    $this->assertSession()->pageTextNotContains('The adjustment label field is required.');
+  }
+
+  /**
+   * Tests a adjustment version of the order creation as it should work as well.
+   */
+  public function testOrderWithInvalidAdjustmentShowsError() {
+    // Create an order through the add form.
+    $this->drupalGet('/admin/commerce/orders');
+    $this->getSession()->getPage()->clickLink('Create a new order');
+    $user = $this->loggedInUser->getAccountName() . ' (' . $this->loggedInUser->id() . ')';
+    $edit = [
+      'customer_type' => 'existing',
+      'uid' => $user,
+    ];
+    $this->submitForm($edit, t('Create'));
+    $edit = [
+      'billing_profile[0][profile][address][0][address][given_name]' => 'John',
+      'billing_profile[0][profile][address][0][address][family_name]' => 'Smith',
+      'billing_profile[0][profile][address][0][address][address_line1]' => '123 street',
+      'billing_profile[0][profile][address][0][address][postal_code]' => '94043',
+      'billing_profile[0][profile][address][0][address][locality]' => 'Mountain View',
+      'billing_profile[0][profile][address][0][address][administrative_area]' => 'CA',
+      'adjustments[0][type]' => 'fee',
+      'adjustments[0][definition][label]' => '',
+      'adjustments[0][definition][amount][number]' => '2.00',
+    ];
+    $this->submitForm($edit, 'Save');
+
+    $this->assertSession()->pageTextContains('The adjustment label field is required.');
   }
 
   /**
