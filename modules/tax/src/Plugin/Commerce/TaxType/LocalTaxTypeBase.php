@@ -93,7 +93,7 @@ abstract class LocalTaxTypeBase extends TaxTypeBase implements LocalTaxTypeInter
    */
   public function applies(OrderInterface $order) {
     $store = $order->getStore();
-    return $this->matchesAddress($store) || $this->matchesRegistrations($store);
+    return $this->matchesAddress($store) || $this->matchesRegistrations($store, $order);
   }
 
   /**
@@ -111,7 +111,8 @@ abstract class LocalTaxTypeBase extends TaxTypeBase implements LocalTaxTypeInter
       }
 
       $adjustments = $order_item->getAdjustments();
-      $rates = $this->resolveRates($order_item, $customer_profile);
+      $rates = $this->resolveRates($order_item, $customer_profile, $store);
+
       // Don't overcharge a tax-exempt customer if the price is tax-inclusive.
       // A negative adjustment is added with the difference, and optionally
       // applied to the unit price in the TaxOrderProcessor.
@@ -128,7 +129,7 @@ abstract class LocalTaxTypeBase extends TaxTypeBase implements LocalTaxTypeInter
         });
         if (empty($positive_tax_adjustments)) {
           $store_profile = $this->buildStoreProfile($store);
-          $rates = $this->resolveRates($order_item, $store_profile);
+          $rates = $this->resolveRates($order_item, $store_profile, $store);
           $negate = TRUE;
         }
       }
@@ -210,7 +211,7 @@ abstract class LocalTaxTypeBase extends TaxTypeBase implements LocalTaxTypeInter
    */
   protected function matchesRegistrations(StoreInterface $store) {
     foreach ($this->getZones() as $zone) {
-      if ($this->checkRegistrations($store, $zone)) {
+      if ($zone->isRegistered($store) && $this->checkRegistrations($store, $zone)) {
         return TRUE;
       }
     }
@@ -244,13 +245,15 @@ abstract class LocalTaxTypeBase extends TaxTypeBase implements LocalTaxTypeInter
    *   The order item.
    * @param \Drupal\profile\Entity\ProfileInterface $customer_profile
    *   The customer profile. Contains the address and tax number.
+   * @param \Drupal\commerce_store\Entity\StoreInterface $store
+   *   The store.
    *
    * @return \Drupal\commerce_tax\TaxRate[]
    *   The tax rates, keyed by tax zone ID.
    */
-  protected function resolveRates(OrderItemInterface $order_item, ProfileInterface $customer_profile) {
+  protected function resolveRates(OrderItemInterface $order_item, ProfileInterface $customer_profile, StoreInterface $store) {
     $rates = [];
-    $zones = $this->resolveZones($order_item, $customer_profile);
+    $zones = $this->resolveZones($order_item, $customer_profile, $store);
     foreach ($zones as $zone) {
       $rate = $this->chainRateResolver->resolve($zone, $order_item, $customer_profile);
       if (is_object($rate)) {
@@ -267,15 +270,17 @@ abstract class LocalTaxTypeBase extends TaxTypeBase implements LocalTaxTypeInter
    *   The order item.
    * @param \Drupal\profile\Entity\ProfileInterface $customer_profile
    *   The customer profile. Contains the address and tax number.
+   * @param \Drupal\commerce_store\Entity\StoreInterface $store
+   *   The store.
    *
    * @return \Drupal\commerce_tax\TaxZone[]
    *   The tax zones.
    */
-  protected function resolveZones(OrderItemInterface $order_item, ProfileInterface $customer_profile) {
+  protected function resolveZones(OrderItemInterface $order_item, ProfileInterface $customer_profile, StoreInterface $store) {
     $customer_address = $customer_profile->get('address')->first();
     $resolved_zones = [];
     foreach ($this->getZones() as $zone) {
-      if ($zone->match($customer_address)) {
+      if ($zone->match($customer_address) && $zone->isRegistered($store)) {
         $resolved_zones[] = $zone;
       }
     }

@@ -5,6 +5,7 @@ namespace Drupal\commerce_tax\Plugin\Commerce\TaxType;
 use Drupal\commerce_order\Entity\OrderItemInterface;
 use Drupal\commerce_store\Entity\StoreInterface;
 use Drupal\commerce_tax\TaxZone;
+use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\profile\Entity\ProfileInterface;
 
@@ -41,18 +42,24 @@ class CanadianSalesTax extends LocalTaxTypeBase {
   protected function matchesRegistrations(StoreInterface $store) {
     $store_registrations = $store->get('tax_registrations')->getValue();
     $store_registrations = array_column($store_registrations, 'value');
-    return in_array('CA', $store_registrations);
+    if (in_array('CA', $store_registrations)) {
+      foreach ($this->getZones() as $zone) {
+        if ($zone->isRegistered($store)) {
+          return TRUE;
+        }
+      }
+    }
   }
 
   /**
    * {@inheritdoc}
    */
-  protected function resolveZones(OrderItemInterface $order_item, ProfileInterface $customer_profile) {
+  protected function resolveZones(OrderItemInterface $order_item, ProfileInterface $customer_profile, StoreInterface $store) {
     $customer_address = $customer_profile->get('address')->first();
     if ($customer_address->getCountryCode() != 'CA') {
       return [];
     }
-    return parent::resolveZones($order_item, $customer_profile);
+    return parent::resolveZones($order_item, $customer_profile, $store);
   }
 
   /**
@@ -85,6 +92,7 @@ class CanadianSalesTax extends LocalTaxTypeBase {
           'default' => TRUE,
         ],
       ],
+      'registration' => 'tax_ca_gst_number',
     ]);
     $zones['bc'] = new TaxZone([
       'id' => 'bc',
@@ -102,6 +110,7 @@ class CanadianSalesTax extends LocalTaxTypeBase {
           ],
         ],
       ],
+      'registration' => 'tax_ca_pst_bc_number',
     ]);
     $zones['mb'] = new TaxZone([
       'id' => 'mb',
@@ -119,6 +128,7 @@ class CanadianSalesTax extends LocalTaxTypeBase {
           ],
         ],
       ],
+      'registration' => 'tax_ca_pst_mb_number',
     ]);
     $zones['nb'] = new TaxZone([
       'id' => 'nb',
@@ -136,6 +146,7 @@ class CanadianSalesTax extends LocalTaxTypeBase {
           ],
         ],
       ],
+      'registration' => 'tax_ca_gst_number',
     ]);
     $zones['nl'] = new TaxZone([
       'id' => 'nl',
@@ -153,6 +164,7 @@ class CanadianSalesTax extends LocalTaxTypeBase {
           ],
         ],
       ],
+      'registration' => 'tax_ca_gst_number',
     ]);
     $zones['ns'] = new TaxZone([
       'id' => 'ns',
@@ -170,6 +182,7 @@ class CanadianSalesTax extends LocalTaxTypeBase {
           ],
         ],
       ],
+      'registration' => 'tax_ca_gst_number',
     ]);
     $zones['on'] = new TaxZone([
       'id' => 'on',
@@ -187,6 +200,7 @@ class CanadianSalesTax extends LocalTaxTypeBase {
           ],
         ],
       ],
+      'registration' => 'tax_ca_gst_number',
     ]);
     $zones['pe'] = new TaxZone([
       'id' => 'pe',
@@ -204,6 +218,7 @@ class CanadianSalesTax extends LocalTaxTypeBase {
           ],
         ],
       ],
+      'registration' => 'tax_ca_gst_number',
     ]);
     $zones['qc'] = new TaxZone([
       'id' => 'qc',
@@ -221,9 +236,52 @@ class CanadianSalesTax extends LocalTaxTypeBase {
           ],
         ],
       ],
+      'registration' => 'tax_ca_qst_number',
     ]);
 
     return $zones;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function storeFields() {
+    $fields = [];
+
+    $fields['tax_ca_gst_number'] = BaseFieldDefinition::create('string')
+      ->setLabel(t('Canada GST/HST #'))
+      ->setDisplayOptions('form', [
+        'type' => 'textfield',
+        'weight' => 5,
+      ])
+      ->setDisplayConfigurable('view', TRUE)
+      ->setDisplayConfigurable('form', TRUE);
+    $fields['tax_ca_pst_bc_number'] = BaseFieldDefinition::create('string')
+      ->setLabel(t('British Columbia PST #'))
+      ->setDisplayOptions('form', [
+        'type' => 'textfield',
+        'weight' => 5,
+      ])
+      ->setDisplayConfigurable('view', TRUE)
+      ->setDisplayConfigurable('form', TRUE);
+    $fields['tax_ca_pst_mb_number'] = BaseFieldDefinition::create('string')
+      ->setLabel(t('Manitoba PST #'))
+      ->setDisplayOptions('form', [
+        'type' => 'textfield',
+        'weight' => 5,
+      ])
+      ->setDisplayConfigurable('view', TRUE)
+      ->setDisplayConfigurable('form', TRUE);
+    $fields['tax_ca_qst_number'] = BaseFieldDefinition::create('string')
+      ->setLabel(t('Quebec QST #'))
+      ->setDisplayOptions('form', [
+        'type' => 'textfield',
+        'weight' => 5,
+      ])
+      ->setDisplayConfigurable('view', TRUE)
+      ->setDisplayConfigurable('form', TRUE);
+
+    return $fields;
   }
 
 }

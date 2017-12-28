@@ -3,6 +3,7 @@
 namespace Drupal\commerce_tax\Plugin\Commerce\TaxType;
 
 use Drupal\commerce_order\Entity\OrderItemInterface;
+use Drupal\commerce_store\Entity\StoreInterface;
 use Drupal\commerce_tax\TaxableType;
 use Drupal\commerce_tax\TaxZone;
 use Drupal\Core\Form\FormStateInterface;
@@ -33,7 +34,7 @@ class EuropeanUnionVat extends LocalTaxTypeBase {
   /**
    * {@inheritdoc}
    */
-  protected function resolveZones(OrderItemInterface $order_item, ProfileInterface $customer_profile) {
+  protected function resolveZones(OrderItemInterface $order_item, ProfileInterface $customer_profile, StoreInterface $store) {
     $zones = $this->getZones();
     $customer_address = $customer_profile->address->first();
     $customer_country = $customer_address->getCountryCode();

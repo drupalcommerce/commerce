@@ -261,4 +261,11 @@ abstract class TaxTypeBase extends PluginBase implements TaxTypeInterface, Conta
     return $this->storeProfiles[$store_id];
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function storeFields() {
+    return [];
+  }
+
 }

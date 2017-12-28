@@ -40,6 +40,11 @@ function commerce_tax_entity_base_field_info(EntityTypeInterface $entity_type) {
       ->setDisplayConfigurable('view', TRUE)
       ->setDisplayConfigurable('form', TRUE);
 
+    $tax_plugin_manager = \Drupal::service('plugin.manager.commerce_tax_type');
+    foreach($tax_plugin_manager->getDefinitions() as $definition) {
+      $plugin = $tax_plugin_manager->createInstance($definition['id']);
+      $fields += $plugin->storeFields();
+    }
     return $fields;
   }
 }
@@ -58,6 +63,25 @@ function commerce_tax_form_commerce_store_form_alter(&$form, FormStateInterface 
     ];
     $form['prices_include_tax']['#group'] = 'tax_settings';
     $form['tax_registrations']['#group'] = 'tax_settings';
+    $settings = [];
+    $settings['#group'] = 'tax_settings';
+
+    // @todo Fix when https://www.drupal.org/project/drupal/issues/1149078 has
+    // landed. Ideally these should only show up for stores that have selected
+    // CA in tax registrations. However, the States API is broken for select
+    // elements with #multiple => TRUE.
+    /*
+    $settings['#states'] = [
+      'visible' => [
+        ':input[name^="tax_registrations"]' => ['value' => 'CA'],
+      ]
+    ];
+    */
+
+    $form['tax_ca_gst_number'] += $settings;
+    $form['tax_ca_pst_bc_number'] += $settings;
+    $form['tax_ca_pst_mb_number'] += $settings;
+    $form['tax_ca_qst_number'] += $settings;
   }
 }
 
