@@ -68,6 +68,6 @@ interface TaxTypeInterface extends ConfigurablePluginInterface, PluginFormInterf
    * @return array
    *   An array of fields to add to the store entity type.
    */
-   public function storeFields();
+  public function storeFields();
 
 }
