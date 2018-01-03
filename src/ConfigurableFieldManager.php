@@ -71,16 +71,27 @@ class ConfigurableFieldManager implements ConfigurableFieldManagerInterface {
     ]);
     $field->save();
 
+    $modes = [];
     // Show the field on default entity displays, if specified.
     if ($view_display_options = $field_definition->getDisplayOptions('view')) {
-      $view_display = commerce_get_entity_display($entity_type_id, $bundle, 'view');
-      $view_display->setComponent($field_name, $view_display_options);
-      $view_display->save();
+      $modes['view']['default'] = $view_display_options;
     }
     if ($form_display_options = $field_definition->getDisplayOptions('form')) {
-      $form_display = commerce_get_entity_display($entity_type_id, $bundle, 'form');
-      $form_display->setComponent($field_name, $form_display_options);
-      $form_display->save();
+      $modes['form']['default'] = $form_display_options;
+    }
+    $this->configureFieldDisplayModes($field_name, $entity_type_id, $bundle, $modes);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function configureFieldDisplayModes($field_name, $entity_type_id, $bundle, $modes) {
+    foreach ($modes as $display => $mode) {
+      foreach ($mode as $name => $view_display_options) {
+        $view_display = commerce_get_entity_display($entity_type_id, $bundle, $display, $name);
+        $view_display->setComponent($field_name, $view_display_options);
+        $view_display->save();
+      }
     }
   }
 
