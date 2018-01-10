@@ -86,7 +86,7 @@ class OrderForm extends ContentEntityForm {
         '#tag' => 'h3',
         '#value' => $order->getState()->getLabel(),
         '#attributes' => [
-          'class' => 'entity-meta__title',
+          'class' => ['entity-meta__title'],
         ],
         // Hide the rendered state if there's a widget for it.
         '#access' => empty($form['store_id']),
