@@ -3,6 +3,7 @@
 namespace Drupal\commerce_product\Entity;
 
 use Drupal\commerce\Entity\CommerceContentEntityBase;
+use Drupal\Core\Cache\Cache;
 use Drupal\Core\Entity\EntityPublishedTrait;
 use Drupal\Core\Entity\EntityChangedTrait;
 use Drupal\Core\Entity\EntityStorageInterface;
@@ -286,6 +287,13 @@ class Product extends CommerceContentEntityBase implements ProductInterface {
         $variation->save();
       }
     }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getCacheContexts() {
+    return Cache::mergeContexts(parent::getCacheContexts(), ['url.query_args:v']);
   }
 
   /**
