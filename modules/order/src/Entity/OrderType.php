@@ -18,6 +18,7 @@ use Drupal\commerce\Entity\CommerceBundleEntityBase;
  *     plural = "@count order types",
  *   ),
  *   handlers = {
+ *     "access" = "Drupal\commerce\CommerceBundleAccessControlHandler",
  *     "form" = {
  *       "add" = "Drupal\commerce_order\Form\OrderTypeForm",
  *       "edit" = "Drupal\commerce_order\Form\OrderTypeForm",
@@ -40,11 +41,12 @@ use Drupal\commerce\Entity\CommerceBundleEntityBase;
  *     "label",
  *     "id",
  *     "workflow",
- *     "traits",
  *     "refresh_mode",
  *     "refresh_frequency",
  *     "sendReceipt",
  *     "receiptBcc",
+ *     "traits",
+ *     "locked",
  *   },
  *   links = {
  *     "add-form" = "/admin/commerce/config/order-types/add",

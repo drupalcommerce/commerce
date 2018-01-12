@@ -80,34 +80,40 @@ class OrderTypeTest extends OrderBrowserTestBase {
    * Tests deleting an order Type through the form.
    */
   public function testDeleteOrderType() {
-    // Create an order type programmaticaly.
+    /** @var \Drupal\commerce_order\Entity\OrderTypeInterface $type */
     $type = $this->createEntity('commerce_order_type', [
       'id' => 'foo',
       'label' => 'Label for foo',
       'workflow' => 'order_default',
     ]);
     commerce_order_add_order_items_field($type);
-
-    // Create an order.
     $order = $this->createEntity('commerce_order', [
       'type' => $type->id(),
       'mail' => $this->loggedInUser->getEmail(),
       'store_id' => $this->store,
     ]);
 
-    // Try to delete the order type.
-    $this->drupalGet('admin/commerce/config/order-types/' . $type->id() . '/delete');
+    // Confirm that the type can't be deleted while there's an order.
+    $this->drupalGet($type->toUrl('delete-form'));
     $this->assertSession()->pageTextContains(t('@type is used by 1 order on your site. You cannot remove this order type until you have removed all of the @type orders.', ['@type' => $type->label()]));
     $this->assertSession()->pageTextNotContains(t('This action cannot be undone.'));
 
-    // Deleting the order type when its not being referenced by an order.
+    // Confirm that the delete page is not available when the type is locked.
+    $type->lock();
+    $type->save();
+    $this->drupalGet($type->toUrl('delete-form'));
+    $this->assertSession()->statusCodeEquals('403');
+
+    // Delete the order, unlock the type, confirm that deletion works.
     $order->delete();
-    $this->drupalGet('admin/commerce/config/order-types/' . $type->id() . '/delete');
+    $type->unlock();
+    $type->save();
+    $this->drupalGet($type->toUrl('delete-form'));
     $this->assertSession()->pageTextContains(t('Are you sure you want to delete the order type @label?', ['@label' => $type->label()]));
     $this->assertSession()->pageTextContains(t('This action cannot be undone.'));
     $this->submitForm([], t('Delete'));
     $type_exists = (bool) OrderType::load($type->id());
-    $this->assertEmpty($type_exists, 'The order type has been deleted from the database.');
+    $this->assertEmpty($type_exists);
   }
 
 }
