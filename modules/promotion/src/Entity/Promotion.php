@@ -48,7 +48,6 @@ use Drupal\Core\Field\BaseFieldDefinition;
  *   base_table = "commerce_promotion",
  *   data_table = "commerce_promotion_field_data",
  *   admin_permission = "administer commerce_promotion",
- *   fieldable = TRUE,
  *   translatable = TRUE,
  *   entity_keys = {
  *     "id" = "promotion_id",

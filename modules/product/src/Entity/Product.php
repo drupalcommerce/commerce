@@ -47,7 +47,6 @@ use Drupal\user\UserInterface;
  *   },
  *   admin_permission = "administer commerce_product",
  *   permission_granularity = "bundle",
- *   fieldable = TRUE,
  *   translatable = TRUE,
  *   base_table = "commerce_product",
  *   data_table = "commerce_product_field_data",

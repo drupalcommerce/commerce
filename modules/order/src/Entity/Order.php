@@ -48,7 +48,6 @@ use Drupal\profile\Entity\ProfileInterface;
  *   base_table = "commerce_order",
  *   admin_permission = "administer commerce_order",
  *   permission_granularity = "bundle",
- *   fieldable = TRUE,
  *   entity_keys = {
  *     "id" = "order_id",
  *     "label" = "order_number",

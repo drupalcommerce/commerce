@@ -48,7 +48,6 @@ use Drupal\Core\Field\BaseFieldDefinition;
  *   data_table = "commerce_store_field_data",
  *   admin_permission = "administer commerce_store",
  *   permission_granularity = "bundle",
- *   fieldable = TRUE,
  *   translatable = TRUE,
  *   entity_keys = {
  *     "id" = "store_id",

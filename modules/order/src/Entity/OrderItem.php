@@ -35,7 +35,6 @@ use Drupal\Core\Field\BaseFieldDefinition;
  *   },
  *   base_table = "commerce_order_item",
  *   admin_permission = "administer commerce_order",
- *   fieldable = TRUE,
  *   entity_keys = {
  *     "id" = "order_item_id",
  *     "uuid" = "uuid",
