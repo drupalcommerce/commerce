@@ -23,6 +23,68 @@ class PaymentInformation extends CheckoutPaneBase {
   /**
    * {@inheritdoc}
    */
+  public function defaultConfiguration() {
+    return [
+      'free_orders' => ''
+    ] + parent::defaultConfiguration();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function buildConfigurationSummary() {
+    switch ($this->configuration['free_orders']) {
+      case 'collect_billing':
+        $summary = $this->t('Billing information required for free orders: Billing Only');
+        break;
+
+      case 'collect_all':
+        $summary = $this->t('Billing information required for free orders: Billing and Payment');
+        break;
+
+      case 'collect_none':
+      default:
+        $summary = $this->t('Billing information required for free orders: None');
+    }
+
+    return $summary;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function buildConfigurationForm(array $form, FormStateInterface $form_state) {
+    $form = parent::buildConfigurationForm($form, $form_state);
+    $form['free_orders'] = [
+      '#type' => 'select',
+      '#title' => $this->t('Billing information required for free orders'),
+      '#description' => $this->t('Determines what information will be collected for free orders.'),
+      '#default_value' => $this->configuration['free_orders'],
+      '#options' => [
+        'collect_none' => $this->t('None'),
+        'collect_all' => $this->t('Payment and Billing'),
+        'collect_billing' => $this->t('Billing Only')
+      ]
+    ];
+
+    return $form;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function submitConfigurationForm(array &$form, FormStateInterface $form_state) {
+    parent::submitConfigurationForm($form, $form_state);
+
+    if (!$form_state->getErrors()) {
+      $values = $form_state->getValue($form['#parents']);
+      $this->configuration['free_orders'] = $values['free_orders'];
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function buildPaneSummary() {
     $summary = [];
     /** @var \Drupal\commerce_payment\Entity\PaymentGatewayInterface $payment_gateway */
@@ -58,12 +120,28 @@ class PaymentInformation extends CheckoutPaneBase {
   /**
    * {@inheritdoc}
    */
+  public function isVisible() {
+    $order = $this->order;
+    /** @var \Drupal\commerce_price\Price $total */
+    $total = $order->getTotalPrice();
+    if (!$total->isZero()) {
+      return TRUE;
+    }
+    $free_order_config = $this->configuration['free_orders'];
+    return $free_order_config != 'collect_none';
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function buildPaneForm(array $pane_form, FormStateInterface $form_state, array &$complete_form) {
     /** @var \Drupal\commerce_payment\PaymentGatewayStorageInterface $payment_gateway_storage */
     $payment_gateway_storage = $this->entityTypeManager->getStorage('commerce_payment_gateway');
     // Load the payment gateways. This fires an event for filtering the
     // available gateways, and then evaluates conditions on all remaining ones.
     $payment_gateways = $payment_gateway_storage->loadMultipleForOrder($this->order);
+    $free_order_config = $this->configuration['free_orders'];
+    $collect_billing_only = $this->order->getTotalPrice()->isZero() && $free_order_config == 'collect_billing';
     // Can't proceed without any payment gateways.
     if (empty($payment_gateways)) {
       drupal_set_message($this->noPaymentGatewayErrorMessage(), 'error');
@@ -103,7 +181,7 @@ class PaymentInformation extends CheckoutPaneBase {
         'callback' => [get_class($this), 'ajaxRefresh'],
         'wrapper' => $pane_form['#wrapper_id'],
       ],
-      '#access' => count($options) > 1,
+      '#access' => count($options) > 1 && !$collect_billing_only,
     ];
     // Store the values for submitPaneForm().
     foreach ($options as $option_id => $option) {
@@ -118,7 +196,7 @@ class PaymentInformation extends CheckoutPaneBase {
 
     $selected_option = $pane_form['payment_method'][$default_option];
     $payment_gateway = $payment_gateways[$selected_option['#payment_gateway']];
-    if ($payment_gateway->getPlugin() instanceof SupportsStoredPaymentMethodsInterface) {
+    if (!$collect_billing_only && $payment_gateway->getPlugin() instanceof SupportsStoredPaymentMethodsInterface) {
       if (!empty($selected_option['#payment_method_type'])) {
         /** @var \Drupal\commerce_payment\PaymentMethodStorageInterface $payment_method_storage */
         $payment_method_storage = $this->entityTypeManager->getStorage('commerce_payment_method');
@@ -340,6 +418,14 @@ class PaymentInformation extends CheckoutPaneBase {
    */
   public function submitPaneForm(array &$pane_form, FormStateInterface $form_state, array &$complete_form) {
     $values = $form_state->getValue($pane_form['#parents']);
+    $free_order_config = $this->configuration['free_orders'];
+
+    // Adding billing profile only when order total is zero and the pane config is setup to collect it.
+    if ($this->order->getTotalPrice()->isZero() && $free_order_config == 'collect_billing') {
+      $this->order->setBillingProfile($pane_form['billing_information']['#profile']);
+      return;
+    }
+
     $selected_option = $pane_form['payment_method'][$values['payment_method']];
     /** @var \Drupal\commerce_payment\PaymentGatewayStorageInterface $payment_gateway_storage */
     $payment_gateway_storage = $this->entityTypeManager->getStorage('commerce_payment_gateway');

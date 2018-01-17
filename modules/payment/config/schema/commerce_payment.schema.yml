@@ -51,6 +51,13 @@ commerce_payment_gateway_configuration:
       sequence:
         type: string
 
+commerce_checkout.commerce_checkout_pane.payment_information:
+  type: commerce_checkout_pane_configuration
+  mapping:
+    capture:
+      type: string
+      label: 'Billing information required for free orders'
+
 commerce_checkout.commerce_checkout_pane.payment_process:
   type: commerce_checkout_pane_configuration
   mapping:
