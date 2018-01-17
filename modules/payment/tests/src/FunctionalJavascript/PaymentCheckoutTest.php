@@ -598,8 +598,6 @@ class PaymentCheckoutTest extends CommerceBrowserTestBase {
 
   /**
    * Tests a free order with billing and payment collection.
-   *
-   * @group debug
    */
   public function testFreeOrderCollectAll() {
     /** @var \Drupal\commerce_checkout\Entity\CheckoutFlow $checkout_flow */

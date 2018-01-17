@@ -105,6 +105,17 @@ class PaymentInformation extends CheckoutPaneBase {
     /** @var \Drupal\commerce_payment\Entity\PaymentGatewayInterface $payment_gateway */
     $payment_gateway = $this->order->get('payment_gateway')->entity;
     if (!$payment_gateway) {
+      $billing_profile = $this->order->getBillingProfile();
+      if ($billing_profile) {
+        $profile_view_builder = $this->entityTypeManager->getViewBuilder('profile');
+        $profile_view = $profile_view_builder->view($billing_profile, 'default');
+        $summary = [
+          'label' => [
+            '#markup' => $this->t('Billing information'),
+          ],
+          'profile' => $profile_view,
+        ];
+      }
       return $summary;
     }
 
