@@ -21,11 +21,26 @@ use Drupal\Core\Form\FormStateInterface;
 class PaymentInformation extends CheckoutPaneBase {
 
   /**
+   * Collect billing and payment for free orders (ie: free trial, later payment.)
+   */
+  const COLLECT_ALL = 'collect_all';
+
+  /**
+   * Collect billing only for free orders (ie: collect customer information.)
+   */
+  const COLLECT_BILLING = 'collect_billing';
+
+  /**
+   * Collect no information for free orders.
+   */
+  const COLLECT_NONE = 'collect_none';
+
+  /**
    * {@inheritdoc}
    */
   public function defaultConfiguration() {
     return [
-      'free_orders' => ''
+      'free_orders' => self::COLLECT_NONE,
     ] + parent::defaultConfiguration();
   }
 
@@ -34,15 +49,15 @@ class PaymentInformation extends CheckoutPaneBase {
    */
   public function buildConfigurationSummary() {
     switch ($this->configuration['free_orders']) {
-      case 'collect_billing':
-        $summary = $this->t('Billing information required for free orders: Billing Only');
-        break;
-
-      case 'collect_all':
+      case self::COLLECT_ALL:
         $summary = $this->t('Billing information required for free orders: Billing and Payment');
         break;
 
-      case 'collect_none':
+      case self::COLLECT_BILLING:
+        $summary = $this->t('Billing information required for free orders: Billing Only');
+        break;
+
+      case self::COLLECT_NONE:
       default:
         $summary = $this->t('Billing information required for free orders: None');
     }
@@ -61,10 +76,10 @@ class PaymentInformation extends CheckoutPaneBase {
       '#description' => $this->t('Determines what information will be collected for free orders.'),
       '#default_value' => $this->configuration['free_orders'],
       '#options' => [
-        'collect_none' => $this->t('None'),
-        'collect_all' => $this->t('Payment and Billing'),
-        'collect_billing' => $this->t('Billing Only')
-      ]
+        self::COLLECT_NONE => $this->t('None'),
+        self::COLLECT_BILLING => $this->t('Billing Only'),
+        self::COLLECT_ALL => $this->t('Payment and Billing'),
+      ],
     ];
 
     return $form;
@@ -121,14 +136,10 @@ class PaymentInformation extends CheckoutPaneBase {
    * {@inheritdoc}
    */
   public function isVisible() {
-    $order = $this->order;
-    /** @var \Drupal\commerce_price\Price $total */
-    $total = $order->getTotalPrice();
-    if (!$total->isZero()) {
+    if (!$this->order->getTotalPrice()->isZero()) {
       return TRUE;
     }
-    $free_order_config = $this->configuration['free_orders'];
-    return $free_order_config != 'collect_none';
+    return $this->configuration['free_orders'] != self::COLLECT_NONE;
   }
 
   /**
@@ -140,14 +151,13 @@ class PaymentInformation extends CheckoutPaneBase {
     // Load the payment gateways. This fires an event for filtering the
     // available gateways, and then evaluates conditions on all remaining ones.
     $payment_gateways = $payment_gateway_storage->loadMultipleForOrder($this->order);
-    $free_order_config = $this->configuration['free_orders'];
-    $collect_billing_only = $this->order->getTotalPrice()->isZero() && $free_order_config == 'collect_billing';
     // Can't proceed without any payment gateways.
     if (empty($payment_gateways)) {
       drupal_set_message($this->noPaymentGatewayErrorMessage(), 'error');
       return [];
     }
 
+    $collect_billing_only = $this->order->getTotalPrice()->isZero() && $this->configuration['free_orders'] == self::COLLECT_BILLING;
     $options = $this->buildPaymentMethodOptions($payment_gateways);
     $user_input = $form_state->getUserInput();
     $values = NestedArray::getValue($user_input, $pane_form['#parents']);
@@ -418,10 +428,9 @@ class PaymentInformation extends CheckoutPaneBase {
    */
   public function submitPaneForm(array &$pane_form, FormStateInterface $form_state, array &$complete_form) {
     $values = $form_state->getValue($pane_form['#parents']);
-    $free_order_config = $this->configuration['free_orders'];
 
     // Adding billing profile only when order total is zero and the pane config is setup to collect it.
-    if ($this->order->getTotalPrice()->isZero() && $free_order_config == 'collect_billing') {
+    if ($this->order->getTotalPrice()->isZero() && $this->configuration['free_orders'] == self::COLLECT_BILLING) {
       $this->order->setBillingProfile($pane_form['billing_information']['#profile']);
       return;
     }
