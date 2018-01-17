@@ -4,11 +4,11 @@ description: 'Defines the Product entity and associated features.'
 package: Commerce
 core: 8.x
 dependencies:
-  - commerce
+  - commerce:commerce
   - commerce:commerce_price
   - commerce:commerce_store
-  - path
-  - text
+  - drupal:path
+  - drupal:text
 config_devel:
   install:
     - commerce_product.commerce_product_type.default

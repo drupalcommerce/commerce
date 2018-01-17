@@ -4,4 +4,4 @@ description: 'Defines the Currency entity.'
 package: Commerce
 core: 8.x
 dependencies:
-  - commerce
+  - commerce:commerce

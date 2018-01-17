@@ -4,9 +4,9 @@ description: 'Defines the Store entity and associated features.'
 package: Commerce
 core: 8.x
 dependencies:
-  - commerce
+  - commerce:commerce
   - commerce:commerce_price
-  - options
+  - drupal:options
 config_devel:
   install:
     - commerce_store.commerce_store_type.online
