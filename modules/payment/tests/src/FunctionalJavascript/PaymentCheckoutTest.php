@@ -3,6 +3,7 @@
 namespace Drupal\Tests\commerce_payment\FunctionalJavascript;
 
 use Drupal\commerce_checkout\Entity\CheckoutFlow;
+use Drupal\commerce_order\Adjustment;
 use Drupal\commerce_order\Entity\Order;
 use Drupal\commerce_payment\Entity\Payment;
 use Drupal\commerce_payment\Entity\PaymentGateway;
@@ -525,6 +526,29 @@ class PaymentCheckoutTest extends CommerceBrowserTestBase {
     $payment = Payment::load(1);
     $this->assertNotNull($payment);
     $this->assertEquals($payment->getAmount(), $order->getTotalPrice());
+  }
+
+  /**
+   * @group debug
+   */
+  public function testFreeOrderCollectNone() {
+    $this->drupalGet($this->product->toUrl()->toString());
+    $this->submitForm([], 'Add to cart');
+
+    // Add an adjustment to zero out the order total.
+    $order = Order::load(1);
+    $order->addAdjustment(new Adjustment([
+      'type' => 'custom',
+      'label' => 'Surprise, it is free!',
+      'amount' => $order->getTotalPrice()->multiply('-1'),
+      'locked' => TRUE,
+    ]));
+    $order->save();
+
+    $this->drupalGet('checkout/1');
+    // @todo this is weird if a free order, "Pay" but no payment.
+    $this->submitForm([], 'Pay and complete purchase');
+    $this->assertSession()->pageTextContains('Your order number is 1. You can view your order on your account page when logged in.');
   }
 
 }
