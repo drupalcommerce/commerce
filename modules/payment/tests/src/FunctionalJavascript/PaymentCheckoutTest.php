@@ -7,6 +7,7 @@ use Drupal\commerce_order\Adjustment;
 use Drupal\commerce_order\Entity\Order;
 use Drupal\commerce_payment\Entity\Payment;
 use Drupal\commerce_payment\Entity\PaymentGateway;
+use Drupal\commerce_payment\Plugin\Commerce\CheckoutPane\PaymentInformation;
 use Drupal\Tests\commerce\Functional\CommerceBrowserTestBase;
 use Drupal\Tests\commerce\FunctionalJavascript\JavascriptTestTrait;
 
@@ -529,7 +530,7 @@ class PaymentCheckoutTest extends CommerceBrowserTestBase {
   }
 
   /**
-   * @group debug
+   * Tests a free order with no billing or payment collection.
    */
   public function testFreeOrderCollectNone() {
     $this->drupalGet($this->product->toUrl()->toString());
@@ -546,6 +547,104 @@ class PaymentCheckoutTest extends CommerceBrowserTestBase {
     $order->save();
 
     $this->drupalGet('checkout/1');
+    // @todo this is weird if a free order, "Pay" but no payment.
+    $this->submitForm([], 'Pay and complete purchase');
+    $this->assertSession()->pageTextContains('Your order number is 1. You can view your order on your account page when logged in.');
+  }
+
+  /**
+   * Tests a free order with billing and no payment collection.
+   */
+  public function testFreeOrderCollectBilling() {
+    /** @var \Drupal\commerce_checkout\Entity\CheckoutFlow $checkout_flow */
+    $checkout_flow = CheckoutFlow::load('default');
+    $plugin = $checkout_flow->getPlugin();
+    $configuration = $plugin->getConfiguration();
+    $configuration['panes']['payment_information']['free_orders'] = PaymentInformation::COLLECT_BILLING;
+    $plugin->setConfiguration($configuration);
+    $checkout_flow->save();
+
+    $this->drupalGet($this->product->toUrl()->toString());
+    $this->submitForm([], 'Add to cart');
+
+    // Add an adjustment to zero out the order total.
+    $order = Order::load(1);
+    $order->addAdjustment(new Adjustment([
+      'type' => 'custom',
+      'label' => 'Surprise, it is free!',
+      'amount' => $order->getTotalPrice()->multiply('-1'),
+      'locked' => TRUE,
+    ]));
+    $order->save();
+
+    $this->drupalGet('checkout/1');
+    $this->submitForm([
+      'payment_information[billing_information][address][0][address][given_name]' => 'Johnny',
+      'payment_information[billing_information][address][0][address][family_name]' => 'Appleseed',
+      'payment_information[billing_information][address][0][address][address_line1]' => '123 New York Drive',
+      'payment_information[billing_information][address][0][address][locality]' => 'New York City',
+      'payment_information[billing_information][address][0][address][administrative_area]' => 'NY',
+      'payment_information[billing_information][address][0][address][postal_code]' => '10001',
+    ], 'Continue to review');
+    // @todo failing, should show some sort of review.
+    $this->assertSession()->pageTextContains('Billing information');
+    $this->assertSession()->pageTextContains('Example');
+    $this->assertSession()->pageTextContains('Johnny Appleseed');
+    $this->assertSession()->pageTextContains('123 New York Drive');
+    // @todo this is weird if a free order, "Pay" but no payment.
+    $this->submitForm([], 'Pay and complete purchase');
+    $this->assertSession()->pageTextContains('Your order number is 1. You can view your order on your account page when logged in.');
+  }
+
+  /**
+   * Tests a free order with billing and payment collection.
+   *
+   * @group debug
+   */
+  public function testFreeOrderCollectAll() {
+    /** @var \Drupal\commerce_checkout\Entity\CheckoutFlow $checkout_flow */
+    $checkout_flow = CheckoutFlow::load('default');
+    $plugin = $checkout_flow->getPlugin();
+    $configuration = $plugin->getConfiguration();
+    $configuration['panes']['payment_information']['free_orders'] = PaymentInformation::COLLECT_ALL;
+    $plugin->setConfiguration($configuration);
+    $checkout_flow->save();
+
+    $this->drupalGet($this->product->toUrl()->toString());
+    $this->submitForm([], 'Add to cart');
+
+    // Add an adjustment to zero out the order total.
+    $order = Order::load(1);
+    $order->addAdjustment(new Adjustment([
+      'type' => 'custom',
+      'label' => 'Surprise, it is free!',
+      'amount' => $order->getTotalPrice()->multiply('-1'),
+      'locked' => TRUE,
+    ]));
+    $order->save();
+
+    $this->drupalGet('checkout/1');
+    $radio_button = $this->getSession()->getPage()->findField('New credit card');
+    $radio_button->click();
+    $this->waitForAjaxToFinish();
+
+    $this->submitForm([
+      'payment_information[add_payment_method][payment_details][number]' => '4012888888881881',
+      'payment_information[add_payment_method][payment_details][expiration][month]' => '02',
+      'payment_information[add_payment_method][payment_details][expiration][year]' => '2020',
+      'payment_information[add_payment_method][payment_details][security_code]' => '123',
+      'payment_information[add_payment_method][billing_information][address][0][address][given_name]' => 'Johnny',
+      'payment_information[add_payment_method][billing_information][address][0][address][family_name]' => 'Appleseed',
+      'payment_information[add_payment_method][billing_information][address][0][address][address_line1]' => '123 New York Drive',
+      'payment_information[add_payment_method][billing_information][address][0][address][locality]' => 'New York City',
+      'payment_information[add_payment_method][billing_information][address][0][address][administrative_area]' => 'NY',
+      'payment_information[add_payment_method][billing_information][address][0][address][postal_code]' => '10001',
+    ], 'Continue to review');
+    $this->assertSession()->pageTextContains('Payment information');
+    $this->assertSession()->pageTextContains('Visa ending in 1881');
+    $this->assertSession()->pageTextContains('Expires 2/2020');
+    $this->assertSession()->pageTextContains('Johnny Appleseed');
+    $this->assertSession()->pageTextContains('123 New York Drive');
     // @todo this is weird if a free order, "Pay" but no payment.
     $this->submitForm([], 'Pay and complete purchase');
     $this->assertSession()->pageTextContains('Your order number is 1. You can view your order on your account page when logged in.');
