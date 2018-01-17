@@ -3,14 +3,14 @@
 namespace Drupal\commerce;
 
 use Drupal\Core\Access\AccessResult;
-use Drupal\Core\Entity\EntityAccessControlHandler;
+use Drupal\Core\Entity\EntityAccessControlHandler as CoreEntityAccessControlHandler;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Session\AccountInterface;
 
 /**
  * Defines the access control handler for bundles.
  */
-class CommerceBundleAccessControlHandler extends EntityAccessControlHandler {
+class CommerceBundleAccessControlHandler extends CoreEntityAccessControlHandler {
 
   /**
    * {@inheritdoc}
