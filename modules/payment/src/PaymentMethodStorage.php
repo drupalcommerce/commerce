@@ -87,7 +87,7 @@ class PaymentMethodStorage extends CommerceContentEntityStorage implements Payme
       ->condition($query->orConditionGroup()
         ->condition('expires', $this->time->getRequestTime(), '>')
         ->condition('expires', 0))
-      ->sort('created', 'DESC');
+      ->sort('method_id', 'DESC');
     $result = $query->execute();
     if (empty($result)) {
       return [];

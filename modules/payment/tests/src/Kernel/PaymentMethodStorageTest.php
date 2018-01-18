@@ -120,7 +120,7 @@ class PaymentMethodStorageTest extends CommerceKernelTestBase {
     $payment_method_unlimited->save();
     // Confirm that the expired payment method was not loaded.
     $reusable_payment_methods = $this->storage->loadReusable($this->user, $this->paymentGateway);
-    $this->assertEquals([$payment_method_active->id(), $payment_method_unlimited->id()], array_keys($reusable_payment_methods));
+    $this->assertEquals([$payment_method_unlimited->id(), $payment_method_active->id()], array_keys($reusable_payment_methods));
 
     // Confirm that anonymous users cannot have reusable payment methods.
     $payment_method_active->setOwnerId(0);
