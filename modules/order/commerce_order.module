@@ -5,10 +5,11 @@
  * Defines the Order entity and associated features.
  */
 
-use Drupal\entity\BundleFieldDefinition;
 use Drupal\commerce_order\Entity\OrderTypeInterface;
+use Drupal\commerce_order\Plugin\Field\FieldFormatter\PriceCalculatedFormatter;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\Element;
+use Drupal\entity\BundleFieldDefinition;
 
 /**
  * Implements hook_theme().
@@ -54,6 +55,17 @@ function commerce_order_local_tasks_alter(&$definitions) {
   if (isset($definitions[$id])) {
     $definitions[$id]['title'] = t('Address book');
   }
+}
+
+/**
+ * Implements hook_field_formatter_info_alter().
+ *
+ * Replaces the commerce_price PriceCalculatedFormatter with
+ * the expanded commerce_order one.
+ */
+function commerce_order_field_formatter_info_alter(array &$info) {
+  $info['commerce_price_calculated']['class'] = PriceCalculatedFormatter::class;
+  $info['commerce_price_calculated']['provider'] = 'commerce_order';
 }
 
 /**

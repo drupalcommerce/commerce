@@ -62,3 +62,7 @@ services:
     arguments: ['@current_route_match']
     tags:
       - { name: commerce_store.store_resolver, priority: 100 }
+
+  commerce_order.price_calculator:
+    class: Drupal\commerce_order\PriceCalculator
+    arguments: ['@entity_type.manager', '@commerce_price.chain_price_resolver', '@commerce_order.chain_order_type_resolver', '@request_stack']
