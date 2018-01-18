@@ -5,7 +5,7 @@ namespace Drupal\commerce;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
-use Drupal\entity\BundleFieldDefinition;
+use Drupal\entity\BundleFieldDefinition as EntityBundleFieldDefinition;
 
 class ConfigurableFieldManager implements ConfigurableFieldManagerInterface {
 
@@ -29,7 +29,7 @@ class ConfigurableFieldManager implements ConfigurableFieldManagerInterface {
   /**
    * {@inheritdoc}
    */
-  public function createField(BundleFieldDefinition $field_definition, $lock = TRUE) {
+  public function createField(EntityBundleFieldDefinition $field_definition, $lock = TRUE) {
     $field_name = $field_definition->getName();
     $entity_type_id = $field_definition->getTargetEntityTypeId();
     $bundle = $field_definition->getTargetBundle();
@@ -87,7 +87,7 @@ class ConfigurableFieldManager implements ConfigurableFieldManagerInterface {
   /**
    * {@inheritdoc}
    */
-  public function deleteField(BundleFieldDefinition $field_definition) {
+  public function deleteField(EntityBundleFieldDefinition $field_definition) {
     $field_name = $field_definition->getName();
     $entity_type_id = $field_definition->getTargetEntityTypeId();
     $bundle = $field_definition->getTargetBundle();
@@ -106,7 +106,7 @@ class ConfigurableFieldManager implements ConfigurableFieldManagerInterface {
   /**
    * {@inheritdoc}
    */
-  public function hasData(BundleFieldDefinition $field_definition) {
+  public function hasData(EntityBundleFieldDefinition $field_definition) {
     $field_name = $field_definition->getName();
     $entity_type_id = $field_definition->getTargetEntityTypeId();
     $bundle = $field_definition->getTargetBundle();

@@ -2,7 +2,7 @@
 
 namespace Drupal\commerce;
 
-use Drupal\entity\BundleFieldDefinition;
+use Drupal\entity\BundleFieldDefinition as EntityBundleFieldDefinition;
 
 /**
  * Manages configurable fields based on field definitions.
@@ -25,7 +25,7 @@ interface ConfigurableFieldManagerInterface {
    * @throws \RuntimeException
    *   Thrown when a field with the same name already exists.
    */
-  public function createField(BundleFieldDefinition $field_definition, $lock = TRUE);
+  public function createField(EntityBundleFieldDefinition $field_definition, $lock = TRUE);
 
   /**
    * Deletes the configurable field created from the given field definition.
@@ -39,7 +39,7 @@ interface ConfigurableFieldManagerInterface {
    * @throws \RuntimeException
    *   Thrown when no matching field was found.
    */
-  public function deleteField(BundleFieldDefinition $field_definition);
+  public function deleteField(EntityBundleFieldDefinition $field_definition);
 
   /**
    * Checks whether the configurable field has data.
@@ -56,6 +56,6 @@ interface ConfigurableFieldManagerInterface {
    * @throws \RuntimeException
    *   Thrown when no matching field was found.
    */
-  public function hasData(BundleFieldDefinition $field_definition);
+  public function hasData(EntityBundleFieldDefinition $field_definition);
 
 }

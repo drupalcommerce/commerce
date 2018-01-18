@@ -4,7 +4,7 @@ namespace Drupal\commerce;
 
 @trigger_error('The ' . __NAMESPACE__ . '\BundleFieldDefinition is deprecated. Instead, use \Drupal\entity\BundleFieldDefinition', E_USER_DEPRECATED);
 
-use Drupal\entity\BundleFieldDefinition as BaseBundleFieldDefinition;
+use Drupal\entity\BundleFieldDefinition as EntityBundleFieldDefinition;
 
 /**
  * Provides a field definition class for bundle fields.
@@ -13,4 +13,4 @@ use Drupal\entity\BundleFieldDefinition as BaseBundleFieldDefinition;
  *
  * @deprecated in Commerce 2.0
  */
-class BundleFieldDefinition extends BaseBundleFieldDefinition {}
+class BundleFieldDefinition extends EntityBundleFieldDefinition {}
