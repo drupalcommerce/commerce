@@ -2,6 +2,8 @@
 
 namespace Drupal\commerce_payment\Entity;
 
+use Drupal\commerce_payment\Event\PaymentEvents;
+use Drupal\commerce_payment\PaymentStorage;
 use Drupal\commerce_price\Price;
 use Drupal\Core\Entity\ContentEntityBase;
 use Drupal\Core\Entity\EntityMalformedException;
@@ -296,7 +298,8 @@ class Payment extends ContentEntityBase implements PaymentInterface {
       $refunded_amount = new Price('0', $this->getAmount()->getCurrencyCode());
       $this->setRefundedAmount($refunded_amount);
     }
-    // Maintain the authorized completed timestamps.
+    // Maintain the authorized completed timestamps while also maintaining the
+    // order balance.
     $state = $this->getState()->value;
     $original_state = isset($this->original) ? $this->original->getState()->value : '';
     if ($state == 'authorized' && $original_state != 'authorized') {
@@ -305,9 +308,33 @@ class Payment extends ContentEntityBase implements PaymentInterface {
       }
     }
     if ($state == 'completed' && $original_state != 'completed') {
+      $this->getOrder()->addPayment($this->getAmount())->save();
       if (empty($this->getCompletedTime())) {
         $this->setCompletedTime(\Drupal::time()->getRequestTime());
       }
+      if ($this->getOrder()->getBalance()->isZero() && $storage instanceof PaymentStorage) {
+        $storage->dispatchPaymentEvent($this, PaymentEvents::PAYMENT_ORDER_PAID_IN_FULL);
+      }
+    }
+    elseif (in_array($state, ['partially_refunded', 'refunded']) &&
+        in_array($original_state, ['completed', 'partially_refunded'])) {
+      $original = $this->values['original'];
+      $net_refund = $this->getRefundedAmount()->subtract($original->getRefundedAmount());
+      $this->getOrder()->subtractPayment($net_refund)->save();
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function preDelete(EntityStorageInterface $storage, array $entities) {
+    parent::preDelete($storage, $entities);
+
+    // Subtract each payment from order.
+    foreach ($entities as $payment) {
+      $net_payment = $payment->getAmount()
+        ->subtract($payment->getRefundedAmount());
+      $payment->getOrder()->subtractPayment($net_payment)->save();
     }
   }
 

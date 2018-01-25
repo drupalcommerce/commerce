@@ -4,6 +4,8 @@ namespace Drupal\commerce_payment;
 
 use Drupal\commerce\CommerceContentEntityStorage;
 use Drupal\commerce_order\Entity\OrderInterface;
+use Drupal\commerce_payment\Entity\PaymentInterface;
+use Drupal\commerce_payment\Event\PaymentEvent;
 use Drupal\Core\Entity\EntityStorageException;
 
 /**
@@ -54,6 +56,20 @@ class PaymentStorage extends CommerceContentEntityStorage implements PaymentStor
     }
 
     return parent::doCreate($values);
+  }
+
+  /**
+   * Notifies other modules about payment events.
+   *
+   * @param \Drupal\commerce_payment\Entity\PaymentInterface $payment
+   *   The payment.
+   * @param string $event_id
+   *   The event identifier defined in
+   *   \Drupal\commerce_payment\Event\PaymentEvents.
+   */
+  public function dispatchPaymentEvent(PaymentInterface $payment, $event_id) {
+    $event = new PaymentEvent($payment);
+    $this->eventDispatcher->dispatch($event_id, $event);
   }
 
 }

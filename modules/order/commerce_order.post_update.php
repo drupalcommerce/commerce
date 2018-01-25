@@ -5,6 +5,7 @@
  * Post update functions for Order.
  */
 
+use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Entity\Entity\EntityFormDisplay;
 
 /**
@@ -158,7 +159,8 @@ function commerce_order_post_update_5() {
 function commerce_order_post_update_6() {
   // Remove the default_country setting from any profile form.
   // That allows Commerce to apply its own default taken from the store.
-  $query = \Drupal::entityQuery('entity_form_display')->condition('targetEntityType', 'profile');
+  $query = \Drupal::entityQuery('entity_form_display')
+    ->condition('targetEntityType', 'profile');
   $ids = $query->execute();
   $form_displays = EntityFormDisplay::loadMultiple($ids);
   foreach ($form_displays as $id => $form_display) {
@@ -169,4 +171,19 @@ function commerce_order_post_update_6() {
       $form_display->save();
     }
   }
+}
+
+/**
+ * Add 'total_paid' field to 'commerce_order' entities.
+ */
+function commerce_order_post_update_7() {
+  $storage_definition = BaseFieldDefinition::create('commerce_price')
+    ->setLabel(t('Total paid'))
+    ->setDescription(t('The total amount paid on the order.'))
+    ->setReadOnly(TRUE)
+    ->setDisplayConfigurable('form', FALSE)
+    ->setDisplayConfigurable('view', TRUE);
+  \Drupal::entityDefinitionUpdateManager()
+    ->installFieldStorageDefinition('total_paid', 'commerce_order', 'commerce_order', $storage_definition);
+  return t('The order total paid field was created.');
 }
