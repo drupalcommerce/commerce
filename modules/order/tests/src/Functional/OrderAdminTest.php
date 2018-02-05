@@ -211,18 +211,12 @@ class OrderAdminTest extends OrderBrowserTestBase {
    * Tests that an admin can view an order's details.
    */
   public function testAdminOrderView() {
-    $order_item = $this->createEntity('commerce_order_item', [
-      'type' => 'default',
-      'unit_price' => [
-        'number' => '999',
-        'currency_code' => 'USD',
-      ],
-    ]);
+    // First test for order without items.
+    /** @var \Drupal\commerce_order\Entity\OrderInterface $order */
     $order = $this->createEntity('commerce_order', [
       'type' => 'default',
       'store_id' => $this->store->id(),
       'mail' => $this->loggedInUser->getEmail(),
-      'order_items' => [$order_item],
       'state' => 'draft',
       'uid' => $this->loggedInUser,
     ]);
@@ -231,6 +225,10 @@ class OrderAdminTest extends OrderBrowserTestBase {
     $this->drupalGet($order->toUrl()->toString());
     $this->assertSession()->statusCodeEquals(200);
     $this->assertSession()->pageTextContains($this->loggedInUser->getEmail());
+
+    // Test there are no items.
+    $this->assertSession()->pageTextContains('No items added to this order.');
+    $this->assertSession()->pageTextNotContains('Total');
 
     // Confirm that the transition buttons are visible and functional.
     $workflow = $order->getState()->getWorkflow();
@@ -241,6 +239,22 @@ class OrderAdminTest extends OrderBrowserTestBase {
     $this->click('input.js-form-submit#edit-place');
     $this->assertSession()->buttonNotExists('Place order');
     $this->assertSession()->buttonNotExists('Cancel order');
+
+    // Test with order items.
+    $order_item = $this->createEntity('commerce_order_item', [
+      'type' => 'default',
+      'unit_price' => [
+        'number' => '999',
+        'currency_code' => 'USD',
+      ],
+    ]);
+    $order->setItems([$order_item]);
+    $order->save();
+    $this->drupalGet($order->toUrl()->toString());
+    $this->assertSession()->statusCodeEquals(200);
+    $this->assertSession()->pageTextNotContains('No items added to this order.');
+    $this->assertSession()->pageTextContains('$999.00');
+    $this->assertSession()->pageTextContains('Total price');
 
     // Logout and check that anonymous users cannot see the order admin screen
     // and receive a 403 error code.

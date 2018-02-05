@@ -347,7 +347,16 @@ display:
       sorts: {  }
       header: {  }
       footer: {  }
-      empty: {  }
+      empty:
+        area:
+          id: area
+          table: views
+          field: area
+          empty: true
+          content:
+            value: 'No items added to this order.'
+            format: plain_text
+          plugin_id: text
       relationships: {  }
       arguments:
         order_id:
