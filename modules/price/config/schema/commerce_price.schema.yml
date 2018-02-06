@@ -50,14 +50,3 @@ field.formatter.settings.commerce_price_default:
     display_currency_code:
       type: boolean
       label: 'Display the currency code instead of the currency symbol'
-
-field.formatter.settings.commerce_price_calculated:
-  type: mapping
-  label: 'Calculated price formatter settings'
-  mapping:
-    strip_trailing_zeroes:
-      type: boolean
-      label: 'Strip trailing zeroes after the decimal point'
-    display_currency_code:
-      type: boolean
-      label: 'Display the currency code instead of the currency symbol'

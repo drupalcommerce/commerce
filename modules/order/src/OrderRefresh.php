@@ -156,7 +156,7 @@ class OrderRefresh implements OrderRefreshInterface {
     }
 
     foreach ($order->getItems() as $order_item) {
-      if ($order_item->hasTranslationChanges()) {
+      if (!$order_item->isNew() && $order_item->hasTranslationChanges()) {
         // Remove the order that was set above, to avoid
         // crashes during the entity save process.
         $order_item->order_id->entity = NULL;
