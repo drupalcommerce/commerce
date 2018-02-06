@@ -170,3 +170,34 @@ function commerce_order_post_update_6() {
     }
   }
 }
+
+/**
+ * Revert the 'commerce_order_item_table' view - empty text added.
+ */
+function commerce_order_post_update_7() {
+  /** @var \Drupal\commerce\Config\ConfigUpdaterInterface $config_updater */
+  $config_updater = \Drupal::service('commerce.config_updater');
+
+  $views = [
+    'views.view.commerce_order_item_table',
+  ];
+  $result = $config_updater->revert($views);
+
+  $success_results = $result->getSucceeded();
+  $failure_results = $result->getFailed();
+  if ($success_results) {
+    $message = t('Succeeded:') . '<br>';
+    foreach ($success_results as $success_message) {
+      $message .= $success_message . '<br>';
+    }
+    $message .= '<br>';
+  }
+  if ($failure_results) {
+    $message .= t('Failed:') . '<br>';
+    foreach ($failure_results as $failure_message) {
+      $message .= $failure_message . '<br>';
+    }
+  }
+
+  return $message;
+}
