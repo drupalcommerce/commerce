@@ -166,6 +166,7 @@ class ProductVariationAttributesWidget extends ProductVariationWidgetBase implem
         '#options' => $attribute['values'],
         '#required' => $attribute['required'],
         '#default_value' => $selected_variation->getAttributeValueId($field_name),
+        '#limit_validation_errors' => [],
         '#ajax' => [
           'callback' => [get_class($this), 'ajaxRefresh'],
           'wrapper' => $form['#wrapper_id'],
