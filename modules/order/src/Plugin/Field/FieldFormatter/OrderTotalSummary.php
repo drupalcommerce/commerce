@@ -76,10 +76,15 @@ class OrderTotalSummary extends FormatterBase implements ContainerFactoryPluginI
    */
   public function viewElements(FieldItemListInterface $items, $langcode) {
     $order = $items->getEntity();
-    return [
-      '#theme' => 'commerce_order_total_summary',
-      '#totals' => $this->orderTotalSummary->buildTotals($order),
-    ];
+
+    $element = [];
+    foreach ($items as $delta => $item) {
+      $element[$delta] = [
+        '#theme' => 'commerce_order_total_summary',
+        '#totals' => $this->orderTotalSummary->buildTotals($order),
+      ];
+    }
+    return $element;
   }
 
   /**
