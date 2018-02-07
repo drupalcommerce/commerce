@@ -1,14 +1,27 @@
 custom:
-  label: Custom
+  label: 'Custom'
+  singular_label: 'custom adjustment'
+  plural_label: 'custom adjustments'
   has_ui: true
   weight: 10
 
+fee:
+  label: 'Fee'
+  singular_label: 'fee'
+  plural_label: 'fees'
+  has_ui: true
+  weight: 70
+
 promotion:
-  label: Promotion
+  label: 'Promotion'
+  singular_label: 'promotion'
+  plural_label: 'promotions'
   has_ui: true
   weight: 0
 
 tax:
-  label: Tax
+  label: 'Tax'
+  singular_label: 'tax'
+  plural_label: 'taxes'
   has_ui: true
   weight: 50

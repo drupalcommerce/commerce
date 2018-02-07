@@ -45,6 +45,7 @@ class PromotionTest extends CommerceKernelTestBase {
     $this->installEntitySchema('commerce_order_item');
     $this->installEntitySchema('commerce_promotion');
     $this->installEntitySchema('commerce_promotion_coupon');
+    $this->installSchema('commerce_promotion', ['commerce_promotion_usage']);
     $this->installConfig([
       'profile',
       'commerce_order',
@@ -151,6 +152,13 @@ class PromotionTest extends CommerceKernelTestBase {
     $this->assertFalse($promotion->hasCoupon($coupon1));
     $promotion->addCoupon($coupon1);
     $this->assertTrue($promotion->hasCoupon($coupon1));
+
+    // Check Coupon::postDelete() remove Coupon reference from promotion.
+    $promotion->save();
+    $promotion = $this->reloadEntity($promotion);
+    $this->assertEquals($promotion->id(), 1);
+    $coupon1->delete();
+    $this->assertFalse($promotion->hasCoupon($coupon1));
 
     $promotion->setUsageLimit(10);
     $this->assertEquals(10, $promotion->getUsageLimit());

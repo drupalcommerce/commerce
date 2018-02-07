@@ -4,10 +4,8 @@ description: 'Implements the shopping cart system and add to cart features.'
 package: Commerce
 core: 8.x
 dependencies:
-  - commerce
+  - commerce:commerce
   - commerce:commerce_order
-  - commerce:commerce_price
-  - views
 config_devel:
   install:
     - views.view.commerce_cart_form

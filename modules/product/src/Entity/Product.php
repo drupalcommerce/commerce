@@ -2,8 +2,9 @@
 
 namespace Drupal\commerce_product\Entity;
 
+use Drupal\commerce\Entity\CommerceContentEntityBase;
+use Drupal\Core\Cache\Cache;
 use Drupal\Core\Entity\EntityPublishedTrait;
-use Drupal\Core\Entity\ContentEntityBase;
 use Drupal\Core\Entity\EntityChangedTrait;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
@@ -27,7 +28,7 @@ use Drupal\user\UserInterface;
  *   handlers = {
  *     "event" = "Drupal\commerce_product\Event\ProductEvent",
  *     "storage" = "Drupal\commerce\CommerceContentEntityStorage",
- *     "access" = "Drupal\commerce\EntityAccessControlHandler",
+ *     "access" = "Drupal\entity\EntityAccessControlHandler",
  *     "permission_provider" = "Drupal\commerce\EntityPermissionProvider",
  *     "view_builder" = "Drupal\commerce_product\ProductViewBuilder",
  *     "list_builder" = "Drupal\commerce_product\ProductListBuilder",
@@ -46,7 +47,6 @@ use Drupal\user\UserInterface;
  *   },
  *   admin_permission = "administer commerce_product",
  *   permission_granularity = "bundle",
- *   fieldable = TRUE,
  *   translatable = TRUE,
  *   base_table = "commerce_product",
  *   data_table = "commerce_product_field_data",
@@ -71,7 +71,7 @@ use Drupal\user\UserInterface;
  *   field_ui_base_route = "entity.commerce_product_type.edit_form",
  * )
  */
-class Product extends ContentEntityBase implements ProductInterface {
+class Product extends CommerceContentEntityBase implements ProductInterface {
 
   use EntityChangedTrait;
   use EntityPublishedTrait;
@@ -110,8 +110,7 @@ class Product extends ContentEntityBase implements ProductInterface {
    * {@inheritdoc}
    */
   public function getStores() {
-    $stores = $this->get('stores')->referencedEntities();
-    return $this->ensureTranslations($stores);
+    return $this->getTranslatedReferencedEntities('stores');
   }
 
   /**
@@ -186,8 +185,7 @@ class Product extends ContentEntityBase implements ProductInterface {
    * {@inheritdoc}
    */
   public function getVariations() {
-    $variations = $this->get('variations')->referencedEntities();
-    return $this->ensureTranslations($variations);
+    return $this->getTranslatedReferencedEntities('variations');
   }
 
   /**
@@ -259,27 +257,6 @@ class Product extends ContentEntityBase implements ProductInterface {
   }
 
   /**
-   * Ensures that the provided entities are in the current entity's language.
-   *
-   * @param \Drupal\Core\Entity\ContentEntityInterface[] $entities
-   *   The entities to process.
-   *
-   * @return \Drupal\Core\Entity\ContentEntityInterface[]
-   *   The processed entities.
-   */
-  protected function ensureTranslations(array $entities) {
-    $langcode = $this->language()->getId();
-    foreach ($entities as $index => $entity) {
-      /** @var \Drupal\Core\Entity\ContentEntityInterface $entity */
-      if ($entity->hasTranslation($langcode)) {
-        $entities[$index] = $entity->getTranslation($langcode);
-      }
-    }
-
-    return $entities;
-  }
-
-  /**
    * {@inheritdoc}
    */
   public function preSave(EntityStorageInterface $storage) {
@@ -309,6 +286,13 @@ class Product extends ContentEntityBase implements ProductInterface {
         $variation->save();
       }
     }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getCacheContexts() {
+    return Cache::mergeContexts(parent::getCacheContexts(), ['url.query_args:v']);
   }
 
   /**
@@ -368,7 +352,8 @@ class Product extends ContentEntityBase implements ProductInterface {
         'type' => 'string_textfield',
         'weight' => -5,
       ])
-      ->setDisplayConfigurable('form', TRUE);
+      ->setDisplayConfigurable('form', TRUE)
+      ->setDisplayConfigurable('view', TRUE);
 
     $fields['path'] = BaseFieldDefinition::create('path')
       ->setLabel(t('URL alias'))
@@ -396,12 +381,12 @@ class Product extends ContentEntityBase implements ProductInterface {
       ->setLabel(t('Created'))
       ->setDescription(t('The time when the product was created.'))
       ->setTranslatable(TRUE)
-      ->setDisplayConfigurable('view', TRUE)
       ->setDisplayOptions('form', [
         'type' => 'datetime_timestamp',
         'weight' => 10,
       ])
-      ->setDisplayConfigurable('form', TRUE);
+      ->setDisplayConfigurable('form', TRUE)
+      ->setDisplayConfigurable('view', TRUE);
 
     $fields['changed'] = BaseFieldDefinition::create('changed')
       ->setLabel(t('Changed'))

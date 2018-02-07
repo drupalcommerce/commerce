@@ -5,7 +5,7 @@
  * Defines the Order entity and associated features.
  */
 
-use Drupal\commerce\BundleFieldDefinition;
+use Drupal\entity\BundleFieldDefinition;
 use Drupal\commerce_order\Entity\OrderTypeInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\Element;
@@ -140,7 +140,7 @@ function commerce_order_add_order_items_field(OrderTypeInterface $order_type) {
     ->setLabel('Order items')
     ->setCardinality(BundleFieldDefinition::CARDINALITY_UNLIMITED)
     ->setRequired(TRUE)
-    ->setSetting('target_type', 'commerce_order_type')
+    ->setSetting('target_type', 'commerce_order_item')
     ->setSetting('handler', 'default')
     ->setDisplayOptions('form', [
       'type' => 'inline_entity_form_complex',

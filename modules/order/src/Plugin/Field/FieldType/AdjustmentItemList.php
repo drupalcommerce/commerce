@@ -17,7 +17,9 @@ class AdjustmentItemList extends FieldItemList implements AdjustmentItemListInte
     $adjustments = [];
     /** @var \Drupal\commerce_order\Plugin\Field\FieldType\AdjustmentItem $field_item */
     foreach ($this->list as $key => $field_item) {
-      $adjustments[$key] = $field_item->value;
+      if (!$field_item->isEmpty()) {
+        $adjustments[$key] = $field_item->value;
+      }
     }
 
     return $adjustments;

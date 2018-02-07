@@ -13,6 +13,9 @@ commerce_config_entity_bundle:
       orderby: value
       sequence:
         type: string
+    locked:
+      type: boolean
+      label: 'Locked'
 
 commerce_condition:
   type: mapping
