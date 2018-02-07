@@ -265,7 +265,7 @@ class CouponRedemptionPaneTest extends CommerceBrowserTestBase {
 
     $this->getSession()->getPage()->fillField('Coupon code', $coupon->getCode());
     $this->submitForm([], 'Continue to review');
-    $this->assertSession()->pageTextContains('Visa ending in 1111');
+    $this->assertSession()->pageTextContains('Visa ending in 9999');
     $this->assertSession()->pageTextContains($coupon->getCode());
     $this->assertSession()->pageTextContains('-$99.90');
     $this->assertSession()->pageTextContains('$899.10');

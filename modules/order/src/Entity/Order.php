@@ -2,10 +2,10 @@
 
 namespace Drupal\commerce_order\Entity;
 
+use Drupal\commerce\Entity\CommerceContentEntityBase;
 use Drupal\commerce_order\Adjustment;
 use Drupal\commerce_order\Exception\OrderVersionMismatchException;
 use Drupal\commerce_store\Entity\StoreInterface;
-use Drupal\Core\Entity\ContentEntityBase;
 use Drupal\Core\Entity\EntityChangedTrait;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
@@ -49,7 +49,6 @@ use Drupal\profile\Entity\ProfileInterface;
  *   base_table = "commerce_order",
  *   admin_permission = "administer commerce_order",
  *   permission_granularity = "bundle",
- *   fieldable = TRUE,
  *   entity_keys = {
  *     "id" = "order_id",
  *     "label" = "order_number",
@@ -72,7 +71,7 @@ use Drupal\profile\Entity\ProfileInterface;
  *   }
  * )
  */
-class Order extends ContentEntityBase implements OrderInterface {
+class Order extends CommerceContentEntityBase implements OrderInterface {
 
   use EntityChangedTrait;
 
@@ -110,7 +109,7 @@ class Order extends ContentEntityBase implements OrderInterface {
    * {@inheritdoc}
    */
   public function getStore() {
-    return $this->get('store_id')->entity;
+    return $this->getTranslatedReferencedEntity('store_id');
   }
 
   /**
@@ -320,16 +319,18 @@ class Order extends ContentEntityBase implements OrderInterface {
    * {@inheritdoc}
    */
   public function clearAdjustments() {
-    foreach ($this->getItems() as $order_item) {
-      $order_item->setAdjustments([]);
-    }
-    // Remove all order-level adjustments except the ones added via the UI.
-    $adjustments = $this->getAdjustments();
-    $adjustments = array_filter($adjustments, function ($adjustment) {
+    $locked_callback = function ($adjustment) {
       /** @var \Drupal\commerce_order\Adjustment $adjustment */
-      return $adjustment->getType() == 'custom';
-    });
+      return $adjustment->isLocked();
+    };
+    // Remove all unlocked adjustments.
+    foreach ($this->getItems() as $order_item) {
+      $adjustments = array_filter($order_item->getAdjustments(), $locked_callback);
+      $order_item->setAdjustments($adjustments);
+    }
+    $adjustments = array_filter($this->getAdjustments(), $locked_callback);
     $this->setAdjustments($adjustments);
+
     return $this;
   }
 
@@ -349,6 +350,7 @@ class Order extends ContentEntityBase implements OrderInterface {
           'percentage' => $adjustment->getPercentage(),
           'source_id' => $adjustment->getSourceId(),
           'included' => $adjustment->isIncluded(),
+          'locked' => $adjustment->isLocked(),
         ]);
         $adjustments[] = $multiplied_adjustment;
       }

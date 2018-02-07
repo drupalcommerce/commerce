@@ -27,7 +27,7 @@ use Drupal\Core\Field\BaseFieldDefinition;
  *   handlers = {
  *     "event" = "Drupal\commerce_store\Event\StoreEvent",
  *     "storage" = "Drupal\commerce_store\StoreStorage",
- *     "access" = "Drupal\commerce\EntityAccessControlHandler",
+ *     "access" = "Drupal\entity\EntityAccessControlHandler",
  *     "permission_provider" = "Drupal\commerce\EntityPermissionProvider",
  *     "view_builder" = "Drupal\Core\Entity\EntityViewBuilder",
  *     "list_builder" = "Drupal\commerce_store\StoreListBuilder",
@@ -48,7 +48,6 @@ use Drupal\Core\Field\BaseFieldDefinition;
  *   data_table = "commerce_store_field_data",
  *   admin_permission = "administer commerce_store",
  *   permission_granularity = "bundle",
- *   fieldable = TRUE,
  *   translatable = TRUE,
  *   entity_keys = {
  *     "id" = "store_id",

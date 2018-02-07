@@ -2,10 +2,10 @@
 
 namespace Drupal\commerce_order;
 
-use Drupal\commerce\EntityAccessControlHandler;
 use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Session\AccountInterface;
+use Drupal\entity\EntityAccessControlHandler;
 
 /**
  * Controls access based on the Order entity permissions.

@@ -3,11 +3,11 @@
 namespace Drupal\commerce_promotion\Entity;
 
 use Drupal\commerce\ConditionGroup;
+use Drupal\commerce\Entity\CommerceContentEntityBase;
 use Drupal\commerce\Plugin\Commerce\Condition\ConditionInterface;
 use Drupal\commerce_order\Entity\OrderInterface;
 use Drupal\commerce_promotion\Plugin\Commerce\PromotionOffer\PromotionOfferInterface;
 use Drupal\Core\Datetime\DrupalDateTime;
-use Drupal\Core\Entity\ContentEntityBase;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
@@ -28,7 +28,7 @@ use Drupal\Core\Field\BaseFieldDefinition;
  *   handlers = {
  *     "event" = "Drupal\commerce_promotion\Event\PromotionEvent",
  *     "storage" = "Drupal\commerce_promotion\PromotionStorage",
- *     "access" = "Drupal\commerce\EntityAccessControlHandler",
+ *     "access" = "Drupal\entity\EntityAccessControlHandler",
  *     "permission_provider" = "Drupal\commerce\EntityPermissionProvider",
  *     "view_builder" = "Drupal\Core\Entity\EntityViewBuilder",
  *     "list_builder" = "Drupal\commerce_promotion\PromotionListBuilder",
@@ -48,7 +48,6 @@ use Drupal\Core\Field\BaseFieldDefinition;
  *   base_table = "commerce_promotion",
  *   data_table = "commerce_promotion_field_data",
  *   admin_permission = "administer commerce_promotion",
- *   fieldable = TRUE,
  *   translatable = TRUE,
  *   entity_keys = {
  *     "id" = "promotion_id",
@@ -66,7 +65,7 @@ use Drupal\Core\Field\BaseFieldDefinition;
  *   },
  * )
  */
-class Promotion extends ContentEntityBase implements PromotionInterface {
+class Promotion extends CommerceContentEntityBase implements PromotionInterface {
 
   /**
    * {@inheritdoc}
@@ -136,7 +135,7 @@ class Promotion extends ContentEntityBase implements PromotionInterface {
    * {@inheritdoc}
    */
   public function getStores() {
-    return $this->get('stores')->referencedEntities();
+    return $this->getTranslatedReferencedEntities('stores');
   }
 
   /**

@@ -67,19 +67,28 @@ class OrderItemTypeTest extends OrderBrowserTestBase {
    * Tests deleting an order item type programmatically and through the form.
    */
   public function testOrderItemTypeDeletion() {
-    $values = [
+    /** @var \Drupal\commerce_order\Entity\OrderItemTypeInterface $type */
+    $type = $this->createEntity('commerce_order_item_type', [
       'id' => strtolower($this->randomMachineName(8)),
       'label' => $this->randomMachineName(16),
       'purchasableEntityType' => 'commerce_product_variation',
       'orderType' => 'default',
-    ];
-    $order_item_type = $this->createEntity('commerce_order_item_type', $values);
+    ]);
 
-    $this->drupalGet($order_item_type->toUrl('delete-form'));
+    // Confirm that the delete page is not available when the type is locked.
+    $type->lock();
+    $type->save();
+    $this->drupalGet($type->toUrl('delete-form'));
+    $this->assertSession()->statusCodeEquals('403');
+
+    // Unlock the type, confirm that deletion works.
+    $type->unlock();
+    $type->save();
+    $this->drupalGet($type->toUrl('delete-form'));
     $this->assertSession()->statusCodeEquals(200);
     $this->assertSession()->pageTextContains(t('This action cannot be undone.'));
     $this->submitForm([], t('Delete'));
-    $order_item_type_exists = (bool) OrderItemType::load($order_item_type->id());
+    $order_item_type_exists = (bool) OrderItemType::load($type->id());
     $this->assertEmpty($order_item_type_exists, 'The order item type has been deleted form the database.');
   }
 

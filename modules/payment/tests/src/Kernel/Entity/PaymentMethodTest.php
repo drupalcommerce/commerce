@@ -130,13 +130,13 @@ class PaymentMethodTest extends CommerceKernelTestBase {
     $payment_method->setReusable(FALSE);
     $this->assertEmpty($payment_method->isReusable());
 
-    $this->assertEmpty($payment_method->isDefault());
+    $this->assertFalse($payment_method->isDefault());
     $payment_method->setDefault(TRUE);
-    $this->assertNotEmpty($payment_method->isDefault());
+    $this->assertTrue($payment_method->isDefault());
 
-    $this->assertEmpty($payment_method->isExpired());
+    $this->assertFalse($payment_method->isExpired());
     $payment_method->setExpiresTime(635879700);
-    $this->assertNotEmpty($payment_method->isExpired());
+    $this->assertTrue($payment_method->isExpired());
     $this->assertEquals(635879700, $payment_method->getExpiresTime());
 
     $payment_method->setCreatedTime(635879700);

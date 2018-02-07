@@ -70,6 +70,7 @@ class AddToCartFormatter extends FormatterBase {
           $items->getEntity()->id(),
           $this->viewMode,
           $this->getSetting('combine'),
+          $langcode,
         ],
       ],
       '#create_placeholder' => TRUE,

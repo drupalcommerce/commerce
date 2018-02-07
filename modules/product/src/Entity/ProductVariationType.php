@@ -18,6 +18,7 @@ use Drupal\commerce\Entity\CommerceBundleEntityBase;
  *     plural = "@count product variation types",
  *   ),
  *   handlers = {
+ *     "access" = "Drupal\commerce\CommerceBundleAccessControlHandler",
  *     "list_builder" = "Drupal\commerce_product\ProductVariationTypeListBuilder",
  *     "form" = {
  *       "add" = "Drupal\commerce_product\Form\ProductVariationTypeForm",
@@ -42,6 +43,7 @@ use Drupal\commerce\Entity\CommerceBundleEntityBase;
  *     "orderItemType",
  *     "generateTitle",
  *     "traits",
+ *     "locked",
  *   },
  *   links = {
  *     "add-form" = "/admin/commerce/config/product-variation-types/add",

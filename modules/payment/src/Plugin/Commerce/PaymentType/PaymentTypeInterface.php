@@ -2,7 +2,7 @@
 
 namespace Drupal\commerce_payment\Plugin\Commerce\PaymentType;
 
-use Drupal\commerce\BundlePluginInterface;
+use Drupal\entity\BundlePlugin\BundlePluginInterface;
 
 /**
  * Defines the interface for payment types.

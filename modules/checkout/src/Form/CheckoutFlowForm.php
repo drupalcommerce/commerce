@@ -2,12 +2,12 @@
 
 namespace Drupal\commerce_checkout\Form;
 
-use Drupal\commerce\Form\CommercePluginEntityFormBase;
 use Drupal\commerce_checkout\CheckoutFlowManager;
+use Drupal\Core\Entity\EntityForm;
 use Drupal\Core\Form\FormStateInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
-class CheckoutFlowForm extends CommercePluginEntityFormBase {
+class CheckoutFlowForm extends EntityForm {
 
   /**
    * The checkout flow plugin manager.
@@ -66,6 +66,7 @@ class CheckoutFlowForm extends CommercePluginEntityFormBase {
       '#machine_name' => [
         'exists' => '\Drupal\commerce_checkout\Entity\CheckoutFlow::load',
       ],
+      '#disabled' => !$checkout_flow->isNew(),
     ];
     $form['plugin'] = [
       '#type' => 'radios',
@@ -82,7 +83,7 @@ class CheckoutFlowForm extends CommercePluginEntityFormBase {
       $form['configuration'] = $checkout_flow->getPlugin()->buildConfigurationForm($form['configuration'], $form_state);
     }
 
-    return $this->protectPluginIdElement($form);
+    return $form;
   }
 
   /**

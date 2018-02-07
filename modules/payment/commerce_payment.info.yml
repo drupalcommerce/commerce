@@ -4,10 +4,10 @@ description: 'Provides payment functionality.'
 package: Commerce
 core: 8.x
 dependencies:
+  - commerce:commerce
   - commerce:commerce_order
-  - entity_reference_revisions
-  - filter
-  - user
+  - entity_reference_revisions:entity_reference_revisions
+  - drupal:filter
 config_devel:
   install:
     - field.storage.user.commerce_remote_id

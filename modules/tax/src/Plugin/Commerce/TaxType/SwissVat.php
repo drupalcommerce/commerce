@@ -49,7 +49,8 @@ class SwissVat extends LocalTaxTypeBase {
           'id' => 'standard',
           'label' => $this->t('Standard'),
           'percentages' => [
-            ['number' => '0.08', 'start_date' => '2011-01-01'],
+            ['number' => '0.08', 'start_date' => '2011-01-01', 'end_date' => '2017-12-31'],
+            ['number' => '0.077', 'start_date' => '2018-01-01'],
           ],
           'default' => TRUE,
         ],
@@ -57,7 +58,8 @@ class SwissVat extends LocalTaxTypeBase {
           'id' => 'hotel',
           'label' => $this->t('Hotel'),
           'percentages' => [
-            ['number' => '0.038', 'start_date' => '2011-01-01'],
+            ['number' => '0.038', 'start_date' => '2011-01-01', 'end_date' => '2017-12-31'],
+            ['number' => '0.037', 'start_date' => '2018-01-01'],
           ],
         ],
         [
