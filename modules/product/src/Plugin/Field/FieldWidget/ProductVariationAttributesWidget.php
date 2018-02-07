@@ -6,6 +6,7 @@ use Drupal\commerce_product\Entity\ProductVariationInterface;
 use Drupal\commerce_product\ProductAttributeFieldManagerInterface;
 use Drupal\Component\Utility\Html;
 use Drupal\Component\Utility\NestedArray;
+use Drupal\Core\Entity\EntityRepositoryInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FieldItemListInterface;
@@ -55,11 +56,13 @@ class ProductVariationAttributesWidget extends ProductVariationWidgetBase implem
    *   Any third party settings.
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
+   * @param \Drupal\Core\Entity\EntityRepositoryInterface $entity_repository
+   *   The entity repository.
    * @param \Drupal\commerce_product\ProductAttributeFieldManagerInterface $attribute_field_manager
    *   The attribute field manager.
    */
-  public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, array $third_party_settings, EntityTypeManagerInterface $entity_type_manager, ProductAttributeFieldManagerInterface $attribute_field_manager) {
-    parent::__construct($plugin_id, $plugin_definition, $field_definition, $settings, $third_party_settings, $entity_type_manager);
+  public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, array $third_party_settings, EntityTypeManagerInterface $entity_type_manager, EntityRepositoryInterface $entity_repository, ProductAttributeFieldManagerInterface $attribute_field_manager) {
+    parent::__construct($plugin_id, $plugin_definition, $field_definition, $settings, $third_party_settings, $entity_type_manager, $entity_repository);
 
     $this->attributeFieldManager = $attribute_field_manager;
     $this->attributeStorage = $entity_type_manager->getStorage('commerce_product_attribute');
@@ -76,6 +79,7 @@ class ProductVariationAttributesWidget extends ProductVariationWidgetBase implem
       $configuration['settings'],
       $configuration['third_party_settings'],
       $container->get('entity_type.manager'),
+      $container->get('entity.repository'),
       $container->get('commerce_product.attribute_field_manager')
     );
   }
@@ -86,7 +90,7 @@ class ProductVariationAttributesWidget extends ProductVariationWidgetBase implem
   public function formElement(FieldItemListInterface $items, $delta, array $element, array &$form, FormStateInterface $form_state) {
     /** @var \Drupal\commerce_product\Entity\ProductInterface $product */
     $product = $form_state->get('product');
-    $variations = $this->variationStorage->loadEnabled($product);
+    $variations = $this->loadEnabledVariations($product);
     if (count($variations) === 0) {
       // Nothing to purchase, tell the parent form to hide itself.
       $form_state->set('hide_form', TRUE);
@@ -118,16 +122,27 @@ class ProductVariationAttributesWidget extends ProductVariationWidgetBase implem
       '#prefix' => '<div id="' . $wrapper_id . '">',
       '#suffix' => '</div>',
     ];
-    $parents = array_merge($element['#field_parents'], [$items->getName(), $delta]);
-    $user_input = (array) NestedArray::getValue($form_state->getUserInput(), $parents);
-    if (!empty($user_input)) {
+
+    // If an operation caused the form to rebuild, select the variation from
+    // the user's current input.
+    if ($form_state->isRebuilding()) {
+      $parents = array_merge($element['#field_parents'], [$items->getName(), $delta]);
+      $user_input = (array) NestedArray::getValue($form_state->getUserInput(), $parents);
       $selected_variation = $this->selectVariationFromUserInput($variations, $user_input);
     }
+    // Otherwise load from the current context.
     else {
-      $selected_variation = $this->variationStorage->loadFromContext($product);
-      // The returned variation must also be enabled.
-      if (!in_array($selected_variation, $variations)) {
-        $selected_variation = reset($variations);
+      /** @var \Drupal\commerce_order\Entity\OrderItemInterface $order_item */
+      $order_item = $items->getEntity();
+      if (!$order_item->isNew()) {
+        $selected_variation = $order_item->getPurchasedEntity();
+      }
+      else {
+        $selected_variation = $this->variationStorage->loadFromContext($product);
+        // The returned variation must also be enabled.
+        if (!in_array($selected_variation, $variations)) {
+          $selected_variation = reset($variations);
+        }
       }
     }
 
@@ -151,6 +166,7 @@ class ProductVariationAttributesWidget extends ProductVariationWidgetBase implem
         '#options' => $attribute['values'],
         '#required' => $attribute['required'],
         '#default_value' => $selected_variation->getAttributeValueId($field_name),
+        '#limit_validation_errors' => [],
         '#ajax' => [
           'callback' => [get_class($this), 'ajaxRefresh'],
           'wrapper' => $form['#wrapper_id'],
@@ -182,6 +198,22 @@ class ProductVariationAttributesWidget extends ProductVariationWidgetBase implem
   }
 
   /**
+   * {@inheritdoc}
+   */
+  public function massageFormValues(array $values, array $form, FormStateInterface $form_state) {
+    /** @var \Drupal\commerce_product\Entity\ProductInterface $product */
+    $product = $form_state->get('product');
+    $variations = $this->variationStorage->loadEnabled($product);
+
+    foreach ($values as &$value) {
+      $selected_variation = $this->selectVariationFromUserInput($variations, $value);
+      $value['variation'] = $selected_variation->id();
+    }
+
+    return parent::massageFormValues($values, $form, $form_state);
+  }
+
+  /**
    * Selects a product variation from user input.
    *
    * If there's no user input (form viewed for the first time), the default
@@ -197,7 +229,7 @@ class ProductVariationAttributesWidget extends ProductVariationWidgetBase implem
    */
   protected function selectVariationFromUserInput(array $variations, array $user_input) {
     $current_variation = reset($variations);
-    if (!empty($user_input)) {
+    if (!empty($user_input['attributes'])) {
       $attributes = $user_input['attributes'];
       foreach ($variations as $variation) {
         $match = TRUE;
@@ -232,16 +264,20 @@ class ProductVariationAttributesWidget extends ProductVariationWidgetBase implem
     $field_definitions = $this->attributeFieldManager->getFieldDefinitions($selected_variation->bundle());
     $field_map = $this->attributeFieldManager->getFieldMap($selected_variation->bundle());
     $field_names = array_column($field_map, 'field_name');
+    $attribute_ids = array_column($field_map, 'attribute_id');
     $index = 0;
     foreach ($field_names as $field_name) {
-      /** @var \Drupal\commerce_product\Entity\ProductAttributeInterface $attribute_type */
-      $attribute_type = $this->attributeStorage->load(substr($field_name, 10));
       $field = $field_definitions[$field_name];
+      /** @var \Drupal\commerce_product\Entity\ProductAttributeInterface $attribute */
+      $attribute = $this->attributeStorage->load($attribute_ids[$index]);
+      // Make sure we have translation for attribute.
+      $attribute = $this->entityRepository->getTranslationFromContext($attribute, $selected_variation->language()->getId());
+
       $attributes[$field_name] = [
         'field_name' => $field_name,
-        'title' => $field->getLabel(),
+        'title' => $attribute->label(),
         'required' => $field->isRequired(),
-        'element_type' => $attribute_type->getElementType(),
+        'element_type' => $attribute->getElementType(),
       ];
       // The first attribute gets all values. Every next attribute gets only
       // the values from variations matching the previous attribute value.

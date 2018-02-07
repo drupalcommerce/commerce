@@ -10,6 +10,7 @@ use Drupal\commerce\Entity\CommerceBundleEntityBase;
  * @ConfigEntityType(
  *   id = "commerce_order_item_type",
  *   label = @Translation("Order item type"),
+ *   label_collection = @Translation("Order item types"),
  *   label_singular = @Translation("order item type"),
  *   label_plural = @Translation("order item types"),
  *   label_count = @PluralTranslation(
@@ -17,10 +18,11 @@ use Drupal\commerce\Entity\CommerceBundleEntityBase;
  *     plural = "@count order item types",
  *   ),
  *   handlers = {
+ *     "access" = "Drupal\commerce\CommerceBundleAccessControlHandler",
  *     "form" = {
  *       "add" = "Drupal\commerce_order\Form\OrderItemTypeForm",
  *       "edit" = "Drupal\commerce_order\Form\OrderItemTypeForm",
- *       "delete" = "Drupal\commerce_order\Form\OrderItemTypeDeleteForm"
+ *       "delete" = "Drupal\commerce\Form\CommerceBundleEntityDeleteFormBase"
  *     },
  *     "route_provider" = {
  *       "default" = "Drupal\Core\Entity\Routing\DefaultHtmlRouteProvider",
@@ -41,6 +43,7 @@ use Drupal\commerce\Entity\CommerceBundleEntityBase;
  *     "purchasableEntityType",
  *     "orderType",
  *     "traits",
+ *     "locked",
  *   },
  *   links = {
  *     "add-form" = "/admin/commerce/config/order-item-types/add",

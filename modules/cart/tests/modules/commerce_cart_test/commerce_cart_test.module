@@ -1,5 +1,10 @@
 <?php
 
+/**
+ * @file
+ * Test module for Cart.
+ */
+
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityMalformedException;
 

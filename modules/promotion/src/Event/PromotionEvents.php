@@ -87,4 +87,69 @@ final class PromotionEvents {
    */
   const PROMOTION_TRANSLATION_DELETE = 'commerce_promotion.commerce_promotion.translation_delete';
 
+  /**
+   * Name of the event fired after loading a coupon.
+   *
+   * @Event
+   *
+   * @see \Drupal\commerce_promotion\Event\CouponEvent
+   */
+  const COUPON_LOAD = 'commerce_promotion.commerce_promotion_coupon.load';
+
+  /**
+   * Name of the event fired after creating a new coupon.
+   *
+   * Fired before the coupon is saved.
+   *
+   * @Event
+   *
+   * @see \Drupal\commerce_promotion\Event\CouponEvent
+   */
+  const COUPON_CREATE = 'commerce_promotion.commerce_promotion_coupon.create';
+
+  /**
+   * Name of the event fired before saving a coupon.
+   *
+   * @Event
+   *
+   * @see \Drupal\commerce_promotion\Event\CouponEvent
+   */
+  const COUPON_PRESAVE = 'commerce_promotion.commerce_promotion_coupon.presave';
+
+  /**
+   * Name of the event fired after saving a new coupon.
+   *
+   * @Event
+   *
+   * @see \Drupal\commerce_promotion\Event\CouponEvent
+   */
+  const COUPON_INSERT = 'commerce_promotion.commerce_promotion_coupon.insert';
+
+  /**
+   * Name of the event fired after saving an existing coupon.
+   *
+   * @Event
+   *
+   * @see \Drupal\commerce_promotion\Event\CouponEvent
+   */
+  const COUPON_UPDATE = 'commerce_promotion.commerce_promotion_coupon.update';
+
+  /**
+   * Name of the event fired before deleting a coupon.
+   *
+   * @Event
+   *
+   * @see \Drupal\commerce_promotion\Event\CouponEvent
+   */
+  const COUPON_PREDELETE = 'commerce_promotion.commerce_promotion_coupon.predelete';
+
+  /**
+   * Name of the event fired after deleting a coupon.
+   *
+   * @Event
+   *
+   * @see \Drupal\commerce_promotion\Event\CouponEvent
+   */
+  const COUPON_DELETE = 'commerce_promotion.commerce_promotion_coupon.delete';
+
 }

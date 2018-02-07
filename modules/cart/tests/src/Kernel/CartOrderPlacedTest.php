@@ -13,6 +13,8 @@ use Drupal\Tests\commerce\Kernel\CommerceKernelTestBase;
  */
 class CartOrderPlacedTest extends CommerceKernelTestBase {
 
+  use CartManagerTestTrait;
+
   /**
    * The variation to test against.
    *
@@ -85,17 +87,10 @@ class CartOrderPlacedTest extends CommerceKernelTestBase {
    * Tests that a draft order is no longer a cart once placed.
    */
   public function testCartOrderPlaced() {
-    // Do to issues with hook_entity_bundle_create, we need to run this here
-    // and can't put commerce_cart in $modules.
-    // See https://www.drupal.org/node/2711645
-    // @todo patch core so it doesn't explode in Kernel tests.
-    $this->enableModules(['commerce_cart']);
-    $this->installConfig('commerce_cart');
-    $this->container->get('entity.definition_update_manager')->applyUpdates();
+    $this->installCommerceCart();
 
     $this->store = $this->createStore();
-    $customer = $this->createUser();
-    $cart_order = $this->container->get('commerce_cart.cart_provider')->createCart('default', $this->store, $customer);
+    $cart_order = $this->container->get('commerce_cart.cart_provider')->createCart('default', $this->store, $this->user);
     $this->cartManager = $this->container->get('commerce_cart.cart_manager');
     $this->cartManager->addEntity($cart_order, $this->variation);
 

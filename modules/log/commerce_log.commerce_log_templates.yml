@@ -23,3 +23,7 @@ order_canceled:
   category: commerce_order
   label: 'Order canceled'
   template: '<p>The order was canceled.</p>'
+order_assigned:
+  category: commerce_order
+  label: 'Order assigned'
+  template: '<p>The order was assigned to {{ user }}.</p>'

@@ -1,7 +1,12 @@
-entity.commerce_promotion.collection:
-  path: '/admin/commerce/promotions'
+entity.commerce_promotion_coupon.collection:
+  path: '/promotion/{commerce_promotion}/coupons'
   defaults:
-    _entity_list: 'commerce_promotion'
-    _title: 'Promotions'
+    _entity_list: 'commerce_promotion_coupon'
+    _title: 'Coupons'
+  options:
+    _admin_route: TRUE
+    parameters:
+      commerce_promotion:
+        type: 'entity:commerce_promotion'
   requirements:
-    _permission: 'administer commerce_promotion'
+    _entity_access: 'commerce_promotion.update'

@@ -65,6 +65,29 @@ class EditQuantity extends FieldPluginBase {
   /**
    * {@inheritdoc}
    */
+  protected function defineOptions() {
+    $options = parent::defineOptions();
+    $options['allow_decimal'] = ['default' => FALSE];
+
+    return $options;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function buildOptionsForm(&$form, FormStateInterface $form_state) {
+    parent::buildOptionsForm($form, $form_state);
+
+    $form['allow_decimal'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Allow decimal quantities'),
+      '#default_value' => $this->options['allow_decimal'],
+    ];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function getValue(ResultRow $row, $field = NULL) {
     return '<!--form-item-' . $this->options['id'] . '--' . $row->index . '-->';
   }
@@ -88,18 +111,28 @@ class EditQuantity extends FieldPluginBase {
 
     $form[$this->options['id']]['#tree'] = TRUE;
     foreach ($this->view->result as $row_index => $row) {
+      /** @var \Drupal\commerce_order\Entity\OrderItemInterface $order_item */
       $order_item = $this->getEntity($row);
-      $quantity = $order_item->getQuantity();
+      if ($this->options['allow_decimal']) {
+        $form_display = commerce_get_entity_display('commerce_order_item', $order_item->bundle(), 'form');
+        $quantity_component = $form_display->getComponent('quantity');
+        $step = $quantity_component['settings']['step'];
+        $precision = $step >= '1' ? 0 : strlen($step) - 2;
+      }
+      else {
+        $step = 1;
+        $precision = 0;
+      }
 
       $form[$this->options['id']][$row_index] = [
         '#type' => 'number',
         '#title' => $this->t('Quantity'),
         '#title_display' => 'invisible',
-        '#default_value' => round($quantity),
+        '#default_value' => round($order_item->getQuantity(), $precision),
         '#size' => 4,
-        '#min' => 1,
+        '#min' => 0,
         '#max' => 9999,
-        '#step' => 1,
+        '#step' => $step,
       ];
     }
     // Replace the form submit button label.
@@ -115,14 +148,16 @@ class EditQuantity extends FieldPluginBase {
    *   The current state of the form.
    */
   public function viewsFormSubmit(array &$form, FormStateInterface $form_state) {
-    $quantities = $form_state->getValue($this->options['id']);
+    $quantities = $form_state->getValue($this->options['id'], []);
     foreach ($quantities as $row_index => $quantity) {
       /** @var \Drupal\commerce_order\Entity\OrderItemInterface $order_item */
       $order_item = $this->getEntity($this->view->result[$row_index]);
       if ($order_item->getQuantity() != $quantity) {
         $order_item->setQuantity($quantity);
         $order = $order_item->getOrder();
-        $this->cartManager->updateOrderItem($order, $order_item);
+        $this->cartManager->updateOrderItem($order, $order_item, FALSE);
+        // Tells commerce_cart_order_item_views_form_submit() to save the order.
+        $form_state->set('quantity_updated', TRUE);
       }
     }
   }

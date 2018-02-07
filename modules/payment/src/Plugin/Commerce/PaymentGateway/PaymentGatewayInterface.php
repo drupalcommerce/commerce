@@ -52,6 +52,19 @@ interface PaymentGatewayInterface extends PluginWithFormsInterface, Configurable
   public function getSupportedModes();
 
   /**
+   * Gets the JS library ID.
+   *
+   * This is usually an external library defined in the module's
+   * libraries.yml file. Included by the PaymentInformation pane
+   * to get around core bug #1988968.
+   * Example: 'commerce_braintree/braintree'.
+   *
+   * @return string|null
+   *   The JS library ID, or NULL if not available.
+   */
+  public function getJsLibrary();
+
+  /**
    * Gets the payment type used by the payment gateway.
    *
    * @return \Drupal\commerce_payment\Plugin\Commerce\PaymentType\PaymentTypeInterface

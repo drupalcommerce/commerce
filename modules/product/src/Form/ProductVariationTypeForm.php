@@ -2,6 +2,7 @@
 
 namespace Drupal\commerce_product\Form;
 
+use Drupal\commerce\EntityHelper;
 use Drupal\commerce\EntityTraitManagerInterface;
 use Drupal\commerce\Form\CommerceBundleEntityFormBase;
 use Drupal\commerce_product\ProductAttributeFieldManagerInterface;
@@ -80,15 +81,12 @@ class ProductVariationTypeForm extends CommerceBundleEntityFormBase {
       $order_item_types = array_filter($order_item_types, function ($order_item_type) {
         return $order_item_type->getPurchasableEntityTypeId() == 'commerce_product_variation';
       });
-      $order_item_types = array_map(function ($order_item_type) {
-        return $order_item_type->label();
-      }, $order_item_types);
 
       $form['orderItemType'] = [
         '#type' => 'select',
         '#title' => $this->t('Order item type'),
         '#default_value' => $variation_type->getOrderItemTypeId(),
-        '#options' => $order_item_types,
+        '#options' => EntityHelper::extractLabels($order_item_types),
         '#empty_value' => '',
         '#required' => TRUE,
       ];
@@ -101,10 +99,7 @@ class ProductVariationTypeForm extends CommerceBundleEntityFormBase {
     }
     /** @var \Drupal\commerce_product\Entity\ProductAttributeInterface[] $attributes */
     $attributes = $this->entityTypeManager->getStorage('commerce_product_attribute')->loadMultiple();
-    $attribute_options = array_map(function ($attribute) {
-      /** @var \Drupal\commerce_product\Entity\ProductAttributeInterface $attribute */
-      return $attribute->label();
-    }, $attributes);
+    $attribute_options = EntityHelper::extractLabels($attributes);
 
     $form['original_attributes'] = [
       '#type' => 'value',
@@ -118,13 +113,19 @@ class ProductVariationTypeForm extends CommerceBundleEntityFormBase {
       '#access' => !empty($attribute_options),
     ];
     // Disable options which cannot be unset because of existing data.
+    $disabled_attributes = [];
     foreach ($used_attributes as $attribute_id) {
       if (!$this->attributeFieldManager->canDeleteField($attributes[$attribute_id], $variation_type->id())) {
         $form['attributes'][$attribute_id] = [
           '#disabled' => TRUE,
         ];
+        $disabled_attributes[] = $attribute_id;
       }
     }
+    $form['disabled_attributes'] = [
+      '#type' => 'value',
+      '#value' => $disabled_attributes,
+    ];
 
     if ($this->moduleHandler->moduleExists('language')) {
       $form['language'] = [
@@ -165,6 +166,8 @@ class ProductVariationTypeForm extends CommerceBundleEntityFormBase {
     $attribute_storage = $this->entityTypeManager->getStorage('commerce_product_attribute');
     $original_attributes = $form_state->getValue('original_attributes');
     $attributes = array_filter($form_state->getValue('attributes'));
+    $disabled_attributes = $form_state->getValue('disabled_attributes');
+    $attributes = array_unique(array_merge($disabled_attributes, $attributes));
     $selected_attributes = array_diff($attributes, $original_attributes);
     $unselected_attributes = array_diff($original_attributes, $attributes);
     if ($selected_attributes) {

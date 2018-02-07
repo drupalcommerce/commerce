@@ -2,6 +2,7 @@
 
 namespace Drupal\commerce_product\Form;
 
+use Drupal\commerce\EntityHelper;
 use Drupal\commerce\EntityTraitManagerInterface;
 use Drupal\commerce\Form\CommerceBundleEntityFormBase;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
@@ -63,9 +64,6 @@ class ProductTypeForm extends CommerceBundleEntityFormBase {
     /** @var \Drupal\commerce_product\Entity\ProductTypeInterface $product_type */
     $product_type = $this->entity;
     $variation_types = $this->variationTypeStorage->loadMultiple();
-    $variation_types = array_map(function ($variation_type) {
-      return $variation_type->label();
-    }, $variation_types);
     // Create an empty product to get the default status value.
     // @todo Clean up once https://www.drupal.org/node/2318187 is fixed.
     if ($this->operation == 'add') {
@@ -100,7 +98,7 @@ class ProductTypeForm extends CommerceBundleEntityFormBase {
       '#type' => 'select',
       '#title' => $this->t('Product variation type'),
       '#default_value' => $product_type->getVariationTypeId(),
-      '#options' => $variation_types,
+      '#options' => EntityHelper::extractLabels($variation_types),
       '#required' => TRUE,
       '#disabled' => !$product_type->isNew(),
     ];

@@ -1,0 +1,64 @@
+<?php
+
+/**
+ * @file
+ * Install, update and uninstall functions for the commerce_payment module.
+ */
+
+use Drupal\Core\Field\BaseFieldDefinition;
+
+/**
+ * Add the payment_gateway_mode field to payments and payment methods.
+ */
+function commerce_payment_update_8200() {
+  $entity_definition_update = \Drupal::entityDefinitionUpdateManager();
+
+  $storage_definition = BaseFieldDefinition::create('string')
+    ->setLabel(t('Payment gateway mode'))
+    ->setDescription(t('The payment gateway mode.'))
+    ->setRequired(TRUE);
+  $entity_definition_update->installFieldStorageDefinition('payment_gateway_mode', 'commerce_payment', 'commerce_payment', $storage_definition);
+  $entity_definition_update->installFieldStorageDefinition('payment_gateway_mode', 'commerce_payment_method', 'commerce_payment', $storage_definition);
+}
+
+/**
+ * Remove the authorization_expires field from payments, add the expires and completed fields.
+ */
+function commerce_payment_update_8201() {
+  $entity_definition_update = \Drupal::entityDefinitionUpdateManager();
+
+  $storage_definition = BaseFieldDefinition::create('timestamp')
+    ->setName('authorization_expires')
+    ->setTargetEntityTypeId('commerce_payment')
+    ->setLabel(t('Authorization expires'))
+    ->setDescription(t('The time when the payment authorization expires.'))
+    ->setDisplayConfigurable('view', TRUE);
+  $entity_definition_update->uninstallFieldStorageDefinition($storage_definition);
+
+  $storage_definition = BaseFieldDefinition::create('timestamp')
+    ->setLabel(t('Expires'))
+    ->setDescription(t('The time when the payment expires.'))
+    ->setDisplayConfigurable('view', TRUE);
+  $entity_definition_update->installFieldStorageDefinition('expires', 'commerce_payment', 'commerce_payment', $storage_definition);
+
+  $storage_definition = BaseFieldDefinition::create('timestamp')
+    ->setLabel(t('Completed'))
+    ->setDescription(t('The time when the payment was completed.'))
+    ->setDisplayConfigurable('view', TRUE);
+  $entity_definition_update->installFieldStorageDefinition('completed', 'commerce_payment', 'commerce_payment', $storage_definition);
+}
+
+/**
+ * Make payment_gateway and payment_method order fields optional.
+ */
+function commerce_payment_update_8202() {
+  $entity_definition_update = \Drupal::entityDefinitionUpdateManager();
+
+  $field_definition = $entity_definition_update->getFieldStorageDefinition('payment_gateway', 'commerce_order');
+  $field_definition->setRequired(FALSE);
+  $entity_definition_update->updateFieldStorageDefinition($field_definition);
+
+  $field_definition = $entity_definition_update->getFieldStorageDefinition('payment_method', 'commerce_order');
+  $field_definition->setRequired(FALSE);
+  $entity_definition_update->updateFieldStorageDefinition($field_definition);
+}

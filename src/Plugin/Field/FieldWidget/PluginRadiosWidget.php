@@ -2,8 +2,8 @@
 
 namespace Drupal\commerce\Plugin\Field\FieldWidget;
 
+use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Field\FieldItemListInterface;
-use Drupal\Core\Field\WidgetBase;
 use Drupal\Core\Form\FormStateInterface;
 
 /**
@@ -17,25 +17,23 @@ use Drupal\Core\Form\FormStateInterface;
  *   },
  *  )
  */
-class PluginRadiosWidget extends WidgetBase {
+class PluginRadiosWidget extends PluginSelectWidget {
 
   /**
    * {@inheritdoc}
    */
   public function formElement(FieldItemListInterface $items, $delta, array $element, array &$form, FormStateInterface $form_state) {
-    list($field_type, $plugin_type) = explode(':', $this->fieldDefinition->getType());
-    return [
-      '#type' => 'commerce_plugin_select',
-      '#plugin_element_type' => 'radios',
-      '#plugin_type' => $plugin_type,
-      '#categories' => $this->fieldDefinition->getSetting('categories'),
-      '#default_value' => [
-        'target_plugin_id' => $items[$delta]->target_plugin_id,
-        'target_plugin_configuration' => $items[$delta]->target_plugin_configuration,
-      ],
-      '#required' => $this->fieldDefinition->isRequired(),
-      '#title' => $this->fieldDefinition->getLabel(),
-    ];
+    $element = parent::formElement($items, $delta, $element, $form, $form_state);
+    $element['target_plugin_id']['#type'] = 'radios';
+    return $element;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function ajaxRefresh(&$form, FormStateInterface $form_state) {
+    $element_parents = array_slice($form_state->getTriggeringElement()['#array_parents'], 0, -2);
+    return NestedArray::getValue($form, $element_parents);
   }
 
 }

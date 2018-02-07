@@ -4,4 +4,4 @@ description: 'Module for testing extension updates to configuration.'
 package: Testing
 core: 8.x
 dependencies:
-  - commerce_store
+  - commerce:commerce_store

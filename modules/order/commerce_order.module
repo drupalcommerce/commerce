@@ -5,7 +5,8 @@
  * Defines the Order entity and associated features.
  */
 
-use Drupal\commerce\BundleFieldDefinition;
+use Drupal\entity\BundleFieldDefinition;
+use Drupal\commerce_order\Entity\OrderTypeInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\Element;
 
@@ -87,7 +88,7 @@ function commerce_order_field_widget_form_alter(&$element, FormStateInterface $f
  *   - elements: An associative array containing rendered fields.
  *   - attributes: HTML attributes for the containing element.
  */
-function template_preprocess_commerce_order(&$variables) {
+function template_preprocess_commerce_order(array &$variables) {
   /** @var Drupal\commerce_order\Entity\OrderInterface $order */
   $order = $variables['elements']['#commerce_order'];
 
@@ -114,11 +115,12 @@ function commerce_order_theme_suggestions_commerce_order(array $variables) {
  * Implements hook_theme_suggestions_commerce_order_receipt().
  */
 function commerce_order_theme_suggestions_commerce_order_receipt(array $variables) {
+  $suggestions = [];
   if (isset($variables['order_entity'])) {
     $order = $variables['order_entity'];
-    $original = $variables['theme_hook_original'];
-    $variables['theme_hook_suggestions'][] = $original . '__' . $order->bundle();
+    $suggestions[] = $variables['theme_hook_original'] . '__' . $order->bundle();
   }
+  return $suggestions;
 }
 
 /**
@@ -130,7 +132,7 @@ function commerce_order_theme_suggestions_commerce_order_receipt(array $variable
  * @param \Drupal\commerce_order\Entity\OrderTypeInterface $order_type
  *   The order type.
  */
-function commerce_order_add_order_items_field($order_type) {
+function commerce_order_add_order_items_field(OrderTypeInterface $order_type) {
   $field_definition = BundleFieldDefinition::create('entity_reference')
     ->setTargetEntityTypeId('commerce_order')
     ->setTargetBundle($order_type->id())
@@ -138,7 +140,7 @@ function commerce_order_add_order_items_field($order_type) {
     ->setLabel('Order items')
     ->setCardinality(BundleFieldDefinition::CARDINALITY_UNLIMITED)
     ->setRequired(TRUE)
-    ->setSetting('target_type', 'commerce_order_type')
+    ->setSetting('target_type', 'commerce_order_item')
     ->setSetting('handler', 'default')
     ->setDisplayOptions('form', [
       'type' => 'inline_entity_form_complex',

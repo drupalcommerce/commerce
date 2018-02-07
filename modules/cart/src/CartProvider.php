@@ -173,6 +173,13 @@ class CartProvider implements CartProviderInterface {
   }
 
   /**
+   * {@inheritdoc}
+   */
+  public function clearCaches() {
+    $this->cartData = [];
+  }
+
+  /**
    * Loads the cart data for the given user.
    *
    * @param \Drupal\Core\Session\AccountInterface $account
@@ -190,6 +197,7 @@ class CartProvider implements CartProviderInterface {
 
     if ($account->isAuthenticated()) {
       $query = $this->orderStorage->getQuery()
+        ->condition('state', 'draft')
         ->condition('cart', TRUE)
         ->condition('uid', $account->id())
         ->sort('order_id', 'DESC');
@@ -203,14 +211,20 @@ class CartProvider implements CartProviderInterface {
     if (!$cart_ids) {
       return [];
     }
-    // Getting the cart data and validating the cart ids received from the
+    // Getting the cart data and validating the cart IDs received from the
     // session requires loading the entities. This is a performance hit, but
     // it's assumed that these entities would be loaded at one point anyway.
     /** @var \Drupal\commerce_order\Entity\OrderInterface[] $carts */
     $carts = $this->orderStorage->loadMultiple($cart_ids);
+    $non_eligible_cart_ids = [];
     foreach ($carts as $cart) {
-      if ($cart->getCustomerId() != $uid || empty($cart->cart)) {
-        // Skip orders that are no longer eligible.
+      if ($cart->isLocked()) {
+        // Skip locked carts, the customer is probably off-site for payment.
+        continue;
+      }
+      if ($cart->getCustomerId() != $uid || empty($cart->cart) || $cart->getState()->value != 'draft') {
+        // Skip carts that are no longer eligible.
+        $non_eligible_cart_ids[] = $cart->id();
         continue;
       }
 
@@ -218,6 +232,12 @@ class CartProvider implements CartProviderInterface {
         'type' => $cart->bundle(),
         'store_id' => $cart->getStoreId(),
       ];
+    }
+    // Avoid loading non-eligible carts on the next page load.
+    if (!$account->isAuthenticated()) {
+      foreach ($non_eligible_cart_ids as $cart_id) {
+        $this->cartSession->deleteCartId($cart_id);
+      }
     }
 
     return $this->cartData[$uid];

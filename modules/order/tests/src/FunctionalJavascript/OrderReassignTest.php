@@ -37,13 +37,6 @@ class OrderReassignTest extends CommerceBrowserTestBase {
   }
 
   /**
-   * {@inheritdoc}
-   */
-  protected function setUp() {
-    parent::setUp();
-  }
-
-  /**
    * Tests the reassign form with a new user.
    */
   public function testOrderReassign() {

@@ -5,3 +5,4 @@ id: online
 label: Online
 description: ''
 traits: {  }
+locked: false

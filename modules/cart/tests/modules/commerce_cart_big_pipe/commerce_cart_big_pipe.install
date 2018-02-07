@@ -1,0 +1,13 @@
+<?php
+
+/**
+ * @file
+ * Installation functions for Commerce Cart Big Pipe module.
+ */
+
+/**
+ * Implements hook_install().
+ */
+function commerce_cart_big_pipe_install() {
+  module_set_weight('commerce_cart_big_pipe', 10);
+}

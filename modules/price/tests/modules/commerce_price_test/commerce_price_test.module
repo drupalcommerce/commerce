@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Module file for commerce_price_test.
+ * Test module for Price.
  */
 
 use Drupal\commerce_price\Price;

@@ -37,7 +37,7 @@ class AdjustmentDefaultWidget extends WidgetBase {
       '_none' => $this->t('- Select -'),
     ];
     foreach ($plugin_manager->getDefinitions() as $id => $definition) {
-      if ($definition['has_ui'] == TRUE) {
+      if (!empty($definition['has_ui'])) {
         $types[$id] = $definition['label'];
       }
     }
@@ -57,6 +57,12 @@ class AdjustmentDefaultWidget extends WidgetBase {
       '#type' => 'value',
       '#value' => empty($source_id) ? 'custom' : $source_id,
     ];
+    // If this is being added through the UI, the adjustment should be locked.
+    // UI added adjustments need to be locked to persist after an order refresh.
+    $element['locked'] = [
+      '#type' => 'value',
+      '#value' => ($adjustment) ? $adjustment->isLocked() : TRUE,
+    ];
 
     $states_selector_name = $this->fieldDefinition->getName() . "[$delta][type]";
     $element['definition'] = [
@@ -73,7 +79,6 @@ class AdjustmentDefaultWidget extends WidgetBase {
       '#title' => $this->t('Label'),
       '#default_value' => ($adjustment) ? $adjustment->getLabel() : '',
     ];
-
     $element['definition']['amount'] = [
       '#type' => 'commerce_price',
       '#title' => t('Amount'),
@@ -84,6 +89,11 @@ class AdjustmentDefaultWidget extends WidgetBase {
           'select[name="' . $states_selector_name . '"]' => ['value' => '_none'],
         ],
       ],
+    ];
+    $element['definition']['included'] = [
+      '#type' => 'checkbox',
+      '#title' => t('Included in the base price'),
+      '#default_value' => ($adjustment) ? $adjustment->isIncluded() : FALSE,
     ];
 
     return $element;
@@ -97,12 +107,21 @@ class AdjustmentDefaultWidget extends WidgetBase {
       if ($value['type'] == '_none') {
         continue;
       }
+      // The method can be called with invalid or incomplete data, in
+      // preparation for validation. Passing such data to the Adjustment
+      // object would result in an exception.
+      if (empty($value['definition']['label'])) {
+        $form_state->setErrorByName('adjustments[' . $key . '][definition][label]', $this->t('The adjustment label field is required.'));
+        continue;
+      }
 
       $values[$key] = new Adjustment([
         'type' => $value['type'],
         'label' => $value['definition']['label'],
         'amount' => new Price($value['definition']['amount']['number'], $value['definition']['amount']['currency_code']),
         'source_id' => $value['source_id'],
+        'included' => $value['definition']['included'],
+        'locked' => $value['locked'],
       ]);
     }
     return $values;

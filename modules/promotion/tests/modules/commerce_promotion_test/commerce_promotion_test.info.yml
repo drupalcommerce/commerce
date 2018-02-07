@@ -1,0 +1,8 @@
+name: Commerce Promotion Test
+type: module
+description: Provides items for testing Commerce Promotion.
+package: Testing
+core: 8.x
+dependencies:
+  - commerce:commerce_cart
+  - commerce:commerce_promotion

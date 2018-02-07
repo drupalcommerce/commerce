@@ -31,6 +31,13 @@ class CommerceBundleEntityBase extends ConfigEntityBundleBase implements Commerc
   protected $traits = [];
 
   /**
+   * Whether the bundle is locked, indicating that it cannot be deleted.
+   *
+   * @var bool
+   */
+  protected $locked = FALSE;
+
+  /**
    * {@inheritdoc}
    */
   public function getTraits() {
@@ -50,6 +57,29 @@ class CommerceBundleEntityBase extends ConfigEntityBundleBase implements Commerc
    */
   public function hasTrait($trait) {
     return in_array($trait, $this->traits);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function isLocked() {
+    return (bool) $this->locked;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function lock() {
+    $this->locked = TRUE;
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function unlock() {
+    $this->locked = FALSE;
+    return $this;
   }
 
 }

@@ -126,7 +126,7 @@ final class CreditCard {
    */
   public static function detectType($number) {
     if (!is_numeric($number)) {
-      return FALSE;
+      return NULL;
     }
     $types = self::getTypes();
     foreach ($types as $type) {
@@ -137,7 +137,7 @@ final class CreditCard {
       }
     }
 
-    return FALSE;
+    return NULL;
   }
 
   /**

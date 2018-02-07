@@ -2,12 +2,14 @@
 
 namespace Drupal\commerce_product\Entity;
 
-use Drupal\user\UserInterface;
-use Drupal\Core\Entity\ContentEntityBase;
+use Drupal\commerce\Entity\CommerceContentEntityBase;
+use Drupal\Core\Cache\Cache;
+use Drupal\Core\Entity\EntityPublishedTrait;
 use Drupal\Core\Entity\EntityChangedTrait;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
+use Drupal\user\UserInterface;
 
 /**
  * Defines the product entity class.
@@ -15,6 +17,7 @@ use Drupal\Core\Field\BaseFieldDefinition;
  * @ContentEntityType(
  *   id = "commerce_product",
  *   label = @Translation("Product"),
+ *   label_collection = @Translation("Products"),
  *   label_singular = @Translation("product"),
  *   label_plural = @Translation("products"),
  *   label_count = @PluralTranslation(
@@ -25,7 +28,7 @@ use Drupal\Core\Field\BaseFieldDefinition;
  *   handlers = {
  *     "event" = "Drupal\commerce_product\Event\ProductEvent",
  *     "storage" = "Drupal\commerce\CommerceContentEntityStorage",
- *     "access" = "Drupal\commerce\EntityAccessControlHandler",
+ *     "access" = "Drupal\entity\EntityAccessControlHandler",
  *     "permission_provider" = "Drupal\commerce\EntityPermissionProvider",
  *     "view_builder" = "Drupal\commerce_product\ProductViewBuilder",
  *     "list_builder" = "Drupal\commerce_product\ProductListBuilder",
@@ -44,7 +47,6 @@ use Drupal\Core\Field\BaseFieldDefinition;
  *   },
  *   admin_permission = "administer commerce_product",
  *   permission_granularity = "bundle",
- *   fieldable = TRUE,
  *   translatable = TRUE,
  *   base_table = "commerce_product",
  *   data_table = "commerce_product_field_data",
@@ -54,7 +56,7 @@ use Drupal\Core\Field\BaseFieldDefinition;
  *     "label" = "title",
  *     "langcode" = "langcode",
  *     "uuid" = "uuid",
- *     "status" = "status",
+ *     "published" = "status",
  *   },
  *   links = {
  *     "canonical" = "/product/{commerce_product}",
@@ -69,9 +71,10 @@ use Drupal\Core\Field\BaseFieldDefinition;
  *   field_ui_base_route = "entity.commerce_product_type.edit_form",
  * )
  */
-class Product extends ContentEntityBase implements ProductInterface {
+class Product extends CommerceContentEntityBase implements ProductInterface {
 
   use EntityChangedTrait;
+  use EntityPublishedTrait;
 
   /**
    * {@inheritdoc}
@@ -85,21 +88,6 @@ class Product extends ContentEntityBase implements ProductInterface {
    */
   public function setTitle($title) {
     $this->set('title', $title);
-    return $this;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function isPublished() {
-    return (bool) $this->getEntityKey('status');
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function setPublished($published) {
-    $this->set('status', (bool) $published);
     return $this;
   }
 
@@ -122,8 +110,7 @@ class Product extends ContentEntityBase implements ProductInterface {
    * {@inheritdoc}
    */
   public function getStores() {
-    $stores = $this->get('stores')->referencedEntities();
-    return $this->ensureTranslations($stores);
+    return $this->getTranslatedReferencedEntities('stores');
   }
 
   /**
@@ -198,8 +185,7 @@ class Product extends ContentEntityBase implements ProductInterface {
    * {@inheritdoc}
    */
   public function getVariations() {
-    $variations = $this->get('variations')->referencedEntities();
-    return $this->ensureTranslations($variations);
+    return $this->getTranslatedReferencedEntities('variations');
   }
 
   /**
@@ -271,24 +257,19 @@ class Product extends ContentEntityBase implements ProductInterface {
   }
 
   /**
-   * Ensures that the provided entities are in the current entity's language.
-   *
-   * @param \Drupal\Core\Entity\ContentEntityInterface[] $entities
-   *   The entities to process.
-   *
-   * @return \Drupal\Core\Entity\ContentEntityInterface[]
-   *   The processed entities.
+   * {@inheritdoc}
    */
-  protected function ensureTranslations(array $entities) {
-    $langcode = $this->language()->getId();
-    foreach ($entities as $index => $entity) {
-      /** @var \Drupal\Core\Entity\ContentEntityInterface $entity */
-      if ($entity->hasTranslation($langcode)) {
-        $entities[$index] = $entity->getTranslation($langcode);
+  public function preSave(EntityStorageInterface $storage) {
+    parent::preSave($storage);
+
+    foreach (array_keys($this->getTranslationLanguages()) as $langcode) {
+      $translation = $this->getTranslation($langcode);
+
+      // If no owner has been set explicitly, make the anonymous user the owner.
+      if (!$translation->getOwner()) {
+        $translation->setOwnerId(0);
       }
     }
-
-    return $entities;
   }
 
   /**
@@ -305,6 +286,13 @@ class Product extends ContentEntityBase implements ProductInterface {
         $variation->save();
       }
     }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getCacheContexts() {
+    return Cache::mergeContexts(parent::getCacheContexts(), ['url.query_args:v']);
   }
 
   /**
@@ -330,6 +318,7 @@ class Product extends ContentEntityBase implements ProductInterface {
    */
   public static function baseFieldDefinitions(EntityTypeInterface $entity_type) {
     $fields = parent::baseFieldDefinitions($entity_type);
+    $fields += static::publishedBaseFieldDefinitions($entity_type);
 
     $fields['uid'] = BaseFieldDefinition::create('entity_reference')
       ->setLabel(t('Author'))
@@ -363,7 +352,8 @@ class Product extends ContentEntityBase implements ProductInterface {
         'type' => 'string_textfield',
         'weight' => -5,
       ])
-      ->setDisplayConfigurable('form', TRUE);
+      ->setDisplayConfigurable('form', TRUE)
+      ->setDisplayConfigurable('view', TRUE);
 
     $fields['path'] = BaseFieldDefinition::create('path')
       ->setLabel(t('URL alias'))
@@ -374,25 +364,29 @@ class Product extends ContentEntityBase implements ProductInterface {
         'weight' => 30,
       ])
       ->setDisplayConfigurable('form', TRUE)
-      ->setCustomStorage(TRUE);
+      ->setComputed(TRUE);
 
-    $fields['status'] = BaseFieldDefinition::create('boolean')
+    $fields['status']
       ->setLabel(t('Published'))
-      ->setDescription(t('Whether the product is published.'))
-      ->setDefaultValue(TRUE)
-      ->setTranslatable(TRUE)
+      ->setDisplayOptions('form', [
+        'type' => 'boolean_checkbox',
+        'settings' => [
+          'display_label' => TRUE,
+        ],
+        'weight' => 90,
+      ])
       ->setDisplayConfigurable('form', TRUE);
 
     $fields['created'] = BaseFieldDefinition::create('created')
       ->setLabel(t('Created'))
       ->setDescription(t('The time when the product was created.'))
       ->setTranslatable(TRUE)
-      ->setDisplayConfigurable('view', TRUE)
       ->setDisplayOptions('form', [
         'type' => 'datetime_timestamp',
         'weight' => 10,
       ])
-      ->setDisplayConfigurable('form', TRUE);
+      ->setDisplayConfigurable('form', TRUE)
+      ->setDisplayConfigurable('view', TRUE);
 
     $fields['changed'] = BaseFieldDefinition::create('changed')
       ->setLabel(t('Changed'))

@@ -76,6 +76,8 @@ class CouponsFieldPostUpdateTest extends CommerceKernelTestBase {
     $this->assertFalse($this->order->hasField('coupons'));
 
     $this->installModule('commerce_promotion');
+    $this->installEntitySchema('commerce_promotion');
+    $this->installEntitySchema('commerce_promotion_coupon');
     $post_update_registry = $this->container->get('update.post_update_registry');
     foreach ($post_update_registry->getModuleUpdateFunctions('commerce_promotion') as $function) {
       $function();

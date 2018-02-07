@@ -1,0 +1,23 @@
+<?php
+
+/**
+ * @file
+ * Test module for Promotion.
+ */
+
+use Drupal\Core\Form\FormStateInterface;
+
+/**
+ * Implements hook_form_BASE_FORM_ID_alter().
+ */
+function commerce_promotion_test_form_views_form_commerce_cart_form_default_alter(&$form, FormStateInterface $form_state, $form_id) {
+  // We know that view forms are build on the base ID plus arguments.
+  $order_id = substr($form_id, strlen('views_form_commerce_cart_form_default_'));
+
+  $form['coupons'] = [
+    '#type' => 'commerce_coupon_redemption_form',
+    '#description' => 'Enter your coupon code to redeem a promotion.',
+    '#order_id' => $order_id,
+    '#cardinality' => Drupal::request()->query->get('coupon_cardinality'),
+  ];
+}

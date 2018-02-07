@@ -16,19 +16,38 @@ commerce_payment.commerce_payment_gateway.*:
       label: 'Plugin'
     configuration:
       type: commerce_payment.commerce_payment_gateway.plugin.[%parent.plugin]
+    conditions:
+      type: sequence
+      sequence:
+        type: commerce_condition
+    conditionOperator:
+      type: string
+      label: 'Condition operator'
 
 commerce_payment.commerce_payment_gateway.plugin.*:
   type: commerce_payment_gateway_configuration
 
+commerce_payment.commerce_payment_gateway.plugin.manual:
+  type: commerce_payment_gateway_configuration
+  mapping:
+    instructions:
+      type: text_format
+      label: 'Payment instructions'
+      translatable: true
+
 commerce_payment_gateway_configuration:
   type: mapping
   mapping:
+    display_label:
+      type: label
+      label: 'Display label'
     mode:
       type: string
       label: 'Mode'
     payment_method_types:
       type: sequence
       label: 'Payment method types'
+      orderby: value
       sequence:
         type: string
 

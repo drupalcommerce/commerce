@@ -2,8 +2,12 @@
 
 namespace Drupal\Tests\commerce_promotion\Kernel\Entity;
 
+use Drupal\commerce_order\Entity\OrderItemType;
 use Drupal\commerce_order\Entity\OrderType;
+use Drupal\commerce_price\RounderInterface;
+use Drupal\commerce_promotion\Entity\Coupon;
 use Drupal\commerce_promotion\Entity\Promotion;
+use Drupal\commerce_promotion\Plugin\Commerce\PromotionOffer\OrderPercentageOff;
 use Drupal\Core\Datetime\DrupalDateTime;
 use Drupal\Tests\commerce\Kernel\CommerceKernelTestBase;
 
@@ -38,14 +42,21 @@ class PromotionTest extends CommerceKernelTestBase {
 
     $this->installEntitySchema('profile');
     $this->installEntitySchema('commerce_order');
-    $this->installEntitySchema('commerce_order_type');
+    $this->installEntitySchema('commerce_order_item');
     $this->installEntitySchema('commerce_promotion');
     $this->installEntitySchema('commerce_promotion_coupon');
+    $this->installSchema('commerce_promotion', ['commerce_promotion_usage']);
     $this->installConfig([
       'profile',
       'commerce_order',
       'commerce_promotion',
     ]);
+
+    OrderItemType::create([
+      'id' => 'test',
+      'label' => 'Test',
+      'orderType' => 'default',
+    ])->save();
   }
 
   /**
@@ -61,8 +72,17 @@ class PromotionTest extends CommerceKernelTestBase {
    * @covers ::setStores
    * @covers ::setStoreIds
    * @covers ::getStoreIds
-   * @covers ::getCurrentUsage
-   * @covers ::setCurrentUsage
+   * @covers ::getOffer
+   * @covers ::setOffer
+   * @covers ::getConditionOperator
+   * @covers ::setConditionOperator
+   * @covers ::getCouponIds
+   * @covers ::getCoupons
+   * @covers ::setCoupons
+   * @covers ::hasCoupons
+   * @covers ::addCoupon
+   * @covers ::removeCoupon
+   * @covers ::hasCoupon
    * @covers ::getUsageLimit
    * @covers ::setUsageLimit
    * @covers ::getStartDate
@@ -97,8 +117,48 @@ class PromotionTest extends CommerceKernelTestBase {
     $promotion->setStoreIds([$this->store->id()]);
     $this->assertEquals([$this->store->id()], $promotion->getStoreIds());
 
-    $promotion->setCurrentUsage(1);
-    $this->assertEquals(1, $promotion->getCurrentUsage());
+    $rounder = $this->prophesize(RounderInterface::class)->reveal();
+    $offer = new OrderPercentageOff(['percentage' => '0.5'], 'order_percentage_off', [], $rounder);
+    $promotion->setOffer($offer);
+    $this->assertEquals($offer->getPluginId(), $promotion->getOffer()->getPluginId());
+    $this->assertEquals($offer->getConfiguration(), $promotion->getOffer()->getConfiguration());
+
+    $this->assertEquals('AND', $promotion->getConditionOperator());
+    $promotion->setConditionOperator('OR');
+    $this->assertEquals('OR', $promotion->getConditionOperator());
+
+    $coupon1 = Coupon::create([
+      'code' => $this->randomMachineName(),
+      'status' => TRUE,
+    ]);
+    $coupon1->save();
+    $coupon2 = Coupon::create([
+      'code' => $this->randomMachineName(),
+      'status' => TRUE,
+    ]);
+    $coupon2->save();
+    $coupon1 = Coupon::load($coupon1->id());
+    $coupon2 = Coupon::load($coupon2->id());
+    $coupons = [$coupon1, $coupon2];
+    $coupon_ids = [$coupon1->id(), $coupon2->id()];
+
+    $this->assertFalse($promotion->hasCoupons());
+    $promotion->setCoupons($coupons);
+    $this->assertTrue($promotion->hasCoupons());
+    $this->assertEquals($coupons, $promotion->getCoupons());
+    $this->assertEquals($coupon_ids, $promotion->getCouponIds());
+    $this->assertTrue($promotion->hasCoupon($coupon1));
+    $promotion->removeCoupon($coupon1);
+    $this->assertFalse($promotion->hasCoupon($coupon1));
+    $promotion->addCoupon($coupon1);
+    $this->assertTrue($promotion->hasCoupon($coupon1));
+
+    // Check Coupon::postDelete() remove Coupon reference from promotion.
+    $promotion->save();
+    $promotion = $this->reloadEntity($promotion);
+    $this->assertEquals($promotion->id(), 1);
+    $coupon1->delete();
+    $this->assertFalse($promotion->hasCoupon($coupon1));
 
     $promotion->setUsageLimit(10);
     $this->assertEquals(10, $promotion->getUsageLimit());
