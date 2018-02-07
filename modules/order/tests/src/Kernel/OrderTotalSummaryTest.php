@@ -130,6 +130,7 @@ class OrderTotalSummaryTest extends CommerceKernelTestBase {
       'type' => 'promotion',
       'label' => 'Back to school discount',
       'amount' => new Price('-5.00', 'USD'),
+      'percentage' => '0.1',
       'source_id' => '1',
     ]);
     $this->order->setData('test_adjustments', $test_order_adjustments);
@@ -144,6 +145,7 @@ class OrderTotalSummaryTest extends CommerceKernelTestBase {
     $this->assertEquals('promotion', $first['type']);
     $this->assertEquals('Back to school discount', $first['label']);
     $this->assertEquals(new Price('-5', 'USD'), $first['total']);
+    $this->assertEquals('0.1', $first['percentage']);
     $this->assertEquals(0, $first['weight']);
   }
 
@@ -162,6 +164,7 @@ class OrderTotalSummaryTest extends CommerceKernelTestBase {
       'type' => 'promotion',
       'label' => 'Back to school discount',
       'amount' => new Price('-1.00', 'USD'),
+      'percentage' => '0.1',
       'source_id' => '1',
     ]);
     $order_item->setData('test_adjustments', $order_item_test_adjustments);
@@ -179,6 +182,7 @@ class OrderTotalSummaryTest extends CommerceKernelTestBase {
     $this->assertEquals('promotion', $first['type']);
     $this->assertEquals('Back to school discount', $first['label']);
     $this->assertEquals(new Price('-1', 'USD'), $first['total']);
+    $this->assertEquals('0.1', $first['percentage']);
     $this->assertEquals(0, $first['weight']);
   }
 
@@ -197,6 +201,7 @@ class OrderTotalSummaryTest extends CommerceKernelTestBase {
       'type' => 'promotion',
       'label' => 'Back to school discount',
       'amount' => new Price('-1.00', 'USD'),
+      'percentage' => '0.1',
       'source_id' => '1',
     ]);
     // This adjustment should be first.
@@ -215,11 +220,11 @@ class OrderTotalSummaryTest extends CommerceKernelTestBase {
       'type' => 'promotion',
       'label' => 'Back to school discount',
       'amount' => new Price('-5.00', 'USD'),
+      'percentage' => '0.1',
       'source_id' => '1',
     ]);
     $this->order->setData('test_adjustments', $test_order_adjustments);
 
-    // Custom adjustments persist, so we manually add.
     $this->order->addAdjustment(new Adjustment([
       'type' => 'custom',
       'label' => 'Handling fee',
@@ -236,18 +241,21 @@ class OrderTotalSummaryTest extends CommerceKernelTestBase {
     $this->assertEquals('test_adjustment_type', $first['type']);
     $this->assertEquals('50 cent item fee', $first['label']);
     $this->assertEquals(new Price('1', 'USD'), $first['total']);
+    $this->assertNull($first['percentage']);
     $this->assertEquals(-1, $first['weight']);
 
     $second = array_shift($totals['adjustments']);
     $this->assertEquals('promotion', $second['type']);
     $this->assertEquals('Back to school discount', $second['label']);
     $this->assertEquals(new Price('-7', 'USD'), $second['total']);
+    $this->assertEquals('0.1', $second['percentage']);
     $this->assertEquals(0, $second['weight']);
 
     $third = array_shift($totals['adjustments']);
     $this->assertEquals('custom', $third['type']);
     $this->assertEquals('Handling fee', $third['label']);
     $this->assertEquals(new Price('10', 'USD'), $third['total']);
+    $this->assertNull($third['percentage']);
     $this->assertEquals(10, $third['weight']);
   }
 

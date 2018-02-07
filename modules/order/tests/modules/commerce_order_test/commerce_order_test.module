@@ -1,0 +1,22 @@
+<?php
+
+/**
+ * @file
+ * A test module for the commerce_order module.
+ */
+
+use Drupal\Core\Form\FormStateInterface;
+use Drupal\commerce_order\Plugin\Field\FieldWidget\AdjustmentDefaultWidget;
+
+/**
+ * Implements hook_field_widget_form_alter().
+ */
+function commerce_order_test_field_widget_form_alter(&$element, FormStateInterface $form_state, $context) {
+  if ($context['widget'] instanceof AdjustmentDefaultWidget) {
+    /** @var \Drupal\commerce_order\Entity\OrderInterface $order */
+    $order = $form_state->getFormObject()->getEntity();
+    // This will error if getAdjustments() returns invalid items.
+    $order->recalculateTotalPrice();
+    \Drupal::state()->set("commerce_order_test_field_widget_form_alter", $order->getAdjustments());
+  }
+}

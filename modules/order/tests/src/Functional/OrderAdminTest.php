@@ -62,6 +62,10 @@ class OrderAdminTest extends OrderBrowserTestBase {
     $this->assertSession()->buttonExists('Create order item');
     $entity = $this->variation->getSku() . ' (' . $this->variation->id() . ')';
 
+    // Test that commerce_order_test_field_widget_form_alter() has the expected
+    // outcome.
+    $this->assertSame([], \Drupal::state()->get("commerce_order_test_field_widget_form_alter"));
+
     $checkbox = $this->getSession()->getPage()->findField('Override the unit price');
     if ($checkbox) {
       $checkbox->check();
@@ -94,18 +98,32 @@ class OrderAdminTest extends OrderBrowserTestBase {
       'billing_profile[0][profile][address][0][address][postal_code]' => '94043',
       'billing_profile[0][profile][address][0][address][locality]' => 'Mountain View',
       'billing_profile[0][profile][address][0][address][administrative_area]' => 'CA',
-      'adjustments[0][type]' => 'custom',
-      'adjustments[0][definition][label]' => 'Test fee',
+    ];
+    // There is no adjustment - the order should save successfully.
+    $this->submitForm($edit, 'Save');
+    $this->assertSession()->pageTextContains('The order has been successfully saved.');
+
+    // Use an adjustment that is not locked by default.
+    $this->clickLink('Edit');
+    $edit = [
+      'adjustments[0][type]' => 'fee',
+      'adjustments[0][definition][label]' => '',
       'adjustments[0][definition][amount][number]' => '2.00',
     ];
     $this->submitForm($edit, 'Save');
+    $this->assertSession()->pageTextContains('The adjustment label field is required.');
+    $edit['adjustments[0][definition][label]'] = 'Test fee';
+    $this->submitForm($edit, 'Save');
+    $this->assertSession()->pageTextContains('The order has been successfully saved.');
 
+    $this->drupalGet('/admin/commerce/orders');
     $order_number = $this->getSession()->getPage()->find('css', 'tr td.views-field-order-number');
     $this->assertEquals(1, count($order_number), 'Order exists in the table.');
 
     $order = Order::load(1);
     $this->assertEquals(1, count($order->getItems()));
     $this->assertEquals(new Price('5.33', 'USD'), $order->getTotalPrice());
+    $this->assertCount(1, $order->getAdjustments());
   }
 
   /**
@@ -193,7 +211,7 @@ class OrderAdminTest extends OrderBrowserTestBase {
    * Tests that an admin can view an order's details.
    */
   public function testAdminOrderView() {
-    // First test for order without items.
+    // Start from an order without any order items.
     /** @var \Drupal\commerce_order\Entity\OrderInterface $order */
     $order = $this->createEntity('commerce_order', [
       'type' => 'default',
@@ -208,9 +226,9 @@ class OrderAdminTest extends OrderBrowserTestBase {
     $this->assertSession()->statusCodeEquals(200);
     $this->assertSession()->pageTextContains($this->loggedInUser->getEmail());
 
-    // Test there are no items.
-    $this->assertSession()->pageTextContains('No items added to this order.');
-    $this->assertSession()->pageTextNotContains('Total');
+    // Confirm that the order item table is showing the empty text.
+    $this->assertSession()->pageTextContains('There are no order items yet.');
+    $this->assertSession()->pageTextNotContains('Subtotal');
 
     // Confirm that the transition buttons are visible and functional.
     $workflow = $order->getState()->getWorkflow();
@@ -222,7 +240,7 @@ class OrderAdminTest extends OrderBrowserTestBase {
     $this->assertSession()->buttonNotExists('Place order');
     $this->assertSession()->buttonNotExists('Cancel order');
 
-    // Test with order items.
+    // Add an order item, confirm that it is displayed.
     $order_item = $this->createEntity('commerce_order_item', [
       'type' => 'default',
       'unit_price' => [
@@ -234,9 +252,9 @@ class OrderAdminTest extends OrderBrowserTestBase {
     $order->save();
     $this->drupalGet($order->toUrl()->toString());
     $this->assertSession()->statusCodeEquals(200);
-    $this->assertSession()->pageTextNotContains('No items added to this order.');
+    $this->assertSession()->pageTextNotContains('There are no order items yet.');
     $this->assertSession()->pageTextContains('$999.00');
-    $this->assertSession()->pageTextContains('Total price');
+    $this->assertSession()->pageTextContains('Subtotal');
 
     // Logout and check that anonymous users cannot see the order admin screen
     // and receive a 403 error code.

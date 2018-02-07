@@ -3,4 +3,4 @@ description: Provides testing items for Payment
 core: 8.x
 type: module
 dependencies:
-  - commerce_payment
+  - commerce:commerce_payment

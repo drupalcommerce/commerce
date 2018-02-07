@@ -4,5 +4,5 @@ description: 'Test module for Commerce Log.'
 package: Commerce
 core: 8.x
 dependencies:
-  - commerce_log
-  - entity_test
+  - commerce:commerce_log
+  - drupal:entity_test

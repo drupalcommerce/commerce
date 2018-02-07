@@ -38,7 +38,7 @@ interface EntityTraitInterface extends PluginInspectionInterface {
    * THe provided field definitions will be created as configurable
    * fields when the entity trait is installed for an entity type/bundle.
    *
-   * @return \Drupal\commerce\BundleFieldDefinition[]
+   * @return \Drupal\entity\BundleFieldDefinition[]
    *   An array of field definitions, keyed by field name.
    */
   public function buildFieldDefinitions();

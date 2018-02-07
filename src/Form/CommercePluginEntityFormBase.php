@@ -4,6 +4,9 @@ namespace Drupal\commerce\Form;
 
 use Drupal\Core\Entity\EntityForm;
 
+/**
+ * @deprecated in Commerce 2.2. Set #disabled on the ID element directly.
+ */
 abstract class CommercePluginEntityFormBase extends EntityForm {
 
   /**

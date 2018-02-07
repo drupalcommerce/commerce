@@ -19,7 +19,7 @@ use Drupal\Core\Entity\EntityStorageInterface;
  *     plural = "@count product attributes",
  *   ),
  *   handlers = {
- *     "access" = "Drupal\commerce\EntityAccessControlHandler",
+ *     "access" = "Drupal\entity\EntityAccessControlHandler",
  *     "permission_provider" = "Drupal\commerce\EntityPermissionProvider",
  *     "list_builder" = "Drupal\commerce_product\ProductAttributeListBuilder",
  *     "form" = {

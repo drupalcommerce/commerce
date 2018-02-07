@@ -83,6 +83,7 @@ class ProductTypeTest extends ProductBrowserTestBase {
       'id' => 'foo',
       'label' => 'foo',
     ]);
+    /** @var \Drupal\commerce_product\Entity\ProductTypeInterface $product_type */
     $product_type = $this->createEntity('commerce_product_type', [
       'id' => 'foo',
       'label' => 'foo',
@@ -90,23 +91,32 @@ class ProductTypeTest extends ProductBrowserTestBase {
     ]);
     commerce_product_add_stores_field($product_type);
     commerce_product_add_variations_field($product_type);
-
     $product = $this->createEntity('commerce_product', [
       'type' => $product_type->id(),
       'title' => $this->randomMachineName(),
     ]);
 
+    // Confirm that the type can't be deleted while there's a product.
     // @todo Make sure $product_type->delete() also does nothing if there's
     // a product of that type. Right now the check is done on the form level.
-    $this->drupalGet('admin/commerce/config/product-types/' . $product_type->id() . '/delete');
+    $this->drupalGet($product_type->toUrl('delete-form'));
     $this->assertSession()->pageTextContains(
       t('@type is used by 1 product on your site. You cannot remove this product type until you have removed all of the @type products.', ['@type' => $product_type->label()]),
       'The product type will not be deleted until all products of that type are deleted.'
     );
     $this->assertSession()->pageTextNotContains(t('This action cannot be undone.'));
 
+    // Confirm that the delete page is not available when the type is locked.
+    $product_type->lock();
+    $product_type->save();
+    $this->drupalGet($product_type->toUrl('delete-form'));
+    $this->assertSession()->statusCodeEquals('403');
+
+    // Delete the product, unlock the type, confirm that deletion works.
     $product->delete();
-    $this->drupalGet('admin/commerce/config/product-types/' . $product_type->id() . '/delete');
+    $product_type->unlock();
+    $product_type->save();
+    $this->drupalGet($product_type->toUrl('delete-form'));
     $this->assertSession()->pageTextContains(
       t('Are you sure you want to delete the product type @type?', ['@type' => $product_type->label()]),
       'The product type is available for deletion'
@@ -114,7 +124,7 @@ class ProductTypeTest extends ProductBrowserTestBase {
     $this->assertSession()->pageTextContains(t('This action cannot be undone.'));
     $this->submitForm([], 'Delete');
     $exists = (bool) ProductType::load($product_type->id());
-    $this->assertEmpty($exists, 'The new product type has been deleted from the database.');
+    $this->assertEmpty($exists);
   }
 
 }

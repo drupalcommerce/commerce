@@ -18,6 +18,7 @@ use Drupal\commerce\Entity\CommerceBundleEntityBase;
  *     plural = "@count order item types",
  *   ),
  *   handlers = {
+ *     "access" = "Drupal\commerce\CommerceBundleAccessControlHandler",
  *     "form" = {
  *       "add" = "Drupal\commerce_order\Form\OrderItemTypeForm",
  *       "edit" = "Drupal\commerce_order\Form\OrderItemTypeForm",
@@ -42,6 +43,7 @@ use Drupal\commerce\Entity\CommerceBundleEntityBase;
  *     "purchasableEntityType",
  *     "orderType",
  *     "traits",
+ *     "locked",
  *   },
  *   links = {
  *     "add-form" = "/admin/commerce/config/order-item-types/add",

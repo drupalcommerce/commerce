@@ -3,6 +3,7 @@
 namespace Drupal\Tests\commerce_tax\Kernel;
 
 use Drupal\commerce_tax\TaxRate;
+use Drupal\Core\Datetime\DrupalDateTime;
 use Drupal\Tests\commerce\Kernel\CommerceKernelTestBase;
 
 /**
@@ -51,7 +52,8 @@ class TaxRateTest extends CommerceKernelTestBase {
       'id' => 'standard',
       'label' => 'Standard',
       'percentages' => [
-        ['number' => '0.23', 'start_date' => '2012-01-01'],
+        ['number' => '0.23', 'start_date' => '2012-01-01', 'end_date' => '2012-12-31'],
+        ['number' => '0.24', 'start_date' => '2013-01-01'],
       ],
       'default' => TRUE,
     ];
@@ -60,11 +62,21 @@ class TaxRateTest extends CommerceKernelTestBase {
     $this->assertEquals($definition['id'], $rate->getId());
     $this->assertEquals($definition['label'], $rate->getLabel());
     $this->assertTrue($rate->isDefault());
-    $this->assertCount(1, $rate->getPercentages());
+    $this->assertCount(2, $rate->getPercentages());
 
-    $percentage = $rate->getPercentage();
+    $date = new DrupalDateTime('2012-06-30 12:00:00');
+    $percentage = $rate->getPercentage($date);
     $this->assertEquals($percentage, $rate->getPercentages()[0]);
     $this->assertEquals($definition['percentages'][0]['number'], $percentage->getNumber());
+
+    $date = new DrupalDateTime('2012-12-31 17:15:00');
+    $percentage = $rate->getPercentage($date);
+    $this->assertEquals($percentage, $rate->getPercentages()[0]);
+    $this->assertEquals($definition['percentages'][0]['number'], $percentage->getNumber());
+
+    $percentage = $rate->getPercentage();
+    $this->assertEquals($percentage, $rate->getPercentages()[1]);
+    $this->assertEquals($definition['percentages'][1]['number'], $percentage->getNumber());
   }
 
 }

@@ -60,6 +60,9 @@ display:
           description: ''
           columns:
             title: title
+            unit_price__number: unit_price__number
+            quantity: quantity
+            total_price__number: total_price__number
           info:
             title:
               sortable: false
@@ -68,8 +71,29 @@ display:
               separator: ''
               empty_column: false
               responsive: ''
+            unit_price__number:
+              sortable: false
+              default_sort_order: asc
+              align: ''
+              separator: ''
+              empty_column: false
+              responsive: ''
+            quantity:
+              sortable: false
+              default_sort_order: asc
+              align: ''
+              separator: ''
+              empty_column: false
+              responsive: ''
+            total_price__number:
+              sortable: false
+              default_sort_order: asc
+              align: ''
+              separator: ''
+              empty_column: false
+              responsive: ''
           default: '-1'
-          empty_table: false
+          empty_table: true
       row:
         type: fields
         options:
@@ -348,15 +372,17 @@ display:
       header: {  }
       footer: {  }
       empty:
-        area:
-          id: area
+        area_text_custom:
+          id: area_text_custom
           table: views
-          field: area
+          field: area_text_custom
+          relationship: none
+          group_type: group
+          admin_label: ''
           empty: true
-          content:
-            value: 'No items added to this order.'
-            format: plain_text
-          plugin_id: text
+          tokenize: false
+          content: 'There are no order items yet.'
+          plugin_id: text_custom
       relationships: {  }
       arguments:
         order_id:

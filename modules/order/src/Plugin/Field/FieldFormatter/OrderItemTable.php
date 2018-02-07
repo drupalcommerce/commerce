@@ -23,14 +23,18 @@ class OrderItemTable extends FormatterBase {
    * {@inheritdoc}
    */
   public function viewElements(FieldItemListInterface $items, $langcode) {
+    /** @var \Drupal\commerce_order\Entity\OrderInterface $order */
     $order = $items->getEntity();
-    return [
+    $elements = [];
+    $elements[0] = [
       '#type' => 'view',
       // @todo Allow the view to be configurable.
       '#name' => 'commerce_order_item_table',
       '#arguments' => [$order->id()],
       '#embed' => TRUE,
     ];
+
+    return $elements;
   }
 
   /**
