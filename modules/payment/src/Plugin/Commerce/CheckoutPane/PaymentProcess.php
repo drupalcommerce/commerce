@@ -2,18 +2,16 @@
 
 namespace Drupal\commerce_payment\Plugin\Commerce\CheckoutPane;
 
-use Drupal\commerce_checkout\Plugin\Commerce\CheckoutFlow\CheckoutFlowInterface;
+use Drupal\commerce\Response\NeedsRedirectException;
 use Drupal\commerce_checkout\Plugin\Commerce\CheckoutPane\CheckoutPaneBase;
-use Drupal\commerce_order\Entity\OrderInterface;
 use Drupal\commerce_payment\Exception\DeclineException;
 use Drupal\commerce_payment\Exception\PaymentGatewayException;
+use Drupal\commerce_payment\Plugin\Commerce\PaymentGateway\ManualPaymentGatewayInterface;
 use Drupal\commerce_payment\Plugin\Commerce\PaymentGateway\OffsitePaymentGatewayInterface;
 use Drupal\commerce_payment\Plugin\Commerce\PaymentGateway\OnsitePaymentGatewayInterface;
-use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use Drupal\Core\Link;
 use Drupal\Core\Url;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Provides the payment process pane.
@@ -25,47 +23,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *   wrapper_element = "container",
  * )
  */
-class PaymentProcess extends CheckoutPaneBase implements ContainerFactoryPluginInterface {
-
-  /**
-   * The entity type manager.
-   *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
-   */
-  protected $entityTypeManager;
-
-  /**
-   * Constructs a new PaymentProcess object.
-   *
-   * @param array $configuration
-   *   A configuration array containing information about the plugin instance.
-   * @param string $plugin_id
-   *   The plugin_id for the plugin instance.
-   * @param mixed $plugin_definition
-   *   The plugin implementation definition.
-   * @param \Drupal\commerce_checkout\Plugin\Commerce\CheckoutFlow\CheckoutFlowInterface $checkout_flow
-   *   The parent checkout flow.
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
-   *   The entity type manager.
-   */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, CheckoutFlowInterface $checkout_flow, EntityTypeManagerInterface $entity_type_manager) {
-    parent::__construct($configuration, $plugin_id, $plugin_definition, $checkout_flow);
-
-    $this->entityTypeManager = $entity_type_manager;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition, CheckoutFlowInterface $checkout_flow = NULL) {
-    return new static(
-      $configuration,
-      $plugin_id,
-      $plugin_definition,
-      $checkout_flow,
-      $container->get('entity_type.manager')
-    );
-  }
+class PaymentProcess extends CheckoutPaneBase {
 
   /**
    * {@inheritdoc}
@@ -145,18 +103,20 @@ class PaymentProcess extends CheckoutPaneBase implements ContainerFactoryPluginI
     $payment_gateway_plugin = $payment_gateway->getPlugin();
 
     $payment_storage = $this->entityTypeManager->getStorage('commerce_payment');
+    /** @var \Drupal\commerce_payment\Entity\PaymentInterface $payment */
     $payment = $payment_storage->create([
       'state' => 'new',
       'amount' => $this->order->getTotalPrice(),
       'payment_gateway' => $payment_gateway->id(),
       'order_id' => $this->order->id(),
     ]);
+    $next_step_id = $this->checkoutFlow->getNextStepId($this->getStepId());
 
     if ($payment_gateway_plugin instanceof OnsitePaymentGatewayInterface) {
       try {
         $payment->payment_method = $this->order->payment_method->entity;
         $payment_gateway_plugin->createPayment($payment, $this->configuration['capture']);
-        $this->checkoutFlow->redirectToStep($this->checkoutFlow->getNextStepId());
+        $this->checkoutFlow->redirectToStep($next_step_id);
       }
       catch (DeclineException $e) {
         $message = $this->t('We encountered an error processing your payment method. Please verify your details and try again.');
@@ -175,63 +135,89 @@ class PaymentProcess extends CheckoutPaneBase implements ContainerFactoryPluginI
         '#type' => 'commerce_payment_gateway_form',
         '#operation' => 'offsite-payment',
         '#default_value' => $payment,
-        '#return_url' => $this->buildReturnUrl($this->order),
-        '#cancel_url' => $this->buildCancelUrl($this->order),
+        '#return_url' => $this->buildReturnUrl()->toString(),
+        '#cancel_url' => $this->buildCancelUrl()->toString(),
+        '#exception_url' => $this->buildPaymentInformationStepUrl()->toString(),
+        '#exception_message' => $this->t('We encountered an unexpected error processing your payment. Please try again later.'),
         '#capture' => $this->configuration['capture'],
       ];
 
       $complete_form['actions']['next']['#value'] = $this->t('Proceed to @gateway', [
         '@gateway' => $payment_gateway_plugin->getDisplayLabel(),
       ]);
+      // The 'Go back' link needs to use the cancel URL to ensure that the
+      // order is unlocked when the customer is sent to the previous page.
+      $complete_form['actions']['next']['#suffix'] = Link::fromTextAndUrl($this->t('Go back'), $this->buildCancelUrl())->toString();
+      // Hide the actions by default, they are not needed by gateways that
+      // embed iframes or redirect via GET. The offsite-payment form can
+      // choose to show them when needed (redirect via POST).
+      $complete_form['actions']['#access'] = FALSE;
 
       return $pane_form;
     }
+    elseif ($payment_gateway_plugin instanceof ManualPaymentGatewayInterface) {
+      try {
+        $payment_gateway_plugin->createPayment($payment);
+        $this->checkoutFlow->redirectToStep($next_step_id);
+      }
+      catch (PaymentGatewayException $e) {
+        \Drupal::logger('commerce_payment')->error($e->getMessage());
+        $message = $this->t('We encountered an unexpected error processing your payment. Please try again later.');
+        drupal_set_message($message, 'error');
+        $this->redirectToPreviousStep();
+      }
+    }
     else {
-      $this->checkoutFlow->redirectToStep($this->checkoutFlow->getNextStepId());
+      $this->checkoutFlow->redirectToStep($next_step_id);
     }
   }
 
   /**
    * Builds the URL to the "return" page.
    *
-   * @param \Drupal\commerce_order\Entity\OrderInterface $order
-   *   The order.
-   *
-   * @return string
-   *   The "return" page url.
+   * @return \Drupal\Core\Url
+   *   The "return" page URL.
    */
-  protected function buildReturnUrl(OrderInterface $order) {
+  protected function buildReturnUrl() {
     return Url::fromRoute('commerce_payment.checkout.return', [
-      'commerce_order' => $order->id(),
+      'commerce_order' => $this->order->id(),
       'step' => 'payment',
-    ], ['absolute' => TRUE])->toString();
+    ], ['absolute' => TRUE]);
   }
 
   /**
    * Builds the URL to the "cancel" page.
    *
-   * @param \Drupal\commerce_order\Entity\OrderInterface $order
-   *   The order.
-   *
-   * @return string
-   *   The "cancel" page url.
+   * @return \Drupal\Core\Url
+   *   The "cancel" page URL.
    */
-  protected function buildCancelUrl(OrderInterface $order) {
+  protected function buildCancelUrl() {
     return Url::fromRoute('commerce_payment.checkout.cancel', [
-      'commerce_order' => $order->id(),
+      'commerce_order' => $this->order->id(),
       'step' => 'payment',
-    ], ['absolute' => TRUE])->toString();
+    ], ['absolute' => TRUE]);
+  }
+
+  /**
+   * Builds the URL to the payment information checkout step.
+   *
+   * @return \Drupal\Core\Url
+   *   The URL to the payment information checkout step.
+   */
+  protected function buildPaymentInformationStepUrl() {
+    return Url::fromRoute('commerce_checkout.form', [
+      'commerce_order' => $this->order->id(),
+      'step' => $this->checkoutFlow->getPane('payment_information')->getStepId(),
+    ], ['absolute' => TRUE]);
   }
 
   /**
    * Redirects to a previous checkout step on error.
    *
-   * @throws \Drupal\Core\Form\EnforcedResponseException
+   * @throws \Drupal\commerce\Response\NeedsRedirectException
    */
   protected function redirectToPreviousStep() {
-    $payment_info_pane = $this->checkoutFlow->getPane('payment_information');
-    $previous_step_id = $payment_info_pane->getStepId();
-    $this->checkoutFlow->redirectToStep($previous_step_id);
+    throw new NeedsRedirectException($this->buildPaymentInformationStepUrl()->toString());
   }
 
 }

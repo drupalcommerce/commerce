@@ -4,6 +4,7 @@ description: 'Provides a UI for managing promotions.'
 package: Commerce
 core: 8.x
 dependencies:
-  - inline_entity_form
-  - commerce
+  - commerce:commerce
   - commerce:commerce_order
+  - inline_entity_form:inline_entity_form
+  - drupal:options

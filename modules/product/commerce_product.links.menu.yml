@@ -1,3 +1,9 @@
+commerce_product.configuration:
+  title: 'Products'
+  route_name: 'commerce_product.configuration'
+  parent: 'commerce.configuration'
+  weight: -15
+
 entity.commerce_product.collection:
   title: 'Products'
   route_name: 'entity.commerce_product.collection'
@@ -13,11 +19,11 @@ entity.commerce_product_attribute.collection:
 entity.commerce_product_type.collection:
   title: 'Product types'
   route_name: 'entity.commerce_product_type.collection'
-  parent: 'commerce.configuration'
-  description: 'Manage your product types.'
+  parent: 'commerce_product.configuration'
+  description: 'Manage fields, form and display settings for your products.'
 
 entity.commerce_product_variation_type.collection:
   title: 'Product variation types'
   route_name: 'entity.commerce_product_variation_type.collection'
-  parent: 'commerce.configuration'
-  description: 'Manage your product variation types.'
+  parent: 'commerce_product.configuration'
+  description: 'Manage fields, form and display settings for your product variations.'

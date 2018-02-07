@@ -2,9 +2,10 @@
 
 namespace Drupal\commerce_product\Entity;
 
+use Drupal\commerce\Entity\CommerceContentEntityBase;
+use Drupal\commerce\EntityHelper;
 use Drupal\commerce_price\Price;
 use Drupal\Core\Cache\Cache;
-use Drupal\Core\Entity\ContentEntityBase;
 use Drupal\Core\Entity\EntityChangedTrait;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
@@ -18,6 +19,7 @@ use Drupal\user\UserInterface;
  * @ContentEntityType(
  *   id = "commerce_product_variation",
  *   label = @Translation("Product variation"),
+ *   label_collection = @Translation("Product variations"),
  *   label_singular = @Translation("product variation"),
  *   label_plural = @Translation("product variations"),
  *   label_count = @PluralTranslation(
@@ -38,7 +40,6 @@ use Drupal\user\UserInterface;
  *     "translation" = "Drupal\content_translation\ContentTranslationHandler"
  *   },
  *   admin_permission = "administer commerce_product",
- *   fieldable = TRUE,
  *   translatable = TRUE,
  *   content_translation_ui_skip = TRUE,
  *   base_table = "commerce_product_variation",
@@ -55,7 +56,7 @@ use Drupal\user\UserInterface;
  *   field_ui_base_route = "entity.commerce_product_variation_type.edit_form",
  * )
  */
-class ProductVariation extends ContentEntityBase implements ProductVariationInterface {
+class ProductVariation extends CommerceContentEntityBase implements ProductVariationInterface {
 
   use EntityChangedTrait;
 
@@ -89,7 +90,7 @@ class ProductVariation extends ContentEntityBase implements ProductVariationInte
    * {@inheritdoc}
    */
   public function getProduct() {
-    return $this->get('product_id')->entity;
+    return $this->getTranslatedReferencedEntity('product_id');
   }
 
   /**
@@ -240,6 +241,15 @@ class ProductVariation extends ContentEntityBase implements ProductVariationInte
   /**
    * {@inheritdoc}
    */
+  public function getAttributeFieldNames() {
+    $attribute_field_manager = \Drupal::service('commerce_product.attribute_field_manager');
+    $field_map = $attribute_field_manager->getFieldMap($this->bundle());
+    return array_column($field_map, 'field_name');
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function getAttributeValueIds() {
     $attribute_ids = [];
     foreach ($this->getAttributeFieldNames() as $field_name) {
@@ -281,7 +291,7 @@ class ProductVariation extends ContentEntityBase implements ProductVariationInte
       }
     }
 
-    return $attribute_values;
+    return $this->ensureTranslations($attribute_values);
   }
 
   /**
@@ -292,25 +302,8 @@ class ProductVariation extends ContentEntityBase implements ProductVariationInte
     if (!in_array($field_name, $attribute_field_names)) {
       throw new \InvalidArgumentException(sprintf('Unknown attribute field name "%s".', $field_name));
     }
-    $attribute_value = NULL;
-    $field = $this->get($field_name);
-    if (!$field->isEmpty()) {
-      $attribute_value = $field->entity;
-    }
-
+    $attribute_value = $this->getTranslatedReferencedEntity($field_name);
     return $attribute_value;
-  }
-
-  /**
-   * Gets the names of the entity's attribute fields.
-   *
-   * @return string[]
-   *   The attribute field names.
-   */
-  protected function getAttributeFieldNames() {
-    $attribute_field_manager = \Drupal::service('commerce_product.attribute_field_manager');
-    $field_map = $attribute_field_manager->getFieldMap($this->bundle());
-    return array_column($field_map, 'field_name');
   }
 
   /**
@@ -356,10 +349,7 @@ class ProductVariation extends ContentEntityBase implements ProductVariationInte
 
     $product_title = $this->getProduct()->getTitle();
     if ($attribute_values = $this->getAttributeValues()) {
-      $attribute_labels = array_map(function ($attribute_value) {
-        return $attribute_value->label();
-      }, $attribute_values);
-
+      $attribute_labels = EntityHelper::extractLabels($attribute_values);
       $title = $product_title . ' - ' . implode(', ', $attribute_labels);
     }
     else {
@@ -399,11 +389,6 @@ class ProductVariation extends ContentEntityBase implements ProductVariationInte
       ->setRequired(TRUE)
       ->addConstraint('ProductVariationSku')
       ->setSetting('display_description', TRUE)
-      ->setDisplayOptions('view', [
-        'label' => 'hidden',
-        'type' => 'string',
-        'weight' => -4,
-      ])
       ->setDisplayOptions('form', [
         'type' => 'string_textfield',
         'weight' => -4,
@@ -420,11 +405,6 @@ class ProductVariation extends ContentEntityBase implements ProductVariationInte
         'default_value' => '',
         'max_length' => 255,
       ])
-      ->setDisplayOptions('view', [
-        'label' => 'hidden',
-        'type' => 'string',
-        'weight' => -5,
-      ])
       ->setDisplayOptions('form', [
         'type' => 'string_textfield',
         'weight' => -5,
@@ -432,11 +412,10 @@ class ProductVariation extends ContentEntityBase implements ProductVariationInte
       ->setDisplayConfigurable('form', TRUE)
       ->setDisplayConfigurable('view', TRUE);
 
-    // The price is not required because it's not guaranteed to be used
-    // for storage (there might be a price per currency, role, country, etc).
     $fields['price'] = BaseFieldDefinition::create('commerce_price')
       ->setLabel(t('Price'))
       ->setDescription(t('The variation price'))
+      ->setRequired(TRUE)
       ->setDisplayOptions('view', [
         'label' => 'above',
         'type' => 'commerce_price_default',

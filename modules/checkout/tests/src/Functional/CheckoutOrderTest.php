@@ -2,13 +2,7 @@
 
 namespace Drupal\Tests\commerce_checkout\Functional;
 
-use Drupal\commerce_price\Price;
 use Drupal\Tests\commerce\Functional\CommerceBrowserTestBase;
-use Drupal\profile\Entity\Profile;
-use Drupal\commerce_order\Entity\OrderItem;
-use Drupal\commerce_order\Entity\Order;
-use Drupal\commerce_order\Entity\OrderItemType;
-use Drupal\user\RoleInterface;
 
 /**
  * Tests the checkout of an order.
@@ -36,12 +30,12 @@ class CheckoutOrderTest extends CommerceBrowserTestBase {
    *
    * @var array
    */
-  public static $modules = ['system', 'field', 'user', 'text',
-    'entity', 'views', 'address', 'profile', 'commerce', 'inline_entity_form',
-    'commerce_price', 'commerce_product', 'commerce_cart',
-    'commerce_checkout', 'commerce_order', 'views_ui',
-    // @see https://www.drupal.org/node/2807567
-    'editor',
+  public static $modules = [
+    'commerce_product',
+    'commerce_order',
+    'commerce_cart',
+    'commerce_checkout',
+    'views_ui',
   ];
 
   /**
@@ -61,6 +55,7 @@ class CheckoutOrderTest extends CommerceBrowserTestBase {
     parent::setUp();
 
     $this->placeBlock('commerce_cart');
+    $this->placeBlock('commerce_checkout_progress');
 
     $variation = $this->createEntity('commerce_product_variation', [
       'type' => 'default',
@@ -81,74 +76,58 @@ class CheckoutOrderTest extends CommerceBrowserTestBase {
   }
 
   /**
-   * Tests order access.
+   * Tests checkout flow cache metadata.
    */
-  public function testOrderAccess() {
-    $user = $this->drupalCreateUser();
-    $user2 = $this->drupalCreateUser();
+  public function testCacheMetadata() {
+    $this->drupalLogout();
+    $this->drupalGet($this->product->toUrl()->toString());
+    $this->submitForm([], 'Add to cart');
+    $this->assertSession()->pageTextContains('1 item');
+    $cart_link = $this->getSession()->getPage()->findLink('your cart');
+    $cart_link->click();
+    $this->submitForm([], 'Checkout');
+    $this->assertSession()->pageTextNotContains('Order Summary');
+    $this->assertCheckoutProgressStep('Login');
 
-    OrderItemType::create([
-      'id' => 'test',
-      'label' => 'Test',
-      'orderType' => 'default',
-    ])->save();
-    $profile = Profile::create([
-      'type' => 'customer',
-      'address' => [
-        'country' => 'FR',
-        'postal_code' => '75002',
-        'locality' => 'Paris',
-        'address_line1' => 'A french street',
-        'given_name' => 'John',
-        'family_name' => 'LeSmith',
-      ],
-    ]);
-    $profile->save();
-    $order_item = OrderItem::create([
-      'type' => 'default',
-      'quantity' => 2,
-      'unit_price' => new Price('12.00', 'USD'),
-    ]);
-    $order_item->save();
-    $order = Order::create([
-      'type' => 'default',
-      'store_id' => $this->store,
-      'state' => 'in_checkout',
-      'order_number' => '6',
-      'mail' => 'test@example.com',
-      'uid' => $user->id(),
-      'ip_address' => '127.0.0.1',
-      'billing_profile' => $profile,
-      'order_items' => [$order_item],
-    ]);
+    /** @var \Drupal\commerce_order\Entity\OrderInterface $order */
+    $order = $this->container->get('entity_type.manager')->getStorage('commerce_order')->load(1);
+    /** @var \Drupal\commerce_checkout\Entity\CheckoutFlowInterface $checkout_flow */
+    $checkout_flow = $this->container->get('entity_type.manager')->getStorage('commerce_checkout_flow')->load('default');
+
+    // We're on a form, so no Page Cache.
+    $this->assertSession()->responseHeaderEquals('X-Drupal-Cache', NULL);
+    // Dynamic page cache should be present, and a MISS.
+    $this->assertSession()->responseHeaderEquals('X-Drupal-Dynamic-Cache', 'MISS');
+
+    // Assert cache tags bubbled.
+    $cache_tags_header = $this->getSession()->getResponseHeader('X-Drupal-Cache-Tags');
+    $this->assertTrue(strpos($cache_tags_header, 'commerce_order:' . $order->id()) !== FALSE);
+    foreach ($order->getItems() as $item) {
+      $this->assertTrue(strpos($cache_tags_header, 'commerce_order_item:' . $item->id()) !== FALSE);
+    }
+    foreach ($checkout_flow->getCacheTags() as $cache_tag) {
+      $this->assertTrue(strpos($cache_tags_header, $cache_tag) !== FALSE);
+    }
+
+    $this->getSession()->reload();
+    $this->assertSession()->responseHeaderEquals('X-Drupal-Dynamic-Cache', 'HIT');
+
+    // Saving the order should bust the cache.
+    $this->container->get('commerce_order.order_refresh')->refresh($order);
     $order->save();
 
-    // Anonymous user with no session.
-    $this->drupalLogout();
-    $this->drupalGet('/checkout/' . $order->id());
-    $this->assertSession()->statusCodeEquals(403);
+    $this->getSession()->reload();
+    $this->assertSession()->responseHeaderEquals('X-Drupal-Dynamic-Cache', 'MISS');
+    $this->getSession()->reload();
+    $this->assertSession()->responseHeaderEquals('X-Drupal-Dynamic-Cache', 'HIT');
 
-    // Authenticated order owner.
-    $this->drupalLogin($user);
-    $this->drupalGet('/checkout/' . $order->id());
-    $this->assertSession()->statusCodeEquals(200);
+    // Saving the checkout flow configuration entity should bust the cache.
+    $checkout_flow->save();
 
-    // Authenticated user who does not own the order.
-    $this->drupalLogin($user2);
-    $this->drupalGet('/checkout/' . $order->id());
-    $this->assertSession()->statusCodeEquals(403);
-    $this->drupalLogin($user);
-
-    // Order with no order items.
-    $order->removeItem($order_item)->save();
-    $this->drupalGet('/checkout/' . $order->id());
-    $this->assertSession()->statusCodeEquals(403);
-
-    // Authenticated order owner without the 'access checkout' permission.
-    $order->addItem($order_item)->save();
-    user_role_revoke_permissions(RoleInterface::AUTHENTICATED_ID, ['access checkout']);
-    $this->drupalGet('/checkout/' . $order->id());
-    $this->assertSession()->statusCodeEquals(403);
+    $this->getSession()->reload();
+    $this->assertSession()->responseHeaderEquals('X-Drupal-Dynamic-Cache', 'MISS');
+    $this->getSession()->reload();
+    $this->assertSession()->responseHeaderEquals('X-Drupal-Dynamic-Cache', 'HIT');
   }
 
   /**
@@ -163,7 +142,10 @@ class CheckoutOrderTest extends CommerceBrowserTestBase {
     $cart_link->click();
     $this->submitForm([], 'Checkout');
     $this->assertSession()->pageTextNotContains('Order Summary');
+
+    $this->assertCheckoutProgressStep('Login');
     $this->submitForm([], 'Continue as Guest');
+    $this->assertCheckoutProgressStep('Order information');
     $this->submitForm([
       'contact_information[email]' => 'guest@example.com',
       'contact_information[email_confirm]' => 'guest@example.com',
@@ -175,6 +157,7 @@ class CheckoutOrderTest extends CommerceBrowserTestBase {
       'billing_information[profile][address][0][address][locality]' => 'Mountain View',
       'billing_information[profile][address][0][address][administrative_area]' => 'CA',
     ], 'Continue to review');
+    $this->assertCheckoutProgressStep('Review');
     $this->assertSession()->pageTextContains('Contact information');
     $this->assertSession()->pageTextContains('Billing information');
     $this->assertSession()->pageTextContains('Order Summary');
@@ -188,8 +171,10 @@ class CheckoutOrderTest extends CommerceBrowserTestBase {
     $cart_link = $this->getSession()->getPage()->findLink('your cart');
     $cart_link->click();
     $this->submitForm([], 'Checkout');
+    $this->assertCheckoutProgressStep('Login');
     $this->assertSession()->pageTextNotContains('Order Summary');
     $this->submitForm([], 'Continue as Guest');
+    $this->assertCheckoutProgressStep('Order information');
     $this->submitForm([
       'contact_information[email]' => 'guest@example.com',
       'contact_information[email_confirm]' => 'guest@example.com',
@@ -204,6 +189,14 @@ class CheckoutOrderTest extends CommerceBrowserTestBase {
     $this->assertSession()->pageTextContains('Contact information');
     $this->assertSession()->pageTextContains('Billing information');
     $this->assertSession()->pageTextContains('Order Summary');
+    $this->assertCheckoutProgressStep('Review');
+
+    // Go back and forth.
+    $this->getSession()->getPage()->clickLink('Go back');
+    $this->assertCheckoutProgressStep('Order information');
+    $this->getSession()->getPage()->pressButton('Continue to review');
+    $this->assertCheckoutProgressStep('Review');
+
     $this->submitForm([], 'Pay and complete purchase');
     $this->assertSession()->pageTextContains('Your order number is 2. You can view your order on your account page when logged in.');
     $this->assertSession()->pageTextContains('0 items');
@@ -292,32 +285,6 @@ class CheckoutOrderTest extends CommerceBrowserTestBase {
   }
 
   /**
-   * Tests the order summary.
-   */
-  public function testOrderSummary() {
-    $this->drupalGet($this->product->toUrl()->toString());
-    $this->submitForm([], 'Add to cart');
-
-    // Test the default settings: ensure the default view is shown.
-    $this->drupalGet('/checkout/1');
-    $this->assertSession()->elementExists('css', '.view-id-commerce_checkout_order_summary');
-
-    // Disable the order summary.
-    $this->drupalGet('/admin/commerce/config/checkout-flows/manage/default');
-    $this->submitForm(['configuration[order_summary_view]' => ''], t('Save'));
-    $this->drupalGet('/checkout/1');
-    $this->assertSession()->elementNotExists('css', '.view-id-commerce_checkout_order_summary');
-
-    // Use a different view for the order summary.
-    $this->drupalGet('/admin/structure/views/view/commerce_checkout_order_summary/duplicate');
-    $this->submitForm(['id' => 'duplicate_of_commerce_checkout_order_summary'], 'Duplicate');
-    $this->drupalGet('/admin/commerce/config/checkout-flows/manage/default');
-    $this->submitForm(['configuration[order_summary_view]' => 'duplicate_of_commerce_checkout_order_summary'], t('Save'));
-    $this->drupalGet('/checkout/1');
-    $this->assertSession()->elementExists('css', '.view-id-duplicate_of_commerce_checkout_order_summary');
-  }
-
-  /**
    * Tests checkout behaviour after a cart update.
    */
   public function testCheckoutFlowOnCartUpdate() {
@@ -372,6 +339,17 @@ class CheckoutOrderTest extends CommerceBrowserTestBase {
     $this->submitForm([], 'Checkout');
     $this->assertSession()->elementContains('css', 'h1.page-title', 'Order information');
     $this->assertSession()->elementNotContains('css', 'h1.page-title', 'Review');
+  }
+
+  /**
+   * Asserts the current step in the checkout progress block.
+   *
+   * @param string $expected
+   *   The expected value.
+   */
+  protected function assertCheckoutProgressStep($expected) {
+    $current_step = $this->getSession()->getPage()->find('css', '.checkout-progress--step__current')->getText();
+    $this->assertEquals($expected, $current_step);
   }
 
 }

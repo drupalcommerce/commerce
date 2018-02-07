@@ -18,7 +18,7 @@ class CountryCacheContext implements CacheContextInterface {
    *
    * @var \Drupal\commerce\CurrentCountry
    */
-  protected $currentCcountry;
+  protected $currentCountry;
 
   /**
    * Constructs a new CountryCacheContext object.

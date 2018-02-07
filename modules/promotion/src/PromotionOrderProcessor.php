@@ -21,13 +21,6 @@ class PromotionOrderProcessor implements OrderProcessorInterface {
   protected $promotionStorage;
 
   /**
-   * The order type storage.
-   *
-   * @var \Drupal\Core\Entity\EntityStorageInterface
-   */
-  protected $orderTypeStorage;
-
-  /**
    * Constructs a new PromotionOrderProcessor object.
    *
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
@@ -35,15 +28,27 @@ class PromotionOrderProcessor implements OrderProcessorInterface {
    */
   public function __construct(EntityTypeManagerInterface $entity_type_manager) {
     $this->promotionStorage = $entity_type_manager->getStorage('commerce_promotion');
-    $this->orderTypeStorage = $entity_type_manager->getStorage('commerce_order_type');
   }
 
   /**
    * {@inheritdoc}
    */
   public function process(OrderInterface $order) {
-    $order_type = $this->orderTypeStorage->load($order->bundle());
-    $promotions = $this->promotionStorage->loadValid($order_type, $order->getStore());
+    /** @var \Drupal\commerce_promotion\Entity\CouponInterface[] $coupons */
+    $coupons = $order->get('coupons')->referencedEntities();
+    foreach ($coupons as $index => $coupon) {
+      $promotion = $coupon->getPromotion();
+      if ($coupon->available($order) && $promotion->applies($order)) {
+        $promotion->apply($order);
+      }
+      else {
+        // The promotion is no longer available (end date, usage, etc).
+        $order->get('coupons')->removeItem($index);
+      }
+    }
+
+    // Non-coupon promotions are loaded and applied separately.
+    $promotions = $this->promotionStorage->loadAvailable($order);
     foreach ($promotions as $promotion) {
       if ($promotion->applies($order)) {
         $promotion->apply($order);

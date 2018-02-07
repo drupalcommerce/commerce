@@ -32,9 +32,12 @@ class CommerceEntityTrait extends Plugin {
   public $label;
 
   /**
-   * The entity types that can have this trait.
+   * The content entity types that can have this trait.
    *
-   * When empty, defaults to all entity types.
+   * The bundle entities of the content entity type will reference the trait,
+   * and receive any fields it defines.
+   *
+   * When empty, defaults to all content entity types.
    *
    * @var array
    */

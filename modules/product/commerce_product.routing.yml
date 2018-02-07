@@ -1,31 +1,7 @@
-entity.commerce_product.collection:
-  path: '/admin/commerce/products'
+commerce_product.configuration:
+  path: '/admin/commerce/config/products'
   defaults:
-    _entity_list: 'commerce_product'
+    _controller: '\Drupal\system\Controller\SystemController::systemAdminMenuBlockPage'
     _title: 'Products'
   requirements:
-    _permission: 'administer commerce_product'
-
-entity.commerce_product_attribute.collection:
-  path: '/admin/commerce/product-attributes'
-  defaults:
-    _entity_list: 'commerce_product_attribute'
-    _title: 'Product attributes'
-  requirements:
-    _permission: 'administer commerce_product_attribute'
-
-entity.commerce_product_type.collection:
-  path: '/admin/commerce/config/product-types'
-  defaults:
-    _entity_list: 'commerce_product_type'
-    _title: 'Product types'
-  requirements:
-    _permission: 'administer commerce_product_type'
-
-entity.commerce_product_variation_type.collection:
-  path: '/admin/commerce/config/product-variation-types'
-  defaults:
-    _entity_list: 'commerce_product_variation_type'
-    _title: 'Product variation types'
-  requirements:
-    _permission: 'administer commerce_product_type'
+    _permission: 'access commerce administration pages'

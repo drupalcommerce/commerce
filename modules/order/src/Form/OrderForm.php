@@ -4,8 +4,10 @@ namespace Drupal\commerce_order\Form;
 
 use Drupal\Component\Utility\Html;
 use Drupal\Core\Datetime\DateFormatterInterface;
+use Drupal\Component\Datetime\TimeInterface;
 use Drupal\Core\Entity\ContentEntityForm;
 use Drupal\Core\Entity\EntityManagerInterface;
+use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -26,11 +28,15 @@ class OrderForm extends ContentEntityForm {
    *
    * @param \Drupal\Core\Entity\EntityManagerInterface $entity_manager
    *   The entity manager.
+   * @param \Drupal\Core\Entity\EntityTypeBundleInfoInterface $entity_type_bundle_info
+   *   The entity type bundle info.
+   * @param \Drupal\Component\Datetime\TimeInterface $time
+   *   The time.
    * @param \Drupal\Core\Datetime\DateFormatterInterface $date_formatter
    *   The date formatter.
    */
-  public function __construct(EntityManagerInterface $entity_manager, DateFormatterInterface $date_formatter) {
-    parent::__construct($entity_manager);
+  public function __construct(EntityManagerInterface $entity_manager, EntityTypeBundleInfoInterface $entity_type_bundle_info, TimeInterface $time, DateFormatterInterface $date_formatter) {
+    parent::__construct($entity_manager, $entity_type_bundle_info, $time);
 
     $this->dateFormatter = $date_formatter;
   }
@@ -41,6 +47,8 @@ class OrderForm extends ContentEntityForm {
   public static function create(ContainerInterface $container) {
     return new static(
       $container->get('entity.manager'),
+      $container->get('entity_type.bundle.info'),
+      $container->get('datetime.time'),
       $container->get('date.formatter')
     );
   }
@@ -78,7 +86,7 @@ class OrderForm extends ContentEntityForm {
         '#tag' => 'h3',
         '#value' => $order->getState()->getLabel(),
         '#attributes' => [
-          'class' => 'entity-meta__title',
+          'class' => ['entity-meta__title'],
         ],
         // Hide the rendered state if there's a widget for it.
         '#access' => empty($form['store_id']),
@@ -155,7 +163,7 @@ class OrderForm extends ContentEntityForm {
   public function save(array $form, FormStateInterface $form_state) {
     $this->entity->save();
     drupal_set_message($this->t('The order %label has been successfully saved.', ['%label' => $this->entity->label()]));
-    $form_state->setRedirect('entity.commerce_order.collection');
+    $form_state->setRedirect('entity.commerce_order.canonical', ['commerce_order' => $this->entity->id()]);
   }
 
 }

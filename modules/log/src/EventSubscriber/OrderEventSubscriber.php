@@ -2,6 +2,7 @@
 
 namespace Drupal\commerce_log\EventSubscriber;
 
+use Drupal\commerce_order\Event\OrderAssignEvent;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\state_machine\Event\WorkflowTransitionEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -34,6 +35,7 @@ class OrderEventSubscriber implements EventSubscriberInterface {
       'commerce_order.validate.pre_transition' => ['onValidateTransition', -100],
       'commerce_order.fulfill.pre_transition' => ['onFulfillTransition', -100],
       'commerce_order.cancel.pre_transition' => ['onCancelTransition', -100],
+      'commerce_order.order.assign' => ['onOrderAssign', -100],
     ];
     return $events;
   }
@@ -84,6 +86,19 @@ class OrderEventSubscriber implements EventSubscriberInterface {
     /** @var \Drupal\commerce_order\Entity\OrderInterface $order */
     $order = $event->getEntity();
     $this->logStorage->generate($order, 'order_canceled')->save();
+  }
+
+  /**
+   * Creates a log when an order is assigned.
+   *
+   * @param \Drupal\commerce_order\Event\OrderAssignEvent $event
+   *   The order assign event.
+   */
+  public function onOrderAssign(OrderAssignEvent $event) {
+    $order = $event->getOrder();
+    $this->logStorage->generate($order, 'order_assigned', [
+      'user' => $event->getAccount()->getDisplayName(),
+    ])->save();
   }
 
 }

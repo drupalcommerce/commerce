@@ -4,6 +4,7 @@ namespace Drupal\commerce_checkout\Plugin\Commerce\CheckoutFlow;
 
 use Drupal\commerce\Response\NeedsRedirectException;
 use Drupal\Component\Utility\NestedArray;
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Link;
@@ -44,11 +45,13 @@ abstract class CheckoutFlowBase extends PluginBase implements CheckoutFlowInterf
   protected $order;
 
   /**
-   * The current step ID.
+   * The ID of the parent config entity.
+   *
+   * Not available while the plugin is being configured.
    *
    * @var string
    */
-  protected $stepId;
+  protected $entityId;
 
   /**
    * Constructs a new CheckoutFlowBase object.
@@ -69,16 +72,14 @@ abstract class CheckoutFlowBase extends PluginBase implements CheckoutFlowInterf
   public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityTypeManagerInterface $entity_type_manager, EventDispatcherInterface $event_dispatcher, RouteMatchInterface $route_match) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
 
-    $this->setConfiguration($configuration);
     $this->entityTypeManager = $entity_type_manager;
     $this->eventDispatcher = $event_dispatcher;
     $this->order = $route_match->getParameter('commerce_order');
-    // The order is empty when the checkout flow is initialized outside of the
-    // checkout form (usually in the checkout flow admin UI). There's no need
-    // to determine the current step ID in that case, it won't be used.
-    if ($this->order) {
-      $this->stepId = $this->processStepId($route_match->getParameter('step'));
+    if (array_key_exists('_entity_id', $configuration)) {
+      $this->entityId = $configuration['_entity_id'];
+      unset($configuration['_entity_id']);
     }
+    $this->setConfiguration($configuration);
   }
 
   /**
@@ -96,29 +97,6 @@ abstract class CheckoutFlowBase extends PluginBase implements CheckoutFlowInterf
   }
 
   /**
-   * Processes the requested step ID.
-   *
-   * @param string $requested_step_id
-   *   The step ID.
-   *
-   * @return string
-   *   The processed step ID.
-   */
-  protected function processStepId($requested_step_id) {
-    $step_ids = array_keys($this->getVisibleSteps());
-    $step_id = $requested_step_id;
-    if (empty($step_id) || !in_array($step_id, $step_ids)) {
-      // Take the step ID from the order, or default to the first one.
-      $step_id = $this->order->checkout_step->value;
-      if (empty($step_id)) {
-        $step_id = reset($step_ids);
-      }
-    }
-
-    return $step_id;
-  }
-
-  /**
    * {@inheritdoc}
    */
   public function getOrder() {
@@ -128,25 +106,18 @@ abstract class CheckoutFlowBase extends PluginBase implements CheckoutFlowInterf
   /**
    * {@inheritdoc}
    */
-  public function getStepId() {
-    return $this->stepId;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getPreviousStepId() {
+  public function getPreviousStepId($step_id) {
     $step_ids = array_keys($this->getVisibleSteps());
-    $current_index = array_search($this->stepId, $step_ids);
+    $current_index = array_search($step_id, $step_ids);
     return isset($step_ids[$current_index - 1]) ? $step_ids[$current_index - 1] : NULL;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function getNextStepId() {
+  public function getNextStepId($step_id) {
     $step_ids = array_keys($this->getVisibleSteps());
-    $current_index = array_search($this->stepId, $step_ids);
+    $current_index = array_search($step_id, $step_ids);
     return isset($step_ids[$current_index + 1]) ? $step_ids[$current_index + 1] : NULL;
   }
 
@@ -154,7 +125,7 @@ abstract class CheckoutFlowBase extends PluginBase implements CheckoutFlowInterf
    * {@inheritdoc}
    */
   public function redirectToStep($step_id) {
-    $this->order->checkout_step = $step_id;
+    $this->order->set('checkout_step', $step_id);
     if ($step_id == 'complete') {
       $transition = $this->order->getState()->getWorkflow()->getTransition('place');
       $this->order->getState()->applyTransition($transition);
@@ -176,12 +147,13 @@ abstract class CheckoutFlowBase extends PluginBase implements CheckoutFlowInterf
       'payment' => [
         'label' => $this->t('Payment'),
         'next_label' => $this->t('Pay and complete purchase'),
-        'has_order_summary' => FALSE,
+        'has_sidebar' => FALSE,
+        'hidden' => TRUE,
       ],
       'complete' => [
         'label' => $this->t('Complete'),
         'next_label' => $this->t('Pay and complete purchase'),
-        'has_order_summary' => FALSE,
+        'has_sidebar' => FALSE,
       ],
     ];
   }
@@ -192,24 +164,6 @@ abstract class CheckoutFlowBase extends PluginBase implements CheckoutFlowInterf
   public function getVisibleSteps() {
     // All steps are visible by default.
     return $this->getSteps();
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function buildOrderSummary(array $form, FormStateInterface $form_state) {
-    $order_summary = [];
-    if (!empty($this->configuration['order_summary_view'])) {
-      $order_summary = [
-        '#type' => 'view',
-        '#name' => $this->configuration['order_summary_view'],
-        '#display_id' => 'default',
-        '#arguments' => [$this->order->id()],
-        '#embed' => TRUE,
-      ];
-    }
-
-    return $order_summary;
   }
 
   /**
@@ -239,7 +193,6 @@ abstract class CheckoutFlowBase extends PluginBase implements CheckoutFlowInterf
   public function defaultConfiguration() {
     return [
       'display_checkout_progress' => TRUE,
-      'order_summary_view' => 'commerce_checkout_order_summary',
     ];
   }
 
@@ -247,27 +200,11 @@ abstract class CheckoutFlowBase extends PluginBase implements CheckoutFlowInterf
    * {@inheritdoc}
    */
   public function buildConfigurationForm(array $form, FormStateInterface $form_state) {
-    $view_storage = $this->entityTypeManager->getStorage('view');
-    $available_summary_views = [];
-    /** @var \Drupal\views\Entity\View $view */
-    foreach ($view_storage->loadMultiple() as $view) {
-      if (strpos($view->get('tag'), 'commerce_order_summary') !== FALSE) {
-        $available_summary_views[$view->id()] = $view->label();
-      }
-    }
-
     $form['display_checkout_progress'] = [
       '#type' => 'checkbox',
       '#title' => $this->t('Display checkout progress'),
       '#description' => $this->t('Used by the checkout progress block to determine visibility.'),
       '#default_value' => $this->configuration['display_checkout_progress'],
-    ];
-    $form['order_summary_view'] = [
-      '#type' => 'select',
-      '#title' => $this->t('Order summary view'),
-      '#options' => $available_summary_views,
-      '#empty_value' => '',
-      '#default_value' => $this->configuration['order_summary_view'],
     ];
 
     return $form;
@@ -284,8 +221,8 @@ abstract class CheckoutFlowBase extends PluginBase implements CheckoutFlowInterf
   public function submitConfigurationForm(array &$form, FormStateInterface $form_state) {
     if (!$form_state->getErrors()) {
       $values = $form_state->getValue($form['#parents']);
+      $this->configuration = [];
       $this->configuration['display_checkout_progress'] = $values['display_checkout_progress'];
-      $this->configuration['order_summary_view'] = $values['order_summary_view'];
     }
   }
 
@@ -306,18 +243,39 @@ abstract class CheckoutFlowBase extends PluginBase implements CheckoutFlowInterf
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, FormStateInterface $form_state) {
+  public function buildForm(array $form, FormStateInterface $form_state, $step_id = NULL) {
+    // The $step_id argument is optional only because PHP disallows adding
+    // required arguments to an existing interface's method.
+    if (empty($step_id)) {
+      throw new \InvalidArgumentException('The $step_id cannot be empty.');
+    }
+    if ($form_state->isRebuilding()) {
+      // Ensure a fresh order, in case an ajax submit has modified it.
+      $order_storage = $this->entityTypeManager->getStorage('commerce_order');
+      $this->order = $order_storage->load($this->order->id());
+    }
+
     $steps = $this->getVisibleSteps();
     $form['#tree'] = TRUE;
-    $form['#title'] = $steps[$this->stepId]['label'];
+    $form['#step_id'] = $step_id;
+    $form['#title'] = $steps[$step_id]['label'];
     $form['#theme'] = ['commerce_checkout_form'];
     $form['#attached']['library'][] = 'commerce_checkout/form';
-    if ($steps[$this->stepId]['has_order_summary']) {
-      if ($order_summary = $this->buildOrderSummary($form, $form_state)) {
-        $form['order_summary'] = $order_summary;
-      }
+    if ($this->hasSidebar($step_id)) {
+      $form['sidebar']['order_summary'] = [
+        '#theme' => 'commerce_checkout_order_summary',
+        '#order_entity' => $this->order,
+        '#checkout_step' => $step_id,
+      ];
     }
     $form['actions'] = $this->actions($form, $form_state);
+
+    // Make sure the cache is removed if the parent entity or the order change.
+    $parent_entity = $this->entityTypeManager->getStorage('commerce_checkout_flow')->load($this->entityId);
+    CacheableMetadata::createFromRenderArray($form)
+      ->addCacheableDependency($parent_entity)
+      ->addCacheableDependency($this->order)
+      ->applyTo($form);
 
     return $form;
   }
@@ -331,8 +289,8 @@ abstract class CheckoutFlowBase extends PluginBase implements CheckoutFlowInterf
    * {@inheritdoc}
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
-    if ($next_step_id = $this->getNextStepId()) {
-      $this->order->checkout_step = $next_step_id;
+    if ($next_step_id = $this->getNextStepId($form['#step_id'])) {
+      $this->order->set('checkout_step', $next_step_id);
       $form_state->setRedirect('commerce_checkout.form', [
         'commerce_order' => $this->order->id(),
         'step' => $next_step_id,
@@ -349,6 +307,20 @@ abstract class CheckoutFlowBase extends PluginBase implements CheckoutFlowInterf
   }
 
   /**
+   * Gets whether the given step has a sidebar.
+   *
+   * @param string $step_id
+   *   The step ID.
+   *
+   * @return bool
+   *   TRUE if the given step has a sidebar, FALSE otherwise.
+   */
+  protected function hasSidebar($step_id) {
+    $steps = $this->getVisibleSteps();
+    return !empty($steps[$step_id]['has_sidebar']);
+  }
+
+  /**
    * Builds the actions element for the current form.
    *
    * @param array $form
@@ -361,8 +333,8 @@ abstract class CheckoutFlowBase extends PluginBase implements CheckoutFlowInterf
    */
   protected function actions(array $form, FormStateInterface $form_state) {
     $steps = $this->getVisibleSteps();
-    $next_step_id = $this->getNextStepId();
-    $previous_step_id = $this->getPreviousStepId();
+    $next_step_id = $this->getNextStepId($form['#step_id']);
+    $previous_step_id = $this->getPreviousStepId($form['#step_id']);
     $has_next_step = $next_step_id && isset($steps[$next_step_id]['next_label']);
     $has_previous_step = $previous_step_id && isset($steps[$previous_step_id]['previous_label']);
 

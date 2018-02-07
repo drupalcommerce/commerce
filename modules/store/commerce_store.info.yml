@@ -4,13 +4,14 @@ description: 'Defines the Store entity and associated features.'
 package: Commerce
 core: 8.x
 dependencies:
-  - commerce
+  - commerce:commerce
   - commerce:commerce_price
-  - options
+  - drupal:options
 config_devel:
   install:
     - commerce_store.commerce_store_type.online
     - commerce_store.settings
+    - core.entity_form_display.commerce_store.online.default
     - core.entity_view_display.commerce_store.online.default
     - views.view.commerce_stores
     - system.action.commerce_delete_store_action

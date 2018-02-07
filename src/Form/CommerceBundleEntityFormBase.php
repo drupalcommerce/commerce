@@ -70,6 +70,7 @@ class CommerceBundleEntityFormBase extends BundleEntityFormBase {
       '#access' => count($traits) > 0,
     ];
     // Disable options which cannot be unset because of existing data.
+    $disabled_traits = [];
     if (!$entity->isNew()) {
       foreach ($used_traits as $trait_id) {
         $trait = $this->traitManager->createInstance($trait_id);
@@ -77,9 +78,14 @@ class CommerceBundleEntityFormBase extends BundleEntityFormBase {
           $form['traits'][$trait_id] = [
             '#disabled' => TRUE,
           ];
+          $disabled_traits[] = $trait_id;
         }
       }
     }
+    $form['disabled_traits'] = [
+      '#type' => 'value',
+      '#value' => $disabled_traits,
+    ];
 
     return $form;
   }
@@ -94,6 +100,8 @@ class CommerceBundleEntityFormBase extends BundleEntityFormBase {
    */
   protected function validateTraitForm(array &$form, FormStateInterface $form_state) {
     $traits = array_filter($form_state->getValue('traits'));
+    $disabled_traits = $form_state->getValue('disabled_traits');
+    $traits = array_unique(array_merge($disabled_traits, $traits));
     $original_traits = $form_state->getValue('original_traits');
     $installed_traits = [];
     foreach ($original_traits as $trait_id) {
@@ -122,10 +130,12 @@ class CommerceBundleEntityFormBase extends BundleEntityFormBase {
    */
   public function buildEntity(array $form, FormStateInterface $form_state) {
     $entity = parent::buildEntity($form, $form_state);
+    $disabled_traits = $form_state->getValue('disabled_traits');
     /** @var \Drupal\commerce\Entity\CommerceBundleEntityInterface $entity */
     $traits = $entity->getTraits();
     $traits = array_filter($traits);
     $traits = array_values($traits);
+    $traits = array_unique(array_merge($disabled_traits, $traits));
     $entity->setTraits($traits);
 
     return $entity;
@@ -143,7 +153,6 @@ class CommerceBundleEntityFormBase extends BundleEntityFormBase {
     $target_entity_type_id = $this->entity->getEntityType()->getBundleOf();
     /** @var \Drupal\commerce\Entity\CommerceBundleEntityInterface $entity */
     $entity = $this->entity;
-
     $traits = $entity->getTraits();
     $original_traits = $form_state->getValue('original_traits');
     $selected_traits = array_diff($traits, $original_traits);

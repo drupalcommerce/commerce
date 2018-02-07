@@ -2,6 +2,7 @@
 
 namespace Drupal\Tests\commerce_product\Functional;
 
+use Drupal\commerce\EntityHelper;
 use Drupal\commerce_product\Entity\Product;
 use Drupal\commerce_product\Entity\ProductVariation;
 
@@ -25,9 +26,7 @@ class ProductAdminTest extends ProductBrowserTestBase {
     $this->assertSession()->fieldExists('variations[form][inline_entity_form][status][value]');
     $this->assertSession()->buttonExists('Create variation');
 
-    $store_ids = array_map(function ($store) {
-      return $store->id();
-    }, $this->stores);
+    $store_ids = EntityHelper::extractIds($this->stores);
     $title = $this->randomMachineName();
     $edit = [
       'title[0][value]' => $title,
@@ -42,7 +41,7 @@ class ProductAdminTest extends ProductBrowserTestBase {
       'variations[form][inline_entity_form][status][value]' => 1,
     ];
     $this->submitForm($variations_edit, t('Create variation'));
-    $this->submitForm($edit, t('Save and publish'));
+    $this->submitForm($edit, t('Save'));
 
     $result = \Drupal::entityQuery('commerce_product')
       ->condition("title", $edit['title[0][value]'])
@@ -94,9 +93,7 @@ class ProductAdminTest extends ProductBrowserTestBase {
     $this->assertSession()->buttonExists('Update variation');
 
     $title = $this->randomMachineName();
-    $store_ids = array_map(function ($store) {
-      return $store->id();
-    }, $this->stores);
+    $store_ids = EntityHelper::extractIds($this->stores);
     $edit = [
       'title[0][value]' => $title,
     ];
@@ -111,7 +108,7 @@ class ProductAdminTest extends ProductBrowserTestBase {
       'variations[form][inline_entity_form][entities][0][form][status][value]' => 1,
     ];
     $this->submitForm($variations_edit, 'Update variation');
-    $this->submitForm($edit, 'Save and keep published');
+    $this->submitForm($edit, 'Save');
 
     \Drupal::service('entity_type.manager')->getStorage('commerce_product_variation')->resetCache([$variation->id()]);
     $variation = ProductVariation::load($variation->id());

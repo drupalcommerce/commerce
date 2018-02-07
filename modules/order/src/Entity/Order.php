@@ -2,10 +2,9 @@
 
 namespace Drupal\commerce_order\Entity;
 
+use Drupal\commerce\Entity\CommerceContentEntityBase;
 use Drupal\commerce_order\Adjustment;
-use Drupal\commerce_price\Price;
 use Drupal\commerce_store\Entity\StoreInterface;
-use Drupal\Core\Entity\ContentEntityBase;
 use Drupal\Core\Entity\EntityChangedTrait;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
@@ -19,6 +18,7 @@ use Drupal\profile\Entity\ProfileInterface;
  * @ContentEntityType(
  *   id = "commerce_order",
  *   label = @Translation("Order"),
+ *   label_collection = @Translation("Orders"),
  *   label_singular = @Translation("order"),
  *   label_plural = @Translation("orders"),
  *   label_count = @PluralTranslation(
@@ -37,7 +37,8 @@ use Drupal\profile\Entity\ProfileInterface;
  *       "default" = "Drupal\commerce_order\Form\OrderForm",
  *       "add" = "Drupal\commerce_order\Form\OrderForm",
  *       "edit" = "Drupal\commerce_order\Form\OrderForm",
- *       "delete" = "Drupal\Core\Entity\ContentEntityDeleteForm"
+ *       "delete" = "Drupal\Core\Entity\ContentEntityDeleteForm",
+ *       "unlock" = "Drupal\commerce_order\Form\OrderUnlockForm",
  *     },
  *     "route_provider" = {
  *       "default" = "Drupal\commerce_order\OrderRouteProvider",
@@ -47,7 +48,6 @@ use Drupal\profile\Entity\ProfileInterface;
  *   base_table = "commerce_order",
  *   admin_permission = "administer commerce_order",
  *   permission_granularity = "bundle",
- *   fieldable = TRUE,
  *   entity_keys = {
  *     "id" = "order_id",
  *     "label" = "order_number",
@@ -60,13 +60,14 @@ use Drupal\profile\Entity\ProfileInterface;
  *     "delete-form" = "/admin/commerce/orders/{commerce_order}/delete",
  *     "delete-multiple-form" = "/admin/commerce/orders/delete",
  *     "reassign-form" = "/admin/commerce/orders/{commerce_order}/reassign",
+ *     "unlock-form" = "/admin/commerce/orders/{commerce_order}/unlock",
  *     "collection" = "/admin/commerce/orders"
  *   },
  *   bundle_entity_type = "commerce_order_type",
  *   field_ui_base_route = "entity.commerce_order_type.edit_form"
  * )
  */
-class Order extends ContentEntityBase implements OrderInterface {
+class Order extends CommerceContentEntityBase implements OrderInterface {
 
   use EntityChangedTrait;
 
@@ -89,7 +90,7 @@ class Order extends ContentEntityBase implements OrderInterface {
    * {@inheritdoc}
    */
   public function getStore() {
-    return $this->get('store_id')->entity;
+    return $this->getTranslatedReferencedEntity('store_id');
   }
 
   /**
@@ -298,6 +299,25 @@ class Order extends ContentEntityBase implements OrderInterface {
   /**
    * {@inheritdoc}
    */
+  public function clearAdjustments() {
+    $locked_callback = function ($adjustment) {
+      /** @var \Drupal\commerce_order\Adjustment $adjustment */
+      return $adjustment->isLocked();
+    };
+    // Remove all unlocked adjustments.
+    foreach ($this->getItems() as $order_item) {
+      $adjustments = array_filter($order_item->getAdjustments(), $locked_callback);
+      $order_item->setAdjustments($adjustments);
+    }
+    $adjustments = array_filter($this->getAdjustments(), $locked_callback);
+    $this->setAdjustments($adjustments);
+
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function collectAdjustments() {
     $adjustments = [];
     foreach ($this->getItems() as $order_item) {
@@ -307,8 +327,11 @@ class Order extends ContentEntityBase implements OrderInterface {
         $multiplied_adjustment = new Adjustment([
           'type' => $adjustment->getType(),
           'label' => $adjustment->getLabel(),
-          'source_id' => $adjustment->getSourceId(),
           'amount' => $adjustment->getAmount()->multiply($order_item->getQuantity()),
+          'percentage' => $adjustment->getPercentage(),
+          'source_id' => $adjustment->getSourceId(),
+          'included' => $adjustment->isIncluded(),
+          'locked' => $adjustment->isLocked(),
         ]);
         $adjustments[] = $multiplied_adjustment;
       }
@@ -324,17 +347,37 @@ class Order extends ContentEntityBase implements OrderInterface {
    * {@inheritdoc}
    */
   public function getSubtotalPrice() {
-    $currency_code = $this->getOrderCurrencyCode();
-    if (!$currency_code) {
-      // The order object is not complete enough to have a subtotal price yet.
-      return;
-    }
-
-    $subtotal_price = new Price('0', $currency_code);
-    foreach ($this->getItems() as $order_item) {
-      $subtotal_price = $subtotal_price->add($order_item->getTotalPrice());
+    /** @var \Drupal\commerce_price\Price $subtotal_price */
+    $subtotal_price = NULL;
+    if ($this->hasItems()) {
+      foreach ($this->getItems() as $order_item) {
+        $order_item_total = $order_item->getTotalPrice();
+        $subtotal_price = $subtotal_price ? $subtotal_price->add($order_item_total) : $order_item_total;
+      }
     }
     return $subtotal_price;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function recalculateTotalPrice() {
+    /** @var \Drupal\commerce_price\Price $total_price */
+    $total_price = NULL;
+    if ($this->hasItems()) {
+      foreach ($this->getItems() as $order_item) {
+        $order_item_total = $order_item->getTotalPrice();
+        $total_price = $total_price ? $total_price->add($order_item_total) : $order_item_total;
+      }
+      foreach ($this->collectAdjustments() as $adjustment) {
+        if (!$adjustment->isIncluded()) {
+          $total_price = $total_price->add($adjustment->getAmount());
+        }
+      }
+    }
+    $this->total_price = $total_price;
+
+    return $this;
   }
 
   /**
@@ -383,6 +426,29 @@ class Order extends ContentEntityBase implements OrderInterface {
    */
   public function setData($key, $value) {
     $this->get('data')->__set($key, $value);
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function isLocked() {
+    return !empty($this->get('locked')->value);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function lock() {
+    $this->set('locked', TRUE);
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function unlock() {
+    $this->set('locked', FALSE);
     return $this;
   }
 
@@ -441,10 +507,10 @@ class Order extends ContentEntityBase implements OrderInterface {
       if (!$this->getIpAddress()) {
         $this->setIpAddress(\Drupal::request()->getClientIp());
       }
+    }
 
-      if (!$this->getEmail() && $customer = $this->getCustomer()) {
-        $this->setEmail($customer->getEmail());
-      }
+    if (!$this->getEmail() && $customer = $this->getCustomer()) {
+      $this->setEmail($customer->getEmail());
     }
 
     // Maintain the completed timestamp.
@@ -452,68 +518,13 @@ class Order extends ContentEntityBase implements OrderInterface {
     $original_state = isset($this->original) ? $this->original->getState()->value : '';
     if ($state == 'completed' && $original_state != 'completed') {
       if (empty($this->getCompletedTime())) {
-        $this->setCompletedTime(REQUEST_TIME);
+        $this->setCompletedTime(\Drupal::time()->getRequestTime());
       }
     }
-
     // Refresh draft orders on every save.
     if ($this->getState()->value == 'draft' && empty($this->getRefreshState())) {
       $this->setRefreshState(self::REFRESH_ON_SAVE);
     }
-    $this->recalculateTotalPrice();
-  }
-
-  /**
-   * Recalculates the order item total price.
-   */
-  protected function recalculateTotalPrice() {
-    $currency_code = $this->getOrderCurrencyCode();
-    if (!$currency_code) {
-      // The order object is not complete enough to have a total price yet.
-      return;
-    }
-
-    $total_price = new Price('0', $currency_code);
-    foreach ($this->getItems() as $order_item) {
-      $total_price = $total_price->add($order_item->getTotalPrice());
-    }
-    foreach ($this->collectAdjustments() as $adjustment) {
-      $total_price = $total_price->add($adjustment->getAmount());
-    }
-    $this->total_price = $total_price;
-  }
-
-  /**
-   * Gets the order's currency code.
-   *
-   * Priority:
-   * 1) Total price currency.
-   * 2) First order item currency.
-   * 3) Store's default currency.
-   *
-   * @return string|null
-   *   The currency code, or NULL if the order is in an incomplete state
-   *   (no order items, no store).
-   */
-  protected function getOrderCurrencyCode() {
-    $currency_code = NULL;
-    if ($total_price = $this->getTotalPrice()) {
-      $currency_code = $total_price->getCurrencyCode();
-    }
-    elseif ($this->hasItems()) {
-      $order_items = $this->getItems();
-      $first_order_item = reset($order_items);
-      /** @var \Drupal\commerce_price\Price $unit_price */
-      $unit_price = $first_order_item->getUnitPrice();
-      if ($unit_price) {
-        $currency_code = $unit_price->getCurrencyCode();
-      }
-    }
-    elseif ($store = $this->getStore()) {
-      $currency_code = $store->getDefaultCurrencyCode();
-    }
-
-    return $currency_code;
   }
 
   /**
@@ -654,6 +665,7 @@ class Order extends ContentEntityBase implements OrderInterface {
       ->setDisplayOptions('view', [
         'label' => 'hidden',
         'type' => 'commerce_order_total_summary',
+        'weight' => 0,
       ])
       ->setDisplayConfigurable('form', FALSE)
       ->setDisplayConfigurable('view', TRUE);
@@ -675,6 +687,14 @@ class Order extends ContentEntityBase implements OrderInterface {
     $fields['data'] = BaseFieldDefinition::create('map')
       ->setLabel(t('Data'))
       ->setDescription(t('A serialized array of additional data.'));
+
+    $fields['locked'] = BaseFieldDefinition::create('boolean')
+      ->setLabel(t('Locked'))
+      ->setSettings([
+        'on_label' => t('Yes'),
+        'off_label' => t('No'),
+      ])
+      ->setDefaultValue(FALSE);
 
     $fields['created'] = BaseFieldDefinition::create('created')
       ->setLabel(t('Created'))

@@ -69,13 +69,23 @@ class ProductVariationStorage extends CommerceContentEntityStorage implements Pr
   /**
    * {@inheritdoc}
    */
+  public function loadBySku($sku) {
+    $variations = $this->loadByProperties(['sku' => $sku]);
+    $variation = reset($variations);
+
+    return $variation ?: NULL;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function loadFromContext(ProductInterface $product) {
     $current_request = $this->requestStack->getCurrentRequest();
     if ($variation_id = $current_request->query->get('v')) {
       if (in_array($variation_id, $product->getVariationIds())) {
         /** @var \Drupal\commerce_product\Entity\ProductVariationInterface $variation */
         $variation = $this->load($variation_id);
-        if ($variation->isActive()) {
+        if ($variation->isActive() && $variation->access('view')) {
           return $variation;
         }
       }
@@ -93,6 +103,7 @@ class ProductVariationStorage extends CommerceContentEntityStorage implements Pr
     }
     // Speed up loading by filtering out the IDs of disabled variations.
     $query = $this->getQuery()
+      ->addTag('entity_access')
       ->condition('status', TRUE)
       ->condition('variation_id', $ids, 'IN');
     $result = $query->execute();
@@ -102,11 +113,18 @@ class ProductVariationStorage extends CommerceContentEntityStorage implements Pr
     // Restore the original sort order.
     $result = array_intersect_key($ids, $result);
 
+    /** @var \Drupal\commerce_product\Entity\ProductVariationInterface $enabled_variation */
     $enabled_variations = $this->loadMultiple($result);
     // Allow modules to apply own filtering (based on date, stock, etc).
     $event = new FilterVariationsEvent($product, $enabled_variations);
     $this->eventDispatcher->dispatch(ProductEvents::FILTER_VARIATIONS, $event);
     $enabled_variations = $event->getVariations();
+    // Filter out variations that can't be accessed.
+    foreach ($enabled_variations as $variation_id => $enabled_variation) {
+      if (!$enabled_variation->access('view')) {
+        unset($enabled_variations[$variation_id]);
+      }
+    }
 
     return $enabled_variations;
   }

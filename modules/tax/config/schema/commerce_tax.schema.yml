@@ -1,0 +1,63 @@
+commerce_order.commerce_order_item_type.*.third_party.commerce_tax:
+  type: mapping
+  label: 'Tax settings'
+  mapping:
+    taxable_type:
+      type: string
+      label: 'Taxable type'
+
+commerce_tax.commerce_tax_type.*:
+  type: config_entity
+  label: 'Tax type'
+  mapping:
+    id:
+      type: string
+      label: 'ID'
+    label:
+      type: label
+      label: 'Label'
+    plugin:
+      type: string
+      label: 'Plugin'
+    configuration:
+      type: commerce_tax.commerce_tax_type.plugin.[%parent.plugin]
+
+commerce_tax.commerce_tax_type.plugin.*:
+  type: commerce_tax_type_configuration
+
+commerce_tax_type_configuration:
+  type: mapping
+  mapping:
+    display_inclusive:
+      type: boolean
+      label: 'Display taxes of this type inclusive in product prices'
+
+commerce_tax.commerce_tax_type.plugin.custom:
+  type: commerce_tax_type_configuration
+  mapping:
+    display_label:
+      type: string
+      label: 'Display label'
+    round:
+      type: boolean
+      label: 'Round tax at the order item level'
+    rates:
+      type: sequence
+      label: 'Rates'
+      sequence:
+        type: mapping
+        mapping:
+          id:
+            type: string
+            label: 'ID'
+          label:
+            type: label
+            label: 'Label'
+          percentage:
+            type: string
+            label: 'Percentage'
+    territories:
+      type: sequence
+      label: 'Territories'
+      sequence:
+        type: address_zone_territory

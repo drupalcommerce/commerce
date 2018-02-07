@@ -44,6 +44,7 @@ class OrderTotalSummary implements OrderTotalSummaryInterface {
           'type' => $type,
           'label' => $adjustment->getLabel(),
           'total' => $adjustment->getAmount(),
+          'percentage' => $adjustment->getPercentage(),
           'weight' => $types[$type]['weight'],
         ];
       }

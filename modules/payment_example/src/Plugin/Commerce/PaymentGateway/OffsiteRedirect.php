@@ -14,7 +14,7 @@ use Symfony\Component\HttpFoundation\Request;
  *   id = "example_offsite_redirect",
  *   label = "Example (Off-site redirect)",
  *   display_label = "Example",
- *    forms = {
+ *   forms = {
  *     "offsite-payment" = "Drupal\commerce_payment_example\PluginForm\OffsiteRedirect\PaymentOffsiteForm",
  *   },
  *   payment_method_types = {"credit_card"},
@@ -77,10 +77,8 @@ class OffsiteRedirect extends OffsitePaymentGatewayBase {
       'amount' => $order->getTotalPrice(),
       'payment_gateway' => $this->entityId,
       'order_id' => $order->id(),
-      'test' => $this->getMode() == 'test',
       'remote_id' => $request->query->get('txn_id'),
       'remote_state' => $request->query->get('payment_status'),
-      'authorized' => REQUEST_TIME,
     ]);
     $payment->save();
     drupal_set_message('Payment was processed');

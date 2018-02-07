@@ -2,6 +2,7 @@
 
 namespace Drupal\Tests\commerce\Functional;
 
+use Drupal\commerce\EntityHelper;
 use Drupal\commerce_product\Entity\Product;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\Core\Entity\Entity\EntityFormDisplay;
@@ -93,9 +94,7 @@ class EntitySelectWidgetTest extends CommerceBrowserTestBase {
 
     // Create another store. The widget should now be a set of checkboxes.
     $this->createStores(1);
-    $store_ids = array_map(function ($store) {
-      return $store->id();
-    }, $this->stores);
+    $store_ids = EntityHelper::extractIds($this->stores);
     $this->drupalGet($form_url);
     $this->assertNotNull($this->getSession()->getPage()->find('xpath', '//input[@type="checkbox" and starts-with(@name,"stores")]'));
     $this->assertSession()->checkboxNotChecked('edit-stores-target-id-value-1');
@@ -103,7 +102,7 @@ class EntitySelectWidgetTest extends CommerceBrowserTestBase {
     // Check store 1.
     $edit['stores[target_id][value][' . $store_ids[0] . ']'] = $store_ids[0];
     $edit['stores[target_id][value][' . $store_ids[1] . ']'] = FALSE;
-    $this->submitForm($edit, t('Save and keep published'));
+    $this->submitForm($edit, t('Save'));
     $this->assertSession()->statusCodeEquals(200);
     \Drupal::entityTypeManager()->getStorage('commerce_product')->resetCache();
     $this->product = Product::load($this->product->id());
@@ -131,7 +130,7 @@ class EntitySelectWidgetTest extends CommerceBrowserTestBase {
     // Reference both stores 1 and 2.
     $edit = [];
     $edit['stores[target_id][value]'] = $store_labels[0] . ', ' . $store_labels[1];
-    $this->submitForm($edit, t('Save and keep published'));
+    $this->submitForm($edit, t('Save'));
     $this->assertSession()->statusCodeEquals(200);
     \Drupal::entityTypeManager()->getStorage('commerce_product')->resetCache();
     $this->product = Product::load($this->product->id());

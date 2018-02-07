@@ -49,7 +49,7 @@ class PaymentMethodTest extends CommerceKernelTestBase {
     $this->installEntitySchema('profile');
     $this->installEntitySchema('commerce_order');
     $this->installEntitySchema('commerce_order_item');
-    $this->installEntitySchema('commerce_payment');
+    $this->installEntitySchema('commerce_payment_method');
     $this->installConfig('commerce_order');
     $this->installConfig('commerce_payment');
 
@@ -73,6 +73,7 @@ class PaymentMethodTest extends CommerceKernelTestBase {
   /**
    * @covers ::getType
    * @covers ::getPaymentGatewayId
+   * @covers ::getPaymentGatewayMode
    * @covers ::getOwner
    * @covers ::setOwner
    * @covers ::getOwnerId
@@ -104,9 +105,11 @@ class PaymentMethodTest extends CommerceKernelTestBase {
       'type' => 'credit_card',
       'payment_gateway' => 'example',
     ]);
+    $payment_method->save();
 
     $this->assertInstanceOf(CreditCard::class, $payment_method->getType());
     $this->assertEquals('example', $payment_method->getPaymentGatewayId());
+    $this->assertEquals('test', $payment_method->getPaymentGatewayMode());
 
     $payment_method->setOwner($this->user);
     $this->assertEquals($this->user, $payment_method->getOwner());
@@ -127,13 +130,13 @@ class PaymentMethodTest extends CommerceKernelTestBase {
     $payment_method->setReusable(FALSE);
     $this->assertEmpty($payment_method->isReusable());
 
-    $this->assertEmpty($payment_method->isDefault());
+    $this->assertFalse($payment_method->isDefault());
     $payment_method->setDefault(TRUE);
-    $this->assertNotEmpty($payment_method->isDefault());
+    $this->assertTrue($payment_method->isDefault());
 
-    $this->assertEmpty($payment_method->isExpired());
+    $this->assertFalse($payment_method->isExpired());
     $payment_method->setExpiresTime(635879700);
-    $this->assertNotEmpty($payment_method->isExpired());
+    $this->assertTrue($payment_method->isExpired());
     $this->assertEquals(635879700, $payment_method->getExpiresTime());
 
     $payment_method->setCreatedTime(635879700);

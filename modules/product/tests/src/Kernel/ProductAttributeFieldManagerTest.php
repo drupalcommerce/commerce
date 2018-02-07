@@ -41,9 +41,7 @@ class ProductAttributeFieldManagerTest extends CommerceKernelTestBase {
     $this->installEntitySchema('commerce_product_attribute');
     $this->installEntitySchema('commerce_product_attribute_value');
     $this->installEntitySchema('commerce_product_variation');
-    $this->installEntitySchema('commerce_product_variation_type');
     $this->installEntitySchema('commerce_product');
-    $this->installEntitySchema('commerce_product_type');
 
     $this->attributeFieldManager = $this->container->get('commerce_product.attribute_field_manager');
 

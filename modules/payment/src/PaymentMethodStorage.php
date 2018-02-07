@@ -3,9 +3,9 @@
 namespace Drupal\commerce_payment;
 
 use Drupal\commerce\CommerceContentEntityStorage;
-use Drupal\commerce\TimeInterface;
 use Drupal\commerce_payment\Entity\PaymentGatewayInterface;
 use Drupal\commerce_payment\Plugin\Commerce\PaymentGateway\SupportsStoredPaymentMethodsInterface;
+use Drupal\Component\Datetime\TimeInterface;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Entity\EntityManagerInterface;
@@ -24,7 +24,7 @@ class PaymentMethodStorage extends CommerceContentEntityStorage implements Payme
   /**
    * The time.
    *
-   * @var \Drupal\commerce\TimeInterface
+   * @var \Drupal\Component\Datetime\TimeInterface
    */
   protected $time;
 
@@ -43,7 +43,7 @@ class PaymentMethodStorage extends CommerceContentEntityStorage implements Payme
    *   The language manager.
    * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface $event_dispatcher
    *   The event dispatcher.
-   * @param \Drupal\commerce\TimeInterface $time
+   * @param \Drupal\Component\Datetime\TimeInterface $time
    *   The time.
    */
   public function __construct(EntityTypeInterface $entity_type, Connection $database, EntityManagerInterface $entity_manager, CacheBackendInterface $cache, LanguageManagerInterface $language_manager, EventDispatcherInterface $event_dispatcher, TimeInterface $time) {
@@ -63,7 +63,7 @@ class PaymentMethodStorage extends CommerceContentEntityStorage implements Payme
       $container->get('cache.entity'),
       $container->get('language_manager'),
       $container->get('event_dispatcher'),
-      $container->get('commerce.time')
+      $container->get('datetime.time')
     );
   }
 
@@ -79,12 +79,15 @@ class PaymentMethodStorage extends CommerceContentEntityStorage implements Payme
       return [];
     }
 
-    $query = $this->getQuery()
+    $query = $this->getQuery();
+    $query
       ->condition('uid', $account->id())
       ->condition('payment_gateway', $payment_gateway->id())
       ->condition('reusable', TRUE)
-      ->condition('expires', $this->time->getRequestTime(), '>')
-      ->sort('created', 'DESC');
+      ->condition($query->orConditionGroup()
+        ->condition('expires', $this->time->getRequestTime(), '>')
+        ->condition('expires', 0))
+      ->sort('method_id', 'DESC');
     $result = $query->execute();
     if (empty($result)) {
       return [];

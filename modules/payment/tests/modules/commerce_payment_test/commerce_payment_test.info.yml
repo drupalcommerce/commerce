@@ -1,0 +1,6 @@
+name: Commerce Payment Test
+description: Provides testing items for Payment
+core: 8.x
+type: module
+dependencies:
+  - commerce:commerce_payment

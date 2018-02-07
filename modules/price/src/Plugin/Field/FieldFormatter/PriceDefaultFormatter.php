@@ -3,7 +3,6 @@
 namespace Drupal\commerce_price\Plugin\Field\FieldFormatter;
 
 use Drupal\commerce_price\NumberFormatterFactoryInterface;
-use Drupal\commerce_store\StoreContextInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FieldItemListInterface;
@@ -42,13 +41,6 @@ class PriceDefaultFormatter extends FormatterBase implements ContainerFactoryPlu
   protected $numberFormatter;
 
   /**
-   * The store context.
-   *
-   * @var \Drupal\commerce_store\StoreContextInterface
-   */
-  protected $storeContext;
-
-  /**
    * Constructs a new PriceDefaultFormatter object.
    *
    * @param string $plugin_id
@@ -69,10 +61,8 @@ class PriceDefaultFormatter extends FormatterBase implements ContainerFactoryPlu
    *   The entity type manager.
    * @param \Drupal\commerce_price\NumberFormatterFactoryInterface $number_formatter_factory
    *   The number formatter factory.
-   * @param \Drupal\commerce_store\StoreContextInterface $store_context
-   *   The store context.
    */
-  public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, $label, $view_mode, array $third_party_settings, EntityTypeManagerInterface $entity_type_manager, NumberFormatterFactoryInterface $number_formatter_factory, StoreContextInterface $store_context) {
+  public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, $label, $view_mode, array $third_party_settings, EntityTypeManagerInterface $entity_type_manager, NumberFormatterFactoryInterface $number_formatter_factory) {
     parent::__construct($plugin_id, $plugin_definition, $field_definition, $settings, $label, $view_mode, $third_party_settings);
 
     $this->currencyStorage = $entity_type_manager->getStorage('commerce_currency');
@@ -84,7 +74,6 @@ class PriceDefaultFormatter extends FormatterBase implements ContainerFactoryPlu
     if ($this->getSetting('display_currency_code')) {
       $this->numberFormatter->setCurrencyDisplay(NumberFormatterInterface::CURRENCY_DISPLAY_CODE);
     }
-    $this->storeContext = $store_context;
   }
 
   /**
@@ -100,8 +89,7 @@ class PriceDefaultFormatter extends FormatterBase implements ContainerFactoryPlu
       $configuration['view_mode'],
       $configuration['third_party_settings'],
       $container->get('entity_type.manager'),
-      $container->get('commerce_price.number_formatter_factory'),
-      $container->get('commerce_store.store_context')
+      $container->get('commerce_price.number_formatter_factory')
     );
   }
 
@@ -163,7 +151,7 @@ class PriceDefaultFormatter extends FormatterBase implements ContainerFactoryPlu
     foreach ($items as $delta => $item) {
       $currency_codes[] = $item->currency_code;
     }
-    $currencies = $this->currencyStorage->loadMultiple($currency_codes);
+    $currencies = $currency_codes ? $this->currencyStorage->loadMultiple($currency_codes) : [];
 
     $elements = [];
     foreach ($items as $delta => $item) {

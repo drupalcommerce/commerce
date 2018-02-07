@@ -26,6 +26,14 @@ class PriceTestForm extends FormBase {
       '#required' => TRUE,
       '#available_currencies' => ['USD', 'EUR'],
     ];
+    $form['amount_hidden_title'] = [
+      '#type' => 'commerce_price',
+      '#title' => $this->t('Hidden title amount'),
+      '#title_display' => 'invisible',
+      '#default_value' => ['number' => '99.99', 'currency_code' => 'USD'],
+      '#required' => TRUE,
+      '#available_currencies' => ['USD', 'EUR'],
+    ];
     $form['submit'] = [
       '#type' => 'submit',
       '#value' => $this->t('Submit'),

@@ -2,7 +2,7 @@
 
 namespace Drupal\commerce_payment\Plugin\Commerce\PaymentMethodType;
 
-use Drupal\commerce\BundleFieldDefinition;
+use Drupal\entity\BundleFieldDefinition;
 use Drupal\commerce_payment\Entity\PaymentMethodInterface;
 
 /**

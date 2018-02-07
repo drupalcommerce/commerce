@@ -2,49 +2,35 @@
 
 namespace Drupal\commerce_promotion\Plugin\Commerce\PromotionOffer;
 
-use Drupal\commerce_order\EntityAdjustableInterface;
-use Drupal\commerce_price\Price;
+use Drupal\commerce_promotion\Entity\PromotionInterface;
 use Drupal\Component\Plugin\ConfigurablePluginInterface;
-use Drupal\Core\Executable\ExecutableInterface;
-use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
-use Drupal\Core\Plugin\ContextAwarePluginInterface;
+use Drupal\Component\Plugin\PluginInspectionInterface;
+use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Plugin\PluginFormInterface;
 
 /**
- * Defines an interface for Offer plugins.
+ * Defines the interface for offers.
  */
-interface PromotionOfferInterface extends ConfigurablePluginInterface, ContainerFactoryPluginInterface, ContextAwarePluginInterface, ExecutableInterface, PluginFormInterface {
-
-  const ORDER = 'commerce_order';
-  const ORDER_ITEM = 'commerce_order_item';
+interface PromotionOfferInterface extends ConfigurablePluginInterface, PluginFormInterface, PluginInspectionInterface {
 
   /**
-   * Gets the entity type the offer is for.
+   * Gets the offer entity type ID.
+   *
+   * This is the entity type ID of the entity passed to apply().
    *
    * @return string
-   *   The entity type it applies to.
+   *   The offer's entity type ID.
    */
-  public function getTargetEntityType();
+  public function getEntityTypeId();
 
   /**
-   * Get the target entity for the offer.
+   * Applies the offer to the given entity.
    *
-   * @return \Drupal\Core\Entity\EntityInterface
-   *   The target entity.
+   * @param \Drupal\Core\Entity\EntityInterface $entity
+   *   The entity.
+   * @param \Drupal\commerce_promotion\Entity\PromotionInterface $promotion
+   *   THe parent promotion.
    */
-  public function getTargetEntity();
-
-  /**
-   * Applies the promotion offer's adjustment to an item.
-   *
-   * @param \Drupal\commerce_order\EntityAdjustableInterface $entity
-   *   The adjustable entity.
-   * @param \Drupal\commerce_price\Price $amount
-   *   The price object.
-   *
-   * @return \Drupal\commerce_order\Adjustment
-   *   The adjustment.
-   */
-  public function applyAdjustment(EntityAdjustableInterface $entity, Price $amount);
+  public function apply(EntityInterface $entity, PromotionInterface $promotion);
 
 }

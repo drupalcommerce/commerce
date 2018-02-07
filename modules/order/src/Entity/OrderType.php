@@ -10,6 +10,7 @@ use Drupal\commerce\Entity\CommerceBundleEntityBase;
  * @ConfigEntityType(
  *   id = "commerce_order_type",
  *   label = @Translation("Order type"),
+ *   label_collection = @Translation("Order types"),
  *   label_singular = @Translation("order type"),
  *   label_plural = @Translation("order types"),
  *   label_count = @PluralTranslation(
@@ -17,10 +18,11 @@ use Drupal\commerce\Entity\CommerceBundleEntityBase;
  *     plural = "@count order types",
  *   ),
  *   handlers = {
+ *     "access" = "Drupal\commerce\CommerceBundleAccessControlHandler",
  *     "form" = {
  *       "add" = "Drupal\commerce_order\Form\OrderTypeForm",
  *       "edit" = "Drupal\commerce_order\Form\OrderTypeForm",
- *       "delete" = "Drupal\commerce_order\Form\OrderTypeDeleteForm"
+ *       "delete" = "Drupal\commerce\Form\CommerceBundleEntityDeleteFormBase"
  *     },
  *     "route_provider" = {
  *       "default" = "Drupal\Core\Entity\Routing\DefaultHtmlRouteProvider",
@@ -39,11 +41,12 @@ use Drupal\commerce\Entity\CommerceBundleEntityBase;
  *     "label",
  *     "id",
  *     "workflow",
- *     "traits",
  *     "refresh_mode",
  *     "refresh_frequency",
  *     "sendReceipt",
  *     "receiptBcc",
+ *     "traits",
+ *     "locked",
  *   },
  *   links = {
  *     "add-form" = "/admin/commerce/config/order-types/add",

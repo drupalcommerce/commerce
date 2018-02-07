@@ -2,6 +2,7 @@
 
 namespace Drupal\commerce_checkout\Plugin\Commerce\CheckoutPane;
 
+use Drupal\commerce_order\Entity\OrderInterface;
 use Drupal\Component\Plugin\ConfigurablePluginInterface;
 use Drupal\Component\Plugin\DerivativeInspectionInterface;
 use Drupal\Component\Plugin\PluginInspectionInterface;
@@ -16,6 +17,18 @@ use Drupal\Core\Plugin\PluginFormInterface;
 interface CheckoutPaneInterface extends ConfigurablePluginInterface, PluginFormInterface, PluginInspectionInterface, DerivativeInspectionInterface {
 
   /**
+   * Sets the current order.
+   *
+   * Used to keep the pane order in sync with the checkout flow order.
+   *
+   * @param \Drupal\commerce_order\Entity\OrderInterface $order
+   *   The order.
+   *
+   * @return $this
+   */
+  public function setOrder(OrderInterface $order);
+
+  /**
    * Gets the pane ID.
    *
    * @return string
@@ -26,18 +39,23 @@ interface CheckoutPaneInterface extends ConfigurablePluginInterface, PluginFormI
   /**
    * Gets the pane label.
    *
+   * This label is admin-facing.
+   *
    * @return string
    *   The pane label.
    */
   public function getLabel();
 
   /**
-   * Gets the pane administrative label.
+   * Gets the pane display label.
+   *
+   * This label is customer-facing.
+   * Shown as the title of the pane form if the wrapper_element is 'fieldset'.
    *
    * @return string
-   *   The pane administrative label.
+   *   The pane display label.
    */
-  public function getAdminLabel();
+  public function getDisplayLabel();
 
   /**
    * Gets the pane wrapper element.

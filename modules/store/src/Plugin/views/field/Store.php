@@ -2,7 +2,7 @@
 
 namespace Drupal\commerce_store\Plugin\views\field;
 
-use Drupal\views\Plugin\views\field\Field;
+use Drupal\views\Plugin\views\field\EntityField;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Session\AccountInterface;
 
@@ -15,7 +15,7 @@ use Drupal\Core\Session\AccountInterface;
  *
  * @ViewsField("commerce_store")
  */
-class Store extends Field {
+class Store extends EntityField {
 
   /**
    * {@inheritdoc}

@@ -7,3 +7,4 @@ description: ''
 variationType: default
 injectVariationFields: true
 traits: {  }
+locked: false

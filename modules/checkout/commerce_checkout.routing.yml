@@ -1,11 +1,3 @@
-entity.commerce_checkout_flow.collection:
-  path: '/admin/commerce/config/checkout-flows'
-  defaults:
-    _entity_list: 'commerce_checkout_flow'
-    _title: 'Checkout flows'
-  requirements:
-    _permission: 'administer commerce_checkout_flow'
-
 commerce_checkout.form:
   path: '/checkout/{commerce_order}/{step}'
   defaults:

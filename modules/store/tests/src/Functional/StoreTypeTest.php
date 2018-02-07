@@ -97,30 +97,36 @@ class StoreTypeTest extends CommerceBrowserTestBase {
    * Tests deleting a Store Type through the form.
    */
   public function testDeleteStoreType() {
-    // Create a store type programmaticaly.
+    /** @var \Drupal\commerce_store\Entity\StoreTypeInterface $type */
     $type = $this->createEntity('commerce_store_type', [
       'id' => 'foo',
       'label' => 'Label for foo',
     ]);
-
-    // Create a store.
     $store = $this->createStore(NULL, NULL, $type->id());
 
-    // Try to delete the store type.
-    $this->drupalGet('admin/commerce/config/store-types/' . $type->id() . '/delete');
-    $this->assertSession()->pageTextContains(t('@type is used by 1 store on your site. You can not remove this store type until you have removed all of the @type stores.', ['@type' => $type->label()]));
+    // Confirm that the type can't be deleted while there's a store.
+    $this->drupalGet($type->toUrl('delete-form'));
+    $this->assertSession()->pageTextContains(t('@type is used by 1 store on your site. You cannot remove this store type until you have removed all of the @type stores.', ['@type' => $type->label()]));
     $this->assertSession()->pageTextNotContains('This action cannot be undone.');
     $this->assertSession()->pageTextNotContains('The store type deletion confirmation form is not available');
 
-    // Deleting the store type when its not being referenced by a store.
+    // Confirm that the delete page is not available when the type is locked.
+    $type->lock();
+    $type->save();
+    $this->drupalGet($type->toUrl('delete-form'));
+    $this->assertSession()->statusCodeEquals('403');
+
+    // Delete the store, unlock the type, confirm that deletion works.
     $store->delete();
-    $this->drupalGet('admin/commerce/config/store-types/' . $type->id() . '/delete');
+    $type->unlock();
+    $type->save();
+    $this->drupalGet($type->toUrl('delete-form'));
     $this->assertSession()->pageTextContains(t('Are you sure you want to delete the store type @type?', ['@type' => $type->label()]));
     $this->saveHtmlOutput();
     $this->assertSession()->pageTextContains('This action cannot be undone.');
     $this->submitForm([], 'Delete');
     $type_exists = (bool) StoreType::load($type->id());
-    $this->assertEmpty($type_exists, 'The new store type has been deleted from the database.');
+    $this->assertEmpty($type_exists);
   }
 
 }

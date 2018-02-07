@@ -29,6 +29,14 @@ interface OrderItemInterface extends ContentEntityInterface, EntityAdjustableInt
   public function getOrderId();
 
   /**
+   * Gets whether the order item has a purchased entity.
+   *
+   * @return bool
+   *   TRUE if the order item has a purchased entity, FALSE otherwise.
+   */
+  public function hasPurchasedEntity();
+
+  /**
    * Gets the purchased entity.
    *
    * @return \Drupal\commerce\PurchasableEntityInterface|null
@@ -93,10 +101,37 @@ interface OrderItemInterface extends ContentEntityInterface, EntityAdjustableInt
    *
    * @param \Drupal\commerce_price\Price $unit_price
    *   The order item unit price.
+   * @param bool $override
+   *   Whether the unit price should be overridden.
    *
    * @return $this
    */
-  public function setUnitPrice(Price $unit_price);
+  public function setUnitPrice(Price $unit_price, $override = FALSE);
+
+  /**
+   * Gets whether the order item unit price is overridden.
+   *
+   * Overridden unit prices are not updated when the order is refreshed.
+   *
+   * @return bool
+   *   TRUE if the unit price is overridden, FALSE otherwise.
+   */
+  public function isUnitPriceOverridden();
+
+  /**
+   * Gets the adjusted order item unit price.
+   *
+   * The adjusted unit price is calculated by applying the order item's
+   * adjustments to the unit price. This includes promotions, taxes, fees, etc.
+   *
+   * Adjustments are usually included only in the order total price, but
+   * knowing the adjusted unit prices for each order item can be useful for
+   * refunds and other purposes.
+   *
+   * @return \Drupal\commerce_price\Price|null
+   *   The adjusted order item unit price, or NULL.
+   */
+  public function getAdjustedUnitPrice();
 
   /**
    * Gets the order item total price.
@@ -105,6 +140,16 @@ interface OrderItemInterface extends ContentEntityInterface, EntityAdjustableInt
    *   The order item total price, or NULL.
    */
   public function getTotalPrice();
+
+  /**
+   * Gets the adjusted order item total price.
+   *
+   * Calculated by multiplying the adjusted unit price by quantity.
+   *
+   * @return \Drupal\commerce_price\Price|null
+   *   The adjusted order item total price, or NULL.
+   */
+  public function getAdjustedTotalPrice();
 
   /**
    * Gets an order item data value with the given key.

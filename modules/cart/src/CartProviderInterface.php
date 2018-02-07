@@ -35,6 +35,8 @@ interface CartProviderInterface {
    * Finalizes the given cart order.
    *
    * Removes the cart flag from the order and saves it.
+   * If the user is anonymous, moves the cart ID from the
+   * active to the completed cart session.
    *
    * @param \Drupal\commerce_order\Entity\OrderInterface $cart
    *   The cart order.
@@ -94,5 +96,10 @@ interface CartProviderInterface {
    *   A list of cart orders ids.
    */
   public function getCartIds(AccountInterface $account = NULL);
+
+  /**
+   * Clears the static caches.
+   */
+  public function clearCaches();
 
 }
