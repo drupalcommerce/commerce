@@ -164,6 +164,8 @@ class OrderRefresh implements OrderRefreshInterface {
         $order_item->save();
       }
     }
+    
+    return $order;
   }
 
 }
