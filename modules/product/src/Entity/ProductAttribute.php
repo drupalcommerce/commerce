@@ -19,7 +19,7 @@ use Drupal\Core\Entity\EntityStorageInterface;
  *     plural = "@count product attributes",
  *   ),
  *   handlers = {
- *     "access" = "Drupal\commerce\EntityAccessControlHandler",
+ *     "access" = "Drupal\entity\EntityAccessControlHandler",
  *     "permission_provider" = "Drupal\commerce\EntityPermissionProvider",
  *     "list_builder" = "Drupal\commerce_product\ProductAttributeListBuilder",
  *     "form" = {
@@ -80,7 +80,7 @@ class ProductAttribute extends ConfigEntityBundleBase implements ProductAttribut
    */
   public function getValues() {
     $storage = $this->entityTypeManager()->getStorage('commerce_product_attribute_value');
-    return $storage->loadByAttribute($this->id());
+    return $storage->loadMultipleByAttribute($this->id());
   }
 
   /**

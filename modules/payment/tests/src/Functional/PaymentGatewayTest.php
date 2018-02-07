@@ -55,6 +55,8 @@ class PaymentGatewayTest extends CommerceBrowserTestBase {
     $this->assertEquals('example', $payment_gateway->id());
     $this->assertEquals('Example', $payment_gateway->label());
     $this->assertEquals('example_offsite_redirect', $payment_gateway->getPluginId());
+    $this->assertEmpty($payment_gateway->getConditions());
+    $this->assertEquals('AND', $payment_gateway->getConditionOperator());
     $this->assertEquals(TRUE, $payment_gateway->status());
     $payment_gateway_plugin = $payment_gateway->getPlugin();
     $this->assertEquals('test', $payment_gateway_plugin->getMode());
@@ -70,7 +72,7 @@ class PaymentGatewayTest extends CommerceBrowserTestBase {
       'id' => 'edit_example',
       'label' => 'Edit example',
       'plugin' => 'example_offsite_redirect',
-      'status' => TRUE,
+      'status' => 0,
     ];
     $payment_gateway = $this->createEntity('commerce_payment_gateway', $values);
 
@@ -78,6 +80,7 @@ class PaymentGatewayTest extends CommerceBrowserTestBase {
     $values += [
       'configuration[example_offsite_redirect][redirect_method]' => 'get',
       'configuration[example_offsite_redirect][mode]' => 'live',
+      'conditionOperator' => 'OR',
     ];
     $this->submitForm($values, 'Save');
 
@@ -86,7 +89,9 @@ class PaymentGatewayTest extends CommerceBrowserTestBase {
     $this->assertEquals('edit_example', $payment_gateway->id());
     $this->assertEquals('Edit example', $payment_gateway->label());
     $this->assertEquals('example_offsite_redirect', $payment_gateway->getPluginId());
-    $this->assertEquals(TRUE, $payment_gateway->status());
+    $this->assertEmpty($payment_gateway->getConditions());
+    $this->assertEquals('OR', $payment_gateway->getConditionOperator());
+    $this->assertEquals(FALSE, $payment_gateway->status());
     $payment_gateway_plugin = $payment_gateway->getPlugin();
     $this->assertEquals('live', $payment_gateway_plugin->getMode());
     $configuration = $payment_gateway_plugin->getConfiguration();

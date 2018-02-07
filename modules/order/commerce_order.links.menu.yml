@@ -1,17 +1,25 @@
+commerce_order.configuration:
+  title: 'Orders'
+  route_name: 'commerce_order.configuration'
+  parent: 'commerce.configuration'
+  weight: -5
+
 entity.commerce_order.collection:
-  title: Orders
-  route_name: entity.commerce_order.collection
-  parent: commerce.admin_commerce
+  title: 'Orders'
+  route_name: 'entity.commerce_order.collection'
+  parent: 'commerce.admin_commerce'
   description: 'Manage your orders.'
 
 entity.commerce_order_type.collection:
-  title: Order types
-  route_name: entity.commerce_order_type.collection
-  parent: commerce.configuration
-  description: 'Manage your order types.'
+  title: 'Order types'
+  route_name: 'entity.commerce_order_type.collection'
+  parent: 'commerce_order.configuration'
+  description: 'Manage fields, form and display settings for your orders.'
+  weight: -10
 
 entity.commerce_order_item_type.collection:
-  title: Order item types
-  route_name: entity.commerce_order_item_type.collection
-  parent: commerce.configuration
-  description: 'Manage your order item types.'
+  title: 'Order item types'
+  route_name: 'entity.commerce_order_item_type.collection'
+  parent: 'commerce_order.configuration'
+  description: 'Manage fields, form and display settings for your order items.'
+  weight: -5

@@ -35,6 +35,7 @@ class PluginSelectTest extends CommerceBrowserTestBase {
     'entity_test',
     'commerce_test',
     'commerce_order',
+    'commerce_payment',
   ];
 
   /**
@@ -53,20 +54,6 @@ class PluginSelectTest extends CommerceBrowserTestBase {
     parent::setUp();
 
     Role::create(['id' => 'test_role', 'label' => $this->randomString()])->save();
-    $field_storage = FieldStorageConfig::create([
-      'field_name' => 'test_conditions',
-      'entity_type' => 'entity_test',
-      'type' => 'commerce_plugin_item:commerce_condition',
-    ]);
-    $field_storage->save();
-
-    $field = FieldConfig::create([
-      'field_name' => 'test_conditions',
-      'entity_type' => 'entity_test',
-      'bundle' => 'entity_test',
-    ]);
-    $field->save();
-
     $this->entityTestStorage = $this->container->get('entity_type.manager')->getStorage('entity_test');
   }
 
@@ -74,40 +61,68 @@ class PluginSelectTest extends CommerceBrowserTestBase {
    * Tests the plugin_select widget.
    */
   public function testPluginSelect() {
+    $this->createField('commerce_condition');
     $display = commerce_get_entity_display('entity_test', 'entity_test', 'form');
-    $display->setComponent('test_conditions', [
+    $display->setComponent('test_plugin', [
       'type' => 'commerce_plugin_select',
     ])->save();
 
-    $this->doTest();
+    $this->doTestConditions();
   }
 
   /**
    * Tests the plugin_radios widget.
    */
   public function testPluginRadios() {
+    $this->createField('commerce_condition');
     $display = commerce_get_entity_display('entity_test', 'entity_test', 'form');
-    $display->setComponent('test_conditions', [
+    $display->setComponent('test_plugin', [
       'type' => 'commerce_plugin_radios',
     ])->save();
 
-    $this->doTest();
+    $this->doTestConditions();
   }
 
   /**
-   * Performs the assertions common to both test methods.
+   * Tests the plugin_select widget on a plugin type without configuration.
    */
-  protected function doTest() {
+  public function testPluginSelectWithoutConfiguration() {
+    $this->createField('commerce_payment_method_type');
+    $display = commerce_get_entity_display('entity_test', 'entity_test', 'form');
+    $display->setComponent('test_plugin', [
+      'type' => 'commerce_plugin_select',
+    ])->save();
+
     $entity = $this->createEntity('entity_test', [
       'name' => 'Test',
     ]);
     $this->drupalGet($entity->toUrl('edit-form'));
-    $this->getSession()->getPage()->fillField('test_conditions[0][target_plugin_id]', 'order_item_quantity');
+
+    $this->submitForm([
+      'test_plugin[0][target_plugin_id]' => 'paypal',
+    ], 'Save');
+    $this->assertSession()->pageTextContains('entity_test 1 has been updated.');
+
+    $this->entityTestStorage->resetCache([$entity->id()]);
+    $entity = $this->entityTestStorage->load($entity->id());
+    $this->assertEquals('paypal', $entity->test_plugin->target_plugin_id);
+    $this->assertEquals([], $entity->test_plugin->target_plugin_configuration);
+  }
+
+  /**
+   * Tests the configuration common to testPluginSelect and testPluginRadios.
+   */
+  protected function doTestConditions() {
+    $entity = $this->createEntity('entity_test', [
+      'name' => 'Test',
+    ]);
+    $this->drupalGet($entity->toUrl('edit-form'));
+    $this->getSession()->getPage()->fillField('test_plugin[0][target_plugin_id]', 'order_item_quantity');
     $this->waitForAjaxToFinish();
 
     $this->submitForm([
-      'test_conditions[0][target_plugin_configuration][order_item_quantity][operator]' => '==',
-      'test_conditions[0][target_plugin_configuration][order_item_quantity][quantity]' => '99',
+      'test_plugin[0][target_plugin_configuration][order_item_quantity][operator]' => '==',
+      'test_plugin[0][target_plugin_configuration][order_item_quantity][quantity]' => '99',
     ], 'Save');
     $this->assertSession()->pageTextContains('entity_test 1 has been updated.');
 
@@ -116,16 +131,16 @@ class PluginSelectTest extends CommerceBrowserTestBase {
     $this->assertEquals([
       'operator' => '==',
       'quantity' => 99,
-    ], $entity->test_conditions->target_plugin_configuration);
+    ], $entity->test_plugin->target_plugin_configuration);
 
     // Select the other condition.
     $this->drupalGet($entity->toUrl('edit-form'));
-    $this->getSession()->getPage()->fillField('test_conditions[0][target_plugin_id]', 'order_total_price');
+    $this->getSession()->getPage()->fillField('test_plugin[0][target_plugin_id]', 'order_total_price');
     $this->waitForAjaxToFinish();
 
     $this->submitForm([
-      'test_conditions[0][target_plugin_configuration][order_total_price][operator]' => '<',
-      'test_conditions[0][target_plugin_configuration][order_total_price][amount][number]' => '6.67',
+      'test_plugin[0][target_plugin_configuration][order_total_price][operator]' => '<',
+      'test_plugin[0][target_plugin_configuration][order_total_price][amount][number]' => '6.67',
     ], 'Save');
     $this->assertSession()->pageTextContains('entity_test 1 has been updated.');
 
@@ -137,7 +152,29 @@ class PluginSelectTest extends CommerceBrowserTestBase {
         'number' => '6.67',
         'currency_code' => 'USD',
       ],
-    ], $entity->test_conditions->target_plugin_configuration);
+    ], $entity->test_plugin->target_plugin_configuration);
+  }
+
+  /**
+   * Creates a commerce_plugin_item field for the given plugin type.
+   *
+   * @param string $plugin_type
+   *   The plugin type.
+   */
+  protected function createField($plugin_type) {
+    $field_storage = FieldStorageConfig::create([
+      'field_name' => 'test_plugin',
+      'entity_type' => 'entity_test',
+      'type' => 'commerce_plugin_item:' . $plugin_type,
+    ]);
+    $field_storage->save();
+
+    $field = FieldConfig::create([
+      'field_name' => 'test_plugin',
+      'entity_type' => 'entity_test',
+      'bundle' => 'entity_test',
+    ]);
+    $field->save();
   }
 
 }

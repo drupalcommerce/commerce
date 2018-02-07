@@ -75,11 +75,17 @@ class OrderTotalSummary extends FormatterBase implements ContainerFactoryPluginI
    * {@inheritdoc}
    */
   public function viewElements(FieldItemListInterface $items, $langcode) {
+    /** @var \Drupal\commerce_order\Entity\OrderInterface $order */
     $order = $items->getEntity();
-    return [
-      '#theme' => 'commerce_order_total_summary',
-      '#totals' => $this->orderTotalSummary->buildTotals($order),
-    ];
+    $elements = [];
+    if (!$items->isEmpty()) {
+      $elements[0] = [
+        '#theme' => 'commerce_order_total_summary',
+        '#totals' => $this->orderTotalSummary->buildTotals($order),
+      ];
+    }
+
+    return $elements;
   }
 
   /**

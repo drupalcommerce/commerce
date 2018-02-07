@@ -31,6 +31,13 @@ final class Adjustment {
   protected $amount;
 
   /**
+   * The adjustment percentage.
+   *
+   * @var string
+   */
+  protected $percentage;
+
+  /**
    * The source identifier of the adjustment.
    *
    * Points to the source object, if known. For example, a promotion entity for
@@ -46,6 +53,13 @@ final class Adjustment {
    * @var bool
    */
   protected $included = FALSE;
+
+  /**
+   * Whether the adjustment is locked.
+   *
+   * @var bool
+   */
+  protected $locked = FALSE;
 
   /**
    * Constructs a new Adjustment object.
@@ -67,14 +81,26 @@ final class Adjustment {
     if (empty($types[$definition['type']])) {
       throw new \InvalidArgumentException(sprintf('%s is an invalid adjustment type.', $definition['type']));
     }
+    if (!empty($definition['percentage'])) {
+      if (is_float($definition['percentage'])) {
+        throw new \InvalidArgumentException(sprintf('The provided percentage "%s" must be a string, not a float.', $definition['percentage']));
+      }
+      if (!is_numeric($definition['percentage'])) {
+        throw new \InvalidArgumentException(sprintf('The provided percentage "%s" is not a numeric value.', $definition['percentage']));
+      }
+    }
+    // Assume that 'custom' adjustments are always locked, for BC reasons.
+    if ($definition['type'] == 'custom' && !isset($definition['locked'])) {
+      $definition['locked'] = TRUE;
+    }
 
     $this->type = $definition['type'];
-    $this->label = $definition['label'];
+    $this->label = (string) $definition['label'];
     $this->amount = $definition['amount'];
-    if (!empty($definition['source_id'])) {
-      $this->sourceId = $definition['source_id'];
-    }
+    $this->percentage = !empty($definition['percentage']) ? $definition['percentage'] : NULL;
+    $this->sourceId = !empty($definition['source_id']) ? $definition['source_id'] : NULL;
     $this->included = !empty($definition['included']);
+    $this->locked = !empty($definition['locked']);
   }
 
   /**
@@ -98,16 +124,6 @@ final class Adjustment {
   }
 
   /**
-   * Get the source identifier.
-   *
-   * @return string
-   *   The source identifier.
-   */
-  public function getSourceId() {
-    return $this->sourceId;
-  }
-
-  /**
    * Gets the adjustment amount.
    *
    * @return \Drupal\commerce_price\Price
@@ -121,7 +137,7 @@ final class Adjustment {
    * Gets whether the adjustment is positive.
    *
    * @return bool
-   *   TRUE if the adjustmnet is positive, FALSE otherwise.
+   *   TRUE if the adjustment is positive, FALSE otherwise.
    */
   public function isPositive() {
     return $this->amount->getNumber() >= 0;
@@ -138,6 +154,27 @@ final class Adjustment {
   }
 
   /**
+   * Gets the adjustment percentage.
+   *
+   * @return string|null
+   *   The percentage as a decimal. For example, "0.2" for a 20% adjustment.
+   *   Otherwise NULL, if the adjustment was not calculated from a percentage.
+   */
+  public function getPercentage() {
+    return $this->percentage;
+  }
+
+  /**
+   * Get the source identifier.
+   *
+   * @return string
+   *   The source identifier.
+   */
+  public function getSourceId() {
+    return $this->sourceId;
+  }
+
+  /**
    * Gets whether the adjustment is included in the base price.
    *
    * @return bool
@@ -145,6 +182,18 @@ final class Adjustment {
    */
   public function isIncluded() {
     return $this->included;
+  }
+
+  /**
+   * Gets whether the adjustment is locked.
+   *
+   * Locked adjustments are not removed during the order refresh process.
+   *
+   * @return bool
+   *   TRUE if the adjustment is locked, FALSE otherwise.
+   */
+  public function isLocked() {
+    return $this->locked;
   }
 
 }

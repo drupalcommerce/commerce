@@ -100,6 +100,11 @@ class CouponRedemptionForm extends FormElement {
       '#title' => $element['#title'],
       '#description' => $element['#description'],
       '#access' => !$cardinality_reached,
+      // Chrome autofills this field with the address line 1, and ignores
+      // autocomplete => 'off', but respects 'new-password'.
+      '#attributes' => [
+        'autocomplete' => 'new-password',
+      ],
     ];
     $element['apply'] = [
       '#type' => 'submit',
@@ -200,7 +205,7 @@ class CouponRedemptionForm extends FormElement {
     }
     /** @var \Drupal\commerce_promotion\CouponStorageInterface $coupon_storage */
     $coupon_storage = \Drupal::entityTypeManager()->getStorage('commerce_promotion_coupon');
-    $coupon = $coupon_storage->loadByCode($coupon_code);
+    $coupon = $coupon_storage->loadEnabledByCode($coupon_code);
     if (empty($coupon)) {
       $form_state->setErrorByName($coupon_code_path, t('The provided coupon code is invalid.'));
       return;

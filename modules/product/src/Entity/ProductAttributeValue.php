@@ -29,7 +29,6 @@ use Drupal\Core\Field\BaseFieldDefinition;
  *     "translation" = "Drupal\content_translation\ContentTranslationHandler"
  *   },
  *   admin_permission = "administer commerce_product_attribute",
- *   fieldable = TRUE,
  *   translatable = TRUE,
  *   content_translation_ui_skip = TRUE,
  *   base_table = "commerce_product_attribute_value",

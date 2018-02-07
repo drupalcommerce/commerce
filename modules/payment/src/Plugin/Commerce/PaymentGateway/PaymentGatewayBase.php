@@ -9,6 +9,7 @@ use Drupal\commerce_payment\Exception\HardDeclineException;
 use Drupal\commerce_payment\Exception\InvalidRequestException;
 use Drupal\commerce_payment\PaymentMethodTypeManager;
 use Drupal\commerce_payment\PaymentTypeManager;
+use Drupal\commerce_price\Calculator;
 use Drupal\commerce_price\Price;
 use Drupal\Component\Datetime\TimeInterface;
 use Drupal\Component\Utility\NestedArray;
@@ -319,6 +320,7 @@ abstract class PaymentGatewayBase extends PluginBase implements PaymentGatewayIn
       $values = $form_state->getValue($form['#parents']);
       $values['payment_method_types'] = array_filter($values['payment_method_types']);
 
+      $this->configuration = [];
       $this->configuration['display_label'] = $values['display_label'];
       $this->configuration['mode'] = $values['mode'];
       $this->configuration['payment_method_types'] = array_keys($values['payment_method_types']);
@@ -357,6 +359,30 @@ abstract class PaymentGatewayBase extends PluginBase implements PaymentGatewayIn
     }
 
     return $operations;
+  }
+
+  /**
+   * Converts the given amount to its minor units.
+   *
+   * For example, 9.99 USD becomes 999.
+   *
+   * @param \Drupal\commerce_price\Price $amount
+   *   The amount.
+   *
+   * @return int
+   *   The amount in minor units, as an integer.
+   */
+  protected function toMinorUnits(Price $amount) {
+    $currency_storage = $this->entityTypeManager->getStorage('commerce_currency');
+    /** @var \Drupal\commerce_price\Entity\CurrencyInterface $currency */
+    $currency = $currency_storage->load($amount->getCurrencyCode());
+    $fraction_digits = $currency->getFractionDigits();
+    $number = $amount->getNumber();
+    if ($fraction_digits > 0) {
+      $number = Calculator::multiply($number, pow(10, $fraction_digits));
+    }
+
+    return round($number, 0);
   }
 
   /**

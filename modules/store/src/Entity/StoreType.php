@@ -18,6 +18,7 @@ use Drupal\commerce\Entity\CommerceBundleEntityBase;
  *     plural = "@count store types",
  *   ),
  *   handlers = {
+ *     "access" = "Drupal\commerce\CommerceBundleAccessControlHandler",
  *     "list_builder" = "Drupal\commerce_store\StoreTypeListBuilder",
  *     "form" = {
  *       "add" = "Drupal\commerce_store\Form\StoreTypeForm",
@@ -42,6 +43,7 @@ use Drupal\commerce\Entity\CommerceBundleEntityBase;
  *     "uuid",
  *     "description",
  *     "traits",
+ *     "locked",
  *   },
  *   links = {
  *     "add-form" = "/admin/commerce/config/store-types/add",

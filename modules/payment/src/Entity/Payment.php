@@ -39,7 +39,6 @@ use Drupal\Core\Field\BaseFieldDefinition;
  *   },
  *   base_table = "commerce_payment",
  *   admin_permission = "administer commerce_payment",
- *   fieldable = TRUE,
  *   entity_keys = {
  *     "id" = "payment_id",
  *     "bundle" = "type",
@@ -47,8 +46,7 @@ use Drupal\Core\Field\BaseFieldDefinition;
  *   },
  *   links = {
  *     "collection" = "/admin/commerce/orders/{commerce_order}/payments",
- *     "canonical" = "/admin/commerce/orders/{commerce_order}/payments/commerce_payment/edit",
- *     "operation-form" = "/admin/commerce/orders/{commerce_order}/payments/{commerce_payment}/operation/{operation}",
+ *     "edit-form" = "/admin/commerce/orders/{commerce_order}/payments/commerce_payment/edit",
  *     "delete-form" = "/admin/commerce/orders/{commerce_order}/payments/{commerce_payment}/delete",
  *   },
  * )
@@ -254,6 +252,13 @@ class Payment extends ContentEntityBase implements PaymentInterface {
   public function setExpiresTime($timestamp) {
     $this->set('expires', $timestamp);
     return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function isCompleted() {
+    return !$this->get('completed')->isEmpty();
   }
 
   /**

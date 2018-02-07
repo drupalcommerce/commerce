@@ -8,7 +8,6 @@ dependencies:
       - commerce_product
   module:
     - commerce_order
-    - commerce_price
 id: commerce_order_item.default.default
 targetEntityType: commerce_order_item
 bundle: default
@@ -32,9 +31,10 @@ content:
     third_party_settings: {  }
     region: content
   unit_price:
-    type: commerce_price_default
+    type: commerce_unit_price
     weight: 2
-    settings: {  }
+    settings:
+      require_confirmation: true
     third_party_settings: {  }
     region: content
 hidden:

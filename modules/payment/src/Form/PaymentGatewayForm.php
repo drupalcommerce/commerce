@@ -2,13 +2,13 @@
 
 namespace Drupal\commerce_payment\Form;
 
-use Drupal\commerce\Form\CommercePluginEntityFormBase;
 use Drupal\commerce_payment\PaymentGatewayManager;
 use Drupal\Component\Utility\Html;
+use Drupal\Core\Entity\EntityForm;
 use Drupal\Core\Form\FormStateInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
-class PaymentGatewayForm extends CommercePluginEntityFormBase {
+class PaymentGatewayForm extends EntityForm {
 
   /**
    * The payment gateway plugin manager.
@@ -90,6 +90,7 @@ class PaymentGatewayForm extends CommercePluginEntityFormBase {
       '#machine_name' => [
         'exists' => '\Drupal\commerce_payment\Entity\PaymentGateway::load',
       ],
+      '#disabled' => !$gateway->isNew(),
     ];
     $form['plugin'] = [
       '#type' => 'radios',
@@ -116,13 +117,27 @@ class PaymentGatewayForm extends CommercePluginEntityFormBase {
       '#entity_types' => ['commerce_order'],
       '#default_value' => $gateway->get('conditions'),
     ];
+    $form['conditionOperator'] = [
+      '#type' => 'radios',
+      '#title' => $this->t('Condition operator'),
+      '#title_display' => 'invisible',
+      '#options' => [
+        'AND' => $this->t('All conditions must pass'),
+        'OR' => $this->t('Only one condition must pass'),
+      ],
+      '#default_value' => $gateway->getConditionOperator(),
+    ];
     $form['status'] = [
-      '#type' => 'checkbox',
-      '#title' => $this->t('Enabled'),
-      '#default_value' => $gateway->status(),
+      '#type' => 'radios',
+      '#title' => $this->t('Status'),
+      '#options' => [
+        0 => $this->t('Disabled'),
+        1  => $this->t('Enabled'),
+      ],
+      '#default_value' => (int) $gateway->status(),
     ];
 
-    return $this->protectPluginIdElement($form);
+    return $form;
   }
 
   /**

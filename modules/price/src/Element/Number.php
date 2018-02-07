@@ -95,6 +95,10 @@ class Number extends FormElement {
    *   The built commerce_number form element.
    */
   public static function processElement(array $element, FormStateInterface $form_state, array &$complete_form) {
+    // Add a sensible default AJAX event.
+    if (isset($element['#ajax']) && !isset($element['#ajax']['event'])) {
+      $element['#ajax']['event'] = 'blur';
+    }
     // Provide an example to the end user so that they know which decimal
     // separator to use. This is the same pattern Drupal core uses.
     $number_formatter = self::getNumberFormatter($element);
@@ -114,7 +118,7 @@ class Number extends FormElement {
    *   The current state of the form.
    */
   public static function validateNumber(array $element, FormStateInterface $form_state) {
-    $value = $form_state->getValue($element['#parents']);
+    $value = trim($element['#value']);
     if ($value === '') {
       return;
     }

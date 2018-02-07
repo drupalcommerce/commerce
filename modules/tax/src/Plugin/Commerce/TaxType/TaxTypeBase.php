@@ -145,6 +145,7 @@ abstract class TaxTypeBase extends PluginBase implements TaxTypeInterface, Conta
   public function submitConfigurationForm(array &$form, FormStateInterface $form_state) {
     if (!$form_state->getErrors()) {
       $values = $form_state->getValue($form['#parents']);
+      $this->configuration = [];
       $this->configuration['display_inclusive'] = $values['display_inclusive'];
     }
   }
@@ -221,17 +222,15 @@ abstract class TaxTypeBase extends PluginBase implements TaxTypeInterface, Conta
    */
   protected function resolveCustomerProfile(OrderItemInterface $order_item) {
     $order = $order_item->getOrder();
-    $store = $order->getStore();
-    $prices_include_tax = $store->get('prices_include_tax')->value;
     $customer_profile = $order->getBillingProfile();
-    // A shipping profile is prefered, when available.
+    // A shipping profile is preferred, when available.
     $event = new CustomerProfileEvent($customer_profile, $order_item);
     $this->eventDispatcher->dispatch(TaxEvents::CUSTOMER_PROFILE, $event);
     $customer_profile = $event->getCustomerProfile();
-    if (!$customer_profile && $prices_include_tax) {
-      // The customer is still unknown, but prices include tax (VAT scenario),
-      // better to show the store's default tax than nothing.
-      $customer_profile = $this->buildStoreProfile($store);
+    if (!$customer_profile && $this->isDisplayInclusive()) {
+      // The customer is still unknown, but prices are displayed tax-inclusive
+      // (VAT scenario), better to show the store's default tax than nothing.
+      $customer_profile = $this->buildStoreProfile($order->getStore());
     }
 
     return $customer_profile;

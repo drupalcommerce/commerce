@@ -21,6 +21,12 @@ services:
     class: Drupal\commerce_cart\OrderItemMatcher
     arguments: ['@event_dispatcher']
 
+  commerce_cart.cart_subscriber:
+    class: Drupal\commerce_cart\EventSubscriber\CartEventSubscriber
+    arguments: ['@string_translation']
+    tags:
+      - { name: event_subscriber }
+
   commerce_cart.order_subscriber:
     class: Drupal\commerce_cart\EventSubscriber\OrderEventSubscriber
     arguments: ['@commerce_cart.cart_provider']

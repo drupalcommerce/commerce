@@ -18,6 +18,7 @@ use Drupal\commerce\Entity\CommerceBundleEntityBase;
  *     plural = "@count product types",
  *   ),
  *   handlers = {
+ *     "access" = "Drupal\commerce\CommerceBundleAccessControlHandler",
  *     "list_builder" = "Drupal\commerce_product\ProductTypeListBuilder",
  *     "form" = {
  *       "add" = "Drupal\commerce_product\Form\ProductTypeForm",
@@ -43,6 +44,7 @@ use Drupal\commerce\Entity\CommerceBundleEntityBase;
  *     "variationType",
  *     "injectVariationFields",
  *     "traits",
+ *     "locked",
  *   },
  *   links = {
  *     "add-form" = "/admin/commerce/config/product-types/add",

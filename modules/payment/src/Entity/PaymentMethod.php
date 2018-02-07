@@ -40,7 +40,6 @@ use Drupal\profile\Entity\ProfileInterface;
  *   },
  *   base_table = "commerce_payment_method",
  *   admin_permission = "administer commerce_payment_method",
- *   fieldable = TRUE,
  *   entity_keys = {
  *     "id" = "method_id",
  *     "uuid" = "uuid",
