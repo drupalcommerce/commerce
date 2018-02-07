@@ -8,8 +8,11 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 /**
  * Generates the order number for placed orders.
  *
- * Modules wishing to override this logic can register their
- * own event subscriber with a higher weight (e.g. -10).
+ * Modules wishing to provide their own order number logic should register
+ * an event subscriber with a higher priority (for example, 0).
+ *
+ * Modules that need access to the generated order number should register
+ * an event subscriber with a lower priority (for example, -50).
  */
 class OrderNumberSubscriber implements EventSubscriberInterface {
 
@@ -18,13 +21,15 @@ class OrderNumberSubscriber implements EventSubscriberInterface {
    */
   public static function getSubscribedEvents() {
     $events = [
-      'commerce_order.place.pre_transition' => ['setOrderNumber', -100],
+      'commerce_order.place.pre_transition' => ['setOrderNumber', -30],
     ];
     return $events;
   }
 
   /**
-   * Sets the order number, if not already set explicitly, to the order ID.
+   * Sets the order number to the order ID.
+   *
+   * Skipped if the order number has already been set.
    *
    * @param \Drupal\state_machine\Event\WorkflowTransitionEvent $event
    *   The transition event.

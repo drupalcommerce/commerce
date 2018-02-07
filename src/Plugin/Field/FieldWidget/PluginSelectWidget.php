@@ -10,6 +10,7 @@ use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Field\WidgetBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use Drupal\Core\Plugin\PluginFormInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -76,9 +77,10 @@ class PluginSelectWidget extends WidgetBase implements ContainerFactoryPluginInt
   public function formElement(FieldItemListInterface $items, $delta, array $element, array &$form, FormStateInterface $form_state) {
     list(, $plugin_type) = explode(':', $this->fieldDefinition->getType());
 
+    $definitions = $this->pluginManager->getDefinitions();
     $plugins = array_map(function ($definition) {
       return $definition['label'];
-    }, $this->pluginManager->getDefinitions());
+    }, $definitions);
     asort($plugins);
     $target_plugin_id_parents = array_merge($element['#field_parents'], [$items->getName(), $delta, 'target_plugin_id']);
     $target_plugin_id = NestedArray::getValue($form_state->getUserInput(), $target_plugin_id_parents);
@@ -105,25 +107,46 @@ class PluginSelectWidget extends WidgetBase implements ContainerFactoryPluginInt
       '#type' => 'select',
       '#title' => $this->fieldDefinition->getLabel(),
       '#options' => $plugins,
-      '#ajax' => [
-        'callback' => [get_class($this), 'ajaxRefresh'],
-        'wrapper' => $ajax_wrapper_id,
-      ],
       '#default_value' => $target_plugin_id,
       '#required' => $this->fieldDefinition->isRequired(),
     ];
     if (!$element['target_plugin_id']['#required']) {
       $element['target_plugin_id']['#empty_value'] = '';
     }
-
-    $element['target_plugin_configuration'] = [
-      '#type' => 'commerce_plugin_configuration',
-      '#plugin_type' => $plugin_type,
-      '#plugin_id' => $target_plugin_id,
-      '#default_value' => $target_plugin_configuration,
-    ];
+    if (self::supportsConfiguration($definitions)) {
+      $element['target_plugin_id']['#ajax'] = [
+        'callback' => [get_class($this), 'ajaxRefresh'],
+        'wrapper' => $ajax_wrapper_id,
+      ];
+      $element['target_plugin_configuration'] = [
+        '#type' => 'commerce_plugin_configuration',
+        '#plugin_type' => $plugin_type,
+        '#plugin_id' => $target_plugin_id,
+        '#default_value' => $target_plugin_configuration,
+      ];
+    }
 
     return $element;
+  }
+
+  /**
+   * Determines whether plugin configuration is supported.
+   *
+   * Supported if the plugins implement PluginFormInterface.
+   *
+   * @param array $definitions
+   *   The available plugin definitions.
+   *
+   * @return bool
+   *   TRUE if plugin configuration is supported, FALSE otherwise.
+   */
+  protected function supportsConfiguration(array $definitions) {
+    // The plugin manager has $this->pluginInterface, but there's no getter
+    // for it, so it can't be used to check for PluginFormInterface.
+    // Instead, we assume that all plugins implement the same interfaces,
+    // and perform the check against the first plugin.
+    $definition = reset($definitions);
+    return is_subclass_of($definition['class'], PluginFormInterface::class);
   }
 
   /**

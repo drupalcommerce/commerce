@@ -2,10 +2,10 @@
 
 namespace Drupal\commerce_product\Entity;
 
+use Drupal\commerce\Entity\CommerceContentEntityBase;
 use Drupal\commerce\EntityHelper;
 use Drupal\commerce_price\Price;
 use Drupal\Core\Cache\Cache;
-use Drupal\Core\Entity\ContentEntityBase;
 use Drupal\Core\Entity\EntityChangedTrait;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
@@ -40,7 +40,6 @@ use Drupal\user\UserInterface;
  *     "translation" = "Drupal\content_translation\ContentTranslationHandler"
  *   },
  *   admin_permission = "administer commerce_product",
- *   fieldable = TRUE,
  *   translatable = TRUE,
  *   content_translation_ui_skip = TRUE,
  *   base_table = "commerce_product_variation",
@@ -57,7 +56,7 @@ use Drupal\user\UserInterface;
  *   field_ui_base_route = "entity.commerce_product_variation_type.edit_form",
  * )
  */
-class ProductVariation extends ContentEntityBase implements ProductVariationInterface {
+class ProductVariation extends CommerceContentEntityBase implements ProductVariationInterface {
 
   use EntityChangedTrait;
 
@@ -91,7 +90,7 @@ class ProductVariation extends ContentEntityBase implements ProductVariationInte
    * {@inheritdoc}
    */
   public function getProduct() {
-    return $this->get('product_id')->entity;
+    return $this->getTranslatedReferencedEntity('product_id');
   }
 
   /**
@@ -292,7 +291,7 @@ class ProductVariation extends ContentEntityBase implements ProductVariationInte
       }
     }
 
-    return $attribute_values;
+    return $this->ensureTranslations($attribute_values);
   }
 
   /**
@@ -303,12 +302,7 @@ class ProductVariation extends ContentEntityBase implements ProductVariationInte
     if (!in_array($field_name, $attribute_field_names)) {
       throw new \InvalidArgumentException(sprintf('Unknown attribute field name "%s".', $field_name));
     }
-    $attribute_value = NULL;
-    $field = $this->get($field_name);
-    if (!$field->isEmpty()) {
-      $attribute_value = $field->entity;
-    }
-
+    $attribute_value = $this->getTranslatedReferencedEntity($field_name);
     return $attribute_value;
   }
 

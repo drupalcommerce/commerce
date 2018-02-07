@@ -208,6 +208,14 @@ interface PaymentInterface extends ContentEntityInterface, EntityWithPaymentGate
   public function setExpiresTime($timestamp);
 
   /**
+   * Gets whether the payment has been completed.
+   *
+   * @return bool
+   *   TRUE if the payment has been completed, FALSE otherwise.
+   */
+  public function isCompleted();
+
+  /**
    * Gets the payment completed timestamp.
    *
    * @return int

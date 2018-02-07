@@ -26,6 +26,8 @@ class AdjustmentTypeManager extends DefaultPluginManager {
   protected $defaults = [
     'id' => '',
     'label' => '',
+    'singular_label' => '',
+    'plural_label' => '',
     'has_ui' => TRUE,
     'weight' => 0,
     'class' => AdjustmentType::class,
@@ -63,8 +65,10 @@ class AdjustmentTypeManager extends DefaultPluginManager {
     parent::processDefinition($definition, $plugin_id);
 
     $definition['id'] = $plugin_id;
-    if (empty($definition['label'])) {
-      throw new PluginException(sprintf('The adjustment type %s must define the label property.', $plugin_id));
+    foreach (['label', 'singular_label', 'plural_label'] as $required_property) {
+      if (empty($definition[$required_property])) {
+        throw new PluginException(sprintf('The adjustment type %s must define the %s property.', $plugin_id, $required_property));
+      }
     }
   }
 

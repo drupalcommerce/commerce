@@ -100,6 +100,11 @@ class CouponRedemptionForm extends FormElement {
       '#title' => $element['#title'],
       '#description' => $element['#description'],
       '#access' => !$cardinality_reached,
+      // Chrome autofills this field with the address line 1, and ignores
+      // autocomplete => 'off', but respects 'new-password'.
+      '#attributes' => [
+        'autocomplete' => 'new-password',
+      ],
     ];
     $element['apply'] = [
       '#type' => 'submit',

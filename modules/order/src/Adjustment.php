@@ -55,6 +55,13 @@ final class Adjustment {
   protected $included = FALSE;
 
   /**
+   * Whether the adjustment is locked.
+   *
+   * @var bool
+   */
+  protected $locked = FALSE;
+
+  /**
    * Constructs a new Adjustment object.
    *
    * @param array $definition
@@ -82,13 +89,18 @@ final class Adjustment {
         throw new \InvalidArgumentException(sprintf('The provided percentage "%s" is not a numeric value.', $definition['percentage']));
       }
     }
+    // Assume that 'custom' adjustments are always locked, for BC reasons.
+    if ($definition['type'] == 'custom' && !isset($definition['locked'])) {
+      $definition['locked'] = TRUE;
+    }
 
     $this->type = $definition['type'];
-    $this->label = $definition['label'];
+    $this->label = (string) $definition['label'];
     $this->amount = $definition['amount'];
     $this->percentage = !empty($definition['percentage']) ? $definition['percentage'] : NULL;
     $this->sourceId = !empty($definition['source_id']) ? $definition['source_id'] : NULL;
     $this->included = !empty($definition['included']);
+    $this->locked = !empty($definition['locked']);
   }
 
   /**
@@ -170,6 +182,18 @@ final class Adjustment {
    */
   public function isIncluded() {
     return $this->included;
+  }
+
+  /**
+   * Gets whether the adjustment is locked.
+   *
+   * Locked adjustments are not removed during the order refresh process.
+   *
+   * @return bool
+   *   TRUE if the adjustment is locked, FALSE otherwise.
+   */
+  public function isLocked() {
+    return $this->locked;
   }
 
 }

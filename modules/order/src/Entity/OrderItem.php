@@ -2,9 +2,9 @@
 
 namespace Drupal\commerce_order\Entity;
 
+use Drupal\commerce\Entity\CommerceContentEntityBase;
 use Drupal\commerce_order\Adjustment;
 use Drupal\commerce_price\Price;
-use Drupal\Core\Entity\ContentEntityBase;
 use Drupal\Core\Entity\EntityChangedTrait;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
@@ -35,7 +35,6 @@ use Drupal\Core\Field\BaseFieldDefinition;
  *   },
  *   base_table = "commerce_order_item",
  *   admin_permission = "administer commerce_order",
- *   fieldable = TRUE,
  *   entity_keys = {
  *     "id" = "order_item_id",
  *     "uuid" = "uuid",
@@ -46,7 +45,7 @@ use Drupal\Core\Field\BaseFieldDefinition;
  *   field_ui_base_route = "entity.commerce_order_item_type.edit_form",
  * )
  */
-class OrderItem extends ContentEntityBase implements OrderItemInterface {
+class OrderItem extends CommerceContentEntityBase implements OrderItemInterface {
 
   use EntityChangedTrait;
 
@@ -75,7 +74,7 @@ class OrderItem extends ContentEntityBase implements OrderItemInterface {
    * {@inheritdoc}
    */
   public function getPurchasedEntity() {
-    return $this->get('purchased_entity')->entity;
+    return $this->getTranslatedReferencedEntity('purchased_entity');
   }
 
   /**

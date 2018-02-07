@@ -1,4 +1,6 @@
 test_adjustment_type:
-  label: Test order adjustment type
+  label: 'Test'
+  singular_label: 'test'
+  plural_label: 'tests'
   has_ui: false
   weight: -1

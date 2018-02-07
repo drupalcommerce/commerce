@@ -80,6 +80,7 @@ class ProductVariationFieldInjectionTest extends ProductBrowserTestBase {
     $this->assertSession()->pageTextContains('Testing product variation field injection!');
     $this->assertSession()->pageTextContains('Price');
     $this->assertSession()->pageTextContains('$999.00');
+    $this->assertSession()->elementNotExists('css', 'div[data-quickedit-field-id="commerce_product_variation/*"]');
     // We hide the SKU by default.
     $this->assertSession()->pageTextNotContains('INJECTION-CYAN');
 

@@ -4,5 +4,5 @@ description: Provides items for testing Commerce Promotion.
 package: Testing
 core: 8.x
 dependencies:
-  - commerce_cart
-  - commerce_promotion
+  - commerce:commerce_cart
+  - commerce:commerce_promotion
