@@ -21,7 +21,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *
  * @FieldFormatter(
  *   id = "commerce_price_calculated",
- *   label = @Translation("Calculated price"),
+ *   label = @Translation("Calculated"),
  *   field_types = {
  *     "commerce_price"
  *   }
@@ -89,8 +89,8 @@ class PriceCalculatedFormatter extends PriceDefaultFormatter implements Containe
     parent::__construct($plugin_id, $plugin_definition, $field_definition, $settings, $label, $view_mode, $third_party_settings, $entity_type_manager, $number_formatter_factory);
 
     $this->chainPriceResolver = $chain_price_resolver;
-    $this->currentStore = $current_store;
     $this->currencyStorage = $entity_type_manager->getStorage('commerce_currency');
+    $this->currentStore = $current_store;
     $this->currentUser = $current_user;
   }
 
@@ -118,17 +118,16 @@ class PriceCalculatedFormatter extends PriceDefaultFormatter implements Containe
    * {@inheritdoc}
    */
   public function viewElements(FieldItemListInterface $items, $langcode) {
-    $context = new Context($this->currentUser, $this->currentStore->getStore());
     $elements = [];
-    /** @var \Drupal\commerce_price\Plugin\Field\FieldType\PriceItem $item */
-    foreach ($items as $delta => $item) {
+    if (!$items->isEmpty()) {
+      $context = new Context($this->currentUser, $this->currentStore->getStore());
       /** @var \Drupal\commerce\PurchasableEntityInterface $purchasable_entity */
       $purchasable_entity = $items->getEntity();
       $resolved_price = $this->chainPriceResolver->resolve($purchasable_entity, 1, $context);
       $number = $resolved_price->getNumber();
       $currency = $this->currencyStorage->load($resolved_price->getCurrencyCode());
 
-      $elements[$delta] = [
+      $elements[0] = [
         '#markup' => $this->numberFormatter->formatCurrency($number, $currency),
         '#cache' => [
           'tags' => $purchasable_entity->getCacheTags(),
