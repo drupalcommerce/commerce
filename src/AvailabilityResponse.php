@@ -77,9 +77,9 @@ abstract class AvailabilityResponse implements AvailabilityResponseInterface {
    * Creates an AvailabilityResponseUnavailable object.
    *
    * @param int $min
-   *   The minimum amount available.
+   *   The minimum quantity available.
    * @param int $max
-   *   The maximum amount available.
+   *   The maximum quantity available.
    * @param string|null $reason
    *   (optional) The reason why availability is unavailable.
    *   Intended for developers, hence not translatable.
