@@ -62,9 +62,9 @@ abstract class AvailabilityResponse implements AvailabilityResponseInterface {
    * Creates an AvailabilityResponseAvailable object.
    *
    * @param int $min
-   *   The minimum amount available.
+   *   The minimum quantity available.
    * @param int $max
-   *   The maximum amount available.
+   *   The maximum quantity available.
    *
    * @return \Drupal\commerce\AvailabilityResponseAvailable
    *   isAvailable() will be TRUE.
