@@ -49,11 +49,8 @@ interface PriceCalculatorInterface {
    *   The adjustment types to include in the calculated price.
    *   Examples: fee, promotion, tax.
    *
-   * @return array
-   *   An array with the following elements:
-   *   - calculated_price: The resolved unit price with adjustments applied.
-   *   - base_price: The resolved unit price without any adjustments.
-   *   - adjustments: The individual adjustments.
+   * @return \Drupal\commerce_order\PriceCalculatorResult
+   *   The result.
    */
   public function calculate(PurchasableEntityInterface $purchasable_entity, $quantity, Context $context, array $adjustment_types = []);
 

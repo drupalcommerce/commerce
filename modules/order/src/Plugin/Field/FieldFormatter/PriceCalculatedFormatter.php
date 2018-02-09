@@ -179,8 +179,7 @@ class PriceCalculatedFormatter extends PriceDefaultFormatter implements Containe
       $purchasable_entity = $items->getEntity();
       $adjustment_types = array_filter($this->getSetting('adjustment_types'));
       $result = $this->priceCalculator->calculate($purchasable_entity, 1, $context, $adjustment_types);
-      /** @var \Drupal\commerce_price\Price $calculated_price */
-      $calculated_price = $result['calculated_price'];
+      $calculated_price = $result->getCalculatedPrice();
       $number = $calculated_price->getNumber();
       /** @var \Drupal\commerce_price\Entity\CurrencyInterface $currency */
       $currency = $this->currencyStorage->load($calculated_price->getCurrencyCode());

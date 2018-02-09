@@ -99,11 +99,7 @@ class PriceCalculator implements PriceCalculatorInterface {
       $processors = array_merge($processors, $this->getProcessors($adjustment_type));
     }
     if (empty($adjustment_types) || empty($processors)) {
-      return [
-        'calculated_price' => $resolved_price,
-        'base_price' => $resolved_price,
-        'adjustments' => [],
-      ];
+      return new PriceCalculatorResult($resolved_price, $resolved_price);
     }
 
     /** @var \Drupal\commerce_order\OrderItemStorageInterface $order_item_storage */
@@ -120,12 +116,10 @@ class PriceCalculator implements PriceCalculatorInterface {
     foreach ($processors as $processor) {
       $processor->process($order);
     }
+    $calculated_price = $order_item->getAdjustedUnitPrice();
+    $adjustments = $order_item->getAdjustments();
 
-    return [
-      'calculated_price' => $order_item->getAdjustedUnitPrice(),
-      'base_price' => $resolved_price,
-      'adjustments' => $order_item->getAdjustments(),
-    ];
+    return new PriceCalculatorResult($calculated_price, $resolved_price, $adjustments);
   }
 
   /**
