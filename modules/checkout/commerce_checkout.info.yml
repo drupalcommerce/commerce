@@ -10,6 +10,7 @@ dependencies:
 config_devel:
   install:
     - commerce_checkout.commerce_checkout_flow.default
+    - views.view.commerce_checkout_order_summary
+  optional:
     - core.entity_view_display.commerce_product_variation.default.summary
     - core.entity_view_mode.commerce_product_variation.summary
-    - views.view.commerce_checkout_order_summary
