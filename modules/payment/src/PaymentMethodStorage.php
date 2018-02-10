@@ -117,6 +117,27 @@ class PaymentMethodStorage extends CommerceContentEntityStorage implements Payme
   /**
    * {@inheritdoc}
    */
+  public function loadMultipleByUser(UserInterface $account) {
+    return $this->loadByProperties([
+      'uid' => $account->id(),
+    ]);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function loadDefaultByUser(UserInterface $account) {
+    $result = $this->loadByProperties([
+      'uid' => $account->id(),
+      'is_default' => TRUE,
+    ]);
+
+    return reset($result);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   protected function doCreate(array $values) {
     if (!isset($values['payment_gateway'])) {
       throw new EntityStorageException('Missing "payment_gateway" property when creating a payment method.');

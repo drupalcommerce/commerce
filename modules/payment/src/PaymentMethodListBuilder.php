@@ -110,4 +110,21 @@ class PaymentMethodListBuilder extends EntityListBuilder {
     return $build;
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function getOperations(EntityInterface $entity) {
+    $operations = parent::getOperations($entity);
+
+    if (!$entity->isDefault()) {
+      $operations['set_default'] = [
+        'title' => $this->t('Mark as default'),
+        'url' => $entity->toUrl('set-default'),
+        'parameter' => $entity,
+      ];
+    }
+
+    return $operations;
+  }
+
 }

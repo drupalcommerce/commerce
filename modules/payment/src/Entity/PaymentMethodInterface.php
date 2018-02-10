@@ -96,12 +96,12 @@ interface PaymentMethodInterface extends ContentEntityInterface, EntityChangedIn
   /**
    * Sets whether this is the user's default payment method.
    *
-   * @param bool $default
+   * @param bool $is_default
    *   Whether this is the user's default payment method.
    *
    * @return $this
    */
-  public function setDefault($default);
+  public function setDefault($is_default);
 
   /**
    * Gets whether the payment method has expired.
