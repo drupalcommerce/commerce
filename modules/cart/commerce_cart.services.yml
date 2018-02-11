@@ -11,7 +11,7 @@ services:
 
   commerce_cart.cart_provider:
     class: Drupal\commerce_cart\CartProvider
-    arguments: ['@entity_type.manager', '@current_user', '@commerce_cart.cart_session']
+    arguments: ['@entity_type.manager', '@commerce_store.current_store', '@current_user', '@commerce_cart.cart_session']
 
   commerce_cart.cart_manager:
     class: Drupal\commerce_cart\CartManager
