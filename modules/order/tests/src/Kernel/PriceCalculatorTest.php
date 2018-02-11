@@ -13,6 +13,8 @@ use Drupal\Tests\commerce\Kernel\CommerceKernelTestBase;
 /**
  * Tests the price calculator.
  *
+ * @coversDefaultClass \Drupal\commerce_order\PriceCalculator
+ *
  * @group commerce
  */
 class PriceCalculatorTest extends CommerceKernelTestBase {
@@ -153,6 +155,8 @@ class PriceCalculatorTest extends CommerceKernelTestBase {
 
   /**
    * Tests the calculator.
+   *
+   * @covers ::calculate
    */
   public function testCalculation() {
     $first_context = new Context($this->firstUser, $this->store);
@@ -196,11 +200,11 @@ class PriceCalculatorTest extends CommerceKernelTestBase {
     $this->assertCount(2, $result->getAdjustments());
     $adjustments = $result->getAdjustments();
     $first_adjustment = reset($adjustments);
-    $this->assertEquals('tax', $first_adjustment->getType());
-    $this->assertEquals(new Price('0.60', 'USD'), $first_adjustment->getAmount());
+    $this->assertEquals('promotion', $first_adjustment->getType());
+    $this->assertEquals(new Price('-1.80', 'USD'), $first_adjustment->getAmount());
     $second_adjustment = end($adjustments);
-    $this->assertEquals('promotion', $second_adjustment->getType());
-    $this->assertEquals(new Price('-1.80', 'USD'), $second_adjustment->getAmount());
+    $this->assertEquals('tax', $second_adjustment->getType());
+    $this->assertEquals(new Price('0.60', 'USD'), $second_adjustment->getAmount());
 
     $result = $this->priceCalculator->calculate($this->secondVariation, 1, $first_context, ['tax', 'promotion']);
     $this->assertEquals(new Price('2.40', 'USD'), $result->getCalculatedPrice());
@@ -208,11 +212,11 @@ class PriceCalculatorTest extends CommerceKernelTestBase {
     $this->assertCount(2, $result->getAdjustments());
     $adjustments = $result->getAdjustments();
     $first_adjustment = reset($adjustments);
-    $this->assertEquals('tax', $first_adjustment->getType());
-    $this->assertEquals(new Price('0.80', 'USD'), $first_adjustment->getAmount());
+    $this->assertEquals('promotion', $first_adjustment->getType());
+    $this->assertEquals(new Price('-2.40', 'USD'), $first_adjustment->getAmount());
     $second_adjustment = end($adjustments);
-    $this->assertEquals('promotion', $second_adjustment->getType());
-    $this->assertEquals(new Price('-2.40', 'USD'), $second_adjustment->getAmount());
+    $this->assertEquals('tax', $second_adjustment->getType());
+    $this->assertEquals(new Price('0.80', 'USD'), $second_adjustment->getAmount());
 
     // User-specific adjustment added by TestAdjustmentProcessor.
     $result = $this->priceCalculator->calculate($this->secondVariation, 1, $second_context, ['test_adjustment_type']);

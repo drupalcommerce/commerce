@@ -4,7 +4,7 @@ namespace Drupal\commerce_order;
 
 use Drupal\commerce\Context;
 use Drupal\commerce\PurchasableEntityInterface;
-use Drupal\commerce_order\Resolver\OrderTypeResolverInterface;
+use Drupal\commerce_order\Resolver\ChainOrderTypeResolverInterface;
 use Drupal\commerce_price\Resolver\ChainPriceResolverInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -12,25 +12,32 @@ use Symfony\Component\HttpFoundation\RequestStack;
 class PriceCalculator implements PriceCalculatorInterface {
 
   /**
-   * The entity type manager.
+   * The adjustment transformer.
    *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   * @var \Drupal\commerce_order\AdjustmentTransformerInterface
    */
-  protected $entityTypeManager;
+  protected $adjustmentTransformer;
 
   /**
-   * The chain base price resolver.
+   * The chain order type resolver.
+   *
+   * @var \Drupal\commerce_order\Resolver\ChainOrderTypeResolverInterface
+   */
+  protected $chainOrderTypeResolver;
+
+  /**
+   * The chain price resolver.
    *
    * @var \Drupal\commerce_price\Resolver\ChainPriceResolverInterface
    */
   protected $chainPriceResolver;
 
   /**
-   * The order type resolver.
+   * The entity type manager.
    *
-   * @var \Drupal\commerce_order\Resolver\OrderTypeResolverInterface
+   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
    */
-  protected $orderTypeResolver;
+  protected $entityTypeManager;
 
   /**
    * The request stack.
@@ -56,19 +63,22 @@ class PriceCalculator implements PriceCalculatorInterface {
   /**
    * Constructs a new PriceCalculator object.
    *
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
-   *   The entity type manager.
+   * @param \Drupal\commerce_order\AdjustmentTransformerInterface $adjustment_transformer
+   *   The adjustment transformer.
+   * @param \Drupal\commerce_order\Resolver\ChainOrderTypeResolverInterface $chain_order_type_resolver
+   *   The chain order type resolver.
    * @param \Drupal\commerce_price\Resolver\ChainPriceResolverInterface $chain_price_resolver
    *   The chain price resolver.
-   * @param \Drupal\commerce_order\Resolver\OrderTypeResolverInterface $order_type_resolver
-   *   The order type resolver.
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   *   The entity type manager.
    * @param \Symfony\Component\HttpFoundation\RequestStack $request_stack
    *   The request stack.
    */
-  public function __construct(EntityTypeManagerInterface $entity_type_manager, ChainPriceResolverInterface $chain_price_resolver, OrderTypeResolverInterface $order_type_resolver, RequestStack $request_stack) {
-    $this->entityTypeManager = $entity_type_manager;
+  public function __construct(AdjustmentTransformerInterface $adjustment_transformer, ChainOrderTypeResolverInterface $chain_order_type_resolver, ChainPriceResolverInterface $chain_price_resolver, EntityTypeManagerInterface $entity_type_manager, RequestStack $request_stack) {
+    $this->adjustmentTransformer = $adjustment_transformer;
+    $this->chainOrderTypeResolver = $chain_order_type_resolver;
     $this->chainPriceResolver = $chain_price_resolver;
-    $this->orderTypeResolver = $order_type_resolver;
+    $this->entityTypeManager = $entity_type_manager;
     $this->requestStack = $request_stack;
   }
 
@@ -107,7 +117,7 @@ class PriceCalculator implements PriceCalculatorInterface {
     $order_item = $order_item_storage->createFromPurchasableEntity($purchasable_entity);
     $order_item->setUnitPrice($resolved_price);
     $order_item->setQuantity($quantity);
-    $order_type_id = $this->orderTypeResolver->resolve($order_item);
+    $order_type_id = $this->chainOrderTypeResolver->resolve($order_item);
 
     $order = $this->prepareOrder($order_type_id, $context);
     $order_item->order_id = $order;
@@ -118,6 +128,7 @@ class PriceCalculator implements PriceCalculatorInterface {
     }
     $calculated_price = $order_item->getAdjustedUnitPrice();
     $adjustments = $order_item->getAdjustments();
+    $adjustments = $this->adjustmentTransformer->processAdjustments($adjustments);
 
     return new PriceCalculatorResult($calculated_price, $resolved_price, $adjustments);
   }
