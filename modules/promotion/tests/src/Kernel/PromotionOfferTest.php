@@ -90,7 +90,6 @@ class PromotionOfferTest extends CommerceKernelTestBase {
    * Tests order percentage off.
    */
   public function testOrderPercentageOff() {
-    // Use addOrderItem so the total is calculated.
     $order_item = OrderItem::create([
       'type' => 'test',
       'quantity' => '2',
@@ -164,12 +163,12 @@ class PromotionOfferTest extends CommerceKernelTestBase {
     $this->order->save();
     $this->order = $this->reloadEntity($this->order);
 
-    // Offer amount larger than the order total.
+    // Offer amount larger than the order subtotal.
     $this->assertEquals(1, count($this->order->getAdjustments()));
     $this->assertEquals(new Price('-20.00', 'USD'), $this->order->getAdjustments()[0]->getAmount());
     $this->assertEquals(new Price('0.00', 'USD'), $this->order->getTotalPrice());
 
-    // Offer amount smaller than the order total.
+    // Offer amount smaller than the order subtotal.
     $order_item->setQuantity(2);
     $order_item->save();
     $this->order->save();

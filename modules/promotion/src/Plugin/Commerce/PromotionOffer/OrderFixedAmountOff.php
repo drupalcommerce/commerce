@@ -11,7 +11,7 @@ use Drupal\Core\Entity\EntityInterface;
  *
  * @CommercePromotionOffer(
  *   id = "order_fixed_amount_off",
- *   label = @Translation("Fixed amount off the order total"),
+ *   label = @Translation("Fixed amount off the order subtotal"),
  *   entity_type = "commerce_order",
  * )
  */
@@ -24,14 +24,15 @@ class OrderFixedAmountOff extends FixedAmountOffBase {
     $this->assertEntity($entity);
     /** @var \Drupal\commerce_order\Entity\OrderInterface $order */
     $order = $entity;
-    $total_price = $order->getTotalPrice();
+    $subtotal_price = $order->getSubTotalPrice();
     $adjustment_amount = $this->getAmount();
-    if ($total_price->getCurrencyCode() != $adjustment_amount->getCurrencyCode()) {
+    if ($subtotal_price->getCurrencyCode() != $adjustment_amount->getCurrencyCode()) {
       return;
     }
-    // Don't reduce the order total past zero.
-    if ($adjustment_amount->greaterThan($total_price)) {
-      $adjustment_amount = $total_price;
+    // The promotion amount can't be larger than the subtotal, to avoid
+    // potentially having a negative order total.
+    if ($adjustment_amount->greaterThan($subtotal_price)) {
+      $adjustment_amount = $subtotal_price;
     }
 
     $order->addAdjustment(new Adjustment([
