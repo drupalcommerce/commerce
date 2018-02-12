@@ -47,7 +47,6 @@ use Drupal\profile\Entity\ProfileInterface;
  *   },
  *   links = {
  *     "collection" = "/user/{user}/payment-methods",
- *     "canonical" = "/user/{user}/payment-methods/{commerce_payment_method}/edit",
  *     "edit-form" = "/user/{user}/payment-methods/{commerce_payment_method}/edit",
  *     "delete-form" = "/user/{user}/payment-methods/{commerce_payment_method}/delete",
  *     "set-default" = "/user/{user}/payment-methods/{commerce_payment_method}/set-default"

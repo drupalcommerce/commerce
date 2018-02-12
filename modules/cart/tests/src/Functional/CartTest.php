@@ -79,7 +79,7 @@ class CartTest extends OrderBrowserTestBase {
       'variations' => [$variation],
     ]);
     $this->variations[] = $variation;
-    $this->cart = \Drupal::service('commerce_cart.cart_provider')->createCart('default', $this->store);
+    $this->cart = \Drupal::service('commerce_cart.cart_provider')->createCart('default');
     $this->cartManager = \Drupal::service('commerce_cart.cart_manager');
   }
 

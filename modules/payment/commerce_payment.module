@@ -105,7 +105,6 @@ function template_preprocess_commerce_payment_method(array &$variables) {
   $payment_method = $variables['elements']['#commerce_payment_method'];
 
   $variables['payment_method_entity'] = $payment_method;
-  $variables['payment_method_url'] = $payment_method->toUrl();
   $variables['payment_method'] = [
     // The label is generated dynamically, so it's not present in 'elements'.
     'label' => [

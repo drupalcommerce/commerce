@@ -7,7 +7,7 @@ services:
     class: Drupal\commerce_promotion\PromotionOrderProcessor
     arguments: ['@entity_type.manager']
     tags:
-      - { name: commerce_order.order_processor, priority: 50 }
+      - { name: commerce_order.order_processor, priority: 50, adjustment_type: promotion }
 
   commerce_promotion.usage:
     class: Drupal\commerce_promotion\PromotionUsage

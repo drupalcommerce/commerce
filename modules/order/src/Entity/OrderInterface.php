@@ -233,12 +233,14 @@ interface OrderInterface extends ContentEntityInterface, EntityAdjustableInterfa
   /**
    * Collects all adjustments that belong to the order.
    *
-   * Unlike getAdjustments() which returns only order adjustments,
-   * this method returns both order and order item adjustments.
+   * Unlike getAdjustments() which returns only order adjustments, this
+   * method returns both order and order item adjustments (multiplied
+   * by quantity).
    *
    * Important:
-   * The returned order item adjustments are multiplied by quantity,
-   * so that they can be safely added to the order adjustments.
+   * The returned adjustments are unprocessed, and must be processed before use.
+   *
+   * @see \Drupal\commerce_order\AdjustmentTransformerInterface::processAdjustments()
    *
    * @return \Drupal\commerce_order\Adjustment[]
    *   The adjustments.

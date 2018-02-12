@@ -61,3 +61,10 @@ field.formatter.settings.commerce_price_calculated:
     display_currency_code:
       type: boolean
       label: 'Display the currency code instead of the currency symbol'
+    # Needed by the commerce_order version of the formatter.
+    adjustment_types:
+      type: sequence
+      label: 'Adjustment types'
+      sequence:
+        type: string
+        label: 'Adjustment type'

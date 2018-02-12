@@ -7,12 +7,11 @@
  * - attributes: HTML attributes for the wrapper.
  * - totals: An array of order totals values with the following keys:
  *   - subtotal: The order subtotal price.
- *   - adjustments: An array of adjustment totals:
+ *   - adjustments: The adjustments:
  *     - type: The adjustment type.
  *     - label: The adjustment label.
- *     - total: The adjustment total price.
+ *     - amount: The adjustment amount.
  *     - percentage: The decimal adjustment percentage, when available. For example, "0.2" for a 20% adjustment.
- *     - weight: The adjustment weight, taken from the adjustment type.
  *   - total: The order total price.
  *
  * @ingroup themeable
@@ -25,7 +24,7 @@
   </div>
   {% for adjustment in totals.adjustments %}
     <div class="order-total-line order-total-line__adjustment">
-      <span class="order-total-line-label">{{ adjustment.label }} </span><span class="order-total-line-value">{{ adjustment.total|commerce_price_format }}</span>
+      <span class="order-total-line-label">{{ adjustment.label }} </span><span class="order-total-line-value">{{ adjustment.amount|commerce_price_format }}</span>
     </div>
   {% endfor %}
   <div class="order-total-line order-total-line__total">

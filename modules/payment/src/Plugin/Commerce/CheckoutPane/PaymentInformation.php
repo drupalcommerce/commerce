@@ -126,6 +126,7 @@ class PaymentInformation extends CheckoutPaneBase {
           'type' => $selected_option['#payment_method_type'],
           'payment_gateway' => $selected_option['#payment_gateway'],
           'uid' => $this->order->getCustomerId(),
+          'billing_profile' => $this->order->getBillingProfile(),
         ]);
 
         $pane_form['add_payment_method'] = [
