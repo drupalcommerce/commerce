@@ -2,6 +2,7 @@
 
 namespace Drupal\Tests\commerce_price\Kernel;
 
+use Drupal\commerce_price\Price;
 use Drupal\Tests\commerce\Kernel\CommerceKernelTestBase;
 
 /**
@@ -19,30 +20,50 @@ class PriceTwigExtensionTest extends CommerceKernelTestBase {
   ];
 
   /**
-   * Tests an improperly formatted price array.
+   * Tests passing an invalid value.
    */
-  public function testBrokenPrice() {
-    $theme = ['#theme' => 'broken_commerce_price'];
+  public function testInvalidPrice() {
+    $theme = [
+      '#theme' => 'commerce_price_test',
+      '#price' => [
+        // Invalid keys.
+        'numb' => '9.99',
+        'currency_co' => 'USD',
+      ],
+    ];
     $this->setExpectedException('InvalidArgumentException');
     $this->render($theme);
   }
 
   /**
-   * Tests a properly formatted price array.
+   * Tests passing a valid value.
    */
-  public function testWorkingPrice() {
-    $theme = ['#theme' => 'working_commerce_price'];
+  public function testValidPrice() {
+    $theme = [
+      '#theme' => 'commerce_price_test',
+      '#price' => [
+        'number' => '9.99',
+        'currency_code' => 'USD',
+      ],
+    ];
     $this->render($theme);
     $this->assertText('$9.99');
+
+    $theme = [
+      '#theme' => 'commerce_price_test',
+      '#price' => new Price('20.99', 'USD'),
+    ];
+    $this->render($theme);
+    $this->assertText('$20.99');
   }
 
   /**
-   * Tests a price object.
+   * Tests passing an empty value.
    */
-  public function testPriceObject() {
-    $theme = ['#theme' => 'commerce_price_object'];
+  public function testEmptyPrice() {
+    $theme = ['#theme' => 'commerce_price_test'];
     $this->render($theme);
-    $this->assertText('$9.99');
+    $this->assertText('N/A');
   }
 
 }
