@@ -1,40 +1,37 @@
 <?php
 
-namespace Drupal\commerce_price\Plugin\Field\FieldFormatter;
+namespace Drupal\commerce_order\Plugin\Field\FieldFormatter;
 
 use Drupal\commerce\Context;
 use Drupal\commerce\PurchasableEntityInterface;
+use Drupal\commerce_order\AdjustmentTypeManager;
+use Drupal\commerce_order\PriceCalculatorInterface;
 use Drupal\commerce_price\NumberFormatterFactoryInterface;
-use Drupal\commerce_price\Resolver\ChainPriceResolverInterface;
+use Drupal\commerce_price\Plugin\Field\FieldFormatter\PriceDefaultFormatter;
 use Drupal\commerce_store\CurrentStoreInterface;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FieldItemListInterface;
+use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Session\AccountInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * Plugin implementation of the 'commerce_price_calculated' formatter.
+ * Alternative implementation of the 'commerce_price_calculated' formatter.
  *
- * @FieldFormatter(
- *   id = "commerce_price_calculated",
- *   label = @Translation("Calculated"),
- *   field_types = {
- *     "commerce_price"
- *   }
- * )
+ * @see \Drupal\commerce_price\Plugin\Field\FieldFormatter\PriceCalculatedFormatter
  */
 class PriceCalculatedFormatter extends PriceDefaultFormatter implements ContainerFactoryPluginInterface {
 
   /**
-   * The chain price resolver.
+   * The adjustment type manager.
    *
-   * @var \Drupal\commerce_price\Resolver\ChainPriceResolverInterface
+   * @var \Drupal\commerce_order\AdjustmentTypeManager
    */
-  protected $chainPriceResolver;
+  protected $adjustmentTypeManager;
 
   /**
    * The currency storage.
@@ -58,6 +55,13 @@ class PriceCalculatedFormatter extends PriceDefaultFormatter implements Containe
   protected $currentStore;
 
   /**
+   * The price calculator.
+   *
+   * @var \Drupal\commerce_order\PriceCalculatorInterface
+   */
+  protected $priceCalculator;
+
+  /**
    * Constructs a new PriceCalculatedFormatter object.
    *
    * @param string $plugin_id
@@ -78,20 +82,23 @@ class PriceCalculatedFormatter extends PriceDefaultFormatter implements Containe
    *   The entity type manager.
    * @param \Drupal\commerce_price\NumberFormatterFactoryInterface $number_formatter_factory
    *   The number formatter factory.
-   * @param \Drupal\commerce_price\Resolver\ChainPriceResolverInterface $chain_price_resolver
-   *   The chain price resolver.
+   * @param \Drupal\commerce_order\AdjustmentTypeManager $adjustment_type_manager
+   *   The adjustment type manager.
    * @param \Drupal\commerce_store\CurrentStoreInterface $current_store
    *   The current store.
    * @param \Drupal\Core\Session\AccountInterface $current_user
    *   The current user.
+   * @param \Drupal\commerce_order\PriceCalculatorInterface $price_calculator
+   *   The price calculator.
    */
-  public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, $label, $view_mode, array $third_party_settings, EntityTypeManagerInterface $entity_type_manager, NumberFormatterFactoryInterface $number_formatter_factory, ChainPriceResolverInterface $chain_price_resolver, CurrentStoreInterface $current_store, AccountInterface $current_user) {
+  public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, $label, $view_mode, array $third_party_settings, EntityTypeManagerInterface $entity_type_manager, NumberFormatterFactoryInterface $number_formatter_factory, AdjustmentTypeManager $adjustment_type_manager, CurrentStoreInterface $current_store, AccountInterface $current_user, PriceCalculatorInterface $price_calculator) {
     parent::__construct($plugin_id, $plugin_definition, $field_definition, $settings, $label, $view_mode, $third_party_settings, $entity_type_manager, $number_formatter_factory);
 
-    $this->chainPriceResolver = $chain_price_resolver;
+    $this->adjustmentTypeManager = $adjustment_type_manager;
     $this->currencyStorage = $entity_type_manager->getStorage('commerce_currency');
     $this->currentStore = $current_store;
     $this->currentUser = $current_user;
+    $this->priceCalculator = $price_calculator;
   }
 
   /**
@@ -108,10 +115,57 @@ class PriceCalculatedFormatter extends PriceDefaultFormatter implements Containe
       $configuration['third_party_settings'],
       $container->get('entity_type.manager'),
       $container->get('commerce_price.number_formatter_factory'),
-      $container->get('commerce_price.chain_price_resolver'),
+      $container->get('plugin.manager.commerce_adjustment_type'),
       $container->get('commerce_store.current_store'),
-      $container->get('current_user')
+      $container->get('current_user'),
+      $container->get('commerce_order.price_calculator')
     );
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function defaultSettings() {
+    return [
+      'adjustment_types' => [],
+    ] + parent::defaultSettings();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function settingsForm(array $form, FormStateInterface $form_state) {
+    $elements = parent::settingsForm($form, $form_state);
+
+    $elements['adjustment_types'] = [
+      '#type' => 'checkboxes',
+      '#title' => $this->t('Adjustments'),
+      '#options' => [],
+      '#default_value' => $this->getSetting('adjustment_types'),
+    ];
+    foreach ($this->adjustmentTypeManager->getDefinitions() as $plugin_id => $definition) {
+      if (!in_array($plugin_id, ['custom'])) {
+        $label = $this->t('Apply @label to the calculated price', ['@label' => $definition['plural_label']]);
+        $elements['adjustment_types']['#options'][$plugin_id] = $label;
+      }
+    }
+
+    return $elements;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function settingsSummary() {
+    $summary = parent::settingsSummary();
+    $enabled_adjustment_types = array_filter($this->getSetting('adjustment_types'));
+    foreach ($this->adjustmentTypeManager->getDefinitions() as $plugin_id => $definition) {
+      if (in_array($plugin_id, $enabled_adjustment_types)) {
+        $summary[] = $this->t('Apply @label to the calculated price', ['@label' => $definition['plural_label']]);
+      }
+    }
+
+    return $summary;
   }
 
   /**
@@ -123,9 +177,12 @@ class PriceCalculatedFormatter extends PriceDefaultFormatter implements Containe
       $context = new Context($this->currentUser, $this->currentStore->getStore());
       /** @var \Drupal\commerce\PurchasableEntityInterface $purchasable_entity */
       $purchasable_entity = $items->getEntity();
-      $resolved_price = $this->chainPriceResolver->resolve($purchasable_entity, 1, $context);
-      $number = $resolved_price->getNumber();
-      $currency = $this->currencyStorage->load($resolved_price->getCurrencyCode());
+      $adjustment_types = array_filter($this->getSetting('adjustment_types'));
+      $result = $this->priceCalculator->calculate($purchasable_entity, 1, $context, $adjustment_types);
+      $calculated_price = $result->getCalculatedPrice();
+      $number = $calculated_price->getNumber();
+      /** @var \Drupal\commerce_price\Entity\CurrencyInterface $currency */
+      $currency = $this->currencyStorage->load($calculated_price->getCurrencyCode());
 
       $elements[0] = [
         '#markup' => $this->numberFormatter->formatCurrency($number, $currency),

@@ -2,7 +2,6 @@
 
 namespace Drupal\commerce_order\EventSubscriber;
 
-use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\state_machine\Event\WorkflowTransitionEvent;
 use Drupal\Component\Datetime\TimeInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -10,7 +9,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 class TimestampEventSubscriber implements EventSubscriberInterface {
 
   /**
-   * The system time.
+   * The time.
    *
    * @var \Drupal\Component\Datetime\TimeInterface
    */
@@ -19,12 +18,10 @@ class TimestampEventSubscriber implements EventSubscriberInterface {
   /**
    * Constructs a new TimestampEventSubscriber object.
    *
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
-   *   The entity type manager.
    * @param \Drupal\Component\Datetime\TimeInterface $time
-   *   The system time.
+   *   The time.
    */
-  public function __construct(EntityTypeManagerInterface $entity_type_manager, TimeInterface $time) {
+  public function __construct(TimeInterface $time) {
     $this->time = $time;
   }
 

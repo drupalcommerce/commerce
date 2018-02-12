@@ -19,7 +19,7 @@ interface CartProviderInterface {
    * @param string $order_type
    *   The order type ID.
    * @param \Drupal\commerce_store\Entity\StoreInterface $store
-   *   The store.
+   *   The store. If empty, the current store is assumed.
    * @param \Drupal\Core\Session\AccountInterface $account
    *   The user. If empty, the current user is assumed.
    *
@@ -29,7 +29,7 @@ interface CartProviderInterface {
    * @throws \Drupal\commerce_cart\Exception\DuplicateCartException
    *   When a cart with the given criteria already exists.
    */
-  public function createCart($order_type, StoreInterface $store, AccountInterface $account = NULL);
+  public function createCart($order_type, StoreInterface $store = NULL, AccountInterface $account = NULL);
 
   /**
    * Finalizes the given cart order.
@@ -51,14 +51,14 @@ interface CartProviderInterface {
    * @param string $order_type
    *   The order type ID.
    * @param \Drupal\commerce_store\Entity\StoreInterface $store
-   *   The store.
+   *   The store. If empty, the current store is assumed.
    * @param \Drupal\Core\Session\AccountInterface $account
    *   The user. If empty, the current user is assumed.
    *
    * @return \Drupal\commerce_order\Entity\OrderInterface|null
    *   The cart order, or NULL if none found.
    */
-  public function getCart($order_type, StoreInterface $store, AccountInterface $account = NULL);
+  public function getCart($order_type, StoreInterface $store = NULL, AccountInterface $account = NULL);
 
   /**
    * Gets the cart order ID for the given store and user.
@@ -66,14 +66,14 @@ interface CartProviderInterface {
    * @param string $order_type
    *   The order type ID.
    * @param \Drupal\commerce_store\Entity\StoreInterface $store
-   *   The store.
+   *   The store. If empty, the current store is assumed.
    * @param \Drupal\Core\Session\AccountInterface $account
    *   The user. If empty, the current user is assumed.
    *
    * @return int|null
    *   The cart order ID, or NULL if none found.
    */
-  public function getCartId($order_type, StoreInterface $store, AccountInterface $account = NULL);
+  public function getCartId($order_type, StoreInterface $store = NULL, AccountInterface $account = NULL);
 
   /**
    * Gets all cart orders for the given user.

@@ -62,9 +62,7 @@ abstract class CartBrowserTestBase extends OrderBrowserTestBase {
   protected function setUp() {
     parent::setUp();
 
-    $this->createStore();
-
-    $this->cart = \Drupal::service('commerce_cart.cart_provider')->createCart('default', $this->store);
+    $this->cart = \Drupal::service('commerce_cart.cart_provider')->createCart('default');
     $this->cartManager = \Drupal::service('commerce_cart.cart_manager');
     $this->attributeFieldManager = \Drupal::service('commerce_product.attribute_field_manager');
   }

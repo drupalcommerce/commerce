@@ -5,8 +5,6 @@ Drupal Commerce
 Drupal Commerce is the leading flexible eCommerce solution for Drupal,
 powering over 60,000 online stores of all sizes.
 
-Note: 8.x-2.x is in beta. It is already usable for production websites 
-and upgrades between versions are supported. Bugs are still expected. 
 Please report bugs in the [issue queue](https://www.drupal.org/project/issues/commerce?version=8.x).
 
 [Documentation](http://docs.drupalcommerce.org)

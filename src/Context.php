@@ -62,7 +62,7 @@ final class Context {
   /**
    * Gets the store.
    *
-   * @return \Drupal\commerce_store\Entity\Store
+   * @return \Drupal\commerce_store\Entity\StoreInterface
    *   The store.
    */
   public function getStore() {

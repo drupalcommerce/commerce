@@ -15,11 +15,11 @@ interface OrderTotalSummaryInterface {
    * @return array
    *   An array of totals with the following elements:
    *     - subtotal: The order subtotal price.
-   *     - adjustments: An array of adjustment totals:
+   *     - adjustments: The adjustments:
    *         - type: The adjustment type.
    *         - label: The adjustment label.
-   *         - total: The adjustment total price.
-   *         - weight: The adjustment weight, taken from the adjustment type.
+   *         - amount: The adjustment amount.
+   *         - percentage: The decimal adjustment percentage, when available.
    *     - total: The order total price.
    */
   public function buildTotals(OrderInterface $order);

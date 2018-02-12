@@ -37,13 +37,13 @@ class PaymentStorage extends CommerceContentEntityStorage implements PaymentStor
    * {@inheritdoc}
    */
   protected function doCreate(array $values) {
-    if (!isset($values['payment_gateway'])) {
+    if (empty($values['payment_gateway'])) {
       throw new EntityStorageException('Missing "payment_gateway" property when creating a payment.');
     }
     // Populate the type using the payment gateway.
     if (!isset($values['type'])) {
       $payment_gateway = $values['payment_gateway'];
-      if ($payment_gateway) {
+      if (is_string($payment_gateway)) {
         // The caller passed tha payment gateway ID, load the full entity.
         $payment_gateway_storage = $this->entityManager->getStorage('commerce_payment_gateway');
         /** @var \Drupal\commerce_payment\Entity\PaymentGatewayInterface $payment_gateway */

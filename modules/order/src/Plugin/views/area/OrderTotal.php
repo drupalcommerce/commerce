@@ -76,7 +76,7 @@ class OrderTotal extends AreaPluginBase {
         if (!$argument instanceof NumericArgument) {
           continue;
         }
-        if ($argument->getField() !== 'commerce_order.order_id') {
+        if (!in_array($argument->getField(), ['commerce_order.order_id', 'commerce_order_item.order_id'])) {
           continue;
         }
         if ($order = $this->orderStorage->load($argument->getValue())) {

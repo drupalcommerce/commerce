@@ -196,4 +196,124 @@ final class Adjustment {
     return $this->locked;
   }
 
+  /**
+   * Gets the array representation of the adjustment.
+   *
+   * @return array
+   *   The array representation of the adjustment.
+   */
+  public function toArray() {
+    return [
+      'type' => $this->type,
+      'label' => $this->label,
+      'amount' => $this->amount,
+      'percentage' => $this->percentage,
+      'source_id' => $this->sourceId,
+      'included' => $this->included,
+      'locked' => $this->locked,
+    ];
+  }
+
+  /**
+   * Adds the given adjustment to the current adjustment.
+   *
+   * @param \Drupal\commerce_order\Adjustment $adjustment
+   *   The adjustment.
+   *
+   * @return static
+   *   The resulting adjustment.
+   */
+  public function add(Adjustment $adjustment) {
+    $this->assertSameType($adjustment);
+    $this->assertSameSourceId($adjustment);
+    $definition = [
+      'amount' => $this->amount->add($adjustment->getAmount()),
+    ] + $this->toArray();
+
+    return new static($definition);
+  }
+
+  /**
+   * Subtracts the given adjustment from the current adjustment.
+   *
+   * @param \Drupal\commerce_order\Adjustment $adjustment
+   *   The adjustment.
+   *
+   * @return static
+   *   The resulting adjustment.
+   */
+  public function subtract(Adjustment $adjustment) {
+    $this->assertSameType($adjustment);
+    $this->assertSameSourceId($adjustment);
+    $definition = [
+      'amount' => $this->amount->subtract($adjustment->getAmount()),
+    ] + $this->toArray();
+
+    return new static($definition);
+  }
+
+  /**
+   * Multiplies the adjustment amount by the given number.
+   *
+   * @param string $number
+   *   The number.
+   *
+   * @return static
+   *   The resulting adjustment.
+   */
+  public function multiply($number) {
+    $definition = [
+      'amount' => $this->amount->multiply($number),
+    ] + $this->toArray();
+
+    return new static($definition);
+  }
+
+  /**
+   * Divides the adjustment amount by the given number.
+   *
+   * @param string $number
+   *   The number.
+   *
+   * @return static
+   *   The resulting adjustment.
+   */
+  public function divide($number) {
+    $definition = [
+      'amount' => $this->amount->divide($number),
+    ] + $this->toArray();
+
+    return new static($definition);
+  }
+
+  /**
+   * Asserts that the given adjustment's type matches the current one.
+   *
+   * @param \Drupal\commerce_order\Adjustment $adjustment
+   *   The adjustment to compare.
+   *
+   * @throws \InvalidArgumentException
+   *   Thrown when the adjustment type does not match the current one.
+   */
+  protected function assertSameType(Adjustment $adjustment) {
+    if ($this->type != $adjustment->getType()) {
+      throw new \InvalidArgumentException(sprintf('Adjustment type "%s" does not match "%s".', $adjustment->getType(), $this->type));
+    }
+  }
+
+  /**
+   * Asserts that the given adjustment's source ID matches the current one.
+   *
+   * @param \Drupal\commerce_order\Adjustment $adjustment
+   *   The adjustment to compare.
+   *
+   * @throws \InvalidArgumentException
+   *   Thrown when the adjustment source ID does not match the current one.
+   */
+  protected function assertSameSourceId(Adjustment $adjustment) {
+    if ($this->sourceId != $adjustment->getSourceId()) {
+      throw new \InvalidArgumentException(sprintf('Adjustment source ID "%s" does not match "%s".', $adjustment->getSourceId(), $this->sourceId));
+    }
+  }
+
 }

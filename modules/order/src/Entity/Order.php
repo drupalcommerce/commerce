@@ -324,16 +324,7 @@ class Order extends CommerceContentEntityBase implements OrderInterface {
       foreach ($order_item->getAdjustments() as $adjustment) {
         // Order item adjustments apply to the unit price, they
         // must be multiplied by quantity before they are used.
-        $multiplied_adjustment = new Adjustment([
-          'type' => $adjustment->getType(),
-          'label' => $adjustment->getLabel(),
-          'amount' => $adjustment->getAmount()->multiply($order_item->getQuantity()),
-          'percentage' => $adjustment->getPercentage(),
-          'source_id' => $adjustment->getSourceId(),
-          'included' => $adjustment->isIncluded(),
-          'locked' => $adjustment->isLocked(),
-        ]);
-        $adjustments[] = $multiplied_adjustment;
+        $adjustments[] = $adjustment->multiply($order_item->getQuantity());
       }
     }
     foreach ($this->getAdjustments() as $adjustment) {
