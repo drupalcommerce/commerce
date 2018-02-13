@@ -35,7 +35,7 @@ content:
     settings:
       thousand_separator: ''
       decimal_separator: .
-      scale: 2
+      scale: 3
       prefix_suffix: true
     third_party_settings: {  }
     label: above

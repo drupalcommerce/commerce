@@ -303,6 +303,7 @@ class OrderItem extends CommerceContentEntityBase implements OrderItemInterface 
       ->setDescription(t('The number of purchased units.'))
       ->setReadOnly(TRUE)
       ->setSetting('unsigned', TRUE)
+      ->setSetting('scale', 3)
       ->setSetting('min', 0)
       ->setDefaultValue(1)
       ->setDisplayOptions('form', [

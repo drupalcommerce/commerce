@@ -69,3 +69,90 @@ function commerce_product_update_8203() {
 
   $definition_update_manager->updateFieldStorageDefinition($storage_definition);
 }
+
+/**
+ * Update the 'quantity' field.
+ */
+function commerce_product_update_8400() {
+  $config = \Drupal::configFactory();
+  $key_value = \Drupal::keyValue('entity.definitions.installed');
+  $database = \Drupal::database();
+  $db_schema = $database->schema();
+  $all = $updated = [];
+
+  foreach ($config->listAll('core.entity_form_display.commerce_order_item.') as $id) {
+    $editable = $config->getEditable($id);
+    $data = $editable->getRawData();
+
+    if (isset($data['targetEntityType'])) {
+      $entity_type = $data['targetEntityType'];
+      $field_name = 'quantity';
+      $definitions = $key_value->get("{$entity_type}.field_storage_definitions");
+      if (!isset($definitions[$field_name])) {
+        continue;
+      }
+      $changes = $definitions[$field_name]->getSchema()['columns']['value'];
+      $needs_change = $changes['scale'] < 3;
+
+      $tables = ["{$entity_type}_revision", $entity_type];
+
+      foreach ($tables as $table) {
+        if ($needs_change && $db_schema->tableExists($table) && !isset($updated[$table])) {
+          $updated[$table] = FALSE;
+
+          // The table data to restore after the update is completed.
+          $all[$table] = $database->select($table, 'n')
+            ->fields('n')
+            ->execute()
+            ->fetchAll();
+
+          if (!empty($all[$table])) {
+            // Truncate the field table to unlock it for changes.
+            $database
+              ->truncate($table)
+              ->execute();
+          }
+          else {
+            unset($all[$table]);
+          }
+
+          $changes['scale'] = 3;
+          $db_schema->changeField($table, $field_name, $field_name, $changes);
+
+          $updated[$table] = TRUE;
+        }
+      }
+
+      if ($needs_change && isset($data['content'][$field_name]) && $data['content'][$field_name]['type'] !== 'commerce_quantity') {
+        $data['content'][$field_name]['type'] = 'commerce_quantity';
+        $data['content'][$field_name]['settings'] += [
+          'placeholder' => '',
+          'step' => '1',
+        ];
+        $editable->setData($data);
+        $editable->save();
+      }
+    }
+  }
+
+  // Restore earlier saved quantity fields data if exists.
+  foreach ($all as $table => $rows) {
+    $updated[$table] = FALSE;
+    foreach ($rows as $row) {
+      $database->insert($table)
+        ->fields((array) $row)
+        ->execute();
+    }
+    $updated[$table] = TRUE;
+  }
+
+  if (!empty($updated) && !in_array(FALSE, $updated)) {
+    return t('The order item quantity field definition has been successfully updated.');
+  }
+  elseif (in_array(FALSE, $updated)) {
+    return t("The attempt to update order item quantity field is failed. To update the field manually go to commerce_order_item table in the site's DB and edit quantity field structure changing its Length to 10,3. Then flush caches and set Xnumber field widget for each of the order item type's enabled form display modes.");
+  }
+  else {
+    return t('The order item quantity field definition does not require an update as it was updated earlier either manually or by a contrib module.');
+  }
+}
