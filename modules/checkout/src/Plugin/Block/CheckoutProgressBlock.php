@@ -4,6 +4,7 @@ namespace Drupal\commerce_checkout\Plugin\Block;
 
 use Drupal\commerce_checkout\CheckoutOrderManagerInterface;
 use Drupal\Core\Block\BlockBase;
+use Drupal\Core\Link;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -109,9 +110,20 @@ class CheckoutProgressBlock extends BlockBase implements ContainerFactoryPluginI
         continue;
       }
 
+      // Create breadcrumb style links for active checkout steps.
+      if ($index <= $current_step_index && $configuration['display_checkout_progress_breadcrumb_links']) {
+        $label = Link::createFromRoute($step_definition['label'], 'commerce_checkout.form', [
+          'commerce_order' => $order->id(),
+          'step' => $step_id,
+        ])->toRenderable();
+      }
+      else {
+        $label = $step_definition['label'];
+      }
+
       $steps[] = [
         'id' => $step_id,
-        'label' => $step_definition['label'],
+        'label' => $label,
         'position' => $position,
       ];
     }
