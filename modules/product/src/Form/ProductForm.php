@@ -169,9 +169,6 @@ class ProductForm extends ContentEntityForm {
       '#attributes' => [
         'class' => ['product-form-author'],
       ],
-      '#attached' => [
-        'library' => ['commerce_product/drupal.commerce_product'],
-      ],
       '#weight' => 90,
       '#optional' => TRUE,
     ];
