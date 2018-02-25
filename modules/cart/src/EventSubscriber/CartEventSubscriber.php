@@ -7,7 +7,7 @@ use Drupal\commerce_cart\Event\CartEntityAddEvent;
 use Drupal\commerce_cart\Event\CartEvents;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\StringTranslation\TranslationInterface;
-use Drupal\Core\Link;
+use Drupal\Core\Url;
 
 class CartEventSubscriber implements EventSubscriberInterface {
 
@@ -41,9 +41,9 @@ class CartEventSubscriber implements EventSubscriberInterface {
    */
   public function displayAddToCartMessage(CartEntityAddEvent $event) {
     $purchased_entity = $event->getEntity();
-    drupal_set_message($this->t('@entity added to @cart-link.', [
+    drupal_set_message($this->t('@entity added to <a href=":url">your cart</a>.', [
       '@entity' => $purchased_entity->label(),
-      '@cart-link' => Link::createFromRoute($this->t('your cart', [], ['context' => 'cart link']), 'commerce_cart.page')->toString(),
+      ':url' => Url::fromRoute('commerce_cart.page')->toString(),
     ]));
   }
 
