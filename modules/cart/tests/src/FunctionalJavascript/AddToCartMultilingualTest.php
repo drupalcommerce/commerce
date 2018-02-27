@@ -179,7 +179,7 @@ class AddToCartMultilingualTest extends CartBrowserTestBase {
 
     // Change the site language.
     $this->config('system.site')->set('default_langcode', 'fr')->save();
-    drupal_flush_all_caches();
+    $this->rebuildContainer();
 
     $this->drupalGet($this->product->getTranslation('fr')->toUrl());
     // Use AJAX to change the size to Medium, keeping the color on Red.
@@ -208,6 +208,27 @@ class AddToCartMultilingualTest extends CartBrowserTestBase {
   }
 
   /**
+   * Tests the attribute widget default values with a variation url (?v=).
+   */
+  public function testProductVariationAttributesWidgetFromUrl() {
+    $variation = $this->variations[5];
+    $this->drupalGet($variation->toUrl());
+    $this->assertAttributeSelected('purchased_entity[0][attributes][attribute_color]', 'Blue');
+    $this->assertAttributeSelected('purchased_entity[0][attributes][attribute_size]', 'Medium');
+    $this->getSession()->getPage()->pressButton('Add to cart');
+
+    // Change the site language.
+    $this->config('system.site')->set('default_langcode', 'fr')->save();
+    $this->rebuildContainer();
+
+    $variation = $variation->getTranslation('fr');
+    $this->drupalGet($variation->toUrl());
+    $this->assertAttributeSelected('purchased_entity[0][attributes][attribute_color]', 'FR Blue');
+    $this->assertAttributeSelected('purchased_entity[0][attributes][attribute_size]', 'FR Medium');
+    $this->getSession()->getPage()->pressButton('Add to cart');
+  }
+
+  /**
    * Tests the title widget has translated variation title.
    */
   public function testProductVariationTitleWidget() {
@@ -224,7 +245,7 @@ class AddToCartMultilingualTest extends CartBrowserTestBase {
 
     // Change the site language.
     $this->config('system.site')->set('default_langcode', 'fr')->save();
-    drupal_flush_all_caches();
+    $this->rebuildContainer();
 
     $this->drupalGet($this->product->getTranslation('fr')->toUrl());
     // Use AJAX to change the size to Medium, keeping the color on Red.
@@ -244,6 +265,31 @@ class AddToCartMultilingualTest extends CartBrowserTestBase {
     $order_items = $this->cart->getItems();
     $this->assertOrderItemInOrder($this->variations[0]->getTranslation('fr'), $order_items[0]);
     $this->assertOrderItemInOrder($this->variations[5]->getTranslation('fr'), $order_items[1]);
+  }
+
+  /**
+   * Tests the title widget default values with a variation url (?v=).
+   */
+  public function testProductVariationTitleWidgetFromUrl() {
+    $order_item_form_display = EntityFormDisplay::load('commerce_order_item.default.add_to_cart');
+    $order_item_form_display->setComponent('purchased_entity', [
+      'type' => 'commerce_product_variation_title',
+    ]);
+    $order_item_form_display->save();
+
+    $variation = $this->variations[5];
+    $this->drupalGet($variation->toUrl());
+    $this->assertSession()->selectExists('purchased_entity[0][variation]');
+    $this->assertAttributeSelected('purchased_entity[0][variation]', 'My Super Product - Blue, Medium');
+
+    // Change the site language.
+    $this->config('system.site')->set('default_langcode', 'fr')->save();
+    $this->rebuildContainer();
+
+    $variation = $variation->getTranslation('fr');
+    $this->drupalGet($variation->toUrl());
+    $this->assertSession()->selectExists('purchased_entity[0][variation]');
+    $this->assertAttributeSelected('purchased_entity[0][variation]', 'Mon super produit - FR Blue, FR Medium');
   }
 
 }

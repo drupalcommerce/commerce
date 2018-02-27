@@ -134,6 +134,28 @@ abstract class ProductVariationWidgetBase extends WidgetBase implements Containe
   }
 
   /**
+   * Gets the default variation for the widget.
+   *
+   * @param \Drupal\commerce_product\Entity\ProductInterface $product
+   *   The product.
+   * @param array $variations
+   *   An array of available variations.
+   *
+   * @return \Drupal\commerce_product\Entity\ProductVariationInterface
+   *   The default variation.
+   */
+  protected function getDefaultVariation(ProductInterface $product, array $variations) {
+    $langcode = $product->language()->getId();
+    $selected_variation = $this->variationStorage->loadFromContext($product);
+    $selected_variation = $this->entityRepository->getTranslationFromContext($selected_variation, $langcode);
+    // The returned variation must also be enabled.
+    if (!in_array($selected_variation, $variations)) {
+      $selected_variation = reset($variations);
+    }
+    return $selected_variation;
+  }
+
+  /**
    * Gets the enabled variations for the product.
    *
    * @param \Drupal\commerce_product\Entity\ProductInterface $product

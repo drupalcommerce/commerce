@@ -145,8 +145,6 @@ class MultipleCartFormsTest extends CartBrowserTestBase {
 
   /**
    * Tests that a page with multiple add to cart forms works properly.
-   *
-   * @group debug
    */
   public function testMultipleRenderedProducts() {
     // View of rendered products, each containing an add to cart form.
