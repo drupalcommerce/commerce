@@ -166,6 +166,16 @@ class AddToCartMultiAttributeTest extends CartBrowserTestBase {
     $this->getSession()->getPage()->selectFieldOption('purchased_entity[0][attributes][attribute_color]', 'Magenta');
     $this->waitForAjaxToFinish();
     $this->assertSession()->pageTextContains($variation2->getSku());
+    $this->assertAttributeSelected('purchased_entity[0][attributes][attribute_color]', 'Magenta');
+
+    // Load variation2 directly via the url (?v=).
+    $this->drupalGet($variation2->toUrl());
+    $this->assertSession()->pageTextContains($variation2->getSku());
+    $this->assertAttributeSelected('purchased_entity[0][attributes][attribute_color]', 'Magenta');
+    $this->getSession()->getPage()->selectFieldOption('purchased_entity[0][attributes][attribute_color]', 'Cyan');
+    $this->waitForAjaxToFinish();
+    $this->assertSession()->pageTextContains($variation1->getSku());
+    $this->assertAttributeSelected('purchased_entity[0][attributes][attribute_color]', 'Cyan');
   }
 
 }

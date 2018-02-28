@@ -138,11 +138,7 @@ class ProductVariationAttributesWidget extends ProductVariationWidgetBase implem
         $selected_variation = $order_item->getPurchasedEntity();
       }
       else {
-        $selected_variation = $this->variationStorage->loadFromContext($product);
-        // The returned variation must also be enabled.
-        if (!in_array($selected_variation, $variations)) {
-          $selected_variation = reset($variations);
-        }
+        $selected_variation = $this->getDefaultVariation($product, $variations);
       }
     }
 

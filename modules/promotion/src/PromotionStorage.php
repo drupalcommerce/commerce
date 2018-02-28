@@ -83,7 +83,7 @@ class PromotionStorage extends CommerceContentEntityStorage implements Promotion
     $query = $this->getQuery();
     $or_condition = $query->orConditionGroup()
       ->condition('end_date', $today, '>=')
-      ->notExists('end_date', $today);
+      ->notExists('end_date');
     $query
       ->condition('stores', [$order->getStoreId()], 'IN')
       ->condition('order_types', [$order->bundle()], 'IN')

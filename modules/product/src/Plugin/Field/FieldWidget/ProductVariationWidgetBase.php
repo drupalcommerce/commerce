@@ -123,7 +123,7 @@ abstract class ProductVariationWidgetBase extends WidgetBase implements Containe
     }
     /** @var \Drupal\commerce_product\ProductVariationFieldRendererInterface $variation_field_renderer */
     $variation_field_renderer = \Drupal::service('commerce_product.variation_field_renderer');
-    $view_mode = $form_state->get('form_display')->getMode();
+    $view_mode = $form_state->get('view_mode');
     $variation_field_renderer->replaceRenderedFields($response, $variation, $view_mode);
     // Allow modules to add arbitrary ajax commands to the response.
     $event = new ProductVariationAjaxChangeEvent($variation, $response, $view_mode);
@@ -131,6 +131,28 @@ abstract class ProductVariationWidgetBase extends WidgetBase implements Containe
     $event_dispatcher->dispatch(ProductEvents::PRODUCT_VARIATION_AJAX_CHANGE, $event);
 
     return $response;
+  }
+
+  /**
+   * Gets the default variation for the widget.
+   *
+   * @param \Drupal\commerce_product\Entity\ProductInterface $product
+   *   The product.
+   * @param array $variations
+   *   An array of available variations.
+   *
+   * @return \Drupal\commerce_product\Entity\ProductVariationInterface
+   *   The default variation.
+   */
+  protected function getDefaultVariation(ProductInterface $product, array $variations) {
+    $langcode = $product->language()->getId();
+    $selected_variation = $this->variationStorage->loadFromContext($product);
+    $selected_variation = $this->entityRepository->getTranslationFromContext($selected_variation, $langcode);
+    // The returned variation must also be enabled.
+    if (!in_array($selected_variation, $variations)) {
+      $selected_variation = reset($variations);
+    }
+    return $selected_variation;
   }
 
   /**

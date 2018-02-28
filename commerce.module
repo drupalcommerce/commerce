@@ -123,7 +123,6 @@ function _commerce_entity_theme_suggestions($entity_type_id, array $variables) {
   $sanitized_view_mode = strtr($variables['elements']['#view_mode'], '.', '_');
 
   $suggestions = [];
-  $suggestions[] = $original;
   $suggestions[] = $original . '__' . $sanitized_view_mode;
   $suggestions[] = $original . '__' . $entity->bundle();
   $suggestions[] = $original . '__' . $entity->bundle() . '__' . $sanitized_view_mode;

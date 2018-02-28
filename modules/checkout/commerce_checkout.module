@@ -52,7 +52,6 @@ function commerce_checkout_theme() {
 function commerce_checkout_theme_suggestions_commerce_checkout_form(array $variables) {
   $original = $variables['theme_hook_original'];
   $suggestions = [];
-  $suggestions[] = $original;
   // If the checkout form has a sidebar, suggest the enhanced layout.
   if (isset($variables['form']['sidebar']) && Element::isVisibleElement($variables['form']['sidebar'])) {
     $suggestions[] = $original . '__with_sidebar';
