@@ -5,4 +5,5 @@ package: Testing
 core: 8.x
 dependencies:
   - commerce:commerce_cart
+  - commerce:commerce_product
   - commerce:commerce_promotion

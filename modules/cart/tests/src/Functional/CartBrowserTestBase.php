@@ -44,10 +44,7 @@ abstract class CartBrowserTestBase extends OrderBrowserTestBase {
    * @var array
    */
   public static $modules = [
-    'commerce_cart',
     'commerce_cart_test',
-    'node',
-    'taxonomy',
   ];
 
   /**
@@ -56,7 +53,6 @@ abstract class CartBrowserTestBase extends OrderBrowserTestBase {
   protected function getAdministratorPermissions() {
     return array_merge([
       'administer commerce_product',
-      'access content',
     ], parent::getAdministratorPermissions());
   }
 

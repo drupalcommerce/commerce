@@ -27,7 +27,6 @@ class CartProviderTest extends CommerceKernelTestBase {
     'path',
     'profile',
     'state_machine',
-    'commerce_product',
     'commerce_order',
   ];
 

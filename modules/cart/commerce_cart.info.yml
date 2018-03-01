@@ -6,9 +6,9 @@ core: 8.x
 dependencies:
   - commerce:commerce
   - commerce:commerce_order
-  - commerce:commerce_product
 config_devel:
   install:
-    - core.entity_form_mode.commerce_order_item.add_to_cart
     - views.view.commerce_cart_form
     - views.view.commerce_carts
+  optional:
+    - core.entity_view_mode.commerce_product_attribute_value.add_to_cart.yml
