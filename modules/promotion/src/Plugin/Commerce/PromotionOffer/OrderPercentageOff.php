@@ -11,7 +11,7 @@ use Drupal\Core\Entity\EntityInterface;
  *
  * @CommercePromotionOffer(
  *   id = "order_percentage_off",
- *   label = @Translation("Percentage off the order total"),
+ *   label = @Translation("Percentage off the order subtotal"),
  *   entity_type = "commerce_order",
  * )
  */
@@ -24,7 +24,7 @@ class OrderPercentageOff extends PercentageOffBase {
     $this->assertEntity($entity);
     /** @var \Drupal\commerce_order\Entity\OrderInterface $order */
     $order = $entity;
-    $adjustment_amount = $order->getTotalPrice()->multiply($this->getPercentage());
+    $adjustment_amount = $order->getSubtotalPrice()->multiply($this->getPercentage());
     $adjustment_amount = $this->rounder->round($adjustment_amount);
 
     $order->addAdjustment(new Adjustment([

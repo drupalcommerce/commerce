@@ -28,7 +28,9 @@ class PriceTwigExtension extends \Twig_Extension {
   /**
    * Formats a price object/array.
    *
-   * Example: {{ order.getTotalPrice|commerce_price_format }}
+   * Examples:
+   * {{ order.getTotalPrice|commerce_price_format }}
+   * {{ order.getTotalPrice|commerce_price_format|default('N/A') }}
    *
    * @param mixed $price
    *   Either a Price object, or an array with number and currency_code keys.
@@ -39,10 +41,13 @@ class PriceTwigExtension extends \Twig_Extension {
    * @throws \InvalidArgumentException
    */
   public static function formatPrice($price) {
+    if (empty($price)) {
+      return '';
+    }
+
     if ($price instanceof Price) {
       $price = $price->toArray();
     }
-
     if (is_array($price) && isset($price['currency_code']) && isset($price['number'])) {
       $number_formatter = \Drupal::service('commerce_price.number_formatter_factory')->createInstance();
       $currency_storage = \Drupal::entityTypeManager()->getStorage('commerce_currency');

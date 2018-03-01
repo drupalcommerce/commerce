@@ -360,9 +360,16 @@ class Order extends CommerceContentEntityBase implements OrderInterface {
         $order_item_total = $order_item->getTotalPrice();
         $total_price = $total_price ? $total_price->add($order_item_total) : $order_item_total;
       }
-      foreach ($this->collectAdjustments() as $adjustment) {
-        if (!$adjustment->isIncluded()) {
-          $total_price = $total_price->add($adjustment->getAmount());
+      $adjustments = $this->collectAdjustments();
+      if ($adjustments) {
+        /** @var \Drupal\commerce_order\AdjustmentTransformerInterface $adjustment_transformer */
+        $adjustment_transformer = \Drupal::service('commerce_order.adjustment_transformer');
+        $adjustments = $adjustment_transformer->combineAdjustments($adjustments);
+        $adjustments = $adjustment_transformer->roundAdjustments($adjustments);
+        foreach ($adjustments as $adjustment) {
+          if (!$adjustment->isIncluded()) {
+            $total_price = $total_price->add($adjustment->getAmount());
+          }
         }
       }
     }

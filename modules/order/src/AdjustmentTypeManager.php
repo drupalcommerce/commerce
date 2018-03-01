@@ -4,6 +4,7 @@ namespace Drupal\commerce_order;
 
 use Drupal\commerce_order\Plugin\Commerce\AdjustmentType\AdjustmentType;
 use Drupal\Component\Plugin\Exception\PluginException;
+use Drupal\Component\Utility\Unicode;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Plugin\DefaultPluginManager;
@@ -65,10 +66,19 @@ class AdjustmentTypeManager extends DefaultPluginManager {
     parent::processDefinition($definition, $plugin_id);
 
     $definition['id'] = $plugin_id;
-    foreach (['label', 'singular_label', 'plural_label'] as $required_property) {
+    foreach (['label'] as $required_property) {
       if (empty($definition[$required_property])) {
         throw new PluginException(sprintf('The adjustment type %s must define the %s property.', $plugin_id, $required_property));
       }
+    }
+    // Provide fallback labels for contrib adjustment types defined before 2.4.
+    if (empty($definition['singular_label'])) {
+      $label = Unicode::strtolower($definition['label']);
+      $definition['singular_label'] = t('@label adjustment', ['@label' => $label]);
+    }
+    if (empty($definition['plural_label'])) {
+      $label = Unicode::strtolower($definition['label']);
+      $definition['plural_label'] = t('@label adjustments', ['@label' => $label]);
     }
   }
 

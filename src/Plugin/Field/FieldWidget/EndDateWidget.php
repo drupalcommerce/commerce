@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\commerce_promotion\Plugin\Field\FieldWidget;
+namespace Drupal\commerce\Plugin\Field\FieldWidget;
 
 use Drupal\Core\Datetime\DrupalDateTime;
 use Drupal\Core\Field\FieldItemListInterface;

@@ -181,8 +181,8 @@ class OrderTest extends CommerceKernelTestBase {
     $order->addItem($another_order_item);
     $this->assertEquals([$order_item, $another_order_item], $order->getItems());
     $this->assertNotEmpty($order->hasItem($another_order_item));
-
     $this->assertEquals(new Price('8.00', 'USD'), $order->getTotalPrice());
+
     $adjustments = [];
     $adjustments[] = new Adjustment([
       'type' => 'custom',
@@ -195,68 +195,28 @@ class OrderTest extends CommerceKernelTestBase {
       'amount' => new Price('10.00', 'USD'),
       'locked' => TRUE,
     ]);
-    // Included adjustments do not affect the order total.
-    $adjustments[] = new Adjustment([
-      'type' => 'tax',
-      'label' => 'Tax',
-      'amount' => new Price('12.00', 'USD'),
-      'included' => TRUE,
-    ]);
     $order->addAdjustment($adjustments[0]);
     $order->addAdjustment($adjustments[1]);
-    $order->addAdjustment($adjustments[2]);
     $this->assertEquals($adjustments, $order->getAdjustments());
     $collected_adjustments = $order->collectAdjustments();
     $this->assertEquals($adjustments[0]->getAmount(), $collected_adjustments[0]->getAmount());
     $this->assertEquals($adjustments[1]->getAmount(), $collected_adjustments[1]->getAmount());
-    $this->assertEquals($adjustments[2]->getAmount(), $collected_adjustments[2]->getAmount());
     $order->removeAdjustment($adjustments[0]);
     $this->assertEquals(new Price('8.00', 'USD'), $order->getSubtotalPrice());
     $this->assertEquals(new Price('18.00', 'USD'), $order->getTotalPrice());
-    $this->assertEquals([$adjustments[1], $adjustments[2]], $order->getAdjustments());
+    $this->assertEquals([$adjustments[1]], $order->getAdjustments());
     $order->setAdjustments($adjustments);
     $this->assertEquals($adjustments, $order->getAdjustments());
     $this->assertEquals(new Price('17.00', 'USD'), $order->getTotalPrice());
-    // Add an adjustment to the second order item, confirm it's a part of the
-    // order total, multiplied by quantity.
-    $order->removeItem($another_order_item);
-    $order_item_adjustments = [];
-    $order_item_adjustments[] = new Adjustment([
-      'type' => 'fee',
-      'label' => 'Random fee',
-      'amount' => new Price('5.00', 'USD'),
-    ]);
-    $order_item_adjustments[] = new Adjustment([
-      'type' => 'fee',
-      'label' => 'Non-random fee',
-      'amount' => new Price('7.00', 'USD'),
-      'locked' => TRUE,
-    ]);
-    $multiplied_order_item_adjustments = [];
-    $multiplied_order_item_adjustments[] = new Adjustment([
+    // Confirm that locked adjustments persist after clear.
+    // Custom adjustments are locked by default.
+    $order->addAdjustment(new Adjustment([
       'type' => 'fee',
       'label' => 'Random fee',
       'amount' => new Price('10.00', 'USD'),
-    ]);
-    $multiplied_order_item_adjustments[] = new Adjustment([
-      'type' => 'fee',
-      'label' => 'Non-random fee',
-      'amount' => new Price('14.00', 'USD'),
-      'locked' => TRUE,
-    ]);
-    $another_order_item->setAdjustments($order_item_adjustments);
-    $order->addItem($another_order_item);
-    $this->assertEquals(new Price('41.00', 'USD'), $order->getTotalPrice());
-    $collected_adjustments = $order->collectAdjustments();
-    $this->assertEquals($multiplied_order_item_adjustments[0], $collected_adjustments[0]);
-    $this->assertEquals($multiplied_order_item_adjustments[1], $collected_adjustments[1]);
-    // Confirm that locked adjustments persist after clear.
-    // Custom adjustments are locked by default.
-    $order->setAdjustments($adjustments);
+    ]));
     $order->clearAdjustments();
-    unset($adjustments[2]);
-    unset($multiplied_order_item_adjustments[0]);
-    $this->assertEquals(array_merge($multiplied_order_item_adjustments, $adjustments), $order->collectAdjustments());
+    $this->assertEquals($adjustments, $order->getAdjustments());
 
     $this->assertEquals('completed', $order->getState()->value);
 
@@ -281,6 +241,72 @@ class OrderTest extends CommerceKernelTestBase {
 
     $order->setCompletedTime(635879900);
     $this->assertEquals(635879900, $order->getCompletedTime());
+  }
+
+  /**
+   * Tests the order total recalculation logic.
+   *
+   * @covers ::recalculateTotalPrice
+   */
+  public function testTotalCalculation() {
+    $order = Order::create([
+      'type' => 'default',
+      'state' => 'completed',
+    ]);
+    $order->save();
+
+    /** @var \Drupal\commerce_order\Entity\OrderItemInterface $order_item */
+    $order_item = OrderItem::create([
+      'type' => 'test',
+      'quantity' => '2',
+      'unit_price' => new Price('2.00', 'USD'),
+    ]);
+    $order_item->save();
+    $order_item = $this->reloadEntity($order_item);
+    /** @var \Drupal\commerce_order\Entity\OrderItemInterface $another_order_item */
+    $another_order_item = OrderItem::create([
+      'type' => 'test',
+      'quantity' => '1',
+      'unit_price' => new Price('3.00', 'USD'),
+    ]);
+    $another_order_item->save();
+    $another_order_item = $this->reloadEntity($another_order_item);
+
+    $adjustments = [];
+    $adjustments[0] = new Adjustment([
+      'type' => 'tax',
+      'label' => 'Tax',
+      'amount' => new Price('100.00', 'USD'),
+      'included' => TRUE,
+    ]);
+    $adjustments[1] = new Adjustment([
+      'type' => 'tax',
+      'label' => 'Tax',
+      'amount' => new Price('2.121', 'USD'),
+      'source_id' => 'us_sales_tax',
+    ]);
+    $adjustments[2] = new Adjustment([
+      'type' => 'tax',
+      'label' => 'Tax',
+      'amount' => new Price('5.344', 'USD'),
+      'source_id' => 'us_sales_tax',
+    ]);
+
+    // Included adjustments do not affect the order total.
+    $order->addAdjustment($adjustments[0]);
+    // Order item adjustments are multiplied by quantity.
+    $order_item->addAdjustment($adjustments[1]);
+    $another_order_item->addAdjustment($adjustments[2]);
+    $order->setItems([$order_item, $another_order_item]);
+
+    $collected_adjustments = $order->collectAdjustments();
+    $this->assertCount(3, $collected_adjustments);
+    $this->assertEquals($adjustments[1]->multiply('2'), $collected_adjustments[0]);
+    $this->assertEquals($adjustments[2], $collected_adjustments[1]);
+    $this->assertEquals($adjustments[0], $collected_adjustments[2]);
+    // The total will be correct only if the adjustments were correctly
+    // multiplied, combined, and rounded.
+    $this->assertEquals(new Price('16.59', 'USD'), $order->getTotalPrice());
   }
 
   /**
