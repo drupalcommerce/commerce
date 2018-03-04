@@ -78,8 +78,6 @@ class ProductViewBuilder extends EntityViewBuilder {
       $attribute_field_names = $variation->getAttributeFieldNames();
       $rendered_fields = $this->variationFieldRenderer->renderFields($variation, $view_mode);
       foreach ($rendered_fields as $field_name => $rendered_field) {
-        // Turn off Quick Edit for injected variation fields, to avoid warnings.
-        $rendered_field['#view_mode'] = '_custom';
         // Group attribute fields to allow them to be excluded together.
         if (in_array($field_name, $attribute_field_names)) {
           $build['variation_attributes']['variation_' . $field_name] = $rendered_field;
