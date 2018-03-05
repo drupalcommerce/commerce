@@ -44,6 +44,30 @@ function commerce_product_entity_view_display_update(EntityInterface $entity) {
 }
 
 /**
+ * Implements hook_theme_registry_alter().
+ */
+function commerce_product_theme_registry_alter(&$theme_registry) {
+  // The preprocess function must run after quickedit_preprocess_field().
+  $theme_registry['field']['preprocess functions'][] = 'commerce_product_remove_quickedit';
+}
+
+/**
+ * Turn off Quick Edit for injected variation fields, to avoid warnings.
+ */
+function commerce_product_remove_quickedit(&$variables) {
+  $entity_type_id = $variables['element']['#entity_type'];
+  if ($entity_type_id != 'commerce_product_variation' || empty($variables['#ajax_replace_class'])) {
+    return;
+  }
+
+  if (isset($variables['attributes']['data-quickedit-field-id'])) {
+    unset($variables['attributes']['data-quickedit-field-id']);
+    $context_key = array_search('user.permissions', $variables['#cache']['contexts']);
+    unset($variables['#cache']['contexts'][$context_key]);
+  }
+}
+
+/**
  * Implements hook_theme().
  */
 function commerce_product_theme() {
