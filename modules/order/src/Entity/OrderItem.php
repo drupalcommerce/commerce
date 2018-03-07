@@ -386,7 +386,7 @@ class OrderItem extends CommerceContentEntityBase implements OrderItemInterface 
       // hidden instead. https://www.drupal.org/node/2346347#comment-10254087.
       $fields['purchased_entity']->setRequired(FALSE);
       $fields['purchased_entity']->setDisplayOptions('form', [
-        'type' => 'hidden',
+        'region' => 'hidden',
       ]);
       $fields['purchased_entity']->setDisplayConfigurable('form', FALSE);
       $fields['purchased_entity']->setDisplayConfigurable('view', FALSE);

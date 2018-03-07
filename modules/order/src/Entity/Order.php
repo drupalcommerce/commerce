@@ -624,7 +624,7 @@ class Order extends CommerceContentEntityBase implements OrderInterface {
         'weight' => 0,
       ])
       ->setDisplayOptions('form', [
-        'type' => 'hidden',
+        'region' => 'hidden',
         'weight' => 0,
       ])
       ->setDisplayConfigurable('form', TRUE)

@@ -89,14 +89,6 @@ class ProductForm extends ContentEntityForm {
       '#type' => 'hidden',
       '#default_value' => $product->getChangedTime(),
     ];
-
-    $form['footer'] = [
-      '#type' => 'container',
-      '#weight' => 99,
-      '#attributes' => [
-        'class' => ['product-form-footer'],
-      ],
-    ];
     $form['status']['#group'] = 'footer';
 
     $last_saved = t('Not saved yet');

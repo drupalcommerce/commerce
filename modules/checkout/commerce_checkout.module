@@ -85,8 +85,7 @@ function commerce_checkout_entity_base_field_info(EntityTypeInterface $entity_ty
       ->setSetting('target_type', 'commerce_checkout_flow')
       ->setSetting('handler', 'default')
       ->setDisplayOptions('form', [
-        'type' => 'hidden',
-        'weight' => 0,
+        'region' => 'hidden',
       ])
       ->setDisplayConfigurable('view', FALSE)
       ->setDisplayConfigurable('form', FALSE);
@@ -96,8 +95,7 @@ function commerce_checkout_entity_base_field_info(EntityTypeInterface $entity_ty
     $fields['checkout_step'] = BaseFieldDefinition::create('string')
       ->setLabel(t('Checkout step'))
       ->setDisplayOptions('form', [
-        'type' => 'hidden',
-        'weight' => 0,
+        'region' => 'hidden',
       ])
       ->setDisplayConfigurable('view', FALSE)
       ->setDisplayConfigurable('form', FALSE);
