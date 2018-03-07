@@ -8,6 +8,7 @@ use Drupal\commerce_payment\Exception\PaymentGatewayException;
 use Drupal\commerce_payment\Plugin\Commerce\PaymentGateway\OffsitePaymentGatewayInterface;
 use Drupal\Core\Access\AccessException;
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
+use Drupal\Core\Messenger\MessengerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -24,13 +25,23 @@ class PaymentCheckoutController implements ContainerInjectionInterface {
   protected $checkoutOrderManager;
 
   /**
+   * The messenger.
+   *
+   * @var \Drupal\Core\Messenger\MessengerInterface
+   */
+  protected $messenger;
+
+  /**
    * Constructs a new PaymentCheckoutController object.
    *
    * @param \Drupal\commerce_checkout\CheckoutOrderManagerInterface $checkout_order_manager
    *   The checkout order manager.
+   * @param \Drupal\Core\Messenger\MessengerInterface $messenger
+   *   The messenger.
    */
-  public function __construct(CheckoutOrderManagerInterface $checkout_order_manager) {
+  public function __construct(CheckoutOrderManagerInterface $checkout_order_manager, MessengerInterface $messenger) {
     $this->checkoutOrderManager = $checkout_order_manager;
+    $this->messenger = $messenger;
   }
 
   /**
@@ -38,7 +49,8 @@ class PaymentCheckoutController implements ContainerInjectionInterface {
    */
   public static function create(ContainerInterface $container) {
     return new static(
-      $container->get('commerce_checkout.checkout_order_manager')
+      $container->get('commerce_checkout.checkout_order_manager'),
+      $container->get('messenger')
     );
   }
 
@@ -70,7 +82,7 @@ class PaymentCheckoutController implements ContainerInjectionInterface {
     }
     catch (PaymentGatewayException $e) {
       \Drupal::logger('commerce_payment')->error($e->getMessage());
-      drupal_set_message(t('Payment failed at the payment server. Please review your information and try again.'), 'error');
+      $this->messenger->addError(t('Payment failed at the payment server. Please review your information and try again.'));
       $redirect_step_id = $checkout_flow_plugin->getPreviousStepId($step_id);
     }
     $checkout_flow_plugin->redirectToStep($redirect_step_id);

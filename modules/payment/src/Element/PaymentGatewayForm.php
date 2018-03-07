@@ -99,7 +99,7 @@ class PaymentGatewayForm extends RenderElement {
     catch (PaymentGatewayException $e) {
       \Drupal::logger('commerce_payment')->error($e->getMessage());
       if (!empty($element['#exception_url'])) {
-        drupal_set_message($element['#exception_message'], 'error');
+        \Drupal::messenger()->addError($element['#exception_message']);
         throw new NeedsRedirectException($element['#exception_url']);
       }
       else {

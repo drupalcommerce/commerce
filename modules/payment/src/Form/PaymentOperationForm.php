@@ -51,7 +51,7 @@ class PaymentOperationForm extends EntityForm {
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
     if (!empty($form['payment']['#success_message'])) {
-      drupal_set_message($form['payment']['#success_message']);
+      $this->messenger()->addMessage($form['payment']['#success_message']);
     }
     $form_state->setRedirect('entity.commerce_payment.collection', ['commerce_order' => $this->entity->getOrderId()]);
   }

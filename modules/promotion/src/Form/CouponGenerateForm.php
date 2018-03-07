@@ -265,13 +265,13 @@ class CouponGenerateForm extends FormBase {
       $created = count($results['codes']);
       // An incomplete set of coupons was generated.
       if ($created != $results['total_quantity']) {
-        drupal_set_message(t('Generated %created out of %total requested coupons. Consider adding a unique prefix/suffix or increasing the pattern length to improve results.', [
+        \Drupal::messenger()->addWarning(t('Generated %created out of %total requested coupons. Consider adding a unique prefix/suffix or increasing the pattern length to improve results.', [
           '%created' => $created,
           '%total' => $results['total_quantity'],
-        ]), 'warning');
+        ]));
       }
       else {
-        drupal_set_message(\Drupal::translation()->formatPlural(
+        \Drupal::messenger()->addMessage(\Drupal::translation()->formatPlural(
           $created,
           'Generated 1 coupon.',
           'Generated @count coupons.'
@@ -280,7 +280,7 @@ class CouponGenerateForm extends FormBase {
     }
     else {
       $error_operation = reset($operations);
-      drupal_set_message(t('An error occurred while processing @operation with arguments: @args', [
+      \Drupal::messenger()->addError(t('An error occurred while processing @operation with arguments: @args', [
         '@operation' => $error_operation[0],
         '@args' => print_r($error_operation[0], TRUE),
       ]));

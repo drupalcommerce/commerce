@@ -117,7 +117,7 @@ class CheckoutFlowForm extends EntityForm {
    */
   public function save(array $form, FormStateInterface $form_state) {
     $status = $this->entity->save();
-    drupal_set_message($this->t('Saved the %label checkout flow.', ['%label' => $this->entity->label()]));
+    $this->messenger()->addMessage($this->t('Saved the %label checkout flow.', ['%label' => $this->entity->label()]));
     if ($status == SAVED_UPDATED) {
       $form_state->setRedirect('entity.commerce_checkout_flow.collection');
     }

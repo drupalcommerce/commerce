@@ -99,7 +99,7 @@ class OrderReassignForm extends FormBase {
     $this->order->setEmail($values['mail']);
     $this->order->setCustomerId($values['uid']);
     $this->order->save();
-    drupal_set_message($this->t('The order %label has been assigned to customer %customer.', [
+    $this->messenger()->addMessage($this->t('The order %label has been assigned to customer %customer.', [
       '%label' => $this->order->label(),
       '%customer' => $this->order->getCustomer()->label(),
     ]));

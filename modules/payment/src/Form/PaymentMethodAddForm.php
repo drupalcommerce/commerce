@@ -168,7 +168,7 @@ class PaymentMethodAddForm extends FormBase implements ContainerInjectionInterfa
     elseif ($step == 'payment_method') {
       /** @var \Drupal\commerce_payment\Entity\PaymentMethodInterface $payment_method */
       $payment_method = $form_state->getValue('payment_method');
-      drupal_set_message($this->t('%label saved to your payment methods.', ['%label' => $payment_method->label()]));
+      $this->messenger()->addMessage($this->t('%label saved to your payment methods.', ['%label' => $payment_method->label()]));
       $form_state->setRedirect('entity.commerce_payment_method.collection', ['user' => $payment_method->getOwnerId()]);
     }
   }

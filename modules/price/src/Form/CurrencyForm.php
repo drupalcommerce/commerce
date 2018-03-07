@@ -139,7 +139,7 @@ class CurrencyForm extends EntityForm {
   public function save(array $form, FormStateInterface $form_state) {
     $currency = $this->entity;
     $currency->save();
-    drupal_set_message($this->t('Saved the %label currency.', [
+    $this->messenger()->addMessage($this->t('Saved the %label currency.', [
       '%label' => $currency->label(),
     ]));
     $form_state->setRedirect('entity.commerce_currency.collection');

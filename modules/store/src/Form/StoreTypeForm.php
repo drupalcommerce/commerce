@@ -73,7 +73,7 @@ class StoreTypeForm extends CommerceBundleEntityFormBase {
     $this->entity->save();
     $this->submitTraitForm($form, $form_state);
 
-    drupal_set_message($this->t('Saved the %label store type.', [
+    $this->messenger()->addMessage($this->t('Saved the %label store type.', [
       '%label' => $this->entity->label(),
     ]));
     $form_state->setRedirect('entity.commerce_store_type.collection');

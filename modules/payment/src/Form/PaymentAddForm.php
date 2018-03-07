@@ -248,7 +248,7 @@ class PaymentAddForm extends FormBase implements ContainerInjectionInterface {
     elseif ($step == 'payment') {
       /** @var \Drupal\commerce_payment\Entity\PaymentInterface $payment */
       $payment = $form_state->getValue('payment');
-      drupal_set_message($this->t('Payment saved.'));
+      $this->messenger()->addMessage($this->t('Payment saved.'));
       $form_state->setRedirect('entity.commerce_payment.collection', ['commerce_order' => $payment->getOrderId()]);
     }
   }

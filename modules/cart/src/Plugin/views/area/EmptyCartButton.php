@@ -5,6 +5,7 @@ namespace Drupal\commerce_cart\Plugin\views\area;
 use Drupal\commerce_cart\CartManagerInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\Messenger\MessengerInterface;
 use Drupal\views\Plugin\views\area\AreaPluginBase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -23,11 +24,18 @@ class EmptyCartButton extends AreaPluginBase {
   protected $cartManager;
 
   /**
-   * The order storage.
+   * The entity manager.
    *
-   * @var \Drupal\Core\Entity\EntityStorageInterface
+   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
    */
-  protected $orderStorage;
+  protected $entityTypeManager;
+
+  /**
+   * The messenger.
+   *
+   * @var \Drupal\Core\Messenger\MessengerInterface
+   */
+  protected $messenger;
 
   /**
    * Constructs a new EmptyCartButton object.
@@ -42,12 +50,15 @@ class EmptyCartButton extends AreaPluginBase {
    *   The cart manager.
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
+   * @param \Drupal\Core\Messenger\MessengerInterface $messenger
+   *   The messenger.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, CartManagerInterface $cart_manager, EntityTypeManagerInterface $entity_type_manager) {
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, CartManagerInterface $cart_manager, EntityTypeManagerInterface $entity_type_manager, MessengerInterface $messenger) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
 
     $this->cartManager = $cart_manager;
-    $this->orderStorage = $entity_type_manager->getStorage('commerce_order');
+    $this->entityTypeManager = $entity_type_manager;
+    $this->messenger = $messenger;
   }
 
   /**
@@ -59,7 +70,8 @@ class EmptyCartButton extends AreaPluginBase {
       $plugin_id,
       $plugin_definition,
       $container->get('commerce_cart.cart_manager'),
-      $container->get('entity_type.manager')
+      $container->get('entity_type.manager'),
+      $container->get('messenger')
     );
   }
 
@@ -117,11 +129,12 @@ class EmptyCartButton extends AreaPluginBase {
   public function viewsFormSubmit(array &$form, FormStateInterface $form_state) {
     $triggering_element = $form_state->getTriggeringElement();
     if (!empty($triggering_element['#empty_cart_button'])) {
+      $order_storage = $this->entityTypeManager->getStorage('commerce_order');
       /** @var \Drupal\commerce_order\Entity\OrderInterface $cart */
-      $cart = $this->orderStorage->load($this->view->argument['order_id']->getValue());
+      $cart = $order_storage->load($this->view->argument['order_id']->getValue());
       $this->cartManager->emptyCart($cart);
 
-      drupal_set_message($this->t('Your shopping cart has been emptied.'));
+      $this->messenger->addMessage($this->t('Your shopping cart has been emptied.'));
     }
   }
 

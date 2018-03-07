@@ -49,7 +49,7 @@ class PriceTestForm extends FormBase {
     // Create a Price to ensure the values are valid.
     $value = $form_state->getValue('amount');
     $price = new Price($value['number'], $value['currency_code']);
-    drupal_set_message(t('The number is "@number" and the currency code is "@currency_code".', [
+    $this->messenger()->addMessage(t('The number is "@number" and the currency code is "@currency_code".', [
       '@number' => $price->getNumber(),
       '@currency_code' => $price->getCurrencyCode(),
     ]));

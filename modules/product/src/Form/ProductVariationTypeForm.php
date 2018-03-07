@@ -159,7 +159,7 @@ class ProductVariationTypeForm extends CommerceBundleEntityFormBase {
    */
   public function save(array $form, FormStateInterface $form_state) {
     $this->entity->save();
-    drupal_set_message($this->t('Saved the %label product variation type.', ['%label' => $this->entity->label()]));
+    $this->messenger()->addMessage($this->t('Saved the %label product variation type.', ['%label' => $this->entity->label()]));
     $form_state->setRedirect('entity.commerce_product_variation_type.collection');
 
     $this->submitTraitForm($form, $form_state);

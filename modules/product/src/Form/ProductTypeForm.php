@@ -156,7 +156,7 @@ class ProductTypeForm extends CommerceBundleEntityFormBase {
     }
     $this->submitTraitForm($form, $form_state);
 
-    drupal_set_message($this->t('The product type %label has been successfully saved.', ['%label' => $this->entity->label()]));
+    $this->messenger()->addMessage($this->t('The product type %label has been successfully saved.', ['%label' => $this->entity->label()]));
     $form_state->setRedirect('entity.commerce_product_type.collection');
     if ($status == SAVED_NEW) {
       commerce_product_add_stores_field($this->entity);

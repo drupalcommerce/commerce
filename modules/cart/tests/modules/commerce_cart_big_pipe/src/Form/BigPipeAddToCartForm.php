@@ -16,7 +16,7 @@ class BigPipeAddToCartForm extends AddToCartForm {
   public function buildForm(array $form, FormStateInterface $form_state) {
     // Sleep between 0.0 and 2.0 seconds.
     $load_slowdown = mt_rand(0, 20) / 10;
-    drupal_set_message(sprintf('Delayed form build by %s seconds', $load_slowdown));
+    $this->messenger()->addMessage(sprintf('Delayed form build by %s seconds', $load_slowdown));
     sleep($load_slowdown);
     return parent::buildForm($form, $form_state);
   }

@@ -240,7 +240,7 @@ function commerce_cart_order_item_views_form_submit($form, FormStateInterface $f
   /** @var \Drupal\commerce_order\Entity\OrderInterface $order */
   $order = \Drupal::entityTypeManager()->getStorage('commerce_order')->load($order_id);
   $order->save();
-  drupal_set_message(t('Your shopping cart has been updated.'));
+  \Drupal::messenger()->addMessage(t('Your shopping cart has been updated.'));
 }
 
 /**

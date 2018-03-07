@@ -42,7 +42,7 @@ class OrderUnlockForm extends ContentEntityConfirmFormBase {
     $order->unlock();
     $order->save();
 
-    drupal_set_message($this->t('The order %label has been unlocked.', [
+    $this->messenger()->addMessage($this->t('The order %label has been unlocked.', [
       '%label' => $order->label(),
     ]));
     $form_state->setRedirectUrl($order->toUrl('collection'));

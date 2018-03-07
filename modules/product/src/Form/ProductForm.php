@@ -211,7 +211,7 @@ class ProductForm extends ContentEntityForm {
     /** @var \Drupal\commerce_product\Entity\ProductInterface $product */
     $product = $this->getEntity();
     $product->save();
-    drupal_set_message($this->t('The product %label has been successfully saved.', ['%label' => $product->label()]));
+    $this->messenger()->addMessage($this->t('The product %label has been successfully saved.', ['%label' => $product->label()]));
     $form_state->setRedirect('entity.commerce_product.canonical', ['commerce_product' => $product->id()]);
   }
 

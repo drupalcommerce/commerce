@@ -81,7 +81,6 @@ class OffsiteRedirect extends OffsitePaymentGatewayBase {
       'remote_state' => $request->query->get('payment_status'),
     ]);
     $payment->save();
-    drupal_set_message('Payment was processed');
   }
 
 }

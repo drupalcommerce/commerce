@@ -24,11 +24,11 @@ class PaymentMethodDeleteForm extends ContentEntityDeleteForm {
       $payment_gateway_plugin->deletePaymentMethod($payment_method);
     }
     catch (PaymentGatewayException $e) {
-      drupal_set_message($e->getMessage(), 'error');
+      $this->messenger()->addError($e->getMessage());
       return;
     }
 
-    drupal_set_message($this->getDeletionMessage());
+    $this->messenger()->addMessage($this->getDeletionMessage());
     $this->logDeletionMessage();
   }
 

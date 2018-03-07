@@ -43,7 +43,7 @@ class StoreForm extends ContentEntityForm {
       $store_storage = $this->entityTypeManager->getStorage('commerce_store');
       $store_storage->markAsDefault($this->entity);
     }
-    drupal_set_message($this->t('Saved the %label store.', [
+    $this->messenger()->addMessage($this->t('Saved the %label store.', [
       '%label' => $this->entity->label(),
     ]));
     $form_state->setRedirect('entity.commerce_store.collection');

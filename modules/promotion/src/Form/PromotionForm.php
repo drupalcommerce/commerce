@@ -114,7 +114,7 @@ class PromotionForm extends ContentEntityForm {
    */
   public function save(array $form, FormStateInterface $form_state) {
     $this->entity->save();
-    drupal_set_message($this->t('Saved the %label promotion.', ['%label' => $this->entity->label()]));
+    $this->messenger()->addMessage($this->t('Saved the %label promotion.', ['%label' => $this->entity->label()]));
 
     if (!empty($form_state->getTriggeringElement()['#continue'])) {
       $form_state->setRedirect('entity.commerce_promotion_coupon.collection', ['commerce_promotion' => $this->entity->id()]);
