@@ -9,3 +9,9 @@ entity.commerce_promotion_coupon.add_form:
   title: 'Add coupon'
   appears_on:
     - entity.commerce_promotion_coupon.collection
+
+entity.commerce_promotion_coupon.generate_form:
+  route_name: entity.commerce_promotion_coupon.generate_form
+  title: 'Generate coupons'
+  appears_on:
+    - entity.commerce_promotion_coupon.collection

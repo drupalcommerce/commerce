@@ -25,3 +25,7 @@ services:
     arguments: ['@entity_type.manager', '@commerce_promotion.usage']
     tags:
       - { name: event_subscriber }
+
+  commerce_promotion.coupon_code_generator:
+    class: Drupal\commerce_promotion\CouponCodeGenerator
+    arguments: ['@database']
