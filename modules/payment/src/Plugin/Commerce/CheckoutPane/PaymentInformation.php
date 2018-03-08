@@ -28,6 +28,17 @@ class PaymentInformation extends CheckoutPaneBase {
     /** @var \Drupal\commerce_payment\Entity\PaymentGatewayInterface $payment_gateway */
     $payment_gateway = $this->order->get('payment_gateway')->entity;
     if (!$payment_gateway) {
+      $billing_profile = $this->order->getBillingProfile();
+      if ($billing_profile) {
+        $profile_view_builder = $this->entityTypeManager->getViewBuilder('profile');
+        $profile_view = $profile_view_builder->view($billing_profile, 'default');
+        $summary = [
+          'label' => [
+            '#markup' => $this->t('Billing information'),
+          ],
+          'profile' => $profile_view,
+        ];
+      }
       return $summary;
     }
 
@@ -70,6 +81,7 @@ class PaymentInformation extends CheckoutPaneBase {
       return [];
     }
 
+    $collect_billing_only = $this->collectBillingProfileOnly();
     $options = $this->buildPaymentMethodOptions($payment_gateways);
     $user_input = $form_state->getUserInput();
     $values = NestedArray::getValue($user_input, $pane_form['#parents']);
@@ -103,7 +115,7 @@ class PaymentInformation extends CheckoutPaneBase {
         'callback' => [get_class($this), 'ajaxRefresh'],
         'wrapper' => $pane_form['#wrapper_id'],
       ],
-      '#access' => count($options) > 1,
+      '#access' => count($options) > 1 && !$collect_billing_only,
     ];
     // Store the values for submitPaneForm().
     foreach ($options as $option_id => $option) {
@@ -118,7 +130,7 @@ class PaymentInformation extends CheckoutPaneBase {
 
     $selected_option = $pane_form['payment_method'][$default_option];
     $payment_gateway = $payment_gateways[$selected_option['#payment_gateway']];
-    if ($payment_gateway->getPlugin() instanceof SupportsStoredPaymentMethodsInterface) {
+    if (!$collect_billing_only && $payment_gateway->getPlugin() instanceof SupportsStoredPaymentMethodsInterface) {
       if (!empty($selected_option['#payment_method_type'])) {
         /** @var \Drupal\commerce_payment\PaymentMethodStorageInterface $payment_method_storage */
         $payment_method_storage = $this->entityTypeManager->getStorage('commerce_payment_method');
@@ -341,6 +353,12 @@ class PaymentInformation extends CheckoutPaneBase {
    */
   public function submitPaneForm(array &$pane_form, FormStateInterface $form_state, array &$complete_form) {
     $values = $form_state->getValue($pane_form['#parents']);
+
+    if ($this->collectBillingProfileOnly()) {
+      $this->order->setBillingProfile($pane_form['billing_information']['#profile']);
+      return;
+    }
+
     $selected_option = $pane_form['payment_method'][$values['payment_method']];
     /** @var \Drupal\commerce_payment\PaymentGatewayStorageInterface $payment_gateway_storage */
     $payment_gateway_storage = $this->entityTypeManager->getStorage('commerce_payment_gateway');
@@ -381,6 +399,19 @@ class PaymentInformation extends CheckoutPaneBase {
    */
   protected function noPaymentGatewayErrorMessage() {
     return $this->t('No payment gateways are defined, create one first.');
+  }
+
+  /**
+   * Determines if only the billing profile should be collected.
+   *
+   * @return bool
+   *  Returns TRUE if only the billing profile should be collected.
+   */
+  protected function collectBillingProfileOnly() {
+    // This will be enhanced to consider the payment method storage strategy
+    // that will be determined in #2871483. Such as collecting payment methods
+    // for free orders for later use in recurring instances.
+    return $this->order->getTotalPrice()->isZero();
   }
 
 }

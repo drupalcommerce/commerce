@@ -85,7 +85,9 @@ class PaymentProcess extends CheckoutPaneBase {
   public function isVisible() {
     // This pane can't be used without the PaymentInformation pane.
     $payment_info_pane = $this->checkoutFlow->getPane('payment_information');
-    return $payment_info_pane->isVisible() && $payment_info_pane->getStepId() != '_disabled';
+    // Disable if order total is 0.
+    $order_total = $this->order->getTotalPrice();
+    return $payment_info_pane->isVisible() && $payment_info_pane->getStepId() != '_disabled' && !$order_total->isZero();
   }
 
   /**

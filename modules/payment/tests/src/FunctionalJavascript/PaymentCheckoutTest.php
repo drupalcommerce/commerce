@@ -3,9 +3,11 @@
 namespace Drupal\Tests\commerce_payment\FunctionalJavascript;
 
 use Drupal\commerce_checkout\Entity\CheckoutFlow;
+use Drupal\commerce_order\Adjustment;
 use Drupal\commerce_order\Entity\Order;
 use Drupal\commerce_payment\Entity\Payment;
 use Drupal\commerce_payment\Entity\PaymentGateway;
+use Drupal\commerce_payment\Plugin\Commerce\CheckoutPane\PaymentInformation;
 use Drupal\Tests\commerce\Functional\CommerceBrowserTestBase;
 use Drupal\Tests\commerce\FunctionalJavascript\JavascriptTestTrait;
 
@@ -525,6 +527,43 @@ class PaymentCheckoutTest extends CommerceBrowserTestBase {
     $payment = Payment::load(1);
     $this->assertNotNull($payment);
     $this->assertEquals($payment->getAmount(), $order->getTotalPrice());
+  }
+
+  /**
+   * Tests a free order with no billing or payment collection.
+   *
+   * @group debug
+   */
+  public function testFreeOrder() {
+    $this->drupalGet($this->product->toUrl()->toString());
+    $this->submitForm([], 'Add to cart');
+
+    // Add an adjustment to zero out the order total.
+    $order = Order::load(1);
+    $order->addAdjustment(new Adjustment([
+      'type' => 'custom',
+      'label' => 'Surprise, it is free!',
+      'amount' => $order->getTotalPrice()->multiply('-1'),
+      'locked' => TRUE,
+    ]));
+    $order->save();
+
+    $this->drupalGet('checkout/1');
+    $this->submitForm([
+      'payment_information[billing_information][address][0][address][given_name]' => 'Johnny',
+      'payment_information[billing_information][address][0][address][family_name]' => 'Appleseed',
+      'payment_information[billing_information][address][0][address][address_line1]' => '123 New York Drive',
+      'payment_information[billing_information][address][0][address][locality]' => 'New York City',
+      'payment_information[billing_information][address][0][address][administrative_area]' => 'NY',
+      'payment_information[billing_information][address][0][address][postal_code]' => '10001',
+    ], 'Continue to review');
+    $this->assertSession()->pageTextContains('Billing information');
+    $this->assertSession()->pageTextContains('Example');
+    $this->assertSession()->pageTextContains('Johnny Appleseed');
+    $this->assertSession()->pageTextContains('123 New York Drive');
+    // @todo this is weird if a free order, "Pay" but no payment.
+    $this->submitForm([], 'Pay and complete purchase');
+    $this->assertSession()->pageTextContains('Your order number is 1. You can view your order on your account page when logged in.');
   }
 
 }
