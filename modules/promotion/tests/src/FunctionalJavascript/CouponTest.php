@@ -41,6 +41,7 @@ class CouponTest extends CommerceBrowserTestBase {
   protected function getAdministratorPermissions() {
     return array_merge([
       'administer commerce_promotion',
+      'bulk generate commerce_promotion_coupon',
     ], parent::getAdministratorPermissions());
   }
 
@@ -130,6 +131,48 @@ class CouponTest extends CommerceBrowserTestBase {
     \Drupal::service('entity_type.manager')->getStorage('commerce_promotion_coupon')->resetCache([$coupon->id()]);
     $coupon_exists = (bool) Coupon::load($coupon->id());
     $this->assertFalse($coupon_exists);
+  }
+
+  /**
+   * Tests bulk generation of coupons.
+   */
+  public function testGenerateCoupons() {
+    $coupon_quantity = 52;
+
+    $this->drupalGet('/promotion/' . $this->promotion->id() . '/coupons');
+    $this->getSession()->getPage()->clickLink('Generate coupons');
+
+    // Check the integrity of the form and set values.
+    $this->assertSession()->fieldExists('format');
+    $this->getSession()->getPage()->selectFieldOption('format', 'numeric');
+
+    $this->assertSession()->fieldExists('quantity');
+    $this->getSession()->getPage()->fillField('quantity', (string) $coupon_quantity);
+
+    // Use POST here to invoke batch_process() in the internal browser.
+    $this->drupalPostForm(NULL, [], t('Generate'));
+
+    // Wait until the id="updateprogress" element is gone, or timeout after 3 minutes.
+    $this->getSession()->wait(180000, 'jQuery("#updateprogress").length === 0');
+
+    $this->assertSession()->pageTextContains("Generated $coupon_quantity coupons.");
+    $coupon_count = $this->getSession()->getPage()->findAll('xpath', '//table/tbody/tr/td[text()="0 / 1"]');
+
+    $this->assertEquals(count($coupon_count), $coupon_quantity, 'Coupons exist in the table.');
+
+    $coupons = Coupon::loadMultiple();
+    $this->assertEquals(count($coupons), $coupon_quantity, 'Coupons created');
+    foreach ($coupons as $id => $coupon) {
+      $this->assertEquals($this->promotion->id(), $coupon->getPromotionId());
+      $this->assertTrue(ctype_digit($coupon->getCode()));
+      $this->assertEquals(strlen($coupon->getCode()), 8);
+    }
+
+    \Drupal::service('entity_type.manager')->getStorage('commerce_promotion')->resetCache([$this->promotion->id()]);
+    $this->promotion = Promotion::load($this->promotion->id());
+    foreach ($coupons as $id => $coupon) {
+      $this->assertTrue($this->promotion->hasCoupon($coupon));
+    }
   }
 
 }
