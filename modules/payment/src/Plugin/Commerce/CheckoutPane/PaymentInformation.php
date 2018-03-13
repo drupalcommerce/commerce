@@ -152,6 +152,11 @@ class PaymentInformation extends CheckoutPaneBase {
       ],
       '#access' => count($options) > 1,
     ];
+    // Add a class to each individual radio, to help themers.
+    foreach ($options as $option) {
+      $class_name = isset($option['payment_method']) ? 'stored' : 'new';
+      $pane_form['payment_method'][$option['id']]['#attributes']['class'][] = "payment-method--$class_name";
+    }
     // Store the values for submitPaneForm().
     foreach ($options as $option_id => $option) {
       $pane_form['payment_method'][$option_id]['#payment_gateway'] = $option['payment_gateway'];
