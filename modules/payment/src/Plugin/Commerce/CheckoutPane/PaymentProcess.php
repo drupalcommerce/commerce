@@ -3,15 +3,19 @@
 namespace Drupal\commerce_payment\Plugin\Commerce\CheckoutPane;
 
 use Drupal\commerce\Response\NeedsRedirectException;
+use Drupal\commerce_checkout\Plugin\Commerce\CheckoutFlow\CheckoutFlowInterface;
 use Drupal\commerce_checkout\Plugin\Commerce\CheckoutPane\CheckoutPaneBase;
 use Drupal\commerce_payment\Exception\DeclineException;
 use Drupal\commerce_payment\Exception\PaymentGatewayException;
 use Drupal\commerce_payment\Plugin\Commerce\PaymentGateway\ManualPaymentGatewayInterface;
 use Drupal\commerce_payment\Plugin\Commerce\PaymentGateway\OffsitePaymentGatewayInterface;
 use Drupal\commerce_payment\Plugin\Commerce\PaymentGateway\OnsitePaymentGatewayInterface;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Link;
+use Drupal\Core\Messenger\MessengerInterface;
 use Drupal\Core\Url;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Provides the payment process pane.
@@ -24,6 +28,49 @@ use Drupal\Core\Url;
  * )
  */
 class PaymentProcess extends CheckoutPaneBase {
+
+  /**
+   * The messenger.
+   *
+   * @var \Drupal\Core\Messenger\MessengerInterface
+   */
+  protected $messenger;
+
+  /**
+   * Constructs a new PaymentProcess object.
+   *
+   * @param array $configuration
+   *   A configuration array containing information about the plugin instance.
+   * @param string $plugin_id
+   *   The plugin_id for the plugin instance.
+   * @param mixed $plugin_definition
+   *   The plugin implementation definition.
+   * @param \Drupal\commerce_checkout\Plugin\Commerce\CheckoutFlow\CheckoutFlowInterface $checkout_flow
+   *   The parent checkout flow.
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   *   The entity type manager.
+   * @param \Drupal\Core\Messenger\MessengerInterface $messenger
+   *   The messenger.
+   */
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, CheckoutFlowInterface $checkout_flow, EntityTypeManagerInterface $entity_type_manager, MessengerInterface $messenger) {
+    parent::__construct($configuration, $plugin_id, $plugin_definition, $checkout_flow, $entity_type_manager);
+
+    $this->messenger = $messenger;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition, CheckoutFlowInterface $checkout_flow = NULL) {
+    return new static(
+      $configuration,
+      $plugin_id,
+      $plugin_definition,
+      $checkout_flow,
+      $container->get('entity_type.manager'),
+      $container->get('messenger')
+    );
+  }
 
   /**
    * {@inheritdoc}
@@ -94,7 +141,7 @@ class PaymentProcess extends CheckoutPaneBase {
   public function buildPaneForm(array $pane_form, FormStateInterface $form_state, array &$complete_form) {
     // The payment gateway is currently always required to be set.
     if ($this->order->get('payment_gateway')->isEmpty()) {
-      drupal_set_message($this->t('No payment gateway selected.'), 'error');
+      $this->messenger->addError($this->t('No payment gateway selected.'));
       $this->redirectToPreviousStep();
     }
 
@@ -120,13 +167,13 @@ class PaymentProcess extends CheckoutPaneBase {
       }
       catch (DeclineException $e) {
         $message = $this->t('We encountered an error processing your payment method. Please verify your details and try again.');
-        drupal_set_message($message, 'error');
+        $this->messenger->addError($message);
         $this->redirectToPreviousStep();
       }
       catch (PaymentGatewayException $e) {
         \Drupal::logger('commerce_payment')->error($e->getMessage());
         $message = $this->t('We encountered an unexpected error processing your payment method. Please try again later.');
-        drupal_set_message($message, 'error');
+        $this->messenger->addError($message);
         $this->redirectToPreviousStep();
       }
     }
@@ -163,7 +210,7 @@ class PaymentProcess extends CheckoutPaneBase {
       catch (PaymentGatewayException $e) {
         \Drupal::logger('commerce_payment')->error($e->getMessage());
         $message = $this->t('We encountered an unexpected error processing your payment. Please try again later.');
-        drupal_set_message($message, 'error');
+        $this->messenger->addError($message);
         $this->redirectToPreviousStep();
       }
     }

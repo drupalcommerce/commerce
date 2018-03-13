@@ -2,11 +2,15 @@
 
 namespace Drupal\commerce_payment\Plugin\Commerce\CheckoutPane;
 
+use Drupal\commerce_checkout\Plugin\Commerce\CheckoutFlow\CheckoutFlowInterface;
 use Drupal\commerce_checkout\Plugin\Commerce\CheckoutPane\CheckoutPaneBase;
 use Drupal\commerce_payment\Plugin\Commerce\PaymentGateway\SupportsStoredPaymentMethodsInterface;
 use Drupal\Component\Utility\Html;
 use Drupal\Component\Utility\NestedArray;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Messenger\MessengerInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Provides the payment information pane.
@@ -19,6 +23,49 @@ use Drupal\Core\Form\FormStateInterface;
  * )
  */
 class PaymentInformation extends CheckoutPaneBase {
+
+  /**
+   * The messenger.
+   *
+   * @var \Drupal\Core\Messenger\MessengerInterface
+   */
+  protected $messenger;
+
+  /**
+   * Constructs a new PaymentInformation object.
+   *
+   * @param array $configuration
+   *   A configuration array containing information about the plugin instance.
+   * @param string $plugin_id
+   *   The plugin_id for the plugin instance.
+   * @param mixed $plugin_definition
+   *   The plugin implementation definition.
+   * @param \Drupal\commerce_checkout\Plugin\Commerce\CheckoutFlow\CheckoutFlowInterface $checkout_flow
+   *   The parent checkout flow.
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   *   The entity type manager.
+   * @param \Drupal\Core\Messenger\MessengerInterface $messenger
+   *   The messenger.
+   */
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, CheckoutFlowInterface $checkout_flow, EntityTypeManagerInterface $entity_type_manager, MessengerInterface $messenger) {
+    parent::__construct($configuration, $plugin_id, $plugin_definition, $checkout_flow, $entity_type_manager);
+
+    $this->messenger = $messenger;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition, CheckoutFlowInterface $checkout_flow = NULL) {
+    return new static(
+      $configuration,
+      $plugin_id,
+      $plugin_definition,
+      $checkout_flow,
+      $container->get('entity_type.manager'),
+      $container->get('messenger')
+    );
+  }
 
   /**
    * {@inheritdoc}
@@ -66,7 +113,7 @@ class PaymentInformation extends CheckoutPaneBase {
     $payment_gateways = $payment_gateway_storage->loadMultipleForOrder($this->order);
     // Can't proceed without any payment gateways.
     if (empty($payment_gateways)) {
-      drupal_set_message($this->noPaymentGatewayErrorMessage(), 'error');
+      $this->messenger->addError($this->noPaymentGatewayErrorMessage());
       return [];
     }
 
