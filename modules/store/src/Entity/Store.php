@@ -28,7 +28,7 @@ use Drupal\Core\Field\BaseFieldDefinition;
  *     "event" = "Drupal\commerce_store\Event\StoreEvent",
  *     "storage" = "Drupal\commerce_store\StoreStorage",
  *     "access" = "Drupal\entity\EntityAccessControlHandler",
- *     "permission_provider" = "Drupal\commerce\EntityPermissionProvider",
+ *     "permission_provider" = "Drupal\entity\EntityPermissionProvider",
  *     "view_builder" = "Drupal\Core\Entity\EntityViewBuilder",
  *     "list_builder" = "Drupal\commerce_store\StoreListBuilder",
  *     "views_data" = "Drupal\views\EntityViewsData",
@@ -39,7 +39,7 @@ use Drupal\Core\Field\BaseFieldDefinition;
  *       "delete" = "Drupal\Core\Entity\ContentEntityDeleteForm"
  *     },
  *     "route_provider" = {
- *       "default" = "Drupal\Core\Entity\Routing\AdminHtmlRouteProvider",
+ *       "default" = "Drupal\entity\Routing\AdminHtmlRouteProvider",
  *       "delete-multiple" = "Drupal\entity\Routing\DeleteMultipleRouteProvider",
  *     },
  *     "translation" = "Drupal\content_translation\ContentTranslationHandler"

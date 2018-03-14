@@ -20,7 +20,7 @@ use Drupal\Core\Entity\EntityStorageInterface;
  *   ),
  *   handlers = {
  *     "access" = "Drupal\entity\EntityAccessControlHandler",
- *     "permission_provider" = "Drupal\commerce\EntityPermissionProvider",
+ *     "permission_provider" = "Drupal\entity\EntityPermissionProvider",
  *     "list_builder" = "Drupal\commerce_product\ProductAttributeListBuilder",
  *     "form" = {
  *       "add" = "Drupal\commerce_product\Form\ProductAttributeForm",
@@ -28,7 +28,7 @@ use Drupal\Core\Entity\EntityStorageInterface;
  *       "delete" = "Drupal\commerce_product\Form\ProductAttributeDeleteForm",
  *     },
  *     "route_provider" = {
- *       "default" = "Drupal\Core\Entity\Routing\DefaultHtmlRouteProvider",
+ *       "default" = "Drupal\entity\Routing\DefaultHtmlRouteProvider",
  *     },
  *   },
  *   config_prefix = "commerce_product_attribute",

@@ -29,7 +29,7 @@ use Drupal\user\UserInterface;
  *     "event" = "Drupal\commerce_product\Event\ProductEvent",
  *     "storage" = "Drupal\commerce\CommerceContentEntityStorage",
  *     "access" = "Drupal\entity\EntityAccessControlHandler",
- *     "permission_provider" = "Drupal\commerce\EntityPermissionProvider",
+ *     "permission_provider" = "Drupal\entity\EntityPermissionProvider",
  *     "view_builder" = "Drupal\commerce_product\ProductViewBuilder",
  *     "list_builder" = "Drupal\commerce_product\ProductListBuilder",
  *     "views_data" = "Drupal\views\EntityViewsData",
@@ -40,7 +40,7 @@ use Drupal\user\UserInterface;
  *       "delete" = "Drupal\Core\Entity\ContentEntityDeleteForm"
  *     },
  *     "route_provider" = {
- *       "default" = "Drupal\Core\Entity\Routing\AdminHtmlRouteProvider",
+ *       "default" = "Drupal\entity\Routing\AdminHtmlRouteProvider",
  *       "delete-multiple" = "Drupal\entity\Routing\DeleteMultipleRouteProvider",
  *     },
  *     "translation" = "Drupal\commerce_product\ProductTranslationHandler"

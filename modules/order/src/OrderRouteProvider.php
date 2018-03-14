@@ -3,7 +3,7 @@
 namespace Drupal\commerce_order;
 
 use Drupal\Core\Entity\EntityTypeInterface;
-use Drupal\Core\Entity\Routing\AdminHtmlRouteProvider;
+use Drupal\entity\Routing\AdminHtmlRouteProvider;
 
 /**
  * Provides routes for the Order entity.
