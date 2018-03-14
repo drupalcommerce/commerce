@@ -49,7 +49,7 @@ function template_preprocess_commerce_promotion(array &$variables) {
   $promotion = $variables['elements']['#commerce_promotion'];
 
   $variables['promotion_entity'] = $promotion;
-  $variables['promotion_url'] = $promotion->toUrl();
+  $variables['promotion_url'] = $promotion->isNew() ? '' : $promotion->toUrl();
   $variables['promotion'] = [];
   foreach (Element::children($variables['elements']) as $key) {
     $variables['promotion'][$key] = $variables['elements'][$key];

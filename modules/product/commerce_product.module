@@ -123,7 +123,7 @@ function template_preprocess_commerce_product(array &$variables) {
   $product = $variables['elements']['#commerce_product'];
 
   $variables['product_entity'] = $product;
-  $variables['product_url'] = $product->toUrl();
+  $variables['product_url'] = $product->isNew() ? '' : $product->toUrl();
   $variables['product'] = [];
   foreach (Element::children($variables['elements']) as $key) {
     $variables['product'][$key] = $variables['elements'][$key];
@@ -146,7 +146,11 @@ function template_preprocess_commerce_product_variation(array &$variables) {
   $product = $product_variation->getProduct();
 
   $variables['product_variation_entity'] = $product_variation;
-  $variables['product_url'] = $product->toUrl();
+  $variables['product_url'] = '';
+  if ($product && !$product->isNew()) {
+    $variables['product_url'] = $product->toUrl();
+  }
+
   $variables['product_variation'] = [];
   foreach (Element::children($variables['elements']) as $key) {
     $variables['product_variation'][$key] = $variables['elements'][$key];
