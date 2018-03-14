@@ -161,7 +161,7 @@ class CheckoutOrderTest extends CommerceBrowserTestBase {
     $this->assertSession()->pageTextContains('Contact information');
     $this->assertSession()->pageTextContains('Billing information');
     $this->assertSession()->pageTextContains('Order Summary');
-    $this->submitForm([], 'Pay and complete purchase');
+    $this->submitForm([], 'Complete checkout');
     $this->assertSession()->pageTextContains('Your order number is 1. You can view your order on your account page when logged in.');
     $this->assertSession()->pageTextContains('0 items');
     // Test second order.
@@ -197,7 +197,7 @@ class CheckoutOrderTest extends CommerceBrowserTestBase {
     $this->getSession()->getPage()->pressButton('Continue to review');
     $this->assertCheckoutProgressStep('Review');
 
-    $this->submitForm([], 'Pay and complete purchase');
+    $this->submitForm([], 'Complete checkout');
     $this->assertSession()->pageTextContains('Your order number is 2. You can view your order on your account page when logged in.');
     $this->assertSession()->pageTextContains('0 items');
   }

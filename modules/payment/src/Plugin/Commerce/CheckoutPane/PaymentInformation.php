@@ -71,32 +71,36 @@ class PaymentInformation extends CheckoutPaneBase {
    * {@inheritdoc}
    */
   public function buildPaneSummary() {
+    $billing_profile = $this->order->getBillingProfile();
+    if ($this->order->getTotalPrice()->isZero() && $billing_profile) {
+      // Only the billing information was collected.
+      $view_builder = $this->entityTypeManager->getViewBuilder('profile');
+      $summary = [
+        '#title' => $this->t('Billing information'),
+        'profile' => $view_builder->view($billing_profile, 'default'),
+      ];
+      return $summary;
+    }
+
     $summary = [];
     /** @var \Drupal\commerce_payment\Entity\PaymentGatewayInterface $payment_gateway */
     $payment_gateway = $this->order->get('payment_gateway')->entity;
     if (!$payment_gateway) {
       return $summary;
     }
-
-    $payment_gateway_plugin = $payment_gateway->getPlugin();
     $payment_method = $this->order->get('payment_method')->entity;
-    if ($payment_gateway_plugin instanceof SupportsStoredPaymentMethodsInterface && $payment_method) {
+    if ($payment_method) {
       $view_builder = $this->entityTypeManager->getViewBuilder('commerce_payment_method');
       $summary = $view_builder->view($payment_method, 'default');
     }
-    else {
-      $billing_profile = $this->order->getBillingProfile();
-      if ($billing_profile) {
-        $profile_view_builder = $this->entityTypeManager->getViewBuilder('profile');
-        $profile_view = $profile_view_builder->view($billing_profile, 'default');
-        $label = $payment_gateway->getPlugin()->getDisplayLabel();
-        $summary = [
-          'label' => [
-            '#markup' => $label,
-          ],
-          'profile' => $profile_view,
-        ];
-      }
+    elseif ($billing_profile) {
+      $view_builder = $this->entityTypeManager->getViewBuilder('profile');
+      $summary = [
+        'payment_gateway' => [
+          '#markup' => $payment_gateway->getPlugin()->getDisplayLabel(),
+        ],
+        'profile' => $view_builder->view($billing_profile, 'default'),
+      ];
     }
 
     return $summary;
@@ -106,6 +110,13 @@ class PaymentInformation extends CheckoutPaneBase {
    * {@inheritdoc}
    */
   public function buildPaneForm(array $pane_form, FormStateInterface $form_state, array &$complete_form) {
+    if ($this->order->getTotalPrice()->isZero()) {
+      // Free orders don't need payment, collect just the billing information.
+      $pane_form['#title'] = $this->t('Billing information');
+      $pane_form = $this->buildBillingProfileForm($pane_form, $form_state);
+      return $pane_form;
+    }
+
     /** @var \Drupal\commerce_payment\PaymentGatewayStorageInterface $payment_gateway_storage */
     $payment_gateway_storage = $this->entityTypeManager->getStorage('commerce_payment_gateway');
     // Load the payment gateways. This fires an event for filtering the
@@ -114,7 +125,7 @@ class PaymentInformation extends CheckoutPaneBase {
     // Can't proceed without any payment gateways.
     if (empty($payment_gateways)) {
       $this->messenger->addError($this->noPaymentGatewayErrorMessage());
-      return [];
+      return $pane_form;
     }
 
     $options = $this->buildPaymentMethodOptions($payment_gateways);
@@ -189,21 +200,7 @@ class PaymentInformation extends CheckoutPaneBase {
       }
     }
     else {
-      $store = $this->order->getStore();
-      $billing_profile = $this->order->getBillingProfile();
-      if (!$billing_profile) {
-        $billing_profile = $this->entityTypeManager->getStorage('profile')->create([
-          'uid' => $this->order->getCustomerId(),
-          'type' => 'customer',
-        ]);
-      }
-
-      $pane_form['billing_information'] = [
-        '#type' => 'commerce_profile_select',
-        '#default_value' => $billing_profile,
-        '#default_country' => $store->getAddress()->getCountryCode(),
-        '#available_countries' => $store->getBillingCountries(),
-      ];
+      $pane_form = $this->buildBillingProfileForm($pane_form, $form_state);
     }
 
     return $pane_form;
@@ -369,6 +366,37 @@ class PaymentInformation extends CheckoutPaneBase {
   }
 
   /**
+   * Builds the billing profile form.
+   *
+   * @param array $pane_form
+   *   The pane form.
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   *   The form state of the parent form.
+   *
+   * @return array
+   *   The modified pane form.
+   */
+  protected function buildBillingProfileForm(array $pane_form, FormStateInterface $form_state) {
+    $store = $this->order->getStore();
+    $billing_profile = $this->order->getBillingProfile();
+    if (!$billing_profile) {
+      $billing_profile = $this->entityTypeManager->getStorage('profile')->create([
+        'uid' => $this->order->getCustomerId(),
+        'type' => 'customer',
+      ]);
+    }
+
+    $pane_form['billing_information'] = [
+      '#type' => 'commerce_profile_select',
+      '#default_value' => $billing_profile,
+      '#default_country' => $store->getAddress()->getCountryCode(),
+      '#available_countries' => $store->getBillingCountries(),
+    ];
+
+    return $pane_form;
+  }
+
+  /**
    * Ajax callback.
    */
   public static function ajaxRefresh(array $form, FormStateInterface $form_state) {
@@ -381,8 +409,11 @@ class PaymentInformation extends CheckoutPaneBase {
    * {@inheritdoc}
    */
   public function validatePaneForm(array &$pane_form, FormStateInterface $form_state, array &$complete_form) {
-    $values = $form_state->getValue($pane_form['#parents']);
+    if ($this->order->getTotalPrice()->isZero()) {
+      return;
+    }
 
+    $values = $form_state->getValue($pane_form['#parents']);
     if (!isset($values['payment_method'])) {
       $form_state->setError($complete_form, $this->noPaymentGatewayErrorMessage());
     }
@@ -392,6 +423,11 @@ class PaymentInformation extends CheckoutPaneBase {
    * {@inheritdoc}
    */
   public function submitPaneForm(array &$pane_form, FormStateInterface $form_state, array &$complete_form) {
+    if ($this->order->getTotalPrice()->isZero()) {
+      $this->order->setBillingProfile($pane_form['billing_information']['#profile']);
+      return;
+    }
+
     $values = $form_state->getValue($pane_form['#parents']);
     $selected_option = $pane_form['payment_method'][$values['payment_method']];
     /** @var \Drupal\commerce_payment\PaymentGatewayStorageInterface $payment_gateway_storage */

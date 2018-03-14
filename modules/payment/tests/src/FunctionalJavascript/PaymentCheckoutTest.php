@@ -3,6 +3,7 @@
 namespace Drupal\Tests\commerce_payment\FunctionalJavascript;
 
 use Drupal\commerce_checkout\Entity\CheckoutFlow;
+use Drupal\commerce_order\Adjustment;
 use Drupal\commerce_order\Entity\Order;
 use Drupal\commerce_payment\Entity\Payment;
 use Drupal\commerce_payment\Entity\PaymentGateway;
@@ -525,6 +526,45 @@ class PaymentCheckoutTest extends CommerceBrowserTestBase {
     $payment = Payment::load(1);
     $this->assertNotNull($payment);
     $this->assertEquals($payment->getAmount(), $order->getTotalPrice());
+  }
+
+  /**
+   * Tests a free order, where only the billing information is collected.
+   */
+  public function testFreeOrder() {
+    $this->drupalGet($this->product->toUrl()->toString());
+    $this->submitForm([], 'Add to cart');
+
+    // Add an adjustment to zero out the order total.
+    $order = Order::load(1);
+    $order->addAdjustment(new Adjustment([
+      'type' => 'custom',
+      'label' => 'Surprise, it is free!',
+      'amount' => $order->getTotalPrice()->multiply('-1'),
+      'locked' => TRUE,
+    ]));
+    $order->save();
+
+    $this->drupalGet('checkout/1');
+    $this->assertSession()->pageTextContains('Billing information');
+    $this->assertSession()->pageTextNotContains('Payment information');
+    $this->submitForm([
+      'payment_information[billing_information][address][0][address][given_name]' => 'Johnny',
+      'payment_information[billing_information][address][0][address][family_name]' => 'Appleseed',
+      'payment_information[billing_information][address][0][address][address_line1]' => '123 New York Drive',
+      'payment_information[billing_information][address][0][address][locality]' => 'New York City',
+      'payment_information[billing_information][address][0][address][administrative_area]' => 'NY',
+      'payment_information[billing_information][address][0][address][postal_code]' => '10001',
+    ], 'Continue to review');
+
+    $this->assertSession()->pageTextContains('Billing information');
+    $this->assertSession()->pageTextNotContains('Payment information');
+    $this->assertSession()->pageTextContains('Example');
+    $this->assertSession()->pageTextContains('Johnny Appleseed');
+    $this->assertSession()->pageTextContains('123 New York Drive');
+
+    $this->submitForm([], 'Complete checkout');
+    $this->assertSession()->pageTextContains('Your order number is 1. You can view your order on your account page when logged in.');
   }
 
 }
