@@ -10,6 +10,8 @@ use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Messenger\MessengerInterface;
+use Drupal\Core\Session\AccountInterface;
+use Drupal\Core\Url;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -23,6 +25,13 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * )
  */
 class PaymentInformation extends CheckoutPaneBase {
+
+  /**
+   * The current user.
+   *
+   * @var \Drupal\Core\Session\AccountInterface
+   */
+  protected $currentUser;
 
   /**
    * The messenger.
@@ -44,12 +53,15 @@ class PaymentInformation extends CheckoutPaneBase {
    *   The parent checkout flow.
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
+   * @param \Drupal\Core\Session\AccountInterface $current_user
+   *   The current user.
    * @param \Drupal\Core\Messenger\MessengerInterface $messenger
    *   The messenger.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, CheckoutFlowInterface $checkout_flow, EntityTypeManagerInterface $entity_type_manager, MessengerInterface $messenger) {
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, CheckoutFlowInterface $checkout_flow, EntityTypeManagerInterface $entity_type_manager, AccountInterface $current_user, MessengerInterface $messenger) {
     parent::__construct($configuration, $plugin_id, $plugin_definition, $checkout_flow, $entity_type_manager);
 
+    $this->currentUser = $current_user;
     $this->messenger = $messenger;
   }
 
@@ -63,6 +75,7 @@ class PaymentInformation extends CheckoutPaneBase {
       $plugin_definition,
       $checkout_flow,
       $container->get('entity_type.manager'),
+      $container->get('current_user'),
       $container->get('messenger')
     );
   }
@@ -462,13 +475,21 @@ class PaymentInformation extends CheckoutPaneBase {
   }
 
   /**
-   * Returns an error message in case there are no payment gateways.
+   * Returns an error message in case there are no available payment gateways.
    *
    * @return \Drupal\Core\StringTranslation\TranslatableMarkup
    *   The error message.
    */
   protected function noPaymentGatewayErrorMessage() {
-    return $this->t('No payment gateways are defined, create one first.');
+    if ($this->currentUser->hasPermission('administer commerce_payment_gateway')) {
+      $message = $this->t('There are no <a href=":url"">payment gateways</a> available for this order.', [
+        ':url' => Url::fromRoute('entity.commerce_payment_gateway.collection')->toString(),
+      ]);
+    }
+    else {
+      $message = $this->t('There are no payment gateways available for this order. Please try again later.');
+    }
+    return $message;
   }
 
 }
