@@ -16,3 +16,7 @@ services:
     arguments: ['@current_route_match']
     tags:
       - { name: 'context_provider' }
+
+  commerce_product.variation_attribute_value_mapper:
+    class: Drupal\commerce_product\ProductVariationAttributeMapper
+    arguments: ['@entity_type.manager', '@entity.repository', '@commerce_product.attribute_field_manager']
