@@ -1,11 +1,10 @@
 <?php
 
-namespace Drupal\Tests\commerce_promotion\FunctionalJavascript;
+namespace Drupal\Tests\commerce_promotion\Functional;
 
 use Drupal\commerce_promotion\Entity\Coupon;
 use Drupal\commerce_promotion\Entity\Promotion;
 use Drupal\Tests\commerce\Functional\CommerceBrowserTestBase;
-use Drupal\Tests\commerce\FunctionalJavascript\JavascriptTestTrait;
 
 /**
  * Tests the admin UI for coupons.
@@ -13,8 +12,6 @@ use Drupal\Tests\commerce\FunctionalJavascript\JavascriptTestTrait;
  * @group commerce
  */
 class CouponTest extends CommerceBrowserTestBase {
-
-  use JavascriptTestTrait;
 
   /**
    * The test promotion.
@@ -148,12 +145,8 @@ class CouponTest extends CommerceBrowserTestBase {
 
     $this->assertSession()->fieldExists('quantity');
     $this->getSession()->getPage()->fillField('quantity', (string) $coupon_quantity);
-
-    // Use POST here to invoke batch_process() in the internal browser.
-    $this->drupalPostForm(NULL, [], t('Generate'));
-
-    // Wait until the id="updateprogress" element is gone, or timeout after 3 minutes.
-    $this->getSession()->wait(180000, 'jQuery("#updateprogress").length === 0');
+    $this->getSession()->getPage()->pressButton('Generate');
+    $this->checkForMetaRefresh();
 
     $this->assertSession()->pageTextContains("Generated $coupon_quantity coupons.");
     $coupon_count = $this->getSession()->getPage()->findAll('xpath', '//table/tbody/tr/td[text()="0 / 1"]');
