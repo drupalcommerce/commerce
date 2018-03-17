@@ -60,7 +60,7 @@ interface PaymentGatewayInterface extends ConfigEntityInterface, EntityWithPlugi
   /**
    * Gets the payment gateway plugin configuration.
    *
-   * @return string
+   * @return array
    *   The payment gateway plugin configuration.
    */
   public function getPluginConfiguration();
