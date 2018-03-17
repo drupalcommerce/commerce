@@ -13,7 +13,7 @@ use Drupal\Console\Core\Style\DrupalStyle;
 use Drupal\Console\Annotations\DrupalCommand;
 use Drupal\commerce_price\CurrencyImporter;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
-use Drupal\address\Repository\CountryRepository;
+use CommerceGuys\Intl\Country\CountryRepositoryInterface;
 use Drupal\Core\Render\MetadataBubblingUrlGenerator;
 use Egulias\EmailValidator\EmailValidator;
 use Symfony\Component\Console\Question\Question;
@@ -50,7 +50,7 @@ class CreateStoreCommand extends Command {
   /**
    * The country repository.
    *
-   * @var \Drupal\address\Repository\CountryRepository
+   * @var \CommerceGuys\Intl\Country\CountryRepositoryInterface
    */
   protected $countryRepository;
 
@@ -75,17 +75,17 @@ class CreateStoreCommand extends Command {
    *   The currency importer.
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
-   * @param \Drupal\address\Repository\CountryRepository $address_country_repository
+   * @param \CommerceGuys\Intl\Country\CountryRepositoryInterface $country_repository
    *   The country repository.
    * @param \Drupal\Core\Render\MetadataBubblingUrlGenerator $url_generator
    *   The URL generator.
    * @param \Egulias\EmailValidator\EmailValidator $email_validator
    *   The email validator.
    */
-  public function __construct(CurrencyImporter $commerce_price_currency_importer, EntityTypeManagerInterface $entity_type_manager, CountryRepository $address_country_repository, MetadataBubblingUrlGenerator $url_generator, EmailValidator $email_validator) {
+  public function __construct(CurrencyImporter $commerce_price_currency_importer, EntityTypeManagerInterface $entity_type_manager, CountryRepositoryInterface $country_repository, MetadataBubblingUrlGenerator $url_generator, EmailValidator $email_validator) {
     $this->currencyImporter = $commerce_price_currency_importer;
     $this->entityTypeManager = $entity_type_manager;
-    $this->countryRepository = $address_country_repository;
+    $this->countryRepository = $country_repository;
     $this->urlGenerator = $url_generator;
     $this->emailValidator = $email_validator;
     parent::__construct();
