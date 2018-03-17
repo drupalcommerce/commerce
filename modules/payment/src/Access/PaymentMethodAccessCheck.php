@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\commerce_payment;
+namespace Drupal\commerce_payment\Access;
 
 use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Routing\RouteMatchInterface;

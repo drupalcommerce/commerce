@@ -49,7 +49,7 @@ entity.commerce_payment_method.add_form:
     _form: '\Drupal\commerce_payment\Form\PaymentMethodAddForm'
     _title: 'Add payment method'
   requirements:
-    _custom_access: '\Drupal\commerce_payment\PaymentMethodAccessCheck::checkAccess'
+    _custom_access: '\Drupal\commerce_payment\Access\PaymentMethodAccessCheck::checkAccess'
   options:
     parameters:
       user:
@@ -61,7 +61,7 @@ entity.commerce_payment_method.collection:
     _entity_list: 'commerce_payment_method'
     _title: 'Payment methods'
   requirements:
-    _custom_access: '\Drupal\commerce_payment\PaymentMethodAccessCheck::checkAccess'
+    _custom_access: '\Drupal\commerce_payment\Access\PaymentMethodAccessCheck::checkAccess'
   options:
     parameters:
       user:
