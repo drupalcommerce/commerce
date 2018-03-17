@@ -4,7 +4,6 @@ namespace Drupal\commerce_product\Plugin\Field\FieldWidget;
 
 use Drupal\commerce_product\Entity\ProductVariationInterface;
 use Drupal\commerce_product\ProductAttributeFieldManagerInterface;
-use Drupal\commerce_product\ProductVariationAttributeMapperInterface;
 use Drupal\Component\Utility\Html;
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Entity\EntityRepositoryInterface;
@@ -43,13 +42,6 @@ class ProductVariationAttributesWidget extends ProductVariationWidgetBase implem
   protected $attributeStorage;
 
   /**
-   * The variation attribute value mapper.
-   *
-   * @var \Drupal\commerce_product\ProductVariationAttributeMapperInterface
-   */
-  protected $variationAttributeValueMapper;
-
-  /**
    * Constructs a new ProductVariationAttributesWidget object.
    *
    * @param string $plugin_id
@@ -68,15 +60,12 @@ class ProductVariationAttributesWidget extends ProductVariationWidgetBase implem
    *   The entity repository.
    * @param \Drupal\commerce_product\ProductAttributeFieldManagerInterface $attribute_field_manager
    *   The attribute field manager.
-   * @param \Drupal\commerce_product\ProductVariationAttributeMapperInterface $variation_attribute_value_mapper
-   *   The variation attribute value resolver.
    */
-  public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, array $third_party_settings, EntityTypeManagerInterface $entity_type_manager, EntityRepositoryInterface $entity_repository, ProductAttributeFieldManagerInterface $attribute_field_manager, ProductVariationAttributeMapperInterface $variation_attribute_value_mapper) {
+  public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, array $third_party_settings, EntityTypeManagerInterface $entity_type_manager, EntityRepositoryInterface $entity_repository, ProductAttributeFieldManagerInterface $attribute_field_manager) {
     parent::__construct($plugin_id, $plugin_definition, $field_definition, $settings, $third_party_settings, $entity_type_manager, $entity_repository);
 
     $this->attributeFieldManager = $attribute_field_manager;
     $this->attributeStorage = $entity_type_manager->getStorage('commerce_product_attribute');
-    $this->variationAttributeValueMapper = $variation_attribute_value_mapper;
   }
 
   /**
@@ -91,8 +80,7 @@ class ProductVariationAttributesWidget extends ProductVariationWidgetBase implem
       $configuration['third_party_settings'],
       $container->get('entity_type.manager'),
       $container->get('entity.repository'),
-      $container->get('commerce_product.attribute_field_manager'),
-      $container->get('commerce_product.variation_attribute_value_mapper')
+      $container->get('commerce_product.attribute_field_manager')
     );
   }
 
@@ -236,8 +224,24 @@ class ProductVariationAttributesWidget extends ProductVariationWidgetBase implem
    *   The selected variation.
    */
   protected function selectVariationFromUserInput(array $variations, array $user_input) {
-    $attributes = !empty($user_input['attributes']) ? $user_input['attributes'] : [];
-    return $this->variationAttributeValueMapper->getVariation($variations, $attributes);
+    $current_variation = reset($variations);
+    if (!empty($user_input['attributes'])) {
+      $attributes = $user_input['attributes'];
+      foreach ($variations as $variation) {
+        $match = TRUE;
+        foreach ($attributes as $field_name => $value) {
+          if ($variation->getAttributeValueId($field_name) != $value) {
+            $match = FALSE;
+          }
+        }
+        if ($match) {
+          $current_variation = $variation;
+          break;
+        }
+      }
+    }
+
+    return $current_variation;
   }
 
   /**
@@ -252,7 +256,48 @@ class ProductVariationAttributesWidget extends ProductVariationWidgetBase implem
    *   The attribute information, keyed by field name.
    */
   protected function getAttributeInfo(ProductVariationInterface $selected_variation, array $variations) {
-    return $this->variationAttributeValueMapper->getAttributeInfo($selected_variation, $variations);
+    $attributes = [];
+    $field_definitions = $this->attributeFieldManager->getFieldDefinitions($selected_variation->bundle());
+    $field_map = $this->attributeFieldManager->getFieldMap($selected_variation->bundle());
+    $field_names = array_column($field_map, 'field_name');
+    $attribute_ids = array_column($field_map, 'attribute_id');
+    $index = 0;
+    foreach ($field_names as $field_name) {
+      $field = $field_definitions[$field_name];
+      /** @var \Drupal\commerce_product\Entity\ProductAttributeInterface $attribute */
+      $attribute = $this->attributeStorage->load($attribute_ids[$index]);
+      // Make sure we have translation for attribute.
+      $attribute = $this->entityRepository->getTranslationFromContext($attribute, $selected_variation->language()->getId());
+
+      $attributes[$field_name] = [
+        'field_name' => $field_name,
+        'title' => $attribute->label(),
+        'required' => $field->isRequired(),
+        'element_type' => $attribute->getElementType(),
+      ];
+      // The first attribute gets all values. Every next attribute gets only
+      // the values from variations matching the previous attribute value.
+      // For 'Color' and 'Size' attributes that means getting the colors of all
+      // variations, but only the sizes of variations with the selected color.
+      $callback = NULL;
+      if ($index > 0) {
+        $previous_field_name = $field_names[$index - 1];
+        $previous_field_value = $selected_variation->getAttributeValueId($previous_field_name);
+        $callback = function ($variation) use ($previous_field_name, $previous_field_value) {
+          /** @var \Drupal\commerce_product\Entity\ProductVariationInterface $variation */
+          return $variation->getAttributeValueId($previous_field_name) == $previous_field_value;
+        };
+      }
+
+      $attributes[$field_name]['values'] = $this->getAttributeValues($variations, $field_name, $callback);
+      $index++;
+    }
+    // Filter out attributes with no values.
+    $attributes = array_filter($attributes, function ($attribute) {
+      return !empty($attribute['values']);
+    });
+
+    return $attributes;
   }
 
   /**
@@ -269,7 +314,20 @@ class ProductVariationAttributesWidget extends ProductVariationWidgetBase implem
    *   The attribute values, keyed by attribute ID.
    */
   protected function getAttributeValues(array $variations, $field_name, callable $callback = NULL) {
-    return $this->variationAttributeValueMapper->getAttributeValues($variations, $field_name, $callback);
+    $values = [];
+    foreach ($variations as $variation) {
+      if (is_null($callback) || call_user_func($callback, $variation)) {
+        $attribute_value = $variation->getAttributeValue($field_name);
+        if ($attribute_value) {
+          $values[$attribute_value->id()] = $attribute_value->label();
+        }
+        else {
+          $values['_none'] = '';
+        }
+      }
+    }
+
+    return $values;
   }
 
 }
