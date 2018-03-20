@@ -221,6 +221,7 @@ function commerce_product_add_body_field(ProductTypeInterface $product_type, $la
     ->setTargetBundle($product_type->id())
     ->setName('body')
     ->setLabel($label)
+    ->setTranslatable(TRUE)
     ->setSetting('display_summary', FALSE)
     ->setDisplayOptions('form', [
       'type' => 'text_textarea_with_summary',
