@@ -342,8 +342,9 @@ class Order extends CommerceContentEntityBase implements OrderInterface {
     $subtotal_price = NULL;
     if ($this->hasItems()) {
       foreach ($this->getItems() as $order_item) {
-        $order_item_total = $order_item->getTotalPrice();
-        $subtotal_price = $subtotal_price ? $subtotal_price->add($order_item_total) : $order_item_total;
+        if ($order_item_total = $order_item->getTotalPrice()) {
+          $subtotal_price = $subtotal_price ? $subtotal_price->add($order_item_total) : $order_item_total;
+        }
       }
     }
     return $subtotal_price;
@@ -357,8 +358,9 @@ class Order extends CommerceContentEntityBase implements OrderInterface {
     $total_price = NULL;
     if ($this->hasItems()) {
       foreach ($this->getItems() as $order_item) {
-        $order_item_total = $order_item->getTotalPrice();
-        $total_price = $total_price ? $total_price->add($order_item_total) : $order_item_total;
+        if ($order_item_total = $order_item->getTotalPrice()) {
+          $total_price = $total_price ? $total_price->add($order_item_total) : $order_item_total;
+        }
       }
       $adjustments = $this->collectAdjustments();
       if ($adjustments) {
