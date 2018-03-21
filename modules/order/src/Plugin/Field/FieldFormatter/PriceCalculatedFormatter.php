@@ -34,13 +34,6 @@ class PriceCalculatedFormatter extends PriceDefaultFormatter implements Containe
   protected $adjustmentTypeManager;
 
   /**
-   * The currency storage.
-   *
-   * @var \Drupal\Core\Entity\EntityStorageInterface
-   */
-  protected $currencyStorage;
-
-  /**
    * The current user.
    *
    * @var \Drupal\Core\Session\AccountInterface
@@ -95,7 +88,6 @@ class PriceCalculatedFormatter extends PriceDefaultFormatter implements Containe
     parent::__construct($plugin_id, $plugin_definition, $field_definition, $settings, $label, $view_mode, $third_party_settings, $entity_type_manager, $number_formatter_factory);
 
     $this->adjustmentTypeManager = $adjustment_type_manager;
-    $this->currencyStorage = $entity_type_manager->getStorage('commerce_currency');
     $this->currentStore = $current_store;
     $this->currentUser = $current_user;
     $this->priceCalculator = $price_calculator;
