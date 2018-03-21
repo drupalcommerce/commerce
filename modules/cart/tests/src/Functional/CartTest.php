@@ -114,9 +114,19 @@ class CartTest extends OrderBrowserTestBase {
     $this->assertSession()->elementTextContains('css', '.order-total-line', 'Total');
     $this->assertSession()->pageTextContains('$3,048.00');
 
+    // Confirm that setting the quantity to 0 removes an item.
+    $values = [
+      'edit_quantity[0]' => 0,
+      'edit_quantity[1]' => 3,
+    ];
+    $this->submitForm($values, t('Update cart'));
+    $this->assertSession()->pageTextContains(t('Your shopping cart has been updated.'));
+    $this->assertSession()->fieldExists('edit-edit-quantity-0');
+    $this->assertSession()->fieldNotExists('edit-edit-quantity-1');
+    $this->assertSession()->pageTextContains('$1,050.00');
+
     // Confirm the presence and functioning of the Remove button.
     $this->assertSession()->buttonExists('Remove');
-    $this->submitForm([], t('Remove'));
     $this->submitForm([], t('Remove'));
     $this->assertSession()->pageTextContains(t('Your shopping cart is empty.'));
 

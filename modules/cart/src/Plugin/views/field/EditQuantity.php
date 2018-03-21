@@ -133,6 +133,7 @@ class EditQuantity extends FieldPluginBase {
         '#min' => 0,
         '#max' => 9999,
         '#step' => $step,
+        '#required' => TRUE,
       ];
     }
     // Replace the form submit button label.
@@ -150,15 +151,29 @@ class EditQuantity extends FieldPluginBase {
   public function viewsFormSubmit(array &$form, FormStateInterface $form_state) {
     $quantities = $form_state->getValue($this->options['id'], []);
     foreach ($quantities as $row_index => $quantity) {
+      if (!is_numeric($quantity) || $quantity < 0) {
+        // The input might be invalid if the #required or #min attributes
+        // were removed by an alter hook.
+        continue;
+      }
       /** @var \Drupal\commerce_order\Entity\OrderItemInterface $order_item */
       $order_item = $this->getEntity($this->view->result[$row_index]);
-      if ($order_item->getQuantity() != $quantity) {
-        $order_item->setQuantity($quantity);
-        $order = $order_item->getOrder();
-        $this->cartManager->updateOrderItem($order, $order_item, FALSE);
-        // Tells commerce_cart_order_item_views_form_submit() to save the order.
-        $form_state->set('quantity_updated', TRUE);
+      if ($order_item->getQuantity() == $quantity) {
+        // The quantity hasn't changed.
+        continue;
       }
+
+      if ($quantity > 0) {
+        $order_item->setQuantity($quantity);
+        $this->cartManager->updateOrderItem($order_item->getOrder(), $order_item, FALSE);
+      }
+      else {
+        // Treat quantity "0" as a request for deletion.
+        $this->cartManager->removeOrderItem($order_item->getOrder(), $order_item, FALSE);
+      }
+
+      // Tells commerce_cart_order_item_views_form_submit() to save the order.
+      $form_state->set('quantity_updated', TRUE);
     }
   }
 
