@@ -11,7 +11,7 @@ use Drupal\Core\Field\FormatterBase;
  *
  * @FieldFormatter(
  *   id = "commerce_order_item_table",
- *   label = @Translation("order item table"),
+ *   label = @Translation("Order item table"),
  *   field_types = {
  *     "entity_reference",
  *   },
