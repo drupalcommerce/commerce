@@ -3,8 +3,6 @@
 namespace Drupal\Tests\commerce_cart\Functional;
 
 use Drupal\Tests\commerce_order\Functional\OrderBrowserTestBase;
-use Drupal\user\Entity\Role;
-use Drupal\user\RoleInterface;
 
 /**
  * Tests the cart page.
@@ -128,14 +126,6 @@ class CartTest extends OrderBrowserTestBase {
     $this->assertSession()->buttonExists('Remove');
     $this->submitForm([], t('Remove'));
     $this->assertSession()->pageTextContains(t('Your shopping cart is empty.'));
-
-    // Test that cart is denied for user without permission.
-    Role::load(RoleInterface::ANONYMOUS_ID)
-      ->revokePermission('access cart')
-      ->save();
-    $this->drupalLogout();
-    $this->drupalGet('cart');
-    $this->assertSession()->statusCodeEquals(403);
   }
 
   /**

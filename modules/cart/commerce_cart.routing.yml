@@ -4,4 +4,4 @@ commerce_cart.page:
     _controller: '\Drupal\commerce_cart\Controller\CartController::cartPage'
     _title: 'Shopping cart'
   requirements:
-    _permission: 'access cart'
+    _access: 'TRUE'
