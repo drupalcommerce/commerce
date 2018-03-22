@@ -177,6 +177,8 @@ function commerce_checkout_form_alter(&$form, FormStateInterface $form_state, $f
         '#access' => \Drupal::currentUser()->hasPermission('access checkout'),
         '#submit' => array_merge($form['#submit'], ['commerce_checkout_order_item_views_form_submit']),
         '#order_id' => $view->argument['order_id']->value[0],
+        '#update_cart' => TRUE,
+        '#show_update_message' => FALSE,
       ];
     }
   }

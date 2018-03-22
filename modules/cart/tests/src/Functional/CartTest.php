@@ -41,7 +41,7 @@ class CartTest extends OrderBrowserTestBase {
    */
   public static $modules = [
     'commerce_cart',
-    'node',
+    'commerce_checkout',
   ];
 
   /**
@@ -81,18 +81,17 @@ class CartTest extends OrderBrowserTestBase {
     $this->variations[] = $variation;
     $this->cart = \Drupal::service('commerce_cart.cart_provider')->createCart('default');
     $this->cartManager = \Drupal::service('commerce_cart.cart_manager');
-  }
 
-  /**
-   * Test the cart page.
-   */
-  public function testCartPage() {
-    $this->drupalLogin($this->adminUser);
-
+    // Add both variations to the cart.
     foreach ($this->variations as $variation) {
       $this->cartManager->addEntity($this->cart, $variation);
     }
+  }
 
+  /**
+   * Test the basic functioning of the cart page.
+   */
+  public function testCartPage() {
     $this->drupalGet('cart');
     // Confirm the presence of the order total summary.
     $this->assertSession()->elementTextContains('css', '.order-total-line', 'Subtotal');
@@ -137,6 +136,28 @@ class CartTest extends OrderBrowserTestBase {
     $this->drupalLogout();
     $this->drupalGet('cart');
     $this->assertSession()->statusCodeEquals(403);
+  }
+
+  /**
+   * Tests the Checkout button added by commerce_checkout.
+   */
+  public function testCheckoutButton() {
+    $this->drupalGet('cart');
+    // Confirm that the "Checkout" button redirects and updates the cart.
+    $this->assertSession()->buttonExists('Checkout');
+    $values = [
+      'edit_quantity[0]' => 2,
+      'edit_quantity[1]' => 3,
+    ];
+    $this->submitForm($values, t('Checkout'));
+    $this->assertSession()->addressEquals('checkout/1/order_information');
+    $this->assertSession()->pageTextNotContains(t('Your shopping cart has been updated.'));
+
+    $this->drupalGet('cart');
+    $this->assertSession()->fieldValueEquals('edit-edit-quantity-0', 2);
+    $this->assertSession()->fieldValueEquals('edit-edit-quantity-1', 3);
+    $this->assertSession()->elementTextContains('css', '.order-total-line', 'Total');
+    $this->assertSession()->pageTextContains('$3,048.00');
   }
 
 }

@@ -24,7 +24,7 @@ class EmptyCartButton extends AreaPluginBase {
   protected $cartManager;
 
   /**
-   * The entity manager.
+   * The entity type manager.
    *
    * @var \Drupal\Core\Entity\EntityTypeManagerInterface
    */
