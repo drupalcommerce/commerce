@@ -358,7 +358,8 @@ class OrderItem extends CommerceContentEntityBase implements OrderItemInterface 
         'type' => 'timestamp',
         'weight' => 0,
       ])
-      ->setDisplayConfigurable('form', TRUE);
+      ->setDisplayConfigurable('form', TRUE)
+      ->setDisplayConfigurable('view', TRUE);
 
     $fields['changed'] = BaseFieldDefinition::create('changed')
       ->setLabel(t('Changed'))
