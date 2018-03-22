@@ -52,6 +52,14 @@ interface PaymentGatewayInterface extends PluginWithFormsInterface, Configurable
   public function getSupportedModes();
 
   /**
+   * Gets the details of the payment gateway or NULL if not defined..
+   *
+   * @return array|null
+   *   The details definition or NULL.
+   */
+  public function getDetails();
+
+  /**
    * Gets the JS library ID.
    *
    * This is usually an external library defined in the module's

@@ -174,6 +174,14 @@ abstract class PaymentGatewayBase extends PluginBase implements PaymentGatewayIn
   /**
    * {@inheritdoc}
    */
+  public function getDetails() {
+    return ($this->configuration['details']['value']) ? $this->configuration['details'] : NULL;
+
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function getJsLibrary() {
     $js_library = NULL;
     if (!empty($this->pluginDefinition['js_library'])) {
@@ -251,6 +259,10 @@ abstract class PaymentGatewayBase extends PluginBase implements PaymentGatewayIn
     return [
       'display_label' => $this->pluginDefinition['display_label'],
       'mode' => $modes ? reset($modes) : '',
+      'details' => [
+        'value' => '',
+        'format' => 'plain_text',
+      ],
       'payment_method_types' => [],
     ];
   }
@@ -269,6 +281,14 @@ abstract class PaymentGatewayBase extends PluginBase implements PaymentGatewayIn
       '#title' => $this->t('Display name'),
       '#description' => t('Shown to customers during checkout.'),
       '#default_value' => $this->configuration['display_label'],
+    ];
+    $form['details'] = [
+      '#type' => 'text_format',
+      '#title' => $this->t('Additional details'),
+      '#description' => $this->t('Additional details about payment to be shown to the customer on checkout.'),
+      '#default_value' => $this->configuration['details']['value'],
+      '#format' => $this->configuration['details']['format'],
+      '#rows' => 2,
     ];
 
     if (count($modes) > 1) {
@@ -323,6 +343,7 @@ abstract class PaymentGatewayBase extends PluginBase implements PaymentGatewayIn
       $this->configuration = [];
       $this->configuration['display_label'] = $values['display_label'];
       $this->configuration['mode'] = $values['mode'];
+      $this->configuration['details'] = $values['details'];
       $this->configuration['payment_method_types'] = array_keys($values['payment_method_types']);
     }
   }

@@ -36,11 +36,16 @@ class PaymentGatewayTest extends CommerceBrowserTestBase {
     $this->getSession()->getPage()->clickLink('Add payment gateway');
     $this->assertSession()->addressEquals('admin/commerce/config/payment-gateways/add');
 
+    $details = [
+      'value' => 'Test details',
+      'format' => 'plain_text',
+    ];
     $values = [
       'label' => 'Example',
       'plugin' => 'example_offsite_redirect',
       'configuration[example_offsite_redirect][redirect_method]' => 'post',
       'configuration[example_offsite_redirect][mode]' => 'test',
+      'configuration[example_offsite_redirect][details][value]' => $details['value'],
       'status' => '1',
       // Setting the 'id' can fail if focus switches to another field.
       // This is a bug in the machine name JS that can be reproduced manually.
@@ -60,6 +65,7 @@ class PaymentGatewayTest extends CommerceBrowserTestBase {
     $this->assertEquals(TRUE, $payment_gateway->status());
     $payment_gateway_plugin = $payment_gateway->getPlugin();
     $this->assertEquals('test', $payment_gateway_plugin->getMode());
+    $this->assertEquals($details, $payment_gateway_plugin->getDetails());
     $configuration = $payment_gateway_plugin->getConfiguration();
     $this->assertEquals('post', $configuration['redirect_method']);
   }
@@ -77,9 +83,14 @@ class PaymentGatewayTest extends CommerceBrowserTestBase {
     $payment_gateway = $this->createEntity('commerce_payment_gateway', $values);
 
     $this->drupalGet('admin/commerce/config/payment-gateways/manage/' . $payment_gateway->id());
+    $details = [
+      'value' => 'Test details',
+      'format' => 'plain_text',
+    ];
     $values += [
       'configuration[example_offsite_redirect][redirect_method]' => 'get',
       'configuration[example_offsite_redirect][mode]' => 'live',
+      'configuration[example_offsite_redirect][details][value]' => $details['value'],
       'conditionOperator' => 'OR',
     ];
     $this->submitForm($values, 'Save');
@@ -94,6 +105,7 @@ class PaymentGatewayTest extends CommerceBrowserTestBase {
     $this->assertEquals(FALSE, $payment_gateway->status());
     $payment_gateway_plugin = $payment_gateway->getPlugin();
     $this->assertEquals('live', $payment_gateway_plugin->getMode());
+    $this->assertEquals($details, $payment_gateway_plugin->getDetails());
     $configuration = $payment_gateway_plugin->getConfiguration();
     $this->assertEquals('get', $configuration['redirect_method']);
   }

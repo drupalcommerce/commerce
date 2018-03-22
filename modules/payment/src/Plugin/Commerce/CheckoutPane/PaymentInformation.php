@@ -194,6 +194,15 @@ class PaymentInformation extends CheckoutPaneBase {
 
     $selected_option = $pane_form['payment_method'][$default_option];
     $payment_gateway = $payment_gateways[$selected_option['#payment_gateway']];
+
+    // Add details markup if available.
+    if (empty($selected_option['#payment_method']) && $details = $payment_gateway->getPlugin()->getDetails()) {
+      $pane_form['details'] = [
+        '#type' => 'item',
+        '#markup' => check_markup($details['value'], $details['format']),
+      ];
+    }
+
     if ($payment_gateway->getPlugin() instanceof SupportsStoredPaymentMethodsInterface) {
       if (!empty($selected_option['#payment_method_type'])) {
         /** @var \Drupal\commerce_payment\PaymentMethodStorageInterface $payment_method_storage */

@@ -44,6 +44,10 @@ commerce_payment_gateway_configuration:
     mode:
       type: string
       label: 'Mode'
+    details:
+      type: text_format
+      label: 'Details'
+      translatable: true
     payment_method_types:
       type: sequence
       label: 'Payment method types'
