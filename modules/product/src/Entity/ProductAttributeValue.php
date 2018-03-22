@@ -25,7 +25,7 @@ use Drupal\Core\Field\BaseFieldDefinition;
  *     "storage" = "Drupal\commerce_product\ProductAttributeValueStorage",
  *     "access" = "Drupal\commerce\EmbeddedEntityAccessControlHandler",
  *     "view_builder" = "Drupal\Core\Entity\EntityViewBuilder",
- *     "views_data" = "Drupal\views\EntityViewsData",
+ *     "views_data" = "Drupal\commerce\CommerceEntityViewsData",
  *     "translation" = "Drupal\content_translation\ContentTranslationHandler"
  *   },
  *   admin_permission = "administer commerce_product_attribute",

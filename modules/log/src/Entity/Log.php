@@ -23,7 +23,7 @@ use Drupal\Core\Field\BaseFieldDefinition;
  *     "list_builder" = "Drupal\commerce_log\LogListBuilder",
  *     "storage" = "Drupal\commerce_log\LogStorage",
  *     "view_builder" = "Drupal\commerce_log\LogViewBuilder",
- *     "views_data" = "Drupal\views\EntityViewsData",
+ *     "views_data" = "Drupal\commerce\CommerceEntityViewsData",
  *   },
  *   base_table = "commerce_log",
  *   entity_keys = {
