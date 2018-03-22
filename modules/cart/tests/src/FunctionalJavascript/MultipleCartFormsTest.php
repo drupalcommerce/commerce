@@ -56,7 +56,7 @@ class MultipleCartFormsTest extends CartBrowserTestBase {
     /** @var \Drupal\Core\Entity\Entity\EntityFormDisplay $order_item_form_display */
     $order_item_form_display = EntityFormDisplay::load('commerce_order_item.default.add_to_cart');
     $order_item_form_display->setComponent('quantity', [
-      'type' => 'number',
+      'type' => 'commerce_quantity',
     ]);
     $order_item_form_display->save();
 

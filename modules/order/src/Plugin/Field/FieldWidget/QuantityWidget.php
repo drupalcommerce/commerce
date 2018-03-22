@@ -104,6 +104,7 @@ class QuantityWidget extends NumberWidget {
   public function formElement(FieldItemListInterface $items, $delta, array $element, array &$form, FormStateInterface $form_state) {
     $element = parent::formElement($items, $delta, $element, $form, $form_state);
     $element['value']['#step'] = $this->getSetting('step');
+    $element['value']['#min'] = $this->getSetting('step');
 
     return $element;
   }
