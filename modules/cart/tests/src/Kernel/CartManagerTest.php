@@ -118,6 +118,7 @@ class CartManagerTest extends CommerceKernelTestBase {
     $order_item1 = $this->reloadEntity($order_item1);
     $this->assertNotEmpty($cart->hasItem($order_item1));
     $this->assertEquals(1, $order_item1->getQuantity());
+    $this->assertEquals($cart->id(), $order_item1->getOrderId());
     $this->assertEquals(new Price('1.00', 'USD'), $cart->getTotalPrice());
 
     $order_item1->setQuantity(2);
@@ -131,6 +132,7 @@ class CartManagerTest extends CommerceKernelTestBase {
     $this->assertNotEmpty($cart->hasItem($order_item1));
     $this->assertNotEmpty($cart->hasItem($order_item2));
     $this->assertEquals(3, $order_item2->getQuantity());
+    $this->assertEquals($cart->id(), $order_item2->getOrderId());
     $this->assertEquals(new Price('8.00', 'USD'), $cart->getTotalPrice());
 
     $this->cartManager->removeOrderItem($cart, $order_item1);
