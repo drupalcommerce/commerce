@@ -1,0 +1,20 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - commerce_order
+    - entity_reference_revisions
+    - profile
+id: commerce_order.billing_profile
+field_name: billing_profile
+entity_type: commerce_order
+type: entity_reference_revisions
+settings:
+  target_type: profile
+module: entity_reference_revisions
+locked: true
+cardinality: 1
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false

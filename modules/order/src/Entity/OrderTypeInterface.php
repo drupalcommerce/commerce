@@ -11,6 +11,7 @@ interface OrderTypeInterface extends CommerceBundleEntityInterface {
 
   // Refresh modes.
   const REFRESH_ALWAYS = 'always';
+
   const REFRESH_CUSTOMER = 'customer';
 
   /**
@@ -109,4 +110,17 @@ interface OrderTypeInterface extends CommerceBundleEntityInterface {
    */
   public function setReceiptBcc($receipt_bcc);
 
+  /**
+   * Gets the billing profile type.
+   *
+   * @return \Drupal\profile\Entity\ProfileTypeInterface
+   */
+  public function getBillingProfileType();
+
+  /**
+   * Sets the billing profile type.
+   *
+   * @param string $billingProfileType
+   */
+  public function setBillingProfileType($billingProfileType);
 }

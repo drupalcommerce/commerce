@@ -87,6 +87,9 @@ commerce_order.commerce_order_type.*:
     receiptBcc:
       type: string
       label: 'The receipt BCC email'
+    billingProfileType:
+      type: string
+      label: 'The billing profile type'
 
 commerce_order.commerce_order_item_type.*:
   type: commerce_config_entity_bundle

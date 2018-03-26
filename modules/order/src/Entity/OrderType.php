@@ -47,6 +47,7 @@ use Drupal\commerce\Entity\CommerceBundleEntityBase;
  *     "receiptBcc",
  *     "traits",
  *     "locked",
+ *     "billingProfileType",
  *   },
  *   links = {
  *     "add-form" = "/admin/commerce/config/order-types/add",
@@ -92,6 +93,13 @@ class OrderType extends CommerceBundleEntityBase implements OrderTypeInterface {
    * @var bool
    */
   protected $receiptBcc;
+
+  /**
+   * The billing profile type.
+   *
+   * @var string
+   */
+  protected $billingProfileType;
 
   /**
    * {@inheritdoc}
@@ -169,4 +177,22 @@ class OrderType extends CommerceBundleEntityBase implements OrderTypeInterface {
     return $this;
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function getBillingProfileType() {
+    if ($this->billingProfileType) {
+      return $this->entityTypeManager()
+        ->getStorage('profile_type')
+        ->load($this->billingProfileType);
+    }
+    return NULL;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setBillingProfileType($billingProfileType) {
+    $this->billingProfileType = $billingProfileType;
+  }
 }

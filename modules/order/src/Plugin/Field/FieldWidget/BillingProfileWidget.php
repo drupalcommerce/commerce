@@ -80,7 +80,7 @@ class BillingProfileWidget extends WidgetBase implements ContainerFactoryPluginI
     }
     else {
       $profile = $this->entityTypeManager->getStorage('profile')->create([
-        'type' => 'customer',
+        'type' => $this->getProfileType(),
         'uid' => $order->getCustomerId(),
       ]);
     }
@@ -120,6 +120,16 @@ class BillingProfileWidget extends WidgetBase implements ContainerFactoryPluginI
     $entity_type = $field_definition->getTargetEntityTypeId();
     $field_name = $field_definition->getName();
     return $entity_type == 'commerce_order' && $field_name == 'billing_profile';
+  }
+
+  /**
+   * Gets the profile type.
+   *
+   * @return string
+   */
+  private function getProfileType() {
+    $settings = $this->fieldDefinition->getSetting('handler_settings');
+    return reset($settings['target_bundles']);
   }
 
 }

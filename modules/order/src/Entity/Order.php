@@ -632,21 +632,6 @@ class Order extends CommerceContentEntityBase implements OrderInterface {
       ->setDisplayConfigurable('form', TRUE)
       ->setDisplayConfigurable('view', TRUE);
 
-    $fields['billing_profile'] = BaseFieldDefinition::create('entity_reference_revisions')
-      ->setLabel(t('Billing information'))
-      ->setDescription(t('Billing profile'))
-      ->setSetting('target_type', 'profile')
-      ->setSetting('handler', 'default')
-      ->setSetting('handler_settings', ['target_bundles' => ['customer']])
-      ->setTranslatable(TRUE)
-      ->setDisplayOptions('form', [
-        'type' => 'commerce_billing_profile',
-        'weight' => 0,
-        'settings' => [],
-      ])
-      ->setDisplayConfigurable('form', TRUE)
-      ->setDisplayConfigurable('view', TRUE);
-
     $fields['adjustments'] = BaseFieldDefinition::create('commerce_adjustment')
       ->setLabel(t('Adjustments'))
       ->setRequired(FALSE)

@@ -6,6 +6,7 @@ workflow: order_default
 refresh_mode: customer
 refresh_frequency: 300
 sendReceipt: true
+billingProfileType: customer
 receiptBcc: ''
 traits: {  }
 locked: false
