@@ -42,8 +42,7 @@ use Drupal\profile\Entity\ProfileInterface;
  *     },
  *     "route_provider" = {
  *       "default" = "Drupal\commerce_order\OrderRouteProvider",
- *       "delete-multiple" =
- *   "Drupal\entity\Routing\DeleteMultipleRouteProvider",
+ *       "delete-multiple" = "Drupal\entity\Routing\DeleteMultipleRouteProvider",
  *     },
  *   },
  *   base_table = "commerce_order",
@@ -558,8 +557,7 @@ class Order extends CommerceContentEntityBase implements OrderInterface {
       }
     }
     /** @var \Drupal\commerce_order\OrderItemStorageInterface $order_item_storage */
-    $order_item_storage = \Drupal::service('entity_type.manager')
-      ->getStorage('commerce_order_item');
+    $order_item_storage = \Drupal::service('entity_type.manager')->getStorage('commerce_order_item');
     $order_item_storage->delete($order_items);
   }
 
@@ -684,10 +682,7 @@ class Order extends CommerceContentEntityBase implements OrderInterface {
       ])
       ->setDisplayConfigurable('form', TRUE)
       ->setDisplayConfigurable('view', TRUE)
-      ->setSetting('workflow_callback', [
-        '\Drupal\commerce_order\Entity\Order',
-        'getWorkflowId',
-      ]);
+      ->setSetting('workflow_callback', ['\Drupal\commerce_order\Entity\Order', 'getWorkflowId']);
 
     $fields['data'] = BaseFieldDefinition::create('map')
       ->setLabel(t('Data'))
