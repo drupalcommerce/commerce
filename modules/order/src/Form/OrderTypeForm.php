@@ -7,6 +7,7 @@ use Drupal\commerce\Form\CommerceBundleEntityFormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\field\Entity\FieldConfig;
+use Drupal\profile\Entity\ProfileType;
 
 /**
  * Provides an order type form.
@@ -54,7 +55,7 @@ class OrderTypeForm extends CommerceBundleEntityFormBase {
       '#target_type' => 'profile_type',
       '#disabled' => !$this->entity->isNew(),
       '#title' => $this->t('Billing profile type'),
-      '#default_value' => $order_type->getBillingProfileType(),
+      '#default_value' => ProfileType::load($order_type->getBillingProfileTypeId()),
       '#description' => $this->t('The billing profile type to use with this order type.'),
     ];
 
@@ -154,7 +155,6 @@ class OrderTypeForm extends CommerceBundleEntityFormBase {
 
     if ($status == SAVED_NEW) {
       commerce_order_add_order_items_field($this->entity);
-      commerce_order_add_customer_profile_field($this->entity);
     }
   }
 

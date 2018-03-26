@@ -111,16 +111,16 @@ interface OrderTypeInterface extends CommerceBundleEntityInterface {
   public function setReceiptBcc($receipt_bcc);
 
   /**
-   * Gets the billing profile type.
+   * Gets the billing profile type id.
    *
-   * @return \Drupal\profile\Entity\ProfileTypeInterface
+   * @return string
    */
-  public function getBillingProfileType();
+  public function getBillingProfileTypeId();
 
   /**
-   * Sets the billing profile type.
+   * Sets the billing profile type id.
    *
-   * @param string $billingProfileType
+   * @param string $billingProfileTypeId
    */
-  public function setBillingProfileType($billingProfileType);
+  public function setBillingProfileTypeId($billingProfileTypeId);
 }

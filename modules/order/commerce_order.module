@@ -173,36 +173,6 @@ function commerce_order_add_order_items_field(OrderTypeInterface $order_type) {
 }
 
 /**
- * Adds the default billing profile field to an order type.
- *
- * @param \Drupal\commerce_order\Entity\OrderTypeInterface $order_type
- *   The order type.
- */
-function commerce_order_add_customer_profile_field(OrderTypeInterface $order_type) {
-  $field_definition = BundleFieldDefinition::create('entity_reference_revisions')
-    ->setTargetEntityTypeId('commerce_order')
-    ->setTargetBundle($order_type->id())
-    ->setName('billing_profile')
-    ->setLabel(t('Billing information'))
-    ->setDescription(t('Billing profile'))
-    ->setSetting('target_type', 'profile')
-    ->setSetting('handler', 'default')
-    ->setSetting('handler_settings', ['target_bundles' => [$order_type->getBillingProfileType()->id()]])
-    ->setTranslatable(TRUE)
-    ->setDisplayOptions('form', [
-      'type' => 'commerce_billing_profile',
-      'weight' => 0,
-      'settings' => [],
-    ])
-    ->setRequired(TRUE)
-    ->setDisplayConfigurable('form', TRUE)
-    ->setDisplayConfigurable('view', TRUE);
-
-  $configurable_field_manager = \Drupal::service('commerce.configurable_field_manager');
-  $configurable_field_manager->createField($field_definition);
-}
-
-/**
  * Implements hook_views_data_alter().
  */
 function commerce_order_views_data_alter(array &$data) {

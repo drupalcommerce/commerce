@@ -42,7 +42,8 @@ use Drupal\profile\Entity\ProfileInterface;
  *     },
  *     "route_provider" = {
  *       "default" = "Drupal\commerce_order\OrderRouteProvider",
- *       "delete-multiple" = "Drupal\entity\Routing\DeleteMultipleRouteProvider",
+ *       "delete-multiple" =
+ *   "Drupal\entity\Routing\DeleteMultipleRouteProvider",
  *     },
  *   },
  *   base_table = "commerce_order",
@@ -557,7 +558,8 @@ class Order extends CommerceContentEntityBase implements OrderInterface {
       }
     }
     /** @var \Drupal\commerce_order\OrderItemStorageInterface $order_item_storage */
-    $order_item_storage = \Drupal::service('entity_type.manager')->getStorage('commerce_order_item');
+    $order_item_storage = \Drupal::service('entity_type.manager')
+      ->getStorage('commerce_order_item');
     $order_item_storage->delete($order_items);
   }
 
@@ -632,6 +634,21 @@ class Order extends CommerceContentEntityBase implements OrderInterface {
       ->setDisplayConfigurable('form', TRUE)
       ->setDisplayConfigurable('view', TRUE);
 
+    $fields['billing_profile'] = BaseFieldDefinition::create('entity_reference_revisions')
+      ->setLabel(t('Billing information'))
+      ->setDescription(t('Billing profile'))
+      ->setSetting('target_type', 'profile')
+      ->setSetting('handler', 'default')
+      ->setSetting('handler_settings', ['target_bundles' => ['customer']])
+      ->setTranslatable(TRUE)
+      ->setDisplayOptions('form', [
+        'type' => 'commerce_billing_profile',
+        'weight' => 0,
+        'settings' => [],
+      ])
+      ->setDisplayConfigurable('form', TRUE)
+      ->setDisplayConfigurable('view', TRUE);
+
     $fields['adjustments'] = BaseFieldDefinition::create('commerce_adjustment')
       ->setLabel(t('Adjustments'))
       ->setRequired(FALSE)
@@ -667,7 +684,10 @@ class Order extends CommerceContentEntityBase implements OrderInterface {
       ])
       ->setDisplayConfigurable('form', TRUE)
       ->setDisplayConfigurable('view', TRUE)
-      ->setSetting('workflow_callback', ['\Drupal\commerce_order\Entity\Order', 'getWorkflowId']);
+      ->setSetting('workflow_callback', [
+        '\Drupal\commerce_order\Entity\Order',
+        'getWorkflowId',
+      ]);
 
     $fields['data'] = BaseFieldDefinition::create('map')
       ->setLabel(t('Data'))
@@ -709,6 +729,21 @@ class Order extends CommerceContentEntityBase implements OrderInterface {
         'weight' => 0,
       ])
       ->setDisplayConfigurable('view', TRUE);
+
+    return $fields;
+  }
+
+  public static function bundleFieldDefinitions(EntityTypeInterface $entity_type, $bundle, array $base_field_definitions) {
+    /** @var \Drupal\commerce_order\Entity\OrderTypeInterface $order_type */
+    $order_type = OrderType::load($bundle);
+    $fields = [];
+
+    $fields['billing_profile'] = clone $base_field_definitions['billing_profile'];
+    $fields['billing_profile']->setSetting('handler_settings', [
+      'target_bundles' => [
+        $order_type->getBillingProfileTypeId(),
+      ],
+    ]);
 
     return $fields;
   }
