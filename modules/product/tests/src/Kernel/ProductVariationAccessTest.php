@@ -21,7 +21,7 @@ class ProductVariationAccessTest extends CommerceKernelTestBase {
   public static $modules = [
     'path',
     'commerce_product',
-    'commerce_product_access_test',
+    'commerce_product_test',
   ];
 
   /**

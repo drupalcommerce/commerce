@@ -1,0 +1,7 @@
+name: Commerce Product Test
+type: module
+description: 'Test module for Commerce Product.'
+package: Testing
+core: 8.x
+dependencies:
+  - commerce:commerce_product
