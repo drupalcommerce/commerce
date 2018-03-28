@@ -282,12 +282,6 @@ class OrderTest extends CommerceKernelTestBase {
     $this->assertEquals(new Price('17.00', 'USD'), $order->getTotalPaid());
     $this->assertEquals(new Price('0.00', 'USD'), $order->getBalance());
 
-    // Confirm that we can set the refunded amount
-    $payment->setRefundedAmount(new Price('5.00', 'USD'))->save();
-    $order = Order::load($order->id());
-    $this->assertEquals(new Price('12.00', 'USD'), $order->getTotalPaid());
-    $this->assertEquals(new Price('5.00', 'USD'), $order->getBalance());
-
     // Confirm that when we delete the payment, the payment and the refund are removed from the order
     $payment->delete();
     $order = Order::load($order->id());
@@ -298,14 +292,16 @@ class OrderTest extends CommerceKernelTestBase {
       'order_id' => $order->id(),
       'amount' => new Price('7.00', 'USD'),
       'payment_gateway' => 'example',
-      'state' => 'completed',
     ]);
     $payment2->save();
     $order = Order::load($order->id());
     $this->assertEquals(new Price('0.00', 'USD'), $order->getBalance());
 
+    $payment2->setState('completed');
+    $payment2->save();
+
     // Test that payments can be partially refunded multiple times.
-    $this->payment_gateway_plugin->refundPayment($payment2, new Price('5.00', 'USD'));
+    $this->payment_gateway_plugin->refundPayment($payment2, new Price('7.00', 'USD'));
     $order = Order::load($order->id());
     $this->assertEquals(new Price('5.00', 'USD'), $order->getBalance());
 
