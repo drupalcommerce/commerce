@@ -49,7 +49,7 @@ class ProductVariationAttributeMapper implements ProductVariationAttributeMapper
    * {@inheritdoc}
    */
   public function selectVariation(array $variations, array $attribute_values = []) {
-    $selected_variation = reset($variations);
+    $selected_variation = NULL;
     // Select the first variation that matches the most attribute values.
     // Start with all attribute values, reduce them by 1 until a match is found.
     while (!empty($attribute_values)) {

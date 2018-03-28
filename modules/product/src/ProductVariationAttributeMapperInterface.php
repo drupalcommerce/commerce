@@ -20,15 +20,14 @@ interface ProductVariationAttributeMapperInterface {
    * 1) [Red, Small, Cotton]
    * 2) [Red, Small]
    * 3) [Red]
-   * If no match could be made, the default variation is selected instead.
    *
    * @param \Drupal\commerce_product\Entity\ProductVariationInterface[] $variations
    *   The variations.
    * @param array $attribute_values
    *   Attribute value IDs, keyed by the field name.
    *
-   * @return \Drupal\commerce_product\Entity\ProductVariationInterface
-   *   The selected variation.
+   * @return \Drupal\commerce_product\Entity\ProductVariationInterface|null
+   *   The selected variation, or NULL if none could be selected.
    */
   public function selectVariation(array $variations, array $attribute_values = []);
 

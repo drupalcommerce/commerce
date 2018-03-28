@@ -136,14 +136,21 @@ class ProductVariationAttributeMapperTest extends CommerceKernelTestBase {
 
     // No attribute values.
     $selected_variation = $this->mapper->selectVariation($product->getVariations());
-    $this->assertEquals($product->getDefaultVariation()->id(), $selected_variation->id());
+    $this->assertNull($selected_variation);
 
     // Empty attribute values.
     $selected_variation = $this->mapper->selectVariation($product->getVariations(), [
       'attribute_color' => '',
       'attribute_size' => '',
     ]);
-    $this->assertEquals($product->getDefaultVariation()->id(), $selected_variation->id());
+    $this->assertNull($selected_variation);
+
+    // Missing first attribute.
+    $selected_variation = $this->mapper->selectVariation($variations, [
+      'attribute_color' => '',
+      'attribute_size' => $this->sizeAttributes['large']->id(),
+    ]);
+    $this->assertNull($selected_variation);
 
     // Single attribute value.
     $selected_variation = $this->mapper->selectVariation($variations, [
@@ -171,13 +178,6 @@ class ProductVariationAttributeMapperTest extends CommerceKernelTestBase {
     $this->assertEquals($variations[3]->id(), $selected_variation->id());
     $this->assertEquals('Blue', $selected_variation->getAttributeValue('attribute_color')->label());
     $this->assertEquals('Small', $selected_variation->getAttributeValue('attribute_size')->label());
-
-    // Missing first attribute.
-    $selected_variation = $this->mapper->selectVariation($variations, [
-      'attribute_color' => '',
-      'attribute_size' => $this->sizeAttributes['large']->id(),
-    ]);
-    $this->assertEquals($product->getDefaultVariation()->id(), $selected_variation->id());
   }
 
   /**
@@ -494,15 +494,8 @@ class ProductVariationAttributeMapperTest extends CommerceKernelTestBase {
     }
     $product->save();
 
-    /** @var \Drupal\commerce_product\Entity\ProductVariation[] $variations */
-    $variations = $product->getVariations();
-    $selected_variation = $this->mapper->selectVariation($product->getVariations());
-    $this->assertEquals($product->getDefaultVariation()->id(), $selected_variation->id());
-    $this->assertEquals('Small', $selected_variation->getAttributeValue('attribute_size')->label());
-    $this->assertEquals('Black', $selected_variation->getAttributeValue('attribute_color')->label());
-    $this->assertEquals('1', $selected_variation->getAttributeValue('attribute_pack')->label());
-
-    // Verify available attribute selections.
+    // Verify available attribute selections for the default variation.
+    $selected_variation = $product->getDefaultVariation();
     $attributes = $this->mapper->prepareAttributes($selected_variation, $product->getVariations());
     $size_attribute = $attributes['attribute_size'];
     $this->assertEquals(['7' => 'Small', '8' => 'Medium', '9' => 'Large'], $size_attribute->getValues());

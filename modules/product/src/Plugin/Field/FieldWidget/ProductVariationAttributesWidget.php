@@ -128,20 +128,21 @@ class ProductVariationAttributesWidget extends ProductVariationWidgetBase implem
 
     // If an operation caused the form to rebuild, select the variation from
     // the user's current input.
+    $selected_variation = NULL;
     if ($form_state->isRebuilding()) {
       $parents = array_merge($element['#field_parents'], [$items->getName(), $delta, 'attributes']);
       $attribute_values = (array) NestedArray::getValue($form_state->getUserInput(), $parents);
       $selected_variation = $this->variationAttributeMapper->selectVariation($variations, $attribute_values);
     }
-    // Otherwise load from the current context.
-    else {
+    // Otherwise fallback to the default.
+    if (!$selected_variation) {
       /** @var \Drupal\commerce_order\Entity\OrderItemInterface $order_item */
       $order_item = $items->getEntity();
-      if (!$order_item->isNew()) {
-        $selected_variation = $order_item->getPurchasedEntity();
+      if ($order_item->isNew()) {
+        $selected_variation = $this->getDefaultVariation($product, $variations);
       }
       else {
-        $selected_variation = $this->getDefaultVariation($product, $variations);
+        $selected_variation = $order_item->getPurchasedEntity();
       }
     }
 
@@ -204,12 +205,18 @@ class ProductVariationAttributesWidget extends ProductVariationWidgetBase implem
   public function massageFormValues(array $values, array $form, FormStateInterface $form_state) {
     /** @var \Drupal\commerce_product\Entity\ProductInterface $product */
     $product = $form_state->get('product');
+    $default_variation = $product->getDefaultVariation();
     $variations = $this->variationStorage->loadEnabled($product);
 
     foreach ($values as &$value) {
       $attribute_values = isset($value['attributes']) ? $value['attributes'] : [];
       $selected_variation = $this->variationAttributeMapper->selectVariation($variations, $attribute_values);
-      $value['variation'] = $selected_variation->id();
+      if ($selected_variation) {
+        $value['variation'] = $selected_variation->id();
+      }
+      else {
+        $value['variation'] = $default_variation->id();
+      }
     }
 
     return parent::massageFormValues($values, $form, $form_state);
