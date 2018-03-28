@@ -41,6 +41,9 @@ function commerce_checkout_theme() {
         'checkout_step' => '',
       ],
     ],
+    'commerce_checkout_pane' => [
+      'render element' => 'elements',
+    ],
   ];
 
   return $theme;
@@ -56,6 +59,17 @@ function commerce_checkout_theme_suggestions_commerce_checkout_form(array $varia
   if (isset($variables['form']['sidebar']) && Element::isVisibleElement($variables['form']['sidebar'])) {
     $suggestions[] = $original . '__with_sidebar';
   }
+
+  return $suggestions;
+}
+
+/**
+ * Implements hook_theme_suggestions_HOOK().
+ */
+function commerce_checkout_theme_suggestions_commerce_checkout_pane(array $variables) {
+  $original = $variables['theme_hook_original'];
+  $suggestions = [];
+  $suggestions[] = $original . '__' . $variables['elements']['#pane_id'];
 
   return $suggestions;
 }
