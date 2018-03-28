@@ -173,6 +173,7 @@ function commerce_order_post_update_6() {
 }
 
 /**
+<<<<<<< HEAD
  * Revert the 'commerce_order_item_table' view - empty text added.
  */
 function commerce_order_post_update_7() {
@@ -207,6 +208,11 @@ function commerce_order_post_update_7() {
  * Add 'total_paid' field to 'commerce_order' entities.
  */
 function commerce_order_post_update_8() {
+=======
+ * Add 'total_paid' field to 'commerce_order' entities.
+ */
+function commerce_order_post_update_7() {
+>>>>>>> 52dbc5df40e0544d6e5e9f49f5fa3100ad4e8cc3
   $storage_definition = BaseFieldDefinition::create('commerce_price')
     ->setLabel(t('Total paid'))
     ->setDescription(t('The total amount paid on the order.'))
