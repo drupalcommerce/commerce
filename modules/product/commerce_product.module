@@ -297,3 +297,23 @@ function commerce_product_field_widget_form_alter(&$element, FormStateInterface 
     $element['#access'] = FALSE;
   }
 }
+
+/**
+ * Implements hook_form_FORM_ID_alter() for 'entity_form_display_edit_form'.
+ *
+ * Don't allow referencing existing variations, since a variation must
+ * always belong to a single product only.
+ */
+function commerce_product_form_entity_form_display_edit_form_alter(array &$form, FormStateInterface $form_state) {
+  if ($form['#entity_type'] != 'commerce_product') {
+    return;
+  }
+
+  if (isset($form['fields']['variations']['plugin']['settings_edit_form']['settings'])) {
+    $settings = &$form['fields']['variations']['plugin']['settings_edit_form']['settings'];
+    if (isset($settings['allow_existing'])) {
+      $settings['allow_existing']['#access'] = FALSE;
+      $settings['match_operator']['#access'] = FALSE;
+    }
+  }
+}
