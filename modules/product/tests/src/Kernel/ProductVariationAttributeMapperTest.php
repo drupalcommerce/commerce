@@ -8,6 +8,7 @@ use Drupal\commerce_product\Entity\ProductAttributeValue;
 use Drupal\commerce_product\Entity\ProductVariation;
 use Drupal\commerce_product\Entity\ProductVariationType;
 use Drupal\commerce_product\Entity\ProductVariationTypeInterface;
+use Drupal\field\Entity\FieldConfig;
 use Drupal\Tests\commerce\Kernel\CommerceKernelTestBase;
 
 /**
@@ -122,7 +123,7 @@ class ProductVariationAttributeMapperTest extends CommerceKernelTestBase {
       '1tb' => '1TB',
       '2tb' => '2TB',
       '3tb' => '3TB',
-    ]);
+    ], FALSE);
   }
 
   /**
@@ -288,7 +289,7 @@ class ProductVariationAttributeMapperTest extends CommerceKernelTestBase {
     $this->assertEquals('disk2', $disk2_attribute->getId());
     $this->assertEquals('Disk2', $disk2_attribute->getLabel());
     $this->assertEquals('select', $disk2_attribute->getElementType());
-    $this->assertTrue($disk2_attribute->isRequired());
+    $this->assertFalse($disk2_attribute->isRequired());
     $this->assertEquals(['_none' => ''], $disk2_attribute->getValues());
 
     // Test from the 16GB x 1TB x None variation.
@@ -312,7 +313,7 @@ class ProductVariationAttributeMapperTest extends CommerceKernelTestBase {
     $this->assertEquals('disk2', $disk2_attribute->getId());
     $this->assertEquals('Disk2', $disk2_attribute->getLabel());
     $this->assertEquals('select', $disk2_attribute->getElementType());
-    $this->assertTrue($disk2_attribute->isRequired());
+    $this->assertFalse($disk2_attribute->isRequired());
     $this->assertEquals(['_none' => '', '17' => '1TB'], $disk2_attribute->getValues());
   }
 
@@ -375,7 +376,7 @@ class ProductVariationAttributeMapperTest extends CommerceKernelTestBase {
     $this->assertEquals('disk2', $disk2_attribute->getId());
     $this->assertEquals('Disk2', $disk2_attribute->getLabel());
     $this->assertEquals('select', $disk2_attribute->getElementType());
-    $this->assertTrue($disk2_attribute->isRequired());
+    $this->assertFalse($disk2_attribute->isRequired());
     $this->assertEquals(['18' => '2TB'], $disk2_attribute->getValues());
 
     // Test 8GB x 1TB x 2TB.
@@ -401,7 +402,7 @@ class ProductVariationAttributeMapperTest extends CommerceKernelTestBase {
     $this->assertEquals('disk2', $disk2_attribute->getId());
     $this->assertEquals('Disk2', $disk2_attribute->getLabel());
     $this->assertEquals('select', $disk2_attribute->getElementType());
-    $this->assertTrue($disk2_attribute->isRequired());
+    $this->assertFalse($disk2_attribute->isRequired());
     // There should only be one Disk 2 option, since the other 8GB RAM option
     // has a Disk 1 value of 2TB.
     $this->assertEquals(['18' => '2TB'], $disk2_attribute->getValues());
@@ -427,7 +428,7 @@ class ProductVariationAttributeMapperTest extends CommerceKernelTestBase {
     $this->assertEquals('disk2', $disk2_attribute->getId());
     $this->assertEquals('Disk2', $disk2_attribute->getLabel());
     $this->assertEquals('select', $disk2_attribute->getElementType());
-    $this->assertTrue($disk2_attribute->isRequired());
+    $this->assertFalse($disk2_attribute->isRequired());
     // There should only be one Disk 2 option, since the other 8GB RAM option
     // has a Disk 1 value of 2TB.
     $this->assertEquals(['17' => '1TB'], $disk2_attribute->getValues());
@@ -635,17 +636,25 @@ class ProductVariationAttributeMapperTest extends CommerceKernelTestBase {
    *   The attribute field name.
    * @param array $options
    *   Associative array of key name values. [red => Red].
+   * @param bool $required
+   *   Whether the created attribute should be required.
    *
    * @return \Drupal\commerce_product\Entity\ProductAttributeValueInterface[]
    *   Array of attribute entities.
    */
-  protected function createAttributeSet(ProductVariationTypeInterface $variation_type, $name, array $options) {
+  protected function createAttributeSet(ProductVariationTypeInterface $variation_type, $name, array $options, $required = TRUE) {
     $attribute = ProductAttribute::create([
       'id' => $name,
       'label' => ucfirst($name),
     ]);
     $attribute->save();
     $this->attributeFieldManager->createField($attribute, $variation_type->id());
+    // The field is always created as required by default.
+    if (!$required) {
+      $field = FieldConfig::loadByName('commerce_product_variation', $variation_type->id(), 'attribute_' . $name);
+      $field->setRequired(FALSE);
+      $field->save();
+    }
 
     $attribute_set = [];
     foreach ($options as $key => $value) {

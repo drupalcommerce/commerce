@@ -35,7 +35,7 @@ final class PreparedAttribute {
    *
    * @var bool
    */
-  protected $required = TRUE;
+  protected $required;
 
   /**
    * The attribute values.
@@ -51,7 +51,7 @@ final class PreparedAttribute {
    *   The definition.
    */
   public function __construct(array $definition) {
-    foreach (['id', 'label', 'element_type', 'required', 'values'] as $required_property) {
+    foreach (['id', 'label', 'element_type', 'values'] as $required_property) {
       if (empty($definition[$required_property])) {
         throw new \InvalidArgumentException(sprintf('Missing required property "%s".', $required_property));
       }
@@ -63,7 +63,7 @@ final class PreparedAttribute {
     $this->id = $definition['id'];
     $this->label = $definition['label'];
     $this->elementType = $definition['element_type'];
-    $this->required = $definition['required'];
+    $this->required = isset($definition['required']) ? $definition['required'] : TRUE;
     $this->values = $definition['values'];
   }
 
