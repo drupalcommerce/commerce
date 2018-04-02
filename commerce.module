@@ -36,6 +36,23 @@ function commerce_field_widget_info_alter(array &$info) {
 }
 
 /**
+ * Implements hook_field_formatter_info_alter().
+ *
+ * Exposes the commerce_plugin_item_default formatter for each of the field
+ * type's derivatives, since core does not do it automatically.
+ */
+function commerce_field_formatter_info_alter(array &$info) {
+  if (isset($info['commerce_plugin_item_default'])) {
+    $field_type_manager = \Drupal::service('plugin.manager.field.field_type');
+    foreach ($field_type_manager->getDefinitions() as $key => $definition) {
+      if ($definition['id'] == 'commerce_plugin_item') {
+        $info['commerce_plugin_item_default']['field_types'][] = $key;
+      }
+    }
+  }
+}
+
+/**
  * Implements hook_field_widget_form_alter().
  *
  * Base fields have a description that's used for two very different purposes:
