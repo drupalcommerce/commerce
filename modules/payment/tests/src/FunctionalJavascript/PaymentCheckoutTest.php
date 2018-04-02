@@ -210,17 +210,6 @@ class PaymentCheckoutTest extends CommerceBrowserTestBase {
     $default_radio_button = $page->findField('Visa ending in 9999');
     $this->assertTrue($default_radio_button->getAttribute('checked'));
 
-    // The order's payment gateway should be selected if it is not on-site,
-    // and there is no order payment method.
-    $order = Order::load(1);
-    $order->payment_method = NULL;
-    $order->payment_gateway = 'offsite';
-    $order->save();
-    $this->drupalGet('checkout/1');
-    $this->assertSession()->pageTextContains('Payment information');
-    $default_radio_button = $page->findField('Example');
-    $this->assertTrue($default_radio_button->getAttribute('checked'));
-
     /** @var \Drupal\commerce_payment\Entity\PaymentGateway $gateway */
     $gateway = PaymentGateway::create([
       'id' => 'onsite2',

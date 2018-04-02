@@ -4,6 +4,8 @@ namespace Drupal\commerce_payment\Plugin\Commerce\CheckoutPane;
 
 use Drupal\commerce_checkout\Plugin\Commerce\CheckoutFlow\CheckoutFlowInterface;
 use Drupal\commerce_checkout\Plugin\Commerce\CheckoutPane\CheckoutPaneBase;
+use Drupal\commerce_payment\PaymentOption;
+use Drupal\commerce_payment\PaymentOptionsBuilderInterface;
 use Drupal\commerce_payment\Plugin\Commerce\PaymentGateway\SupportsStoredPaymentMethodsInterface;
 use Drupal\Component\Utility\Html;
 use Drupal\Component\Utility\NestedArray;
@@ -41,6 +43,13 @@ class PaymentInformation extends CheckoutPaneBase {
   protected $messenger;
 
   /**
+   * The payment options builder.
+   *
+   * @var \Drupal\commerce_payment\PaymentOptionsBuilderInterface
+   */
+  protected $paymentOptionsBuilder;
+
+  /**
    * Constructs a new PaymentInformation object.
    *
    * @param array $configuration
@@ -57,12 +66,15 @@ class PaymentInformation extends CheckoutPaneBase {
    *   The current user.
    * @param \Drupal\Core\Messenger\MessengerInterface $messenger
    *   The messenger.
+   * @param \Drupal\commerce_payment\PaymentOptionsBuilderInterface $payment_options_builder
+   *   The payment options builder.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, CheckoutFlowInterface $checkout_flow, EntityTypeManagerInterface $entity_type_manager, AccountInterface $current_user, MessengerInterface $messenger) {
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, CheckoutFlowInterface $checkout_flow, EntityTypeManagerInterface $entity_type_manager, AccountInterface $current_user, MessengerInterface $messenger, PaymentOptionsBuilderInterface $payment_options_builder) {
     parent::__construct($configuration, $plugin_id, $plugin_definition, $checkout_flow, $entity_type_manager);
 
     $this->currentUser = $current_user;
     $this->messenger = $messenger;
+    $this->paymentOptionsBuilder = $payment_options_builder;
   }
 
   /**
@@ -76,7 +88,8 @@ class PaymentInformation extends CheckoutPaneBase {
       $checkout_flow,
       $container->get('entity_type.manager'),
       $container->get('current_user'),
-      $container->get('messenger')
+      $container->get('messenger'),
+      $container->get('commerce_payment.options_builder')
     );
   }
 
@@ -141,18 +154,6 @@ class PaymentInformation extends CheckoutPaneBase {
       return $pane_form;
     }
 
-    $options = $this->buildPaymentMethodOptions($payment_gateways);
-    $user_input = $form_state->getUserInput();
-    $values = NestedArray::getValue($user_input, $pane_form['#parents']);
-    $default_option = NULL;
-    if (!empty($values['payment_method'])) {
-      // The form was rebuilt via AJAX, use the submitted value.
-      $default_option = $values['payment_method'];
-    }
-    else {
-      $default_option = $this->getDefaultPaymentMethodOption($options);
-    }
-
     // Prepare the form for ajax.
     $pane_form['#wrapper_id'] = Html::getUniqueId('payment-information-wrapper');
     $pane_form['#prefix'] = '<div id="' . $pane_form['#wrapper_id'] . '">';
@@ -165,11 +166,24 @@ class PaymentInformation extends CheckoutPaneBase {
       }
     }
 
+    $options = $this->paymentOptionsBuilder->buildOptions($this->order, $payment_gateways);
+    $option_labels = array_map(function (PaymentOption $option) {
+      return $option->getLabel();
+    }, $options);
+    $parents = array_merge($pane_form['#parents'], ['payment_method']);
+    $default_option_id = NestedArray::getValue($form_state->getUserInput(), $parents);
+    if ($default_option_id && isset($options[$default_option_id])) {
+      $default_option = $options[$default_option_id];
+    }
+    else {
+      $default_option = $this->paymentOptionsBuilder->selectDefaultOption($this->order, $options);
+    }
+
     $pane_form['payment_method'] = [
       '#type' => 'radios',
       '#title' => $this->t('Payment method'),
-      '#options' => array_column($options, 'label', 'id'),
-      '#default_value' => $default_option,
+      '#options' => $option_labels,
+      '#default_value' => $default_option->getId(),
       '#ajax' => [
         'callback' => [get_class($this), 'ajaxRefresh'],
         'wrapper' => $pane_form['#wrapper_id'],
@@ -178,39 +192,16 @@ class PaymentInformation extends CheckoutPaneBase {
     ];
     // Add a class to each individual radio, to help themers.
     foreach ($options as $option) {
-      $class_name = isset($option['payment_method']) ? 'stored' : 'new';
-      $pane_form['payment_method'][$option['id']]['#attributes']['class'][] = "payment-method--$class_name";
+      $class_name = $option->getPaymentMethodId() ? 'stored' : 'new';
+      $pane_form['payment_method'][$option->getId()]['#attributes']['class'][] = "payment-method--$class_name";
     }
-    // Store the values for submitPaneForm().
-    foreach ($options as $option_id => $option) {
-      $pane_form['payment_method'][$option_id]['#payment_gateway'] = $option['payment_gateway'];
-      if (isset($option['payment_method'])) {
-        $pane_form['payment_method'][$option_id]['#payment_method'] = $option['payment_method'];
-      }
-      if (isset($option['payment_method_type'])) {
-        $pane_form['payment_method'][$option_id]['#payment_method_type'] = $option['payment_method_type'];
-      }
-    }
+    // Store the options for submitPaneForm().
+    $pane_form['#payment_options'] = $options;
 
-    $selected_option = $pane_form['payment_method'][$default_option];
-    $payment_gateway = $payment_gateways[$selected_option['#payment_gateway']];
+    $default_payment_gateway_id = $default_option->getPaymentGatewayId();
+    $payment_gateway = $payment_gateways[$default_payment_gateway_id];
     if ($payment_gateway->getPlugin() instanceof SupportsStoredPaymentMethodsInterface) {
-      if (!empty($selected_option['#payment_method_type'])) {
-        /** @var \Drupal\commerce_payment\PaymentMethodStorageInterface $payment_method_storage */
-        $payment_method_storage = $this->entityTypeManager->getStorage('commerce_payment_method');
-        $payment_method = $payment_method_storage->create([
-          'type' => $selected_option['#payment_method_type'],
-          'payment_gateway' => $selected_option['#payment_gateway'],
-          'uid' => $this->order->getCustomerId(),
-          'billing_profile' => $this->order->getBillingProfile(),
-        ]);
-
-        $pane_form['add_payment_method'] = [
-          '#type' => 'commerce_payment_gateway_form',
-          '#operation' => 'add-payment-method',
-          '#default_value' => $payment_method,
-        ];
-      }
+      $pane_form = $this->buildPaymentMethodForm($pane_form, $form_state, $default_option);
     }
     else {
       $pane_form = $this->buildBillingProfileForm($pane_form, $form_state);
@@ -220,162 +211,40 @@ class PaymentInformation extends CheckoutPaneBase {
   }
 
   /**
-   * Builds the payment method options for the given payment gateways.
+   * Builds the payment method form for the selected payment option.
    *
-   * The payment method options will be derived from the given payment gateways
-   * and added to the return array in the following order:
-   * 1) The customer's stored payment methods.
-   * 2) The order's payment method (if not added in the previous step).
-   * 3) Options to create new payment methods of valid types.
-   * 4) Options for the remaining gateways (off-site, manual, etc).
-   *
-   * @param \Drupal\commerce_payment\Entity\PaymentGatewayInterface[] $payment_gateways
-   *   The payment gateways.
+   * @param array $pane_form
+   *   The pane form.
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   *   The form state of the parent form.
+   * @param \Drupal\commerce_payment\PaymentOption $payment_option
+   *   The payment option.
    *
    * @return array
-   *   The options array keyed by payment method ID (or in the case of the new
-   *   payment method options, a key indicating the type of payment method to
-   *   create) whose values are associative arrays with the following keys:
-   *   - id: the payment method ID (or new payment method key).
-   *   - label: the label to use for selecting this payment method.
-   *   - payment_gateway: the ID of the gateway the payment method is for.
-   *   - payment_method: the ID of an existing stored payment method.
-   *   - payment_method_type: the payment method type ID for new payment methods
+   *   The modified pane form.
    */
-  protected function buildPaymentMethodOptions(array $payment_gateways) {
-    /** @var \Drupal\commerce_payment\Entity\PaymentGatewayInterface[] $payment_gateways_with_payment_methods */
-    $payment_gateways_with_payment_methods = array_filter($payment_gateways, function ($payment_gateway) {
-      /** @var \Drupal\commerce_payment\Entity\PaymentGatewayInterface $payment_gateway */
-      return $payment_gateway->getPlugin() instanceof SupportsStoredPaymentMethodsInterface;
-    });
-
-    $options = [];
-    // 1) Add options to reuse stored payment methods for known customers.
-    $customer = $this->order->getCustomer();
-    if ($customer) {
-      $billing_countries = $this->order->getStore()->getBillingCountries();
-      /** @var \Drupal\commerce_payment\PaymentMethodStorageInterface $payment_method_storage */
-      $payment_method_storage = $this->entityTypeManager->getStorage('commerce_payment_method');
-
-      foreach ($payment_gateways_with_payment_methods as $payment_gateway_id => $payment_gateway) {
-        $payment_methods = $payment_method_storage->loadReusable($customer, $payment_gateway, $billing_countries);
-
-        foreach ($payment_methods as $payment_method_id => $payment_method) {
-          $options[$payment_method_id] = [
-            'id' => $payment_method_id,
-            'label' => $payment_method->label(),
-            'payment_gateway' => $payment_gateway_id,
-            'payment_method' => $payment_method_id,
-          ];
-        }
-      }
+  protected function buildPaymentMethodForm(array $pane_form, FormStateInterface $form_state, PaymentOption $payment_option) {
+    if ($payment_option->getPaymentMethodId() && !$payment_option->getPaymentMethodTypeId()) {
+      // Editing payment methods at checkout is not supported.
+      return $pane_form;
     }
 
-    // 2) Add the order's payment method if it was not included above.
-    /** @var \Drupal\commerce_payment\Entity\PaymentMethodInterface $order_payment_method */
-    $order_payment_method = $this->order->get('payment_method')->entity;
-    if ($order_payment_method) {
-      $order_payment_method_id = $order_payment_method->id();
+    /** @var \Drupal\commerce_payment\PaymentMethodStorageInterface $payment_method_storage */
+    $payment_method_storage = $this->entityTypeManager->getStorage('commerce_payment_method');
+    $payment_method = $payment_method_storage->create([
+      'type' => $payment_option->getPaymentMethodTypeId(),
+      'payment_gateway' => $payment_option->getPaymentGatewayId(),
+      'uid' => $this->order->getCustomerId(),
+      'billing_profile' => $this->order->getBillingProfile(),
+    ]);
 
-      if (!isset($options[$order_payment_method_id])) {
-        $options[$order_payment_method_id] = [
-          'id' => $order_payment_method_id,
-          'label' => $order_payment_method->label(),
-          'payment_gateway' => $order_payment_method->getPaymentGatewayId(),
-          'payment_method' => $order_payment_method_id,
-        ];
-      }
-    }
+    $pane_form['add_payment_method'] = [
+      '#type' => 'commerce_payment_gateway_form',
+      '#operation' => 'add-payment-method',
+      '#default_value' => $payment_method,
+    ];
 
-    // 3) Add options to create new stored payment methods of supported types.
-    $payment_method_type_counts = [];
-    // Count how many new payment method options will be built per gateway.
-    foreach ($payment_gateways_with_payment_methods as $payment_gateway) {
-      $payment_method_types = $payment_gateway->getPlugin()->getPaymentMethodTypes();
-
-      foreach ($payment_method_types as $payment_method_type_id => $payment_method_type) {
-        if (!isset($payment_method_type_counts[$payment_method_type_id])) {
-          $payment_method_type_counts[$payment_method_type_id] = 1;
-        }
-        else {
-          $payment_method_type_counts[$payment_method_type_id]++;
-        }
-      }
-    }
-
-    foreach ($payment_gateways_with_payment_methods as $payment_gateway) {
-      $payment_gateway_plugin = $payment_gateway->getPlugin();
-      $payment_method_types = $payment_gateway_plugin->getPaymentMethodTypes();
-
-      foreach ($payment_method_types as $payment_method_type_id => $payment_method_type) {
-        $option_id = 'new--' . $payment_method_type_id . '--' . $payment_gateway->id();
-        $option_label = $payment_method_type->getCreateLabel();
-        // If there is more than one option for this payment method type,
-        // append the payment gateway label to avoid duplicate option labels.
-        if ($payment_method_type_counts[$payment_method_type_id] > 1) {
-          $option_label = $this->t('@payment_method_label (@payment_gateway_label)', [
-            '@payment_method_label' => $payment_method_type->getCreateLabel(),
-            '@payment_gateway_label' => $payment_gateway_plugin->getDisplayLabel(),
-          ]);
-        }
-
-        $options[$option_id] = [
-          'id' => $option_id,
-          'label' => $option_label,
-          'payment_gateway' => $payment_gateway->id(),
-          'payment_method_type' => $payment_method_type_id,
-        ];
-      }
-    }
-
-    // 4) Add options for the remaining gateways (off-site, manual, etc).
-    /** @var \Drupal\commerce_payment\Entity\PaymentGatewayInterface[] $other_payment_gateways */
-    $other_payment_gateways = array_diff_key($payment_gateways, $payment_gateways_with_payment_methods);
-    foreach ($other_payment_gateways as $payment_gateway_id => $payment_gateway) {
-      $options[$payment_gateway_id] = [
-        'id' => $payment_gateway_id,
-        'label' => $payment_gateway->getPlugin()->getDisplayLabel(),
-        'payment_gateway' => $payment_gateway_id,
-      ];
-    }
-
-    return $options;
-  }
-
-  /**
-   * Gets the default payment method option.
-   *
-   * Priority:
-   * 1) The order's payment method
-   * 2) The order's payment gateway (if it does not support payment methods)
-   * 3) First defined option.
-   *
-   * @param array $options
-   *   The options.
-   *
-   * @return string
-   *   The selected option ID.
-   */
-  protected function getDefaultPaymentMethodOption(array $options) {
-    /** @var \Drupal\commerce_payment\Entity\PaymentGatewayInterface $order_payment_gateway */
-    $order_payment_gateway = $this->order->get('payment_gateway')->entity;
-    /** @var \Drupal\commerce_payment\Entity\PaymentMethodInterface $order_payment_method */
-    $order_payment_method = $this->order->get('payment_method')->entity;
-
-    $default_option = NULL;
-    if ($order_payment_method) {
-      $default_option = $order_payment_method->id();
-    }
-    elseif ($order_payment_gateway && !($order_payment_gateway instanceof SupportsStoredPaymentMethodsInterface)) {
-      $default_option = $order_payment_gateway->id();
-    }
-    // The order doesn't have a payment method/gateway specified, or it has, but it is no longer available.
-    if (!$default_option || !isset($options[$default_option])) {
-      $option_ids = array_keys($options);
-      $default_option = reset($option_ids);
-    }
-
-    return $default_option;
+    return $pane_form;
   }
 
   /**
@@ -442,24 +311,25 @@ class PaymentInformation extends CheckoutPaneBase {
     }
 
     $values = $form_state->getValue($pane_form['#parents']);
-    $selected_option = $pane_form['payment_method'][$values['payment_method']];
+    /** @var \Drupal\commerce_payment\PaymentOption $selected_option */
+    $selected_option = $pane_form['#payment_options'][$values['payment_method']];
     /** @var \Drupal\commerce_payment\PaymentGatewayStorageInterface $payment_gateway_storage */
     $payment_gateway_storage = $this->entityTypeManager->getStorage('commerce_payment_gateway');
     /** @var \Drupal\commerce_payment\Entity\PaymentGatewayInterface $payment_gateway */
-    $payment_gateway = $payment_gateway_storage->load($selected_option['#payment_gateway']);
+    $payment_gateway = $payment_gateway_storage->load($selected_option->getPaymentGatewayId());
     if (!$payment_gateway) {
       return;
     }
 
     if ($payment_gateway->getPlugin() instanceof SupportsStoredPaymentMethodsInterface) {
-      if (!empty($selected_option['#payment_method_type'])) {
+      if (!empty($selected_option->getPaymentMethodTypeId())) {
         // The payment method was just created.
         $payment_method = $values['add_payment_method'];
       }
       else {
         /** @var \Drupal\commerce_payment\PaymentMethodStorageInterface $payment_method_storage */
         $payment_method_storage = $this->entityTypeManager->getStorage('commerce_payment_method');
-        $payment_method = $payment_method_storage->load($selected_option['#payment_method']);
+        $payment_method = $payment_method_storage->load($selected_option->getPaymentMethodId());
       }
 
       /** @var \Drupal\commerce_payment\Entity\PaymentMethodInterface $payment_method */

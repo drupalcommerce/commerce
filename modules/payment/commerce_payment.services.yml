@@ -15,3 +15,7 @@ services:
   plugin.manager.commerce_payment_type:
     class: Drupal\commerce_payment\PaymentTypeManager
     parent: default_plugin_manager
+
+  commerce_payment.options_builder:
+    class: Drupal\commerce_payment\PaymentOptionsBuilder
+    arguments: ['@entity_type.manager']
