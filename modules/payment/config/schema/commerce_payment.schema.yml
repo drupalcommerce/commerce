@@ -1,3 +1,14 @@
+commerce.commerce_condition.plugin.order_payment_gateway:
+  type: commerce_condition_configuration
+  mapping:
+    payment_gateways:
+      type: sequence
+      label: 'Payment gateways'
+      orderby: value
+      sequence:
+        type: string
+        label: 'Payment gateway'
+
 commerce_payment.commerce_payment_gateway.*:
   type: config_entity
   label: 'Payment gateway'
