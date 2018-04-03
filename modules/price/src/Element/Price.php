@@ -34,6 +34,8 @@ class Price extends FormElement {
     return [
       // List of currencies codes. If empty, all currencies will be available.
       '#available_currencies' => [],
+      // The check is performed here so that it is cached.
+      '#price_inline_errors' => \Drupal::moduleHandler()->moduleExists('inline_form_errors'),
 
       '#size' => 10,
       '#maxlength' => 128,
@@ -41,6 +43,9 @@ class Price extends FormElement {
       '#allow_negative' => FALSE,
       '#attached' => [
         'library' => ['commerce_price/admin'],
+      ],
+      '#element_validate' => [
+        [$class, 'moveInlineErrors'],
       ],
       '#process' => [
         [$class, 'processElement'],
@@ -112,6 +117,7 @@ class Price extends FormElement {
       // '6' is the field storage maximum.
       '#max_fraction_digits' => 6,
       '#min' => $element['#allow_negative'] ? NULL : 0,
+      '#error_no_message' => TRUE,
     ];
     if (isset($element['#ajax'])) {
       $element['number']['#ajax'] = $element['#ajax'];
@@ -144,7 +150,7 @@ class Price extends FormElement {
     if (!empty($element['#description'])) {
       $element[$last_visible_element]['#field_suffix'] .= '<div class="description">' . $element['#description'] . '</div>';
     }
-    // Remove the keys that were transfered to child elements.
+    // Remove the keys that were transferred to child elements.
     unset($element['#size']);
     unset($element['#maxlength']);
     unset($element['#ajax']);
@@ -169,6 +175,26 @@ class Price extends FormElement {
       return FALSE;
     }
     return TRUE;
+  }
+
+  /**
+   * Moves inline errors from the "number" element to the main element.
+   *
+   * This ensures that they are displayed in the right place
+   * (below both number and currency_code, instead of between them).
+   *
+   * Only performed when the inline_form_errors module is installed.
+   *
+   * @param array $element
+   *   The form element.
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   *   The current state of the form.
+   */
+  public static function moveInlineErrors(array $element, FormStateInterface $form_state) {
+    $error = $form_state->getError($element['number']);
+    if (!empty($error) && !empty($element['#price_inline_errors'])) {
+      $form_state->setError($element, $error);
+    }
   }
 
 }
