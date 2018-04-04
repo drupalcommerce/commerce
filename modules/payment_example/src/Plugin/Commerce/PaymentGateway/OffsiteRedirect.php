@@ -47,7 +47,8 @@ class OffsiteRedirect extends OffsitePaymentGatewayBase {
       '#title' => $this->t('Redirect method'),
       '#options' => [
         'get' => $this->t('Redirect via GET (302 header)'),
-        'post' => $this->t('Redirect via POST'),
+        'post' => $this->t('Redirect via POST (automatic)'),
+        'post_manual' => $this->t('Redirect via POST (manual)'),
       ],
       '#default_value' => $this->configuration['redirect_method'],
     ];

@@ -2,7 +2,6 @@
 
 namespace Drupal\commerce_payment\Plugin\Commerce\CheckoutPane;
 
-use Drupal\commerce\Response\NeedsRedirectException;
 use Drupal\commerce_checkout\Plugin\Commerce\CheckoutFlow\CheckoutFlowInterface;
 use Drupal\commerce_checkout\Plugin\Commerce\CheckoutPane\CheckoutPaneBase;
 use Drupal\commerce_payment\Exception\DeclineException;
@@ -200,8 +199,8 @@ class PaymentProcess extends CheckoutPaneBase {
       $complete_form['actions']['next']['#value'] = $this->t('Proceed to @gateway', [
         '@gateway' => $payment_gateway_plugin->getDisplayLabel(),
       ]);
-      // The 'Go back' link needs to use the cancel URL to ensure that the
-      // order is unlocked when the customer is sent to the previous page.
+      // Make sure that the payment gateway's onCancel() method is invoked,
+      // by pointing the "Go back" link to the cancel URL.
       $complete_form['actions']['next']['#suffix'] = Link::fromTextAndUrl($this->t('Go back'), $this->buildCancelUrl())->toString();
       // Hide the actions by default, they are not needed by gateways that
       // embed iframes or redirect via GET. The offsite-payment form can
@@ -272,7 +271,8 @@ class PaymentProcess extends CheckoutPaneBase {
    * @throws \Drupal\commerce\Response\NeedsRedirectException
    */
   protected function redirectToPreviousStep() {
-    throw new NeedsRedirectException($this->buildPaymentInformationStepUrl()->toString());
+    $step_id = $this->checkoutFlow->getPane('payment_information')->getStepId();
+    return $this->checkoutFlow->redirectToStep($step_id);
   }
 
 }

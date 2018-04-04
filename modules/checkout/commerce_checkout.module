@@ -6,7 +6,6 @@
  */
 
 use Drupal\commerce\EntityHelper;
-use Drupal\commerce_order\Entity\OrderInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Form\FormStateInterface;
@@ -115,26 +114,6 @@ function commerce_checkout_entity_base_field_info(EntityTypeInterface $entity_ty
       ->setDisplayConfigurable('form', FALSE);
 
     return $fields;
-  }
-}
-
-/**
- * Implements hook_ENTITY_TYPE_presave().
- */
-function commerce_checkout_commerce_order_presave(OrderInterface $order) {
-  if (!$order->hasField('checkout_step')) {
-    return;
-  }
-
-  // Lock the order while on the 'payment' checkout step.
-  $checkout_step = $order->get('checkout_step')->value;
-  $original_order = $order->original;
-  $previous_checkout_step = $original_order ? $original_order->get('checkout_step')->value : '';
-  if ($checkout_step == 'payment' && $previous_checkout_step != 'payment') {
-    $order->lock();
-  }
-  elseif ($checkout_step != 'payment' && $previous_checkout_step == 'payment') {
-    $order->unlock();
   }
 }
 

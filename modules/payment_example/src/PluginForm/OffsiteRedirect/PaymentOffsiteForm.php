@@ -20,8 +20,10 @@ class PaymentOffsiteForm extends BasePaymentOffsiteForm {
     /** @var \Drupal\commerce_payment\Plugin\Commerce\PaymentGateway\OffsitePaymentGatewayInterface $payment_gateway_plugin */
     $payment_gateway_plugin = $payment->getPaymentGateway()->getPlugin();
     $redirect_method = $payment_gateway_plugin->getConfiguration()['redirect_method'];
-    if ($redirect_method == 'post') {
+    $remove_js = ($redirect_method == 'post_manual');
+    if (in_array($redirect_method, ['post', 'post_manual'])) {
       $redirect_url = Url::fromRoute('commerce_payment_example.dummy_redirect_post')->toString();
+      $redirect_method = 'post';
     }
     else {
       // Gateways that use the GET redirect method usually perform an API call
@@ -44,7 +46,13 @@ class PaymentOffsiteForm extends BasePaymentOffsiteForm {
       'total' => $payment->getAmount()->getNumber(),
     ];
 
-    return $this->buildRedirectForm($form, $form_state, $redirect_url, $data, $redirect_method);
+    $form = $this->buildRedirectForm($form, $form_state, $redirect_url, $data, $redirect_method);
+    if ($remove_js) {
+      // Disable the javascript that auto-clicks the Submit button.
+      unset($form['#attached']['library']);
+    }
+
+    return $form;
   }
 
 }

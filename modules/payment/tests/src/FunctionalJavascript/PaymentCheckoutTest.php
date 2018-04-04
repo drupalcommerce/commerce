@@ -261,7 +261,7 @@ class PaymentCheckoutTest extends CommerceBrowserTestBase {
     $order = Order::load(1);
     $this->assertEquals('onsite', $order->get('payment_gateway')->target_id);
     $this->assertEquals('1', $order->get('payment_method')->target_id);
-
+    $this->assertFalse($order->isLocked());
     // Verify that a payment was created.
     $payment = Payment::load(1);
     $this->assertNotNull($payment);
@@ -315,7 +315,7 @@ class PaymentCheckoutTest extends CommerceBrowserTestBase {
     $payment_method = $order->get('payment_method')->entity;
     $this->assertEquals('1881', $payment_method->get('card_number')->value);
     $this->assertEquals('123 New York Drive', $payment_method->getBillingProfile()->get('address')->address_line1);
-
+    $this->assertFalse($order->isLocked());
     // Verify that a payment was created.
     $payment = Payment::load(1);
     $this->assertNotNull($payment);
@@ -354,6 +354,8 @@ class PaymentCheckoutTest extends CommerceBrowserTestBase {
     $this->assertSession()->pageTextContains('We encountered an error processing your payment method. Please verify your details and try again.');
     $this->assertSession()->addressEquals('checkout/1/order_information');
 
+    $order = Order::load(1);
+    $this->assertFalse($order->isLocked());
     // Verify a payment was not created.
     $payment = Payment::load(1);
     $this->assertNull($payment);
@@ -384,9 +386,63 @@ class PaymentCheckoutTest extends CommerceBrowserTestBase {
     $this->assertSession()->pageTextContains('123 New York Drive');
     $this->submitForm([], 'Pay and complete purchase');
     $this->assertSession()->pageTextContains('Your order number is 1. You can view your order on your account page when logged in.');
+
     $order = Order::load(1);
     $this->assertEquals('offsite', $order->get('payment_gateway')->target_id);
+    $this->assertFalse($order->isLocked());
+    // Verify that a payment was created.
+    $payment = Payment::load(1);
+    $this->assertNotNull($payment);
+    $this->assertEquals($payment->getAmount(), $order->getTotalPrice());
+  }
 
+  /**
+   * Tests checkout with an off-site gateway (POST redirect method, manual).
+   *
+   * In this scenario the customer must click the submit button on the payment
+   * page in order to proceed to the gateway.
+   */
+  public function testCheckoutWithOffsiteRedirectPostManual() {
+    $payment_gateway = PaymentGateway::load('offsite');
+    $payment_gateway->getPlugin()->setConfiguration([
+      'redirect_method' => 'post_manual',
+      'payment_method_types' => ['credit_card'],
+    ]);
+    $payment_gateway->save();
+
+    $this->drupalGet($this->product->toUrl()->toString());
+    $this->submitForm([], 'Add to cart');
+    $this->drupalGet('checkout/1');
+    $radio_button = $this->getSession()->getPage()->findField('Example');
+    $radio_button->click();
+    $this->waitForAjaxToFinish();
+
+    $this->submitForm([
+      'payment_information[billing_information][address][0][address][given_name]' => 'Johnny',
+      'payment_information[billing_information][address][0][address][family_name]' => 'Appleseed',
+      'payment_information[billing_information][address][0][address][address_line1]' => '123 New York Drive',
+      'payment_information[billing_information][address][0][address][locality]' => 'New York City',
+      'payment_information[billing_information][address][0][address][administrative_area]' => 'NY',
+      'payment_information[billing_information][address][0][address][postal_code]' => '10001',
+    ], 'Continue to review');
+    $this->assertSession()->pageTextContains('Payment information');
+    $this->assertSession()->pageTextContains('Example');
+    $this->assertSession()->pageTextContains('Johnny Appleseed');
+    $this->assertSession()->pageTextContains('123 New York Drive');
+    $this->submitForm([], 'Pay and complete purchase');
+
+    $this->assertSession()->addressEquals('checkout/1/payment');
+    $order = Order::load(1);
+    $this->assertEquals('offsite', $order->get('payment_gateway')->target_id);
+    $this->assertTrue($order->isLocked());
+
+    $this->submitForm([], 'Proceed to Example');
+    $this->assertSession()->pageTextContains('Your order number is 1. You can view your order on your account page when logged in.');
+
+    \Drupal::entityTypeManager()->getStorage('commerce_order')->resetCache(['1']);
+    $order = Order::load(1);
+    $this->assertEquals('offsite', $order->get('payment_gateway')->target_id);
+    $this->assertFalse($order->isLocked());
     // Verify that a payment was created.
     $payment = Payment::load(1);
     $this->assertNotNull($payment);
@@ -431,9 +487,10 @@ class PaymentCheckoutTest extends CommerceBrowserTestBase {
     $this->assertSession()->pageTextContains('123 New York Drive');
     $this->submitForm([], 'Pay and complete purchase');
     $this->assertSession()->pageTextContains('Your order number is 1. You can view your order on your account page when logged in.');
+
     $order = Order::load(1);
     $this->assertEquals('offsite', $order->get('payment_gateway')->target_id);
-
+    $this->assertFalse($order->isLocked());
     // Verify that a payment was created.
     $payment = Payment::load(1);
     $this->assertNotNull($payment);
@@ -477,6 +534,9 @@ class PaymentCheckoutTest extends CommerceBrowserTestBase {
     $this->assertSession()->pageTextContains('We encountered an unexpected error processing your payment. Please try again later.');
     $this->assertSession()->addressEquals('checkout/1/order_information');
 
+    $order = Order::load(1);
+    // @todo Fix order unlocking in this situation.
+    // $this->assertFalse($order->isLocked());
     // Verify a payment was not created.
     $payment = Payment::load(1);
     $this->assertNull($payment);
@@ -508,9 +568,10 @@ class PaymentCheckoutTest extends CommerceBrowserTestBase {
     $this->submitForm([], 'Pay and complete purchase');
     $this->assertSession()->pageTextContains('Your order number is 1. You can view your order on your account page when logged in.');
     $this->assertSession()->pageTextContains('Sample payment instructions.');
+
     $order = Order::load(1);
     $this->assertEquals('manual', $order->get('payment_gateway')->target_id);
-
+    $this->assertFalse($order->isLocked());
     // Verify that a payment was created.
     $payment = Payment::load(1);
     $this->assertNotNull($payment);
