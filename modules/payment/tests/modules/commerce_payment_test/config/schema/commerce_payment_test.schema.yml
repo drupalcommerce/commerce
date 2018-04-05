@@ -1,0 +1,6 @@
+commerce_payment.commerce_payment_gateway.plugin.test_onsite:
+  type: commerce_payment_gateway_configuration
+  mapping:
+    api_key:
+      type: string
+      label: 'API key'

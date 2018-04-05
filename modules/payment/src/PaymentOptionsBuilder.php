@@ -6,8 +6,12 @@ use Drupal\commerce\EntityHelper;
 use Drupal\commerce_order\Entity\OrderInterface;
 use Drupal\commerce_payment\Plugin\Commerce\PaymentGateway\SupportsStoredPaymentMethodsInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\StringTranslation\StringTranslationTrait;
+use Drupal\Core\StringTranslation\TranslationInterface;
 
 class PaymentOptionsBuilder implements PaymentOptionsBuilderInterface {
+
+  use StringTranslationTrait;
 
   /**
    * The entity type manager.
@@ -21,9 +25,12 @@ class PaymentOptionsBuilder implements PaymentOptionsBuilderInterface {
    *
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
+   * @param \Drupal\Core\StringTranslation\TranslationInterface $string_translation
+   *   The string translation.
    */
-  public function __construct(EntityTypeManagerInterface $entity_type_manager) {
+  public function __construct(EntityTypeManagerInterface $entity_type_manager, TranslationInterface $string_translation) {
     $this->entityTypeManager = $entity_type_manager;
+    $this->stringTranslation = $string_translation;
   }
 
   /**

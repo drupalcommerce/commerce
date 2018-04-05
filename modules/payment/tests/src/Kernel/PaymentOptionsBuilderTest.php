@@ -48,6 +48,7 @@ class PaymentOptionsBuilderTest extends CommerceKernelTestBase {
     'commerce_order',
     'commerce_payment',
     'commerce_payment_example',
+    'commerce_payment_test',
   ];
 
   /**
@@ -257,21 +258,42 @@ class PaymentOptionsBuilderTest extends CommerceKernelTestBase {
   }
 
   /**
-   * Tests building options for a specific gateway.
+   * Tests building options for two different on-site gateways.
+   *
+   * Confirms that the payment gateway list can be restricted, and that
+   * multiple on-site gateways get unique "add" option labels.
    *
    * @covers ::buildOptions
    */
-  public function testBuildOptionsForSpecificGateway() {
-    $payment_gateway = PaymentGateway::load('cash_on_delivery');
-    $options = $this->paymentOptionsBuilder->buildOptions($this->order, [$payment_gateway]);
-    $this->assertCount(1, $options);
+  public function testBuildOptionsWithTwoOnsiteGateways() {
+    $first_payment_gateway = PaymentGateway::create([
+      'id' => 'first_onsite',
+      'label' => 'First (On-site)',
+      'plugin' => 'example_onsite',
+    ]);
+    $second_payment_gateway = PaymentGateway::create([
+      'id' => 'second_onsite',
+      'label' => 'Second (On-site)',
+      'plugin' => 'test_onsite',
+    ]);
+    $second_payment_gateway->save();
+    $payment_gateways = [$first_payment_gateway, $second_payment_gateway];
+    $options = $this->paymentOptionsBuilder->buildOptions($this->order, $payment_gateways);
+    /** @var \Drupal\commerce_payment\PaymentOption[] $options */
+    $options = array_values($options);
+    $this->assertCount(2, $options);
 
-    $option = reset($options);
-    $this->assertEquals('cash_on_delivery', $option->getId());
-    $this->assertEquals('Cash on delivery', $option->getLabel());
-    $this->assertEquals('cash_on_delivery', $option->getPaymentGatewayId());
-    $this->assertNull($option->getPaymentMethodId());
-    $this->assertNull($option->getPaymentMethodTypeId());
+    $this->assertEquals('new--credit_card--first_onsite', $options[0]->getId());
+    $this->assertEquals('New credit card (Example)', $options[0]->getLabel());
+    $this->assertEquals('first_onsite', $options[0]->getPaymentGatewayId());
+    $this->assertNull($options[0]->getPaymentMethodId());
+    $this->assertEquals('credit_card', $options[0]->getPaymentMethodTypeId());
+
+    $this->assertEquals('new--credit_card--second_onsite', $options[1]->getId());
+    $this->assertEquals('New credit card (Test)', $options[1]->getLabel());
+    $this->assertEquals('second_onsite', $options[1]->getPaymentGatewayId());
+    $this->assertNull($options[1]->getPaymentMethodId());
+    $this->assertEquals('credit_card', $options[1]->getPaymentMethodTypeId());
   }
 
   /**

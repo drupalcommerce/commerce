@@ -23,4 +23,4 @@ services:
 
   commerce_payment.options_builder:
     class: Drupal\commerce_payment\PaymentOptionsBuilder
-    arguments: ['@entity_type.manager']
+    arguments: ['@entity_type.manager', '@string_translation']
