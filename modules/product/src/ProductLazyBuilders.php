@@ -69,6 +69,12 @@ class ProductLazyBuilders {
     $order_item_storage = $this->entityTypeManager->getStorage('commerce_order_item');
     /** @var \Drupal\commerce_product\Entity\ProductInterface $product */
     $product = $this->entityTypeManager->getStorage('commerce_product')->load($product_id);
+
+    // @todo Quickfix for Layout Builder
+    if (!$product) {
+      return [];
+    }
+
     // Load Product for current language.
     $product = $this->entityRepository->getTranslationFromContext($product, $langcode);
 

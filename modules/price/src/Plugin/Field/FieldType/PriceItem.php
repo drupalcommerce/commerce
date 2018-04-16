@@ -3,6 +3,7 @@
 namespace Drupal\commerce_price\Plugin\Field\FieldType;
 
 use Drupal\commerce_price\Price;
+use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FieldItemBase;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\Core\Form\FormStateInterface;
@@ -144,6 +145,19 @@ class PriceItem extends FieldItemBase {
    */
   public function toPrice() {
     return new Price($this->number, $this->currency_code);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function generateSampleValue(FieldDefinitionInterface $field_definition) {
+    $currencies = \Drupal::entityTypeManager()->getStorage('commerce_currency')->loadMultiple();
+    $currency_codes = array_keys($currencies);
+    $values = [
+      'number' => '9.99',
+      'currency_code' => reset($currency_codes),
+    ];
+    return $values;
   }
 
 }
