@@ -39,7 +39,10 @@ class LayoutBuilderProductVariationContext implements ContextProviderInterface {
     $value = NULL;
 
     /** @var \Drupal\commerce_product\Entity\ProductInterface $product */
-    if (strpos($this->routeMatch->getRouteName(), 'layout_builder') !== FALSE) {
+    if ($product = $this->routeMatch->getParameter('commerce_product')) {
+      $value = $product->getDefaultVariation();
+    }
+    elseif (strpos($this->routeMatch->getRouteName(), 'layout_builder') !== FALSE) {
       /** @var \Drupal\layout_builder\DefaultsSectionStorageInterface $section_storage */
       $section_storage = $this->routeMatch->getParameter('section_storage');
       $contexts = $section_storage->getContexts();
