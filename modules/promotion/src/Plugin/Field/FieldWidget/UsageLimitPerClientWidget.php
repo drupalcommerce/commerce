@@ -68,7 +68,7 @@ class UsageLimitPerClientWidget extends WidgetBase {
   public function massageFormValues(array $values, array $form, FormStateInterface $form_state) {
     $new_values = [];
     foreach ($values as $key => $value) {
-      if (!empty($form_state->getValue($this->parent)[$key]['limit'])) {
+      if (!empty($form_state->getValue('usage_limit')[$key]['limit'])) {
         $new_values[$key] = $value['usage_limit_per_client'];
       }
     }
