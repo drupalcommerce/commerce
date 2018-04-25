@@ -820,6 +820,13 @@ class EuropeanUnionVat extends LocalTaxTypeBase {
             ['number' => '0.12', 'start_date' => '2011-01-01'],
           ],
         ],
+        [
+          'id' => 'super_reduced',
+          'label' => $labels['super_reduced'],
+          'percentages' => [
+            ['number' => '0.05', 'start_date' => '2018-01-01'],
+          ],
+        ],
       ],
     ]);
     $zones['mt'] = new TaxZone([
