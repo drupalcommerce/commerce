@@ -56,7 +56,7 @@ function commerce_product_theme_registry_alter(&$theme_registry) {
  */
 function commerce_product_remove_quickedit(&$variables) {
   $entity_type_id = $variables['element']['#entity_type'];
-  if ($entity_type_id != 'commerce_product_variation' || empty($variables['#ajax_replace_class'])) {
+  if ($entity_type_id != 'commerce_product_variation' || empty($variables['element']['#ajax_replace_class'])) {
     return;
   }
 
