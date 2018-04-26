@@ -200,7 +200,8 @@ class CanadianSalesTax extends LocalTaxTypeBase {
           'id' => 'hst',
           'label' => $this->t('HST'),
           'percentages' => [
-            ['number' => '0.14', 'start_date' => '2013-04-01'],
+            ['number' => '0.14', 'start_date' => '2013-04-01', 'end_date' => '2016-09-30'],
+            ['number' => '0.15', 'start_date' => '2016-10-01'],
           ],
         ],
       ],
@@ -218,6 +219,24 @@ class CanadianSalesTax extends LocalTaxTypeBase {
           'label' => $this->t('QST'),
           'percentages' => [
             ['number' => '0.09975', 'start_date' => '2013-01-01'],
+          ],
+        ],
+      ],
+    ]);
+    $zones['sk'] = new TaxZone([
+      'id' => 'sk',
+      'label' => $this->t('Saskatchewan'),
+      'display_label' => $this->t('PST'),
+      'territories' => [
+        ['country_code' => 'CA', 'administrative_area' => 'SK'],
+      ],
+      'rates' => [
+        [
+          'id' => 'pst',
+          'label' => $this->t('PST'),
+          'percentages' => [
+            ['number' => '0.05', 'start_date' => '2013-04-01', 'end_date' => '2017-03-22'],
+            ['number' => '0.06', 'start_date' => '2017-03-23'],
           ],
         ],
       ],
