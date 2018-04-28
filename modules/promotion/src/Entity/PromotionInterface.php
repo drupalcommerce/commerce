@@ -35,6 +35,24 @@ interface PromotionInterface extends ContentEntityInterface, EntityStoresInterfa
   public function setName($name);
 
   /**
+   * Gets the promotion customer facing display name.
+   *
+   * @return string
+   *   The promotion display name.
+   */
+  public function getDisplayName();
+
+  /**
+   * Sets the promotion customer facing display name.
+   *
+   * @param string $display_name
+   *   The promotion display name.
+   *
+   * @return $this
+   */
+  public function setDisplayName($display_name);
+
+  /**
    * Gets the promotion description.
    *
    * @return string

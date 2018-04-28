@@ -37,8 +37,7 @@ class OrderFixedAmountOff extends FixedAmountOffBase {
 
     $order->addAdjustment(new Adjustment([
       'type' => 'promotion',
-      // @todo Change to label from UI when added in #2770731.
-      'label' => t('Discount'),
+      'label' => $promotion->getDisplayName(),
       'amount' => $adjustment_amount->multiply('-1'),
       'source_id' => $promotion->id(),
     ]));
