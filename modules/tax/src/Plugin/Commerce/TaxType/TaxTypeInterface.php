@@ -62,4 +62,12 @@ interface TaxTypeInterface extends ConfigurablePluginInterface, PluginFormInterf
    */
   public function apply(OrderInterface $order);
 
+  /**
+   * Generate store fields specific to this tax type.
+   *
+   * @return array
+   *   An array of fields to add to the store entity type.
+   */
+  public function storeFields();
+
 }

@@ -4,6 +4,7 @@ namespace Drupal\commerce_tax;
 
 use CommerceGuys\Addressing\AddressInterface;
 use CommerceGuys\Addressing\Zone\ZoneTerritory;
+use Drupal\commerce_store\Entity\StoreInterface;
 
 /**
  * Represents a tax zone.
@@ -46,6 +47,13 @@ class TaxZone {
   protected $rates;
 
   /**
+   * Field on the Store holding registration data.
+   *
+   * @var string
+   */
+  protected $registration;
+
+  /**
    * Constructs a new TaxZone instance.
    *
    * @param array $definition
@@ -71,6 +79,9 @@ class TaxZone {
     }
     foreach ($definition['rates'] as $rate_definition) {
       $this->rates[] = new TaxRate($rate_definition);
+    }
+    if (isset($definition['registration'])) {
+      $this->registration = $definition['registration'];
     }
   }
 
@@ -142,6 +153,19 @@ class TaxZone {
       }
     }
     return FALSE;
+  }
+
+  /**
+   * Checks if the zone is registered if a registration field is specificed.
+   *
+   * @return bool
+   *   Whether the zone is registered.
+   */
+  public function isRegistered(StoreInterface $store) {
+    if (isset($this->registration)) {
+      return (bool) $store->get($this->registration)->value;
+    }
+    return TRUE;
   }
 
 }
