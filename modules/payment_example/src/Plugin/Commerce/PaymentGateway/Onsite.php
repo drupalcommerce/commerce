@@ -23,6 +23,7 @@ use Drupal\Core\Form\FormStateInterface;
  *   display_label = "Example",
  *   forms = {
  *     "add-payment-method" = "Drupal\commerce_payment_example\PluginForm\Onsite\PaymentMethodAddForm",
+ *     "edit-payment-method" = "Drupal\commerce_payment\PluginForm\PaymentMethodEditForm",
  *   },
  *   payment_method_types = {"credit_card"},
  *   credit_card_types = {
@@ -221,6 +222,17 @@ class Onsite extends OnsitePaymentGatewayBase implements OnsiteInterface {
     // See \Drupal\commerce_payment\Exception for the available exceptions.
     // Delete the local entity.
     $payment_method->delete();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function updatePaymentMethod(PaymentMethodInterface $payment_method) {
+    // The default payment method edit form only supports updating billing info.
+    $billing_profile = $payment_method->getBillingProfile();
+
+    // Perform the update request here, throw an exception if it fails.
+    // See \Drupal\commerce_payment\Exception for the available exceptions.
   }
 
 }

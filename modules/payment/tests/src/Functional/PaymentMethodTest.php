@@ -75,9 +75,9 @@ class PaymentMethodTest extends CommerceBrowserTestBase {
   }
 
   /**
-   * Tests creating a payment method.
+   * Tests creating and updating a payment method.
    */
-  public function testPaymentMethodCreation() {
+  public function testPaymentMethodCreationAndUpdate() {
     /** @var \Drupal\commerce_payment_example\Plugin\Commerce\PaymentGateway\OnsiteInterface $plugin */
     $this->drupalGet($this->collectionUrl);
     $this->getSession()->getPage()->clickLink('Add payment method');
@@ -100,7 +100,35 @@ class PaymentMethodTest extends CommerceBrowserTestBase {
     $this->assertSession()->pageTextContains('Visa ending in 1111 saved to your payment methods.');
 
     $payment_method = PaymentMethod::load(1);
+    $billing_profile = $payment_method->getBillingProfile();
     $this->assertEquals($this->user->id(), $payment_method->getOwnerId());
+    $this->assertEquals('NY', $billing_profile->get('address')->first()->getAdministrativeArea());
+    $this->assertEquals(1, $payment_method->getBillingProfile()->id());
+
+    $this->drupalGet($this->collectionUrl . '/' . $payment_method->id() . '/edit');
+    $form_values = [
+      'payment_method[payment_details][expiration][month]' => '02',
+      'payment_method[payment_details][expiration][year]' => '2026',
+      'payment_method[billing_information][address][0][address][given_name]' => 'Johnny',
+      'payment_method[billing_information][address][0][address][family_name]' => 'Appleseed',
+      'payment_method[billing_information][address][0][address][address_line1]' => '123 New York Drive',
+      'payment_method[billing_information][address][0][address][locality]' => 'Greenville',
+      'payment_method[billing_information][address][0][address][administrative_area]' => 'SC',
+      'payment_method[billing_information][address][0][address][postal_code]' => '29615',
+    ];
+    $this->submitForm($form_values, 'Save');
+    $this->assertSession()->addressEquals($this->collectionUrl);
+
+    $this->assertSession()->pageTextContains('2/2026');
+
+    \Drupal::entityTypeManager()->getStorage('commerce_payment_method')->resetCache([1]);
+    \Drupal::entityTypeManager()->getStorage('profile')->resetCache([1]);
+    $payment_method = PaymentMethod::load(1);
+    $this->assertEquals('2026', $payment_method->get('card_exp_year')->value);
+    $billing_profile = $payment_method->getBillingProfile();
+    $this->assertEquals($this->user->id(), $payment_method->getOwnerId());
+    $this->assertEquals('SC', $billing_profile->get('address')->first()->getAdministrativeArea());
+    $this->assertEquals(1, $payment_method->getBillingProfile()->id());
   }
 
   /**

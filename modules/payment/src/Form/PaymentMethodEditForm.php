@@ -26,10 +26,8 @@ class PaymentMethodEditForm extends EntityForm {
   /**
    * {@inheritdoc}
    */
-  public function validateForm(array &$form, FormStateInterface $form_state) {
-    parent::validateForm($form, $form_state);
-
-    $this->entity = $form_state->getValue('payment_method');
+  public function buildEntity(array $form, FormStateInterface $form_state) {
+    return $form_state->getValue('payment_method');
   }
 
   /**
@@ -41,7 +39,7 @@ class PaymentMethodEditForm extends EntityForm {
       '%label' => $this->entity->label(),
       '@entity-type' => $this->entity->getEntityType()->getLowercaseLabel(),
     ]));
-    $form_state->setRedirect($this->entity->toUrl('collection'));
+    $form_state->setRedirectUrl($this->entity->toUrl('collection'));
   }
 
 }
