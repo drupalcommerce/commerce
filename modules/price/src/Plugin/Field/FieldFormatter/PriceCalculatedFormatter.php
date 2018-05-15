@@ -2,13 +2,12 @@
 
 namespace Drupal\commerce_price\Plugin\Field\FieldFormatter;
 
+use CommerceGuys\Intl\Formatter\CurrencyFormatterInterface;
 use Drupal\commerce\Context;
 use Drupal\commerce\PurchasableEntityInterface;
-use Drupal\commerce_price\NumberFormatterFactoryInterface;
 use Drupal\commerce_price\Resolver\ChainPriceResolverInterface;
 use Drupal\commerce_store\CurrentStoreInterface;
 use Drupal\Core\Cache\Cache;
-use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Language\LanguageInterface;
@@ -35,13 +34,6 @@ class PriceCalculatedFormatter extends PriceDefaultFormatter implements Containe
    * @var \Drupal\commerce_price\Resolver\ChainPriceResolverInterface
    */
   protected $chainPriceResolver;
-
-  /**
-   * The currency storage.
-   *
-   * @var \Drupal\Core\Entity\EntityStorageInterface
-   */
-  protected $currencyStorage;
 
   /**
    * The current user.
@@ -74,10 +66,8 @@ class PriceCalculatedFormatter extends PriceDefaultFormatter implements Containe
    *   The view mode.
    * @param array $third_party_settings
    *   Any third party settings settings.
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
-   *   The entity type manager.
-   * @param \Drupal\commerce_price\NumberFormatterFactoryInterface $number_formatter_factory
-   *   The number formatter factory.
+   * @param \CommerceGuys\Intl\Formatter\CurrencyFormatterInterface $currency_formatter
+   *   The currency formatter.
    * @param \Drupal\commerce_price\Resolver\ChainPriceResolverInterface $chain_price_resolver
    *   The chain price resolver.
    * @param \Drupal\commerce_store\CurrentStoreInterface $current_store
@@ -85,11 +75,10 @@ class PriceCalculatedFormatter extends PriceDefaultFormatter implements Containe
    * @param \Drupal\Core\Session\AccountInterface $current_user
    *   The current user.
    */
-  public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, $label, $view_mode, array $third_party_settings, EntityTypeManagerInterface $entity_type_manager, NumberFormatterFactoryInterface $number_formatter_factory, ChainPriceResolverInterface $chain_price_resolver, CurrentStoreInterface $current_store, AccountInterface $current_user) {
-    parent::__construct($plugin_id, $plugin_definition, $field_definition, $settings, $label, $view_mode, $third_party_settings, $entity_type_manager, $number_formatter_factory);
+  public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, $label, $view_mode, array $third_party_settings, CurrencyFormatterInterface $currency_formatter, ChainPriceResolverInterface $chain_price_resolver, CurrentStoreInterface $current_store, AccountInterface $current_user) {
+    parent::__construct($plugin_id, $plugin_definition, $field_definition, $settings, $label, $view_mode, $third_party_settings, $currency_formatter);
 
     $this->chainPriceResolver = $chain_price_resolver;
-    $this->currencyStorage = $entity_type_manager->getStorage('commerce_currency');
     $this->currentStore = $current_store;
     $this->currentUser = $current_user;
   }
@@ -106,8 +95,7 @@ class PriceCalculatedFormatter extends PriceDefaultFormatter implements Containe
       $configuration['label'],
       $configuration['view_mode'],
       $configuration['third_party_settings'],
-      $container->get('entity_type.manager'),
-      $container->get('commerce_price.number_formatter_factory'),
+      $container->get('commerce_price.currency_formatter'),
       $container->get('commerce_price.chain_price_resolver'),
       $container->get('commerce_store.current_store'),
       $container->get('current_user')
@@ -125,10 +113,11 @@ class PriceCalculatedFormatter extends PriceDefaultFormatter implements Containe
       $purchasable_entity = $items->getEntity();
       $resolved_price = $this->chainPriceResolver->resolve($purchasable_entity, 1, $context);
       $number = $resolved_price->getNumber();
-      $currency = $this->currencyStorage->load($resolved_price->getCurrencyCode());
+      $currency_code = $resolved_price->getCurrencyCode();
+      $options = $this->getFormattingOptions();
 
       $elements[0] = [
-        '#markup' => $this->numberFormatter->formatCurrency($number, $currency),
+        '#markup' => $this->currencyFormatter->format($number, $currency_code, $options),
         '#cache' => [
           'tags' => $purchasable_entity->getCacheTags(),
           'contexts' => Cache::mergeContexts($purchasable_entity->getCacheContexts(), [

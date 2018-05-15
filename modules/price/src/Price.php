@@ -6,6 +6,8 @@ use Drupal\commerce_price\Exception\CurrencyMismatchException;
 
 /**
  * Provides a value object for monetary values.
+ *
+ * Use the commerce_price.currency_formatter service to format prices.
  */
 final class Price {
 

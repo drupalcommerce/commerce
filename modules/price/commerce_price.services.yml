@@ -1,15 +1,28 @@
 services:
+  commerce_price.currency_repository:
+    class: Drupal\commerce_price\Repository\CurrencyRepository
+    arguments: ['@entity_type.manager']
+
+  commerce_price.number_format_repository:
+    class: Drupal\commerce_price\Repository\NumberFormatRepository
+    arguments: ['@event_dispatcher']
+
+  commerce_price.currency_formatter:
+    class: Drupal\commerce_price\CurrencyFormatter
+    arguments: ['@commerce_price.number_format_repository', '@commerce_price.currency_repository', '@commerce.current_locale']
+
+  commerce_price.number_formatter:
+    class: Drupal\commerce_price\NumberFormatter
+    arguments: ['@commerce_price.number_format_repository', '@commerce.current_locale']
+
   commerce_price.currency_importer:
     class: Drupal\commerce_price\CurrencyImporter
     arguments: ['@entity_type.manager', '@language_manager']
 
-  commerce_price.number_format_repository:
-    class: Drupal\commerce_price\NumberFormatRepository
-    arguments: ['@cache.data', '@event_dispatcher']
-
   commerce_price.number_formatter_factory:
     class: Drupal\commerce_price\NumberFormatterFactory
-    arguments: ['@commerce.current_locale', '@commerce_price.number_format_repository']
+    arguments: ['@commerce_price.currency_formatter']
+    deprecated: The "%service_id%" service is deprecated. You should use the 'commerce_price.currency_formatter' service instead. See http://drupal.org/node/the-change-notice-nid
 
   commerce_price.chain_price_resolver:
     class: Drupal\commerce_price\Resolver\ChainPriceResolver

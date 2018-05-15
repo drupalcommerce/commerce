@@ -21,7 +21,7 @@ class NumberTestForm extends FormBase {
     $form['number'] = [
       '#type' => 'commerce_number',
       '#title' => $this->t('Amount'),
-      '#default_value' => 99.99,
+      '#default_value' => '99.99',
       '#min' => 2,
       '#max' => 100,
       '#required' => TRUE,

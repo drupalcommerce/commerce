@@ -114,8 +114,6 @@ class Price extends FormElement {
       '#size' => $element['#size'],
       '#maxlength' => $element['#maxlength'],
       '#min_fraction_digits' => min($fraction_digits),
-      // '6' is the field storage maximum.
-      '#max_fraction_digits' => 6,
       '#min' => $element['#allow_negative'] ? NULL : 0,
       '#error_no_message' => TRUE,
     ];

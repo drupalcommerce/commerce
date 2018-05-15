@@ -2,18 +2,20 @@
 
 namespace Drupal\commerce_price\Entity;
 
-use CommerceGuys\Intl\Currency\CurrencyInterface as ExternalCurrencyInterface;
 use Drupal\Core\Config\Entity\ConfigEntityInterface;
 
 /**
  * Defines the interface for currencies.
- *
- * The external currency interface contains getters, while this interface
- * adds matching setters.
- *
- * @see \CommerceGuys\Intl\Currency\CurrencyInterface
  */
-interface CurrencyInterface extends ExternalCurrencyInterface, ConfigEntityInterface {
+interface CurrencyInterface extends ConfigEntityInterface {
+
+  /**
+   * Gets the alphabetic currency code.
+   *
+   * @return string
+   *   The alphabetic currency code.
+   */
+  public function getCurrencyCode();
 
   /**
    * Sets the alphabetic currency code.
@@ -26,6 +28,14 @@ interface CurrencyInterface extends ExternalCurrencyInterface, ConfigEntityInter
   public function setCurrencyCode($currency_code);
 
   /**
+   * Gets the currency name.
+   *
+   * @return string
+   *   The currency name.
+   */
+  public function getName();
+
+  /**
    * Sets the currency name.
    *
    * @param string $name
@@ -34,6 +44,17 @@ interface CurrencyInterface extends ExternalCurrencyInterface, ConfigEntityInter
    * @return $this
    */
   public function setName($name);
+
+  /**
+   * Gets the numeric currency code.
+   *
+   * The numeric code has three digits, and the first one can be a zero,
+   * hence the need to pass it around as a string.
+   *
+   * @return string
+   *   The numeric currency code.
+   */
+  public function getNumericCode();
 
   /**
    * Sets the numeric currency code.
@@ -46,6 +67,14 @@ interface CurrencyInterface extends ExternalCurrencyInterface, ConfigEntityInter
   public function setNumericCode($numeric_code);
 
   /**
+   * Gets the currency symbol.
+   *
+   * @return string
+   *   The currency symbol.
+   */
+  public function getSymbol();
+
+  /**
    * Sets the currency symbol.
    *
    * @param string $symbol
@@ -54,6 +83,16 @@ interface CurrencyInterface extends ExternalCurrencyInterface, ConfigEntityInter
    * @return $this
    */
   public function setSymbol($symbol);
+
+  /**
+   * Gets the number of fraction digits.
+   *
+   * Used when rounding or formatting an amount for display.
+   *
+   * @return int
+   *   The number of fraction digits.
+   */
+  public function getFractionDigits();
 
   /**
    * Sets the number of fraction digits.
