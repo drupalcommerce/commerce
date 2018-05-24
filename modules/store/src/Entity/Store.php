@@ -3,6 +3,7 @@
 namespace Drupal\commerce_store\Entity;
 
 use CommerceGuys\Addressing\AddressFormat\AddressField;
+use CommerceGuys\Addressing\AddressFormat\FieldOverride;
 use Drupal\address\AddressInterface;
 use Drupal\commerce_price\Entity\CurrencyInterface;
 use Drupal\user\UserInterface;
@@ -262,19 +263,17 @@ class Store extends ContentEntityBase implements StoreInterface {
       ->setDisplayConfigurable('view', TRUE)
       ->setDisplayConfigurable('form', TRUE);
 
-    // Disable the name and organization fields on the store address.
-    $disabled_fields = [
-      AddressField::GIVEN_NAME,
-      AddressField::ADDITIONAL_NAME,
-      AddressField::FAMILY_NAME,
-      AddressField::ORGANIZATION,
-    ];
     $fields['address'] = BaseFieldDefinition::create('address')
       ->setLabel(t('Address'))
       ->setDescription(t('The store address.'))
       ->setCardinality(1)
       ->setRequired(TRUE)
-      ->setSetting('fields', array_diff(AddressField::getAll(), $disabled_fields))
+      ->setSetting('field_overrides', [
+        AddressField::GIVEN_NAME => ['override' => FieldOverride::HIDDEN],
+        AddressField::ADDITIONAL_NAME => ['override' => FieldOverride::HIDDEN],
+        AddressField::FAMILY_NAME => ['override' => FieldOverride::HIDDEN],
+        AddressField::ORGANIZATION => ['override' => FieldOverride::HIDDEN],
+      ])
       ->setDisplayOptions('form', [
         'type' => 'address_default',
         'settings' => [

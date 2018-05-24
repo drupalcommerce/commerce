@@ -3,19 +3,19 @@
 namespace Drupal\commerce_store\Command;
 
 // @codingStandardsIgnoreStart
+use CommerceGuys\Addressing\Country\CountryRepositoryInterface;
 use CommerceGuys\Intl\Currency\CurrencyRepository;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Command\Command;
 use Drupal\Console\Core\Command\Shared\CommandTrait;
 use Drupal\Console\Core\Style\DrupalStyle;
 use Drupal\Console\Annotations\DrupalCommand;
 use Drupal\commerce_price\CurrencyImporter;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
-use CommerceGuys\Intl\Country\CountryRepositoryInterface;
 use Drupal\Core\Render\MetadataBubblingUrlGenerator;
 use Egulias\EmailValidator\EmailValidator;
+use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\Question;
 // @codingStandardsIgnoreEnd
 
@@ -50,7 +50,7 @@ class CreateStoreCommand extends Command {
   /**
    * The country repository.
    *
-   * @var \CommerceGuys\Intl\Country\CountryRepositoryInterface
+   * @var \CommerceGuys\Addressing\Country\CountryRepositoryInterface
    */
   protected $countryRepository;
 
@@ -75,7 +75,7 @@ class CreateStoreCommand extends Command {
    *   The currency importer.
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
-   * @param \CommerceGuys\Intl\Country\CountryRepositoryInterface $country_repository
+   * @param \CommerceGuys\Addressing\Country\CountryRepositoryInterface $country_repository
    *   The country repository.
    * @param \Drupal\Core\Render\MetadataBubblingUrlGenerator $url_generator
    *   The URL generator.
