@@ -86,5 +86,4 @@ class EntityBundle extends Bundle {
     return $dependencies;
   }
 
-
 }
