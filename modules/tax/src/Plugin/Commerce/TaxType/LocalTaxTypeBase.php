@@ -151,7 +151,7 @@ abstract class LocalTaxTypeBase extends TaxTypeBase implements LocalTaxTypeInter
         if ($this->shouldRound()) {
           $tax_amount = $this->rounder->round($tax_amount);
         }
-        if ($prices_include_tax && !$this->isDisplayInclusive()) {
+        if ($prices_include_tax && !$this->isDisplayInclusive() && !$negate) {
           $unit_price = $unit_price->subtract($tax_amount);
           $order_item->setUnitPrice($unit_price);
         }

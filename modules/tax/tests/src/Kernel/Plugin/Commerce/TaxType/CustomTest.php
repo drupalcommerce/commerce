@@ -225,6 +225,26 @@ class CustomTest extends CommerceKernelTestBase {
     $order_item = reset($order_items);
     $this->assertEquals(new Price('10.33', 'USD'), $order_item->getUnitPrice());
 
+    // Confirm that the unit price is only reduced once
+    // when the tax type itself is not display inclusive.
+    $configuration['display_inclusive'] = FALSE;
+    $this->plugin->setConfiguration($configuration);
+    $order = $this->buildOrder('JP', 'RS', ['JP'], TRUE);
+    $this->assertTrue($this->plugin->applies($order));
+    $this->plugin->apply($order);
+    $this->assertCount(1, $order->collectAdjustments());
+    $adjustments = $order->collectAdjustments();
+    $adjustment = reset($adjustments);
+    $this->assertEquals(new Price('-1.72', 'USD'), $adjustment->getAmount());
+    $this->assertEquals('0.2', $adjustment->getPercentage());
+    $this->assertFalse($adjustment->isIncluded());
+    $order_items = $order->getItems();
+    $order_item = reset($order_items);
+    $this->assertEquals(new Price('10.33', 'USD'), $order_item->getUnitPrice());
+    // Revert the display_inclusive setting for the next set of assertions.
+    $configuration['display_inclusive'] = TRUE;
+    $this->plugin->setConfiguration($configuration);
+
     // Applying the Japanese tax should replace the negative adjustment.
     // The price should stay the same in RS and JP regardless of which
     // tax is included.
