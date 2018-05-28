@@ -119,8 +119,9 @@ class PaymentListBuilder extends EntityListBuilder {
    */
   public function buildHeader() {
     $header['label'] = $this->t('Payment');
-    $header['remote_id'] = $this->t('Remote ID');
     $header['state'] = $this->t('State');
+    $header['payment_gateway'] = $this->t('Payment gateway');
+    $header['remote_id'] = $this->t('Remote ID');
     return $header + parent::buildHeader();
   }
 
@@ -136,10 +137,12 @@ class PaymentListBuilder extends EntityListBuilder {
       $formatted_amount .= ' ' . $this->t('Refunded:') . ' ';
       $formatted_amount .= $this->currencyFormatter->format($refunded_amount->getNumber(), $refunded_amount->getCurrencyCode());
     }
+    $payment_gateway = $entity->getPaymentGateway();
 
     $row['label'] = $formatted_amount;
-    $row['remote_id'] = $entity->getRemoteId() ?: $this->t('N/A');
     $row['state'] = $entity->getState()->getLabel();
+    $row['payment_gateway'] = $payment_gateway ? $payment_gateway->label() : '';
+    $row['remote_id'] = $entity->getRemoteId() ?: $this->t('N/A');
 
     return $row + parent::buildRow($entity);
   }
