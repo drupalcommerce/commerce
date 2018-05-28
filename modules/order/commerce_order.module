@@ -205,7 +205,7 @@ function commerce_order_mail($key, &$message, $params) {
  * This is an alternative to locking the field which still leaves
  * the field editable.
  */
-function commerce_product_field_storage_config_access(FieldStorageConfigInterface $field_storage, $operation) {
+function commerce_order_field_storage_config_access(FieldStorageConfigInterface $field_storage, $operation) {
   if ($field_storage->id() == 'profile.address' && $operation == 'delete') {
     return AccessResult::forbidden();
   }
@@ -217,7 +217,7 @@ function commerce_product_field_storage_config_access(FieldStorageConfigInterfac
  *
  * Hides the "Storage settings" operation for the profile 'address' field.
  */
-function commerce_product_entity_operation_alter(array &$operations, EntityInterface $entity) {
+function commerce_order_entity_operation_alter(array &$operations, EntityInterface $entity) {
   if ($entity->getEntityTypeId() == 'field_config' && $entity->id() == 'profile.customer.address') {
     unset($operations['storage-settings']);
   }
@@ -229,7 +229,7 @@ function commerce_product_entity_operation_alter(array &$operations, EntityInter
  * Hides the 'Available countries' setting for the profile 'address' field.
  * The setting is unused because in Commerce it is taken from the store.
  */
-function commerce_product_form_field_config_edit_form_alter(array &$form, FormStateInterface $form_state) {
+function commerce_order_form_field_config_edit_form_alter(array &$form, FormStateInterface $form_state) {
   /** @var \Drupal\Core\Field\FieldConfigInterface $entity */
   $entity = $form_state->getFormObject()->getEntity();
   if ($entity->id() == 'profile.customer.address') {
