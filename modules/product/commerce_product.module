@@ -264,6 +264,7 @@ function commerce_product_add_variations_field(ProductTypeInterface $product_typ
       'type' => 'inline_entity_form_complex',
       'weight' => 10,
       'settings' => [
+        'allow_duplicate' => TRUE,
         'override_labels' => TRUE,
         'label_singular' => 'variation',
         'label_plural' => 'variations',

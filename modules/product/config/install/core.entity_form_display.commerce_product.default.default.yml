@@ -81,13 +81,16 @@ content:
     type: inline_entity_form_complex
     weight: 6
     settings:
-      match_operator: CONTAINS
-      override_labels: false
+      form_mode: default
       label_singular: ''
       label_plural: ''
       allow_new: true
+      allow_duplicate: true
+      override_labels: false
+      collapsible: false
+      collapsed: false
       allow_existing: false
-      form_mode: default
+      match_operator: CONTAINS
     third_party_settings: {  }
     region: content
 hidden: {  }

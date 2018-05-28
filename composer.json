@@ -9,7 +9,7 @@
         "drupal/address": "^1.4",
         "drupal/entity": "^1.0-beta3",
         "drupal/entity_reference_revisions": "~1.0",
-        "drupal/inline_entity_form": "~1.0",
+        "drupal/inline_entity_form": "^1.0-rc1",
         "drupal/profile": "~1.0",
         "drupal/state_machine": "~1.0",
         "commerceguys/intl": "dev-master"

@@ -120,3 +120,21 @@ function commerce_product_post_update_4() {
     ])->save();
   }
 }
+
+/**
+ * Enable the "Duplicate" variation button for every product type.
+ */
+function commerce_product_post_update_5() {
+  $query = \Drupal::entityQuery('entity_form_display')->condition('targetEntityType', 'commerce_product');
+  $ids = $query->execute();
+  $form_displays = EntityFormDisplay::loadMultiple($ids);
+  foreach ($form_displays as $id => $form_display) {
+    /** @var \Drupal\Core\Entity\Display\EntityDisplayInterface $form_display */
+    $component = $form_display->getComponent('variations');
+    if ($component['type'] == 'inline_entity_form_complex') {
+      $component['settings']['allow_duplicate'] = TRUE;
+      $form_display->setComponent('variations', $component);
+      $form_display->save();
+    }
+  }
+}
