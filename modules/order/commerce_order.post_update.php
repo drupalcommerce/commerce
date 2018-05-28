@@ -6,6 +6,7 @@
  */
 
 use Drupal\Core\Entity\Entity\EntityFormDisplay;
+use Drupal\field\Entity\FieldStorageConfig;
 
 /**
  * Revert Order views to fix broken Price fields.
@@ -200,4 +201,13 @@ function commerce_order_post_update_7() {
   }
 
   return $message;
+}
+
+/**
+ * Unlock the profile 'address' field.
+ */
+function commerce_order_post_update_8() {
+  $field = FieldStorageConfig::loadByName('profile', 'address');
+  $field->setLocked(FALSE);
+  $field->save();
 }
