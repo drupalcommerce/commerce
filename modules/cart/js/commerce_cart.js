@@ -15,7 +15,7 @@
 
       if ($cartContents.length > 0) {
         // Expand the block when the link is clicked.
-        $cartButton.on('click', function (e) {
+        $cartButton.once('cart-button-processed').on('click', function (e) {
           // Prevent it from going to the cart.
           e.preventDefault();
           // Get the shopping cart width + the offset to the left.
