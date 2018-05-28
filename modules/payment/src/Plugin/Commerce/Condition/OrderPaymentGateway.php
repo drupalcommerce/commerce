@@ -68,7 +68,10 @@ class OrderPaymentGateway extends ConditionBase {
       // The payment gateway is not known yet, the condition cannot pass.
       return FALSE;
     }
-    $payment_gateway_id = $order->get('payment_gateway')->get('target_id');
+    // Avoiding ->target_id to allow the condition to be unit tested,
+    // because Prophecy doesn't support magic properties.
+    $payment_gateway_item = $order->get('payment_gateway')->first()->getValue();
+    $payment_gateway_id = $payment_gateway_item['target_id'];
 
     return in_array($payment_gateway_id, $this->configuration['payment_gateways']);
   }
