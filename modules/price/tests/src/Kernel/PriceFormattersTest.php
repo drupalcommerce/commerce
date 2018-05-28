@@ -30,11 +30,15 @@ class PriceFormattersTest extends CommerceKernelTestBase {
   ];
 
   /**
+   * The first product variation.
+   *
    * @var \Drupal\commerce_product\Entity\ProductVariationInterface
    */
   protected $variation1;
 
   /**
+   * The second product variation.
+   *
    * @var \Drupal\commerce_product\Entity\ProductVariationInterface
    */
   protected $variation2;
@@ -75,7 +79,7 @@ class PriceFormattersTest extends CommerceKernelTestBase {
     $variation = ProductVariation::create([
       'type' => 'default',
       'sku' => 'TEST_' . strtolower($this->randomMachineName()),
-      'price' => new Price('12.00', 'USD'),
+      'price' => new Price('24.00', 'USD'),
     ]);
     $variation->save();
     $this->variation2 = $variation;
@@ -93,13 +97,19 @@ class PriceFormattersTest extends CommerceKernelTestBase {
 
     $build = $this->productVariationViewBuilder->viewField($this->variation1->price, 'default');
     $this->render($build);
-
     $this->assertText('$12.00');
+
+    $this->productVariationDefaultDisplay->setComponent('price', [
+      'type' => 'commerce_price_default',
+      'settings' => [
+        'currency_display' => 'code',
+      ],
+    ]);
+    $this->productVariationDefaultDisplay->save();
 
     $build = $this->productVariationViewBuilder->viewField($this->variation2->price, 'default');
     $this->render($build);
-
-    $this->assertText('$12.00');
+    $this->assertText('USD24.00');
   }
 
   /**
@@ -114,13 +124,19 @@ class PriceFormattersTest extends CommerceKernelTestBase {
 
     $build = $this->productVariationViewBuilder->viewField($this->variation1->price, 'default');
     $this->render($build);
-
     $this->assertText('$12.00');
+
+    $this->productVariationDefaultDisplay->setComponent('price', [
+      'type' => 'commerce_price_calculated',
+      'settings' => [
+        'currency_display' => 'code',
+      ],
+    ]);
+    $this->productVariationDefaultDisplay->save();
 
     $build = $this->productVariationViewBuilder->viewField($this->variation2->price, 'default');
     $this->render($build);
-
-    $this->assertText('$9.00');
+    $this->assertText('USD21.00');
   }
 
 }

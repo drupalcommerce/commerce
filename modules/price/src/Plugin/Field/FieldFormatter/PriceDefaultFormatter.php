@@ -79,7 +79,7 @@ class PriceDefaultFormatter extends FormatterBase implements ContainerFactoryPlu
   public static function defaultSettings() {
     return [
       'strip_trailing_zeroes' => FALSE,
-      'display_currency_code' => FALSE,
+      'currency_display' => 'symbol',
     ] + parent::defaultSettings();
   }
 
@@ -93,10 +93,15 @@ class PriceDefaultFormatter extends FormatterBase implements ContainerFactoryPlu
       '#title' => $this->t('Strip trailing zeroes after the decimal point.'),
       '#default_value' => $this->getSetting('strip_trailing_zeroes'),
     ];
-    $elements['display_currency_code'] = [
-      '#type' => 'checkbox',
-      '#title' => $this->t('Display the currency code instead of the currency symbol.'),
-      '#default_value' => $this->getSetting('display_currency_code'),
+    $elements['currency_display'] = [
+      '#type' => 'radios',
+      '#title' => $this->t('Currency display'),
+      '#options' => [
+        'symbol' => $this->t('Symbol (e.g. "$")'),
+        'code' => $this->t('Currency code (e.g. "USD")'),
+        'none' => $this->t('None'),
+      ],
+      '#default_value' => $this->getSetting('currency_display'),
     ];
 
     return $elements;
@@ -113,12 +118,16 @@ class PriceDefaultFormatter extends FormatterBase implements ContainerFactoryPlu
     else {
       $summary[] = $this->t('Do not strip trailing zeroes after the decimal point.');
     }
-    if ($this->getSetting('display_currency_code')) {
-      $summary[] = $this->t('Display the currency code instead of the currency symbol.');
-    }
-    else {
-      $summary[] = $this->t('Display the currency symbol.');
-    }
+
+    $currency_display = $this->getSetting('currency_display');
+    $currency_display_options = [
+      'symbol' => $this->t('Symbol (e.g. "$")'),
+      'code' => $this->t('Currency code (e.g. "USD")'),
+      'none' => $this->t('None'),
+    ];
+    $summary[] = $this->t('Currency display: @currency_display.', [
+      '@currency_display' => $currency_display_options[$currency_display],
+    ]);
 
     return $summary;
   }
@@ -151,12 +160,11 @@ class PriceDefaultFormatter extends FormatterBase implements ContainerFactoryPlu
    *   The formatting options.
    */
   protected function getFormattingOptions() {
-    $options = [];
+    $options = [
+      'currency_display' => $this->getSetting('currency_display'),
+    ];
     if ($this->getSetting('strip_trailing_zeroes')) {
       $options['minimum_fraction_digits'] = 0;
-    }
-    if ($this->getSetting('display_currency_code')) {
-      $options['currency_display'] = 'code';
     }
 
     return $options;
