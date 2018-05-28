@@ -3,11 +3,12 @@
 namespace Drupal\commerce_store;
 
 use Drupal\commerce_store\Entity\StoreInterface;
+use Drupal\Core\Entity\ContentEntityStorageInterface;
 
 /**
  * Defines the interface for store storage.
  */
-interface StoreStorageInterface {
+interface StoreStorageInterface extends ContentEntityStorageInterface {
 
   /**
    * Loads the default store.

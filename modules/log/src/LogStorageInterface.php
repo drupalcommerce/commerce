@@ -3,9 +3,9 @@
 namespace Drupal\commerce_log;
 
 use Drupal\Core\Entity\ContentEntityInterface;
-use Drupal\Core\Entity\Sql\SqlEntityStorageInterface;
+use Drupal\Core\Entity\ContentEntityStorageInterface;
 
-interface LogStorageInterface extends SqlEntityStorageInterface {
+interface LogStorageInterface extends ContentEntityStorageInterface {
 
   /**
    * Generates a log.
