@@ -1,0 +1,7 @@
+name: Extra order item field
+type: module
+description: Contains field and field storage config for extra order item field
+package: Testing
+core: 8.x
+dependencies:
+  - commerce:commerce_order

@@ -19,7 +19,7 @@ services:
 
   commerce_cart.order_item_matcher:
     class: Drupal\commerce_cart\OrderItemMatcher
-    arguments: ['@event_dispatcher']
+    arguments: ['@entity_type.manager', '@event_dispatcher']
 
   commerce_cart.cart_subscriber:
     class: Drupal\commerce_cart\EventSubscriber\CartEventSubscriber
