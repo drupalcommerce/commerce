@@ -170,7 +170,7 @@ class PaymentProcess extends CheckoutPaneBase {
       try {
         $payment->payment_method = $this->order->payment_method->entity;
         $payment_gateway_plugin->createPayment($payment, $this->configuration['capture']);
-        $this->checkoutFlow->redirectToStep($next_step_id);
+        $this->redirectToStep($next_step_id);
       }
       catch (DeclineException $e) {
         $message = $this->t('We encountered an error processing your payment method. Please verify your details and try again.');
@@ -212,7 +212,7 @@ class PaymentProcess extends CheckoutPaneBase {
     elseif ($payment_gateway_plugin instanceof ManualPaymentGatewayInterface) {
       try {
         $payment_gateway_plugin->createPayment($payment);
-        $this->checkoutFlow->redirectToStep($next_step_id);
+        $this->redirectToStep($next_step_id);
       }
       catch (PaymentGatewayException $e) {
         \Drupal::logger('commerce_payment')->error($e->getMessage());
@@ -222,7 +222,7 @@ class PaymentProcess extends CheckoutPaneBase {
       }
     }
     else {
-      $this->checkoutFlow->redirectToStep($next_step_id);
+      $this->redirectToStep($next_step_id);
     }
   }
 
@@ -266,13 +266,25 @@ class PaymentProcess extends CheckoutPaneBase {
   }
 
   /**
+   * Redirects to a specific checkout step.
+   *
+   * @param string $step_id
+   *   The step ID to redirect to.
+   *
+   * @throws \Drupal\commerce\Response\NeedsRedirectException
+   */
+  protected function redirectToStep($step_id) {
+    $this->checkoutFlow->redirectToStep($step_id);
+  }
+
+  /**
    * Redirects to a previous checkout step on error.
    *
    * @throws \Drupal\commerce\Response\NeedsRedirectException
    */
   protected function redirectToPreviousStep() {
     $step_id = $this->checkoutFlow->getPane('payment_information')->getStepId();
-    return $this->checkoutFlow->redirectToStep($step_id);
+    return $this->redirectToStep($step_id);
   }
 
 }
