@@ -4,7 +4,7 @@ namespace Drupal\commerce_price;
 
 use CommerceGuys\Intl\Formatter\CurrencyFormatterInterface;
 
-@trigger_error('The ' . __NAMESPACE__ . '\NumberFormatterFactory is deprecated. Instead, use \Drupal\commerce_price\CurrencyFormatter. See http://drupal.org/node/the-change-notice-nid.', E_USER_DEPRECATED);
+@trigger_error('The ' . __NAMESPACE__ . '\NumberFormatterFactory is deprecated. Instead, use \Drupal\commerce_price\CurrencyFormatter. See https://www.drupal.org/node/2975672.', E_USER_DEPRECATED);
 
 /**
  * Defines the NumberFormatter factory.
