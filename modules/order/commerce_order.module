@@ -5,12 +5,15 @@
  * Defines the Order entity and associated features.
  */
 
+use Drupal\commerce_order\Entity\Order;
+use Drupal\commerce_order\Entity\OrderInterface;
 use Drupal\commerce_order\Entity\OrderTypeInterface;
 use Drupal\commerce_order\Plugin\Field\FieldFormatter\PriceCalculatedFormatter;
 use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\Element;
+use Drupal\Core\Session\AccountInterface;
 use Drupal\entity\BundleFieldDefinition;
 use Drupal\field\FieldStorageConfigInterface;
 
@@ -89,6 +92,44 @@ function commerce_order_field_widget_form_alter(&$element, FormStateInterface $f
       if (!$context['items']->getEntity()->isNew()) {
         $element['#disabled'] = TRUE;
       }
+    }
+  }
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_insert() for user entities.
+ *
+ * - Assigns any previous guest orders to new user account.
+ *
+ * @param \Drupal\Core\Session\AccountInterface $user
+ */
+function commerce_order_user_insert(AccountInterface $user) {
+  $order_ids = \Drupal::entityQuery('commerce_order')
+    ->condition('mail', $user->getEmail())
+    ->execute();
+  if ($order_ids) {
+    $orders = Order::loadMultiple($order_ids);
+    foreach ($orders as $order) {
+      $order->setCustomer($user);
+      $order->save();
+    }
+  }
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_presave().
+ *
+ * @param \Drupal\commerce_order\Entity\OrderInterface $order
+ */
+function commerce_order_commerce_order_presave(OrderInterface $order) {
+  $place_transition = $order->getState()->getWorkflow()->getTransition('place');
+  if (!$order->isNew() && empty($order->getPlacedTime()) && $place_transition) {
+    $from_states = $place_transition->getFromStates();
+    $from_state = reset($from_states);
+    $from_state = $from_state->getId();
+    $to_state = $place_transition->getToState()->getId();
+    if ($order->original->state->value == $from_state && $order->state->value == $to_state) {
+      $order->setPlacedTime(REQUEST_TIME);
     }
   }
 }
