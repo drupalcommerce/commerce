@@ -294,7 +294,7 @@ class OrderTest extends CommerceKernelTestBase {
     $payment2->save();
 
     // Test that payments can be partially refunded multiple times.
-    $this->payment_gateway_plugin->refundPayment($payment2, new Price('7.00', 'USD'));
+    $this->payment_gateway_plugin->refundPayment($payment2, new Price('5.00', 'USD'));
     $order = Order::load($order->id());
     $this->assertEquals(new Price('5.00', 'USD'), $order->getBalance());
 
@@ -309,6 +309,7 @@ class OrderTest extends CommerceKernelTestBase {
       'order_id' => $order->id(),
       'amount' => new Price('7.00', 'USD'),
       'payment_gateway' => 'example',
+      'state' => 'completed',
     ]);
     $payment3->save();
     $order = Order::load($order->id());
@@ -316,7 +317,7 @@ class OrderTest extends CommerceKernelTestBase {
     $this->assertEquals(new Price('0.00', 'USD'), $order->getBalance());
 
     // Confirm payment refunding updates order
-    $payment3->setRefundedAmount(new Price('5.00', 'USD'))->save();
+    $this->payment_gateway_plugin->refundPayment($payment3, new Price('5.00', 'USD'));
     $order = Order::load($order->id());
     $this->assertEquals(new Price('12.00', 'USD'), $order->getTotalPaid());
     $this->assertEquals(new Price('5.00', 'USD'), $order->getBalance());
