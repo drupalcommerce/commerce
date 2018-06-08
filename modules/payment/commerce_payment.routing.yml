@@ -16,7 +16,7 @@ entity.commerce_payment.add_form:
       commerce_order:
         type: 'entity:commerce_order'
   requirements:
-    _entity_create_access: 'commerce_payment'
+    _entity_create_any_access: 'commerce_payment'
 
 entity.commerce_payment.operation_form:
   path: '/admin/commerce/orders/{commerce_order}/payments/{commerce_payment}/operation/{operation}'

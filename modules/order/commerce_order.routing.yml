@@ -12,7 +12,7 @@ entity.commerce_order.add_page:
     _form: '\Drupal\commerce_order\Form\OrderAddForm'
     _title: 'Create a new order'
   requirements:
-    _entity_create_access: 'commerce_order'
+    _entity_create_any_access: 'commerce_order'
 
 entity.commerce_order.reassign_form:
   path: '/admin/commerce/orders/{commerce_order}/reassign'
