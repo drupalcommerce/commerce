@@ -6,6 +6,15 @@
  */
 
 use Drupal\Core\Field\BaseFieldDefinition;
+use Drupal\Core\Session\AccountInterface;
+
+/**
+ * Implements hook_install().
+ */
+function commerce_payment_install() {
+  // Allow authenticated users to manage own payment methods.
+  user_role_grant_permissions(AccountInterface::AUTHENTICATED_ROLE, ['manage own commerce_payment_method']);
+}
 
 /**
  * Add the payment_gateway_mode field to payments and payment methods.
