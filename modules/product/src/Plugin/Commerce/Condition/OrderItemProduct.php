@@ -87,6 +87,7 @@ class OrderItemProduct extends ConditionBase implements ContainerFactoryPluginIn
       '#target_type' => 'commerce_product',
       '#tags' => TRUE,
       '#required' => TRUE,
+      '#maxlength' => NULL,
     ];
 
     return $form;

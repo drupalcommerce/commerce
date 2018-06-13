@@ -123,6 +123,7 @@ class EntitySelect extends FormElement {
         '#default_value' => $default_value,
         '#size' => $element['#autocomplete_size'],
         '#placeholder' => $element['#autocomplete_placeholder'],
+        '#maxlength' => NULL,
       ];
     }
 
