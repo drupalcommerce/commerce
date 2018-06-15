@@ -51,6 +51,14 @@ class ProductAttributeValue extends ContentEntityBase implements ProductAttribut
   /**
    * {@inheritdoc}
    */
+  public function getAttribute() {
+    $storage = $this->entityTypeManager()->getStorage('commerce_product_attribute');
+    return $storage->load($this->bundle());
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function getAttributeId() {
     return $this->bundle();
   }

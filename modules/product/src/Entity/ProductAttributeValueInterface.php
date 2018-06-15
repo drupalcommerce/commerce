@@ -11,6 +11,14 @@ use Drupal\Core\Entity\ContentEntityInterface;
 interface ProductAttributeValueInterface extends ContentEntityInterface, EntityChangedInterface {
 
   /**
+   * Gets the attribute.
+   *
+   * @return \Drupal\commerce_product\Entity\ProductAttributeInterface
+   *   The attribute.
+   */
+  public function getAttribute();
+
+  /**
    * Gets the attribute ID.
    *
    * The attribute id is also the bundle of the attribute value.
