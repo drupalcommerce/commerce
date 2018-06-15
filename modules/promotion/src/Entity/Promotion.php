@@ -464,20 +464,35 @@ class Promotion extends CommerceContentEntityBase implements PromotionInterface 
       /** @var \Drupal\commerce\Plugin\Commerce\Condition\ConditionInterface $condition */
       return $condition->getEntityTypeId() == 'commerce_order_item';
     });
-    $order_conditions = new ConditionGroup($order_conditions, $this->getConditionOperator());
-    $order_item_conditions = new ConditionGroup($order_item_conditions, $this->getConditionOperator());
+    $condition_operator = $this->getConditionOperator();
+    $order_conditions = new ConditionGroup($order_conditions, $condition_operator);
+    $order_item_conditions = new ConditionGroup($order_item_conditions, $condition_operator);
 
-    if (!$order_conditions->evaluate($order)) {
+    $order_conditions_apply = $order_conditions->evaluate($order);
+    if ($condition_operator == 'AND' && !$order_conditions_apply) {
       return FALSE;
     }
+
+    $order_item_conditions_apply = FALSE;
     foreach ($order->getItems() as $order_item) {
       // Order item conditions must match at least one order item.
       if ($order_item_conditions->evaluate($order_item)) {
-        return TRUE;
+        $order_item_conditions_apply = TRUE;
+        break;
       }
     }
 
-    return FALSE;
+    if ($condition_operator == 'AND') {
+      return $order_conditions_apply && $order_item_conditions_apply;
+    }
+    elseif ($condition_operator == 'OR') {
+      // Empty condition groups are TRUE by default, which leads to incorrect
+      // logic with ORed groups due to false positives.
+      $order_conditions_apply = $order_conditions->getConditions() && $order_conditions_apply;
+      $order_item_conditions_apply = $order_item_conditions->getConditions() && $order_item_conditions_apply;
+
+      return $order_conditions_apply || $order_item_conditions_apply;
+    }
   }
 
   /**
@@ -493,7 +508,7 @@ class Promotion extends CommerceContentEntityBase implements PromotionInterface 
         /** @var \Drupal\commerce\Plugin\Commerce\Condition\ConditionInterface $condition */
         return $condition->getEntityTypeId() == 'commerce_order_item';
       });
-      $order_item_conditions = new ConditionGroup($order_item_conditions, 'AND');
+      $order_item_conditions = new ConditionGroup($order_item_conditions, $this->getConditionOperator());
       // Apply the offer to order items that pass the conditions.
       foreach ($order->getItems() as $order_item) {
         if ($order_item_conditions->evaluate($order_item)) {

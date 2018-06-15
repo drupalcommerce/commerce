@@ -5,6 +5,7 @@ namespace Drupal\Tests\commerce_promotion\Kernel;
 use Drupal\commerce_order\Entity\OrderItem;
 use Drupal\commerce_order\Entity\OrderItemType;
 use Drupal\commerce_order\Entity\Order;
+use Drupal\commerce_price\Price;
 use Drupal\commerce_promotion\Entity\Promotion;
 use Drupal\Tests\commerce\Kernel\CommerceKernelTestBase;
 
@@ -141,12 +142,17 @@ class PromotionConditionTest extends CommerceKernelTestBase {
     $this->order->save();
     $result = $promotion->applies($this->order);
     $this->assertTrue($result);
+
+    // No order total can satisfy both conditions.
+    $promotion->setConditionOperator('AND');
+    $result = $promotion->applies($this->order);
+    $this->assertFalse($result);
   }
 
   /**
-   * Tests promotions with an order item condition.
+   * Tests promotions with both order and order item conditions.
    */
-  public function testOrderItemCondition() {
+  public function testMixedCondition() {
     // Starts now, enabled. No end time.
     $promotion = Promotion::create([
       'name' => 'Promotion 1',
@@ -165,7 +171,7 @@ class PromotionConditionTest extends CommerceKernelTestBase {
           'target_plugin_configuration' => [
             'operator' => '>',
             'amount' => [
-              'number' => '10.00',
+              'number' => '30.00',
               'currency_code' => 'USD',
             ],
           ],
@@ -174,7 +180,7 @@ class PromotionConditionTest extends CommerceKernelTestBase {
           'target_plugin_id' => 'order_item_quantity',
           'target_plugin_configuration' => [
             'operator' => '>',
-            'quantity' => 2,
+            'quantity' => 1,
           ],
         ],
       ],
@@ -184,31 +190,62 @@ class PromotionConditionTest extends CommerceKernelTestBase {
 
     $order_item = OrderItem::create([
       'type' => 'test',
-      'quantity' => 2,
+      'quantity' => 4,
       'unit_price' => [
-        'number' => '20.00',
+        'number' => '10.00',
         'currency_code' => 'USD',
       ],
     ]);
     $order_item->save();
+
+    // AND: Both conditions apply.
     $this->order->addItem($order_item);
     $this->order->save();
+    $result = $promotion->applies($this->order);
+    $this->assertTrue($result);
 
+    // OR: Both conditions apply.
+    $promotion->setConditionOperator('OR');
+    $result = $promotion->applies($this->order);
+    $this->assertTrue($result);
+
+    // AND: Neither condition applies.
+    $order_item->setQuantity(1);
+    $order_item->save();
+    $this->order->save();
+    $promotion->setConditionOperator('AND');
     $result = $promotion->applies($this->order);
     $this->assertFalse($result);
 
-    $order_item = OrderItem::create([
-      'type' => 'test',
-      'quantity' => 4,
-      'unit_price' => [
-        'number' => '20.00',
-        'currency_code' => 'USD',
-      ],
-    ]);
-    $order_item->save();
-    $this->order->addItem($order_item);
-    $this->order->save();
+    // OR: Neither condition applies.
+    $promotion->setConditionOperator('OR');
+    $result = $promotion->applies($this->order);
+    $this->assertFalse($result);
 
+    // AND: Order condition fails, order item condition passes.
+    $order_item->setQuantity(2);
+    $order_item->save();
+    $this->order->save();
+    $promotion->setConditionOperator('AND');
+    $result = $promotion->applies($this->order);
+    $this->assertFalse($result);
+
+    // OR: Order condition fails, order item condition passes.
+    $promotion->setConditionOperator('OR');
+    $result = $promotion->applies($this->order);
+    $this->assertTrue($result);
+
+    // AND: Order condition passes, order item condition fails.
+    $order_item->setUnitPrice(new Price('40', 'USD'));
+    $order_item->setQuantity(1);
+    $order_item->save();
+    $this->order->save();
+    $promotion->setConditionOperator('AND');
+    $result = $promotion->applies($this->order);
+    $this->assertFalse($result);
+
+    // OR: Order condition passes, order item condition fails.
+    $promotion->setConditionOperator('OR');
     $result = $promotion->applies($this->order);
     $this->assertTrue($result);
   }
