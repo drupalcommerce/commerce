@@ -144,14 +144,20 @@ class OrderItem extends CommerceContentEntityBase implements OrderItemInterface 
   /**
    * {@inheritdoc}
    */
-  public function getAdjustedUnitPrice() {
+  public function getAdjustedUnitPrice(array $adjustment_types = []) {
     if ($unit_price = $this->getUnitPrice()) {
       $adjusted_price = $unit_price;
       foreach ($this->getAdjustments() as $adjustment) {
-        if (!$adjustment->isIncluded()) {
-          $adjusted_price = $adjusted_price->add($adjustment->getAmount());
+        if ($adjustment_types && !in_array($adjustment->getType(), $adjustment_types)) {
+          continue;
         }
+        if ($adjustment->isIncluded()) {
+          continue;
+        }
+
+        $adjusted_price = $adjusted_price->add($adjustment->getAmount());
       }
+
       return $adjusted_price;
     }
   }
@@ -199,8 +205,8 @@ class OrderItem extends CommerceContentEntityBase implements OrderItemInterface 
   /**
    * {@inheritdoc}
    */
-  public function getAdjustedTotalPrice() {
-    if ($adjusted_unit_price = $this->getAdjustedUnitPrice()) {
+  public function getAdjustedTotalPrice(array $adjustment_types = []) {
+    if ($adjusted_unit_price = $this->getAdjustedUnitPrice($adjustment_types)) {
       $rounder = \Drupal::service('commerce_price.rounder');
       $adjusted_total_price = $adjusted_unit_price->multiply($this->getQuantity());
       $adjusted_total_price = $rounder->round($adjusted_total_price);

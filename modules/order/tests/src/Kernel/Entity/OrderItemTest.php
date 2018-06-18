@@ -100,7 +100,7 @@ class OrderItemTest extends CommerceKernelTestBase {
       'percentage' => '0.1',
     ]);
     $adjustments[] = new Adjustment([
-      'type' => 'custom',
+      'type' => 'fee',
       'label' => 'Random fee',
       'amount' => new Price('2.00', 'USD'),
     ]);
@@ -114,8 +114,14 @@ class OrderItemTest extends CommerceKernelTestBase {
     $this->assertEquals(new Price('23.98', 'USD'), $order_item->getAdjustedTotalPrice());
     $order_item->setAdjustments($adjustments);
     $this->assertEquals($adjustments, $order_item->getAdjustments());
+    $this->assertEquals(new Price('9.99', 'USD'), $order_item->getUnitPrice());
     $this->assertEquals(new Price('10.99', 'USD'), $order_item->getAdjustedUnitPrice());
+    $this->assertEquals(new Price('8.99', 'USD'), $order_item->getAdjustedUnitPrice(['custom']));
+    $this->assertEquals(new Price('11.99', 'USD'), $order_item->getAdjustedUnitPrice(['fee']));
+    $this->assertEquals(new Price('19.98', 'USD'), $order_item->getTotalPrice());
     $this->assertEquals(new Price('21.98', 'USD'), $order_item->getAdjustedTotalPrice());
+    $this->assertEquals(new Price('17.98', 'USD'), $order_item->getAdjustedTotalPrice(['custom']));
+    $this->assertEquals(new Price('23.98', 'USD'), $order_item->getAdjustedTotalPrice(['fee']));
 
     $this->assertEquals('default', $order_item->getData('test', 'default'));
     $order_item->setData('test', 'value');

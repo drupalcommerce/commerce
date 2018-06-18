@@ -122,16 +122,20 @@ interface OrderItemInterface extends ContentEntityInterface, EntityAdjustableInt
    * Gets the adjusted order item unit price.
    *
    * The adjusted unit price is calculated by applying the order item's
-   * adjustments to the unit price. This includes promotions, taxes, fees, etc.
+   * adjustments to the unit price. This can include promotions, taxes, etc.
    *
    * Adjustments are usually included only in the order total price, but
    * knowing the adjusted unit prices for each order item can be useful for
    * refunds and other purposes.
    *
+   * @param string[] $adjustment_types
+   *   The adjustment types to include in the adjusted price.
+   *   Examples: fee, promotion, tax. Defaults to all adjustment types.
+   *
    * @return \Drupal\commerce_price\Price|null
    *   The adjusted order item unit price, or NULL.
    */
-  public function getAdjustedUnitPrice();
+  public function getAdjustedUnitPrice(array $adjustment_types = []);
 
   /**
    * Gets the order item total price.
@@ -146,10 +150,14 @@ interface OrderItemInterface extends ContentEntityInterface, EntityAdjustableInt
    *
    * Calculated by multiplying the adjusted unit price by quantity.
    *
+   * @param string[] $adjustment_types
+   *   The adjustment types to include in the adjusted price.
+   *   Examples: fee, promotion, tax. Defaults to all adjustment types.
+   *
    * @return \Drupal\commerce_price\Price|null
    *   The adjusted order item total price, or NULL.
    */
-  public function getAdjustedTotalPrice();
+  public function getAdjustedTotalPrice(array $adjustment_types = []);
 
   /**
    * Gets an order item data value with the given key.
