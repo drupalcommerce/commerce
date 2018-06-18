@@ -122,9 +122,14 @@ class PromotionOfferTest extends CommerceKernelTestBase {
     $this->assertEquals('0.10', $offer_field->target_plugin_configuration['percentage']);
 
     $promotion->apply($this->order);
-    $this->assertEquals(1, count($this->order->getAdjustments()));
-    $this->assertEquals(new Price('36.00', 'USD'), $this->order->getTotalPrice());
+    $this->order->recalculateTotalPrice();
+    $order_items = $this->order->getItems();
+    $order_item = reset($order_items);
 
+    $this->assertEquals(0, count($this->order->getAdjustments()));
+    $this->assertEquals(1, count($order_item->getAdjustments()));
+    $this->assertEquals(new Price('-2.00', 'USD'), $order_item->getAdjustments()[0]->getAmount());
+    $this->assertEquals(new Price('36.00', 'USD'), $this->order->getTotalPrice());
   }
 
   /**

@@ -24,17 +24,20 @@ class OrderPercentageOff extends PercentageOffBase {
     $this->assertEntity($entity);
     /** @var \Drupal\commerce_order\Entity\OrderInterface $order */
     $order = $entity;
-    $adjustment_amount = $order->getSubtotalPrice()->multiply($this->getPercentage());
-    $adjustment_amount = $this->rounder->round($adjustment_amount);
+    // Reduce each individual order item, to simplify VAT taxes, refunds.
+    foreach ($order->getItems() as $order_item) {
+      $adjustment_amount = $order_item->getUnitPrice()->multiply($this->getPercentage());
+      $adjustment_amount = $this->rounder->round($adjustment_amount);
 
-    $order->addAdjustment(new Adjustment([
-      'type' => 'promotion',
-      // @todo Change to label from UI when added in #2770731.
-      'label' => t('Discount'),
-      'amount' => $adjustment_amount->multiply('-1'),
-      'percentage' => $this->getPercentage(),
-      'source_id' => $promotion->id(),
-    ]));
+      $order_item->addAdjustment(new Adjustment([
+        'type' => 'promotion',
+        // @todo Change to label from UI when added in #2770731.
+        'label' => t('Discount'),
+        'amount' => $adjustment_amount->multiply('-1'),
+        'percentage' => $this->getPercentage(),
+        'source_id' => $promotion->id(),
+      ]));
+    }
   }
 
 }

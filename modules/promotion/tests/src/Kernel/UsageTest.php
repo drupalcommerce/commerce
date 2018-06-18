@@ -196,7 +196,7 @@ class UsageTest extends CommerceKernelTestBase {
     $this->order->get('coupons')->appendItem($coupon);
     $this->order->save();
     $this->container->get('commerce_order.order_refresh')->refresh($this->order);
-    $this->assertEquals(2, count($this->order->getAdjustments()));
+    $this->assertEquals(2, count($this->order->collectAdjustments()));
     $this->order->save();
 
     $this->order->getState()->applyTransition($this->order->getState()->getTransitions()['place']);
@@ -237,7 +237,7 @@ class UsageTest extends CommerceKernelTestBase {
 
     $this->assertTrue($promotion->applies($this->order));
     $this->container->get('commerce_order.order_refresh')->refresh($this->order);
-    $this->assertEquals(1, count($this->order->getAdjustments()));
+    $this->assertEquals(1, count($this->order->collectAdjustments()));
     $this->order->save();
 
     $this->order->getState()->applyTransition($this->order->getState()->getTransitions()['place']);
