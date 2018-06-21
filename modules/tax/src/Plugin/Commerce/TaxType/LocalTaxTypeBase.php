@@ -145,8 +145,10 @@ abstract class LocalTaxTypeBase extends TaxTypeBase implements LocalTaxTypeInter
 
       foreach ($rates as $zone_id => $rate) {
         $zone = $zones[$zone_id];
-        $unit_price = $order_item->getUnitPrice();
         $percentage = $rate->getPercentage();
+        // Determine the final unit price.
+        // This calculation must be done with a non-adjusted unit price.
+        $unit_price = $order_item->getUnitPrice();
         $tax_amount = $percentage->calculateTaxAmount($unit_price, $prices_include_tax);
         if ($this->shouldRound()) {
           $tax_amount = $this->rounder->round($tax_amount);
@@ -158,6 +160,14 @@ abstract class LocalTaxTypeBase extends TaxTypeBase implements LocalTaxTypeInter
         elseif (!$prices_include_tax && $this->isDisplayInclusive()) {
           $unit_price = $unit_price->add($tax_amount);
           $order_item->setUnitPrice($unit_price);
+        }
+        // Now determine the actual tax amount, with the adjustments applied.
+        $adjusted_unit_price = $order_item->getAdjustedUnitPrice(['promotion', 'fee']);
+        if (!$adjusted_unit_price->equals($unit_price)) {
+          $tax_amount = $percentage->calculateTaxAmount($adjusted_unit_price, $prices_include_tax);
+          if ($this->shouldRound()) {
+            $tax_amount = $this->rounder->round($tax_amount);
+          }
         }
 
         $order_item->addAdjustment(new Adjustment([

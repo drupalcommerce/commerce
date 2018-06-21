@@ -2,6 +2,7 @@
 
 namespace Drupal\Tests\commerce_tax\Kernel\Plugin\Commerce\TaxType;
 
+use Drupal\commerce_order\Adjustment;
 use Drupal\commerce_order\Entity\Order;
 use Drupal\commerce_order\Entity\OrderItem;
 use Drupal\commerce_order\Entity\OrderItemType;
@@ -186,6 +187,116 @@ class CustomTest extends CommerceKernelTestBase {
     $order_items = $order->getItems();
     $order_item = reset($order_items);
     $this->assertEquals(new Price('8.61', 'USD'), $order_item->getUnitPrice());
+  }
+
+  /**
+   * @covers ::apply
+   */
+  public function testDiscountedPrices() {
+    // Tax-inclusive prices + display-inclusive taxes.
+    // A 10.33 USD price with a 1.00 USD discount should have a 9.33 USD total.
+    $order = $this->buildOrder('RS', 'RS', [], TRUE);
+    $order_items = $order->getItems();
+    $order_item = reset($order_items);
+    $order_item->addAdjustment(new Adjustment([
+      'type' => 'promotion',
+      'label' => t('Discount'),
+      'amount' => new Price('-1', 'USD'),
+    ]));
+    $this->plugin->apply($order);
+    $order_items = $order->getItems();
+    $order_item = reset($order_items);
+
+    $adjustments = $order->collectAdjustments();
+    $tax_adjustment = end($adjustments);
+    $this->assertCount(2, $adjustments);
+    $this->assertEquals('tax', $tax_adjustment->getType());
+    $this->assertEquals(t('VAT'), $tax_adjustment->getLabel());
+    $this->assertEquals(new Price('1.56', 'USD'), $tax_adjustment->getAmount());
+    $this->assertEquals('0.2', $tax_adjustment->getPercentage());
+    $this->assertEquals(new Price('10.33', 'USD'), $order_item->getUnitPrice());
+    $this->assertEquals(new Price('9.33', 'USD'), $order_item->getAdjustedUnitPrice());
+
+    // Non-tax-inclusive prices + display-inclusive taxes.
+    // A 10.33 USD price is 12.40 USD with 20% tax included.
+    // A 1.00 USD discount should result in a 11.40 USD total.
+    $order = $this->buildOrder('RS', 'RS', []);
+    $order_items = $order->getItems();
+    $order_item = reset($order_items);
+    $order_item->addAdjustment(new Adjustment([
+      'type' => 'promotion',
+      'label' => t('Discount'),
+      'amount' => new Price('-1', 'USD'),
+    ]));
+    $this->plugin->apply($order);
+    $order_items = $order->getItems();
+    $order_item = reset($order_items);
+
+    $adjustments = $order->collectAdjustments();
+    $tax_adjustment = end($adjustments);
+    $this->assertCount(2, $adjustments);
+    $this->assertEquals('tax', $tax_adjustment->getType());
+    $this->assertEquals(t('VAT'), $tax_adjustment->getLabel());
+    $this->assertEquals(new Price('2.28', 'USD'), $tax_adjustment->getAmount());
+    $this->assertEquals('0.2', $tax_adjustment->getPercentage());
+    $this->assertEquals(new Price('12.40', 'USD'), $order_item->getUnitPrice());
+    $this->assertEquals(new Price('11.40', 'USD'), $order_item->getAdjustedUnitPrice());
+
+    // Non-tax-inclusive prices + non-display-inclusive taxes.
+    // A 10.33 USD price with a 1.00 USD discount is 9.33 USD.
+    // And 9.33 USD plus 20% tax is 11.20 USD.
+    $configuration = $this->plugin->getConfiguration();
+    $configuration['display_inclusive'] = FALSE;
+    $this->plugin->setConfiguration($configuration);
+    $order = $this->buildOrder('RS', 'RS', []);
+    $order_items = $order->getItems();
+    $order_item = reset($order_items);
+    $order_item->addAdjustment(new Adjustment([
+      'type' => 'promotion',
+      'label' => t('Discount'),
+      'amount' => new Price('-1', 'USD'),
+    ]));
+    $this->plugin->apply($order);
+    $order_items = $order->getItems();
+    $order_item = reset($order_items);
+
+    $adjustments = $order->collectAdjustments();
+    $tax_adjustment = end($adjustments);
+    $this->assertCount(2, $adjustments);
+    $this->assertEquals('tax', $tax_adjustment->getType());
+    $this->assertEquals(t('VAT'), $tax_adjustment->getLabel());
+    $this->assertEquals(new Price('1.87', 'USD'), $tax_adjustment->getAmount());
+    $this->assertEquals('0.2', $tax_adjustment->getPercentage());
+    $this->assertEquals(new Price('10.33', 'USD'), $order_item->getUnitPrice());
+    $this->assertEquals(new Price('11.20', 'USD'), $order_item->getAdjustedUnitPrice());
+
+    // Tax-inclusive prices + non-display-inclusive taxes.
+    // A 10.33 USD price is 8.61 USD once the 20% tax is removed.
+    // A 1.00 USD discount gives 7.61 USD + 20% VAT -> 8.88 USD.
+    $configuration = $this->plugin->getConfiguration();
+    $configuration['display_inclusive'] = FALSE;
+    $this->plugin->setConfiguration($configuration);
+    $order = $this->buildOrder('RS', 'RS', [], TRUE);
+    $order_items = $order->getItems();
+    $order_item = reset($order_items);
+    $order_item->addAdjustment(new Adjustment([
+      'type' => 'promotion',
+      'label' => t('Discount'),
+      'amount' => new Price('-1', 'USD'),
+    ]));
+    $this->plugin->apply($order);
+    $order_items = $order->getItems();
+    $order_item = reset($order_items);
+
+    $adjustments = $order->collectAdjustments();
+    $tax_adjustment = end($adjustments);
+    $this->assertCount(2, $adjustments);
+    $this->assertEquals('tax', $tax_adjustment->getType());
+    $this->assertEquals(t('VAT'), $tax_adjustment->getLabel());
+    $this->assertEquals(new Price('1.27', 'USD'), $tax_adjustment->getAmount());
+    $this->assertEquals('0.2', $tax_adjustment->getPercentage());
+    $this->assertEquals(new Price('8.61', 'USD'), $order_item->getUnitPrice());
+    $this->assertEquals(new Price('8.88', 'USD'), $order_item->getAdjustedUnitPrice());
   }
 
   /**
