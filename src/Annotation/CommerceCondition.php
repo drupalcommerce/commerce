@@ -33,6 +33,7 @@ class CommerceCondition extends Plugin {
    * The condition display label.
    *
    * Shown in the condition UI when enabling/disabling a condition.
+   * Defaults to the main label.
    *
    * @ingroup plugin_translatable
    *

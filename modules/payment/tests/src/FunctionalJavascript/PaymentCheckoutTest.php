@@ -199,7 +199,7 @@ class PaymentCheckoutTest extends CommerceBrowserTestBase {
     $expected_options = [
       'Visa ending in 1111',
       'Visa ending in 9999',
-      'New credit card',
+      'Credit card',
       'Example',
     ];
     $page = $this->getSession()->getPage();
@@ -285,7 +285,7 @@ class PaymentCheckoutTest extends CommerceBrowserTestBase {
     $this->drupalGet($this->product->toUrl()->toString());
     $this->submitForm([], 'Add to cart');
     $this->drupalGet('checkout/1');
-    $radio_button = $this->getSession()->getPage()->findField('New credit card');
+    $radio_button = $this->getSession()->getPage()->findField('Credit card');
     $radio_button->click();
     $this->waitForAjaxToFinish();
 
@@ -330,7 +330,7 @@ class PaymentCheckoutTest extends CommerceBrowserTestBase {
     $this->drupalGet($this->product->toUrl()->toString());
     $this->submitForm([], 'Add to cart');
     $this->drupalGet('checkout/1');
-    $radio_button = $this->getSession()->getPage()->findField('New credit card');
+    $radio_button = $this->getSession()->getPage()->findField('Credit card');
     $radio_button->click();
     $this->waitForAjaxToFinish();
 
