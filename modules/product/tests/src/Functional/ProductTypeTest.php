@@ -2,7 +2,9 @@
 
 namespace Drupal\Tests\commerce_product\Functional;
 
+use Drupal\commerce_order\Entity\OrderItemType;
 use Drupal\commerce_product\Entity\ProductType;
+use Drupal\commerce_product\Entity\ProductVariationType;
 
 /**
  * Ensure the product type works correctly.
@@ -54,10 +56,84 @@ class ProductTypeTest extends ProductBrowserTestBase {
     ];
     $this->submitForm($edit, t('Save'));
     $product_type = ProductType::load($edit['id']);
-    $this->assertNotEmpty(!empty($product_type), 'The new product type has been created.');
-    $this->assertEquals($product_type->label(), $edit['label'], 'The new product type has the correct label.');
-    $this->assertEquals($product_type->getDescription(), $edit['description'], 'The new product type has the correct label.');
-    $this->assertEquals($product_type->getVariationTypeId(), $edit['variationType'], 'The new product type has the correct associated variation type.');
+    $this->assertNotEmpty($product_type);
+    $this->assertEquals($product_type->label(), $edit['label']);
+    $this->assertEquals($product_type->getDescription(), $edit['description']);
+    $this->assertEquals($product_type->getVariationTypeId(), $edit['variationType']);
+
+    // Automatic variation type creation option.
+    $this->drupalGet('admin/commerce/config/product-types/add');
+    $edit = [
+      'id' => strtolower($this->randomMachineName(8)),
+      'label' => $this->randomMachineName(),
+      'description' => 'My even more random product type',
+      'variationType' => '',
+    ];
+    $this->submitForm($edit, t('Save'));
+    $product_type = ProductType::load($edit['id']);
+    $this->assertNotEmpty($product_type);
+    $this->assertEquals($product_type->label(), $edit['label']);
+    $this->assertEquals($product_type->getDescription(), $edit['description']);
+    $this->assertEquals($product_type->getVariationTypeId(), $edit['id']);
+    $product_variation_type = ProductVariationType::load($edit['id']);
+    $this->assertNotEmpty($product_variation_type);
+    $this->assertEquals($product_variation_type->label(), $edit['label']);
+    $this->assertEquals($product_variation_type->getOrderItemTypeId(), 'default');
+
+    // Confirm that a conflicting product variation type ID is detected.
+    $product_type_id = $product_type->id();
+    $product_type->delete();
+    $this->drupalGet('admin/commerce/config/product-types/add');
+    $edit = [
+      'id' => $product_type_id,
+      'label' => $this->randomMachineName(),
+      'description' => 'My even more random product type',
+      'variationType' => '',
+    ];
+    $this->submitForm($edit, t('Save'));
+    $this->assertSession()->pageTextContains(t('A product variation type with the machine name @name already exists. Select an existing product variation type or change the machine name for this product type.', ['@name' => $product_type_id]));
+
+    // Confirm that the form can't be submitted with no order item types.
+    $default_order_item_type = OrderItemType::load('default');
+    $this->assertNotEmpty(!empty($default_order_item_type), 'The default order item type has been loaded.');
+    $default_order_item_type->delete();
+
+    $this->drupalGet('admin/commerce/config/product-types/add');
+    $edit = [
+      'id' => strtolower($this->randomMachineName(8)),
+      'label' => $this->randomMachineName(),
+      'description' => 'Another random product type',
+      'variationType' => '',
+    ];
+    $this->submitForm($edit, t('Save'));
+    $this->assertSession()->pageTextContains(t('A new product variation type cannot be created, because no order item types were found. Select an existing product variation type or retry after creating a new order item type.'));
+
+    // Confirm that a non-default order item type can be selected.
+    $default_order_item_type->delete();
+    OrderItemType::create([
+      'id' => 'test',
+      'label' => 'Test',
+      'orderType' => 'default',
+      'purchasableEntityType' => 'commerce_product_variation',
+    ])->save();
+
+    $this->drupalGet('admin/commerce/config/product-types/add');
+    $edit = [
+      'id' => strtolower($this->randomMachineName(8)),
+      'label' => $this->randomMachineName(),
+      'description' => 'My even more random product type',
+      'variationType' => '',
+    ];
+    $this->submitForm($edit, t('Save'));
+    $product_type = ProductType::load($edit['id']);
+    $this->assertNotEmpty($product_type);
+    $this->assertEquals($product_type->label(), $edit['label']);
+    $this->assertEquals($product_type->getDescription(), $edit['description']);
+    $this->assertEquals($product_type->getVariationTypeId(), $edit['id']);
+    $product_variation_type = ProductVariationType::load($edit['id']);
+    $this->assertNotEmpty($product_variation_type);
+    $this->assertEquals($product_variation_type->label(), $edit['label']);
+    $this->assertEquals($product_variation_type->getOrderItemTypeId(), 'test');
   }
 
   /**
