@@ -622,7 +622,7 @@ class Promotion extends CommerceContentEntityBase implements PromotionInterface 
       ->setCardinality(1)
       ->setRequired(TRUE)
       ->setDisplayOptions('form', [
-        'type' => 'commerce_plugin_radios',
+        'type' => 'commerce_plugin_select',
         'weight' => 3,
       ]);
 

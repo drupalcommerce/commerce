@@ -81,11 +81,17 @@ class PromotionForm extends ContentEntityForm {
       'usage_limit' => 'usage_details',
       'compatibility' => 'compatibility_details',
     ];
-
     foreach ($field_details_mapping as $field => $group) {
       if (isset($form[$field])) {
         $form[$field]['#group'] = $group;
       }
+    }
+
+    // By default an offer is preselected on the add form because the field
+    // is required. Select an empty value instead, to force the user to choose.
+    if ($this->entity->isNew() && !empty($form['offer']['widget'][0]['target_plugin_id'])) {
+      $form['offer']['widget'][0]['target_plugin_id']['#empty_value'] = '';
+      $form['offer']['widget'][0]['target_plugin_id']['#default_value'] = '';
     }
 
     return $form;
