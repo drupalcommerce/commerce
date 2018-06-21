@@ -15,9 +15,10 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * @CommerceCondition(
  *   id = "order_item_product",
  *   label = @Translation("Product"),
- *   display_label = @Translation("Limit by product"),
- *   category = @Translation("Product"),
+ *   display_label = @Translation("Specific products"),
+ *   category = @Translation("Products"),
  *   entity_type = "commerce_order_item",
+ *   weight = -1,
  * )
  */
 class OrderItemProduct extends ConditionBase implements ContainerFactoryPluginInterface {

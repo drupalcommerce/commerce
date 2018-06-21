@@ -60,12 +60,24 @@ class CommerceCondition extends Plugin {
   public $entity_type;
 
   /**
+   * The condition weight.
+   *
+   * Used when sorting the condition list in the UI.
+   *
+   * @var int
+   */
+  public $weight = 0;
+
+  /**
    * Constructs a new CommerceCondition object.
    *
    * @param array $values
    *   The annotation values.
    */
   public function __construct(array $values) {
+    if (empty($values['display_label'])) {
+      $values['display_label'] = $values['label'];
+    }
     if (empty($values['category'])) {
       $values['category'] = t('Other');
     }

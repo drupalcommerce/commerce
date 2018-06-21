@@ -13,7 +13,7 @@ use Drupal\commerce_price\Price;
  * @CommerceCondition(
  *   id = "order_total_price",
  *   label = @Translation("Total price"),
- *   display_label = @Translation("Limit by total price"),
+ *   display_label = @Translation("Current order total"),
  *   category = @Translation("Order"),
  *   entity_type = "commerce_order",
  * )

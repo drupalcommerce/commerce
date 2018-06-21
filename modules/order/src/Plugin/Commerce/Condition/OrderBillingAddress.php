@@ -13,9 +13,9 @@ use Drupal\Core\Form\FormStateInterface;
  * @CommerceCondition(
  *   id = "order_billing_address",
  *   label = @Translation("Billing address"),
- *   display_label = @Translation("Limit by billing address"),
  *   category = @Translation("Customer"),
  *   entity_type = "commerce_order",
+ *   weight = 10,
  * )
  */
 class OrderBillingAddress extends ConditionBase {

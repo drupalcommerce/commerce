@@ -9,8 +9,7 @@ use Drupal\commerce\Plugin\Commerce\Condition\EntityBundleBase;
  *
  * @CommerceCondition(
  *   id = "order_type",
- *   label = @Translation("Type"),
- *   display_label = @Translation("Limit by type"),
+ *   label = @Translation("Order type"),
  *   category = @Translation("Order"),
  *   entity_type = "commerce_order",
  * )

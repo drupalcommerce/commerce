@@ -15,7 +15,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * @CommerceCondition(
  *   id = "order_store",
  *   label = @Translation("Store"),
- *   display_label = @Translation("Limit by store"),
+ *   display_label = @Translation("Store"),
  *   category = @Translation("Order"),
  *   entity_type = "commerce_order",
  * )

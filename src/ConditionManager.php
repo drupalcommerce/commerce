@@ -89,6 +89,13 @@ class ConditionManager extends DefaultPluginManager implements ConditionManagerI
     $event = new FilterConditionsEvent($definitions, $parent_entity_type_id);
     $this->eventDispatcher->dispatch(CommerceEvents::FILTER_CONDITIONS, $event);
     $definitions = $event->getDefinitions();
+    // Sort by weigh and display label.
+    uasort($definitions, function ($a, $b) {
+      if ($a['weight'] == $b['weight']) {
+        return strnatcasecmp($a['display_label'], $b['display_label']);
+      }
+      return ($a['weight'] < $b['weight']) ? -1 : 1;
+    });
 
     return $definitions;
   }

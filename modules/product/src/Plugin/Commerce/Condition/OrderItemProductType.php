@@ -12,8 +12,8 @@ use Drupal\Core\Form\FormStateInterface;
  * @CommerceCondition(
  *   id = "order_item_product_type",
  *   label = @Translation("Product type"),
- *   display_label = @Translation("Limit by product type"),
- *   category = @Translation("Product"),
+ *   display_label = @Translation("Product types"),
+ *   category = @Translation("Products"),
  *   entity_type = "commerce_order_item",
  * )
  */

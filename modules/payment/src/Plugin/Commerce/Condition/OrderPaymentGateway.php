@@ -12,7 +12,7 @@ use Drupal\Core\Form\FormStateInterface;
  * @CommerceCondition(
  *   id = "order_payment_gateway",
  *   label = @Translation("Payment gateway"),
- *   display_label = @Translation("Limit by payment gateway"),
+ *   display_label = @Translation("Selected payment gateway"),
  *   category = @Translation("Order"),
  *   entity_type = "commerce_order",
  * )
