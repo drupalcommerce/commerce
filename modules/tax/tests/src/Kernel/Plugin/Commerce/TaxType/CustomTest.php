@@ -149,29 +149,29 @@ class CustomTest extends CommerceKernelTestBase {
     $this->assertCount(1, $order->collectAdjustments());
 
     // Test non-tax-inclusive prices + display-inclusive taxes.
+    $order_items = $order->getItems();
+    $order_item = reset($order_items);
     $adjustments = $order->collectAdjustments();
     $adjustment = reset($adjustments);
+    $this->assertEquals(new Price('12.40', 'USD'), $order_item->getUnitPrice());
     $this->assertEquals('tax', $adjustment->getType());
     $this->assertEquals(t('VAT'), $adjustment->getLabel());
     $this->assertEquals(new Price('2.07', 'USD'), $adjustment->getAmount());
     $this->assertEquals('0.2', $adjustment->getPercentage());
     $this->assertEquals('serbian_vat|default|standard', $adjustment->getSourceId());
     $this->assertTrue($adjustment->isIncluded());
-    $order_items = $order->getItems();
-    $order_item = reset($order_items);
-    $this->assertEquals(new Price('12.40', 'USD'), $order_item->getUnitPrice());
 
     // Test tax-inclusive prices + display-inclusive taxes.
     $order = $this->buildOrder('RS', 'RS', [], TRUE);
     $this->plugin->apply($order);
+    $order_items = $order->getItems();
+    $order_item = reset($order_items);
     $adjustments = $order->collectAdjustments();
     $adjustment = reset($adjustments);
+    $this->assertEquals(new Price('10.33', 'USD'), $order_item->getUnitPrice());
     $this->assertEquals(new Price('1.72', 'USD'), $adjustment->getAmount());
     $this->assertEquals('0.2', $adjustment->getPercentage());
     $this->assertTrue($adjustment->isIncluded());
-    $order_items = $order->getItems();
-    $order_item = reset($order_items);
-    $this->assertEquals(new Price('10.33', 'USD'), $order_item->getUnitPrice());
 
     // Test tax-inclusive prices + non-display-inclusive taxes.
     $configuration = $this->plugin->getConfiguration();
@@ -179,14 +179,14 @@ class CustomTest extends CommerceKernelTestBase {
     $this->plugin->setConfiguration($configuration);
     $order = $this->buildOrder('RS', 'RS', [], TRUE);
     $this->plugin->apply($order);
+    $order_items = $order->getItems();
+    $order_item = reset($order_items);
     $adjustments = $order->collectAdjustments();
     $adjustment = reset($adjustments);
+    $this->assertEquals(new Price('8.61', 'USD'), $order_item->getUnitPrice());
     $this->assertEquals(new Price('1.72', 'USD'), $adjustment->getAmount());
     $this->assertEquals('0.2', $adjustment->getPercentage());
     $this->assertFalse($adjustment->isIncluded());
-    $order_items = $order->getItems();
-    $order_item = reset($order_items);
-    $this->assertEquals(new Price('8.61', 'USD'), $order_item->getUnitPrice());
   }
 
   /**
@@ -206,16 +206,16 @@ class CustomTest extends CommerceKernelTestBase {
     $this->plugin->apply($order);
     $order_items = $order->getItems();
     $order_item = reset($order_items);
-
     $adjustments = $order->collectAdjustments();
     $tax_adjustment = end($adjustments);
+
+    $this->assertEquals(new Price('10.33', 'USD'), $order_item->getUnitPrice());
+    $this->assertEquals(new Price('9.33', 'USD'), $order_item->getAdjustedUnitPrice());
     $this->assertCount(2, $adjustments);
     $this->assertEquals('tax', $tax_adjustment->getType());
     $this->assertEquals(t('VAT'), $tax_adjustment->getLabel());
     $this->assertEquals(new Price('1.56', 'USD'), $tax_adjustment->getAmount());
     $this->assertEquals('0.2', $tax_adjustment->getPercentage());
-    $this->assertEquals(new Price('10.33', 'USD'), $order_item->getUnitPrice());
-    $this->assertEquals(new Price('9.33', 'USD'), $order_item->getAdjustedUnitPrice());
 
     // Non-tax-inclusive prices + display-inclusive taxes.
     // A 10.33 USD price is 12.40 USD with 20% tax included.
@@ -231,16 +231,16 @@ class CustomTest extends CommerceKernelTestBase {
     $this->plugin->apply($order);
     $order_items = $order->getItems();
     $order_item = reset($order_items);
-
     $adjustments = $order->collectAdjustments();
     $tax_adjustment = end($adjustments);
+
+    $this->assertEquals(new Price('12.40', 'USD'), $order_item->getUnitPrice());
+    $this->assertEquals(new Price('11.40', 'USD'), $order_item->getAdjustedUnitPrice());
     $this->assertCount(2, $adjustments);
     $this->assertEquals('tax', $tax_adjustment->getType());
     $this->assertEquals(t('VAT'), $tax_adjustment->getLabel());
-    $this->assertEquals(new Price('2.28', 'USD'), $tax_adjustment->getAmount());
+    $this->assertEquals(new Price('1.90', 'USD'), $tax_adjustment->getAmount());
     $this->assertEquals('0.2', $tax_adjustment->getPercentage());
-    $this->assertEquals(new Price('12.40', 'USD'), $order_item->getUnitPrice());
-    $this->assertEquals(new Price('11.40', 'USD'), $order_item->getAdjustedUnitPrice());
 
     // Non-tax-inclusive prices + non-display-inclusive taxes.
     // A 10.33 USD price with a 1.00 USD discount is 9.33 USD.
@@ -259,16 +259,16 @@ class CustomTest extends CommerceKernelTestBase {
     $this->plugin->apply($order);
     $order_items = $order->getItems();
     $order_item = reset($order_items);
-
     $adjustments = $order->collectAdjustments();
     $tax_adjustment = end($adjustments);
+
+    $this->assertEquals(new Price('10.33', 'USD'), $order_item->getUnitPrice());
+    $this->assertEquals(new Price('11.20', 'USD'), $order_item->getAdjustedUnitPrice());
     $this->assertCount(2, $adjustments);
     $this->assertEquals('tax', $tax_adjustment->getType());
     $this->assertEquals(t('VAT'), $tax_adjustment->getLabel());
     $this->assertEquals(new Price('1.87', 'USD'), $tax_adjustment->getAmount());
     $this->assertEquals('0.2', $tax_adjustment->getPercentage());
-    $this->assertEquals(new Price('10.33', 'USD'), $order_item->getUnitPrice());
-    $this->assertEquals(new Price('11.20', 'USD'), $order_item->getAdjustedUnitPrice());
 
     // Tax-inclusive prices + non-display-inclusive taxes.
     // A 10.33 USD price is 8.61 USD once the 20% tax is removed.
@@ -287,16 +287,16 @@ class CustomTest extends CommerceKernelTestBase {
     $this->plugin->apply($order);
     $order_items = $order->getItems();
     $order_item = reset($order_items);
-
     $adjustments = $order->collectAdjustments();
     $tax_adjustment = end($adjustments);
+
+    $this->assertEquals(new Price('8.61', 'USD'), $order_item->getUnitPrice());
+    $this->assertEquals(new Price('9.13', 'USD'), $order_item->getAdjustedUnitPrice());
     $this->assertCount(2, $adjustments);
     $this->assertEquals('tax', $tax_adjustment->getType());
     $this->assertEquals(t('VAT'), $tax_adjustment->getLabel());
-    $this->assertEquals(new Price('1.27', 'USD'), $tax_adjustment->getAmount());
+    $this->assertEquals(new Price('1.52', 'USD'), $tax_adjustment->getAmount());
     $this->assertEquals('0.2', $tax_adjustment->getPercentage());
-    $this->assertEquals(new Price('8.61', 'USD'), $order_item->getUnitPrice());
-    $this->assertEquals(new Price('8.88', 'USD'), $order_item->getAdjustedUnitPrice());
   }
 
   /**

@@ -113,28 +113,27 @@ abstract class LocalTaxTypeBase extends TaxTypeBase implements LocalTaxTypeInter
       foreach ($rates as $zone_id => $rate) {
         $zone = $zones[$zone_id];
         $percentage = $rate->getPercentage();
-        // Determine the final unit price.
-        // This calculation must be done with a non-adjusted unit price.
-        $unit_price = $order_item->getUnitPrice();
-        $tax_amount = $percentage->calculateTaxAmount($unit_price, $prices_include_tax);
+        // Stores are allowed to enter prices without tax even if they're
+        // going to be displayed with tax, and vice-versa.
+        // Now that the rates are known, use them to determine the final
+        // unit price (which will in turn finalize the order item total).
+        if ($prices_include_tax != $this->isDisplayInclusive()) {
+          $unit_price = $order_item->getUnitPrice();
+          $tax_amount = $percentage->calculateTaxAmount($unit_price, $prices_include_tax);
+          $tax_amount = $this->rounder->round($tax_amount);
+          if ($prices_include_tax && !$this->isDisplayInclusive()) {
+            $unit_price = $unit_price->subtract($tax_amount);
+          }
+          elseif (!$prices_include_tax && $this->isDisplayInclusive()) {
+            $unit_price = $unit_price->add($tax_amount);
+          }
+          $order_item->setUnitPrice($unit_price);
+        }
+        // Now determine the tax amount, taking into account other adjustments.
+        $adjusted_total_price = $order_item->getAdjustedTotalPrice(['promotion', 'fee']);
+        $tax_amount = $percentage->calculateTaxAmount($adjusted_total_price, $this->isDisplayInclusive());
         if ($this->shouldRound()) {
           $tax_amount = $this->rounder->round($tax_amount);
-        }
-        if ($prices_include_tax && !$this->isDisplayInclusive()) {
-          $unit_price = $unit_price->subtract($tax_amount);
-          $order_item->setUnitPrice($unit_price);
-        }
-        elseif (!$prices_include_tax && $this->isDisplayInclusive()) {
-          $unit_price = $unit_price->add($tax_amount);
-          $order_item->setUnitPrice($unit_price);
-        }
-        // Now determine the actual tax amount, with the adjustments applied.
-        $adjusted_unit_price = $order_item->getAdjustedUnitPrice(['promotion', 'fee']);
-        if (!$adjusted_unit_price->equals($unit_price)) {
-          $tax_amount = $percentage->calculateTaxAmount($adjusted_unit_price, $prices_include_tax);
-          if ($this->shouldRound()) {
-            $tax_amount = $this->rounder->round($tax_amount);
-          }
         }
 
         $order_item->addAdjustment(new Adjustment([

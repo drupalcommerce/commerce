@@ -306,7 +306,15 @@ class Order extends CommerceContentEntityBase implements OrderInterface {
     };
     // Remove all unlocked adjustments.
     foreach ($this->getItems() as $order_item) {
+      /** @var \Drupal\commerce_order\Adjustment[] $adjustments */
       $adjustments = array_filter($order_item->getAdjustments(), $locked_callback);
+      // Convert legacy locked adjustments.
+      if ($adjustments && $order_item->usesLegacyAdjustments()) {
+        foreach ($adjustments as $index => $adjustment) {
+          $adjustments[$index] = $adjustment->multiply($order_item->getQuantity());
+        }
+      }
+      $order_item->set('uses_legacy_adjustments', FALSE);
       $order_item->setAdjustments($adjustments);
     }
     $adjustments = array_filter($this->getAdjustments(), $locked_callback);
@@ -322,9 +330,10 @@ class Order extends CommerceContentEntityBase implements OrderInterface {
     $adjustments = [];
     foreach ($this->getItems() as $order_item) {
       foreach ($order_item->getAdjustments() as $adjustment) {
-        // Order item adjustments apply to the unit price, they
-        // must be multiplied by quantity before they are used.
-        $adjustments[] = $adjustment->multiply($order_item->getQuantity());
+        if ($order_item->usesLegacyAdjustments()) {
+          $adjustment = $adjustment->multiply($order_item->getQuantity());
+        }
+        $adjustments[] = $adjustment;
       }
     }
     foreach ($this->getAdjustments() as $adjustment) {

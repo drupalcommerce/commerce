@@ -24,7 +24,7 @@ class OrderItemPercentageOff extends PercentageOffBase {
     $this->assertEntity($entity);
     /** @var \Drupal\commerce_order\Entity\OrderItemInterface $order_item */
     $order_item = $entity;
-    $adjustment_amount = $order_item->getUnitPrice()->multiply($this->getPercentage());
+    $adjustment_amount = $order_item->getTotalPrice()->multiply($this->getPercentage());
     $adjustment_amount = $this->rounder->round($adjustment_amount);
 
     $order_item->addAdjustment(new Adjustment([

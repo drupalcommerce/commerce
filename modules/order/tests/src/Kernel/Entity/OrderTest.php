@@ -244,6 +244,61 @@ class OrderTest extends CommerceKernelTestBase {
   }
 
   /**
+   * Tests the handling of legacy order item adjustments on adjustment clear.
+   *
+   * @covers ::clearAdjustments
+   * @covers ::collectAdjustments
+   */
+  public function testLegacyOrderItemAdjustments() {
+    /** @var \Drupal\commerce_order\Entity\OrderItemInterface $order_item */
+    $order_item = OrderItem::create([
+      'type' => 'test',
+      'quantity' => '2',
+      'unit_price' => new Price('10.00', 'USD'),
+      'adjustments' => [
+        new Adjustment([
+          'type' => 'custom',
+          'label' => '10% off',
+          'amount' => new Price('-1.00', 'USD'),
+          'percentage' => '0.1',
+        ]),
+        new Adjustment([
+          'type' => 'fee',
+          'label' => 'Random fee',
+          'amount' => new Price('2.00', 'USD'),
+        ]),
+      ],
+      'uses_legacy_adjustments' => TRUE,
+    ]);
+    $order_item->save();
+
+    $order = Order::create([
+      'type' => 'default',
+      'order_items' => [$order_item],
+      'state' => 'draft',
+    ]);
+
+    // Confirm that legacy adjustments are multiplied by quantity.
+    $adjustments = $order->collectAdjustments();
+    $this->assertCount(2, $adjustments);
+    $this->assertEquals('-2.00', $adjustments[0]->getAmount()->getNumber());
+    $this->assertEquals('4.00', $adjustments[1]->getAmount()->getNumber());
+
+    // Confirm that the legacy order item adjustments are converted on clear.
+    $order->clearAdjustments();
+    $order_items = $order->getItems();
+    $order_item = reset($order_items);
+    $adjustments = $order_item->getAdjustments();
+
+    $this->assertFalse($order_item->usesLegacyAdjustments());
+    $this->assertCount(1, $adjustments);
+    $this->assertEquals('-2.00', $adjustments[0]->getAmount()->getNumber());
+
+    // The order item adjustments are no longer multiplied by quantity.
+    $this->assertEquals($adjustments, $order->collectAdjustments());
+  }
+
+  /**
    * Tests the order total recalculation logic.
    *
    * @covers ::recalculateTotalPrice
@@ -294,19 +349,18 @@ class OrderTest extends CommerceKernelTestBase {
 
     // Included adjustments do not affect the order total.
     $order->addAdjustment($adjustments[0]);
-    // Order item adjustments are multiplied by quantity.
     $order_item->addAdjustment($adjustments[1]);
     $another_order_item->addAdjustment($adjustments[2]);
     $order->setItems([$order_item, $another_order_item]);
 
     $collected_adjustments = $order->collectAdjustments();
     $this->assertCount(3, $collected_adjustments);
-    $this->assertEquals($adjustments[1]->multiply('2'), $collected_adjustments[0]);
+    $this->assertEquals($adjustments[1], $collected_adjustments[0]);
     $this->assertEquals($adjustments[2], $collected_adjustments[1]);
     $this->assertEquals($adjustments[0], $collected_adjustments[2]);
     // The total will be correct only if the adjustments were correctly
-    // multiplied, combined, and rounded.
-    $this->assertEquals(new Price('16.59', 'USD'), $order->getTotalPrice());
+    // combined, and rounded.
+    $this->assertEquals(new Price('14.47', 'USD'), $order->getTotalPrice());
   }
 
   /**

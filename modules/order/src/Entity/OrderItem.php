@@ -144,21 +144,9 @@ class OrderItem extends CommerceContentEntityBase implements OrderItemInterface 
   /**
    * {@inheritdoc}
    */
-  public function getAdjustedUnitPrice(array $adjustment_types = []) {
-    if ($unit_price = $this->getUnitPrice()) {
-      $adjusted_price = $unit_price;
-      foreach ($this->getAdjustments() as $adjustment) {
-        if ($adjustment_types && !in_array($adjustment->getType(), $adjustment_types)) {
-          continue;
-        }
-        if ($adjustment->isIncluded()) {
-          continue;
-        }
-
-        $adjusted_price = $adjusted_price->add($adjustment->getAmount());
-      }
-
-      return $adjusted_price;
+  public function getTotalPrice() {
+    if (!$this->get('total_price')->isEmpty()) {
+      return $this->get('total_price')->first()->toPrice();
     }
   }
 
@@ -196,22 +184,82 @@ class OrderItem extends CommerceContentEntityBase implements OrderItemInterface 
   /**
    * {@inheritdoc}
    */
-  public function getTotalPrice() {
-    if (!$this->get('total_price')->isEmpty()) {
-      return $this->get('total_price')->first()->toPrice();
-    }
+  public function usesLegacyAdjustments() {
+    return $this->get('uses_legacy_adjustments')->value;
   }
 
   /**
    * {@inheritdoc}
    */
   public function getAdjustedTotalPrice(array $adjustment_types = []) {
-    if ($adjusted_unit_price = $this->getAdjustedUnitPrice($adjustment_types)) {
-      $rounder = \Drupal::service('commerce_price.rounder');
-      $adjusted_total_price = $adjusted_unit_price->multiply($this->getQuantity());
-      $adjusted_total_price = $rounder->round($adjusted_total_price);
-      return $adjusted_total_price;
+    $total_price = $this->getTotalPrice();
+    if (!$total_price) {
+      return NULL;
     }
+
+    if ($this->usesLegacyAdjustments()) {
+      $adjusted_unit_price = $this->getAdjustedUnitPrice($adjustment_types);
+      $adjusted_total_price = $adjusted_unit_price->multiply($this->getQuantity());
+    }
+    else {
+      $adjusted_total_price = $this->applyAdjustments($total_price, $adjustment_types);
+    }
+
+    $rounder = \Drupal::service('commerce_price.rounder');
+    $adjusted_total_price = $rounder->round($adjusted_total_price);
+
+    return $adjusted_total_price;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getAdjustedUnitPrice(array $adjustment_types = []) {
+    $unit_price = $this->getUnitPrice();
+    if (!$unit_price) {
+      return NULL;
+    }
+
+    if ($this->usesLegacyAdjustments()) {
+      $adjusted_unit_price = $this->applyAdjustments($unit_price, $adjustment_types);
+    }
+    else {
+      $adjusted_total_price = $this->getAdjustedTotalPrice($adjustment_types);
+      $adjusted_unit_price = $adjusted_total_price->divide($this->getQuantity());
+    }
+
+    $rounder = \Drupal::service('commerce_price.rounder');
+    $adjusted_unit_price = $rounder->round($adjusted_unit_price);
+
+    return $adjusted_unit_price;
+  }
+
+  /**
+   * Applies adjustments to the given price.
+   *
+   * @param \Drupal\commerce_price\Price $price
+   *   The price.
+   * @param string[] $adjustment_types
+   *   The adjustment types to include in the adjusted price.
+   *   Examples: fee, promotion, tax. Defaults to all adjustment types.
+   *
+   * @return \Drupal\commerce_price\Price
+   *   The adjusted price.
+   */
+  protected function applyAdjustments(Price $price, array $adjustment_types = []) {
+    $adjusted_price = $price;
+    foreach ($this->getAdjustments() as $adjustment) {
+      if ($adjustment_types && !in_array($adjustment->getType(), $adjustment_types)) {
+        continue;
+      }
+      if ($adjustment->isIncluded()) {
+        continue;
+      }
+
+      $adjusted_price = $adjusted_price->add($adjustment->getAmount());
+    }
+
+    return $adjusted_price;
   }
 
   /**
@@ -337,6 +385,13 @@ class OrderItem extends CommerceContentEntityBase implements OrderItemInterface 
       ->setDescription(t('Whether the unit price is overridden.'))
       ->setDefaultValue(FALSE);
 
+    $fields['total_price'] = BaseFieldDefinition::create('commerce_price')
+      ->setLabel(t('Total price'))
+      ->setDescription(t('The total price of the order item.'))
+      ->setReadOnly(TRUE)
+      ->setDisplayConfigurable('form', FALSE)
+      ->setDisplayConfigurable('view', TRUE);
+
     $fields['adjustments'] = BaseFieldDefinition::create('commerce_adjustment')
       ->setLabel(t('Adjustments'))
       ->setRequired(FALSE)
@@ -344,12 +399,13 @@ class OrderItem extends CommerceContentEntityBase implements OrderItemInterface 
       ->setDisplayConfigurable('form', FALSE)
       ->setDisplayConfigurable('view', TRUE);
 
-    $fields['total_price'] = BaseFieldDefinition::create('commerce_price')
-      ->setLabel(t('Total price'))
-      ->setDescription(t('The total price of the order item.'))
-      ->setReadOnly(TRUE)
-      ->setDisplayConfigurable('form', FALSE)
-      ->setDisplayConfigurable('view', TRUE);
+    $fields['uses_legacy_adjustments'] = BaseFieldDefinition::create('boolean')
+      ->setLabel(t('Uses legacy adjustments'))
+      ->setSettings([
+        'on_label' => t('Yes'),
+        'off_label' => t('No'),
+      ])
+      ->setDefaultValue(FALSE);
 
     $fields['data'] = BaseFieldDefinition::create('map')
       ->setLabel(t('Data'))

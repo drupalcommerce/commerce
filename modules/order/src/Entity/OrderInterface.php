@@ -234,8 +234,7 @@ interface OrderInterface extends ContentEntityInterface, EntityAdjustableInterfa
    * Collects all adjustments that belong to the order.
    *
    * Unlike getAdjustments() which returns only order adjustments, this
-   * method returns both order and order item adjustments (multiplied
-   * by quantity).
+   * method returns both order and order item adjustments.
    *
    * Important:
    * The returned adjustments are unprocessed, and must be processed before use.

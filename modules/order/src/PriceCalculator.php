@@ -126,7 +126,7 @@ class PriceCalculator implements PriceCalculatorInterface {
     foreach ($processors as $processor) {
       $processor->process($order);
     }
-    $calculated_price = $order_item->getAdjustedUnitPrice();
+    $calculated_price = $order_item->getAdjustedTotalPrice();
     $adjustments = $order_item->getAdjustments();
     $adjustments = $this->adjustmentTransformer->processAdjustments($adjustments);
 
