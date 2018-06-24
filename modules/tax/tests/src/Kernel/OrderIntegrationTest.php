@@ -139,9 +139,9 @@ class OrderIntegrationTest extends CommerceKernelTestBase {
   }
 
   /**
-   * Tests the conversion of negative adjustments.
+   * Tests the handling of tax-exempt customers with tax-inclusive prices.
    */
-  public function testNegativeAdjustmentConversion() {
+  public function testTaxExemptPrices() {
     $profile = Profile::create([
       'type' => 'customer',
       'address' => [
@@ -158,6 +158,7 @@ class OrderIntegrationTest extends CommerceKernelTestBase {
     $this->order->addItem($order_item);
     $this->order->setBillingProfile($profile);
     $this->order->save();
+
     $this->assertCount(0, $this->order->collectAdjustments());
     $order_items = $this->order->getItems();
     $order_item = reset($order_items);
