@@ -170,10 +170,19 @@ class PromotionOfferTest extends CommerceKernelTestBase {
     $this->order->state = 'draft';
     $this->order->save();
     $this->order = $this->reloadEntity($this->order);
+    $order_items = $this->order->getItems();
+    $order_item = reset($order_items);
+    $adjustments = $order_item->getAdjustments();
+    $this->assertEquals(1, count($adjustments));
+    /** @var \Drupal\commerce_order\Adjustment $adjustment */
+    $adjustment = reset($adjustments);
 
     // Offer amount larger than the order subtotal.
-    $this->assertEquals(1, count($this->order->getAdjustments()));
-    $this->assertEquals(new Price('-20.00', 'USD'), $this->order->getAdjustments()[0]->getAmount());
+    $this->assertEquals(0, count($this->order->getAdjustments()));
+    $this->assertEquals(1, count($order_item->getAdjustments()));
+    $this->assertEquals(new Price('20.00', 'USD'), $order_item->getTotalPrice());
+    $this->assertEquals(new Price('0.00', 'USD'), $order_item->getAdjustedTotalPrice());
+    $this->assertEquals(new Price('-20.00', 'USD'), $adjustment->getAmount());
     $this->assertEquals(new Price('0.00', 'USD'), $this->order->getTotalPrice());
 
     // Offer amount smaller than the order subtotal.
@@ -181,8 +190,19 @@ class PromotionOfferTest extends CommerceKernelTestBase {
     $order_item->save();
     $this->order->save();
     $this->order = $this->reloadEntity($this->order);
-    $this->assertEquals(1, count($this->order->getAdjustments()));
-    $this->assertEquals(new Price('-25.00', 'USD'), $this->order->getAdjustments()[0]->getAmount());
+    $order_items = $this->order->getItems();
+    $order_item = reset($order_items);
+    $adjustments = $order_item->getAdjustments();
+    $this->assertEquals(1, count($adjustments));
+    /** @var \Drupal\commerce_order\Adjustment $adjustment */
+    $adjustment = reset($adjustments);
+
+    // Offer amount larger than the order subtotal.
+    $this->assertEquals(0, count($this->order->getAdjustments()));
+    $this->assertEquals(1, count($order_item->getAdjustments()));
+    $this->assertEquals(new Price('40.00', 'USD'), $order_item->getTotalPrice());
+    $this->assertEquals(new Price('15.00', 'USD'), $order_item->getAdjustedTotalPrice());
+    $this->assertEquals(new Price('-25.00', 'USD'), $adjustment->getAmount());
     $this->assertEquals(new Price('15.00', 'USD'), $this->order->getTotalPrice());
   }
 

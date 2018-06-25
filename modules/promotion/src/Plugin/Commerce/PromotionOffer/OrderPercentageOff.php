@@ -70,7 +70,7 @@ class OrderPercentageOff extends PercentageOffBase {
     /** @var \Drupal\commerce_order\Entity\OrderInterface $order */
     $order = $entity;
     $percentage = $this->getPercentage();
-    // Calculate the order-level discount and split it across order items.
+    // Calculate the order-level discount and split it between order items.
     $amount = $order->getSubtotalPrice()->multiply($percentage);
     $amount = $this->rounder->round($amount);
     $amounts = $this->splitter->split($order, $amount, $percentage);
