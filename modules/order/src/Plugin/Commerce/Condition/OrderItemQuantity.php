@@ -3,18 +3,21 @@
 namespace Drupal\commerce_order\Plugin\Commerce\Condition;
 
 use Drupal\commerce\Plugin\Commerce\Condition\ConditionBase;
+use Drupal\commerce_price\Calculator;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Form\FormStateInterface;
 
 /**
- * Provides the quantity condition for order items.
+ * Provides the total product quantity condition.
+ *
+ * Implemented as an order condition to be able to count products across
+ * non-combined order items.
  *
  * @CommerceCondition(
  *   id = "order_item_quantity",
- *   label = @Translation("Quantity"),
- *   display_label = @Translation("Total product quantity"),
+ *   label = @Translation("Total product quantity"),
  *   category = @Translation("Order"),
- *   entity_type = "commerce_order_item",
+ *   entity_type = "commerce_order",
  * )
  */
 class OrderItemQuantity extends ConditionBase {
@@ -69,9 +72,13 @@ class OrderItemQuantity extends ConditionBase {
    */
   public function evaluate(EntityInterface $entity) {
     $this->assertEntity($entity);
-    /** @var \Drupal\commerce_order\Entity\OrderItemInterface $order_item */
-    $order_item = $entity;
-    $quantity = $order_item->getQuantity();
+    /** @var \Drupal\commerce_order\Entity\OrderInterface $order */
+    $order = $entity;
+    $quantity = '0';
+    foreach ($order->getItems() as $order_item) {
+      // @todo Filter by offer conditions here, once available.
+      $quantity = Calculator::add($quantity, $order_item->getQuantity());
+    }
 
     switch ($this->configuration['operator']) {
       case '>=':

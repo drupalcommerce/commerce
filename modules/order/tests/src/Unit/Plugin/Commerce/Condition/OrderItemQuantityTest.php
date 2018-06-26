@@ -2,6 +2,7 @@
 
 namespace Drupal\Tests\commerce_order\Unit\Plugin\Commerce\Condition;
 
+use Drupal\commerce_order\Entity\OrderInterface;
 use Drupal\commerce_order\Entity\OrderItemInterface;
 use Drupal\commerce_order\Plugin\Commerce\Condition\OrderItemQuantity;
 use Drupal\Tests\UnitTestCase;
@@ -21,13 +22,17 @@ class OrderItemQuantityTest extends UnitTestCase {
     $condition = new OrderItemQuantity([
       'operator' => $operator,
       'quantity' => $quantity,
-    ], 'order_item_quantity', ['entity_type' => 'commerce_order_item']);
+    ], 'order_item_quantity', ['entity_type' => 'commerce_order']);
     $order_item = $this->prophesize(OrderItemInterface::class);
     $order_item->getEntityTypeId()->willReturn('commerce_order_item');
     $order_item->getQuantity()->willReturn($given_quantity);
     $order_item = $order_item->reveal();
+    $order = $this->prophesize(OrderInterface::class);
+    $order->getEntityTypeId()->willReturn('commerce_order');
+    $order->getItems()->willReturn([$order_item]);
+    $order = $order->reveal();
 
-    $this->assertEquals($result, $condition->evaluate($order_item));
+    $this->assertEquals($result, $condition->evaluate($order));
   }
 
   /**

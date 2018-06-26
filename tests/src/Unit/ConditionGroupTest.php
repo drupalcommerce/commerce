@@ -3,8 +3,9 @@
 namespace Drupal\Tests\commerce\Unit;
 
 use Drupal\commerce\ConditionGroup;
-use Drupal\commerce_order\Entity\OrderItemInterface;
-use Drupal\commerce_order\Plugin\Commerce\Condition\OrderItemQuantity;
+use Drupal\commerce_order\Entity\OrderInterface;
+use Drupal\commerce_order\Plugin\Commerce\Condition\OrderTotalPrice;
+use Drupal\commerce_price\Price;
 use Drupal\Tests\UnitTestCase;
 
 /**
@@ -28,10 +29,13 @@ class ConditionGroupTest extends UnitTestCase {
    */
   public function testGetters() {
     $conditions = [];
-    $conditions[] = new OrderItemQuantity([
+    $conditions[] = new OrderTotalPrice([
       'operator' => '>',
-      'quantity' => '10',
-    ], 'order_item_quantity', []);
+      'amount' => [
+        'number' => '10',
+        'currency_code' => 'USD',
+      ],
+    ], 'order_total_price', ['entity_type' => 'commerce_order']);
 
     $condition_group = new ConditionGroup($conditions, 'AND');
     $this->assertEquals($conditions, $condition_group->getConditions());
@@ -43,33 +47,39 @@ class ConditionGroupTest extends UnitTestCase {
    */
   public function testEvaluate() {
     $conditions = [];
-    $conditions[] = new OrderItemQuantity([
+    $conditions[] = new OrderTotalPrice([
       'operator' => '>',
-      'quantity' => '10',
-    ], 'order_item_quantity', ['entity_type' => 'commerce_order_item']);
-    $conditions[] = new OrderItemQuantity([
+      'amount' => [
+        'number' => '10',
+        'currency_code' => 'USD',
+      ],
+    ], 'order_total_price', ['entity_type' => 'commerce_order']);
+    $conditions[] = new OrderTotalPrice([
       'operator' => '<',
-      'quantity' => '100',
-    ], 'order_item_quantity', ['entity_type' => 'commerce_order_item']);
-    $first_order_item = $this->prophesize(OrderItemInterface::class);
-    $first_order_item->getEntityTypeId()->willReturn('commerce_order_item');
-    $first_order_item->getQuantity()->willReturn(101);
-    $first_order_item = $first_order_item->reveal();
+      'amount' => [
+        'number' => '100',
+        'currency_code' => 'USD',
+      ],
+    ], 'order_total_price', ['entity_type' => 'commerce_order']);
+    $first_order = $this->prophesize(OrderInterface::class);
+    $first_order->getEntityTypeId()->willReturn('commerce_order');
+    $first_order->getTotalPrice()->willReturn(new Price('101', 'USD'));
+    $first_order = $first_order->reveal();
 
-    $second_order_item = $this->prophesize(OrderItemInterface::class);
-    $second_order_item->getEntityTypeId()->willReturn('commerce_order_item');
-    $second_order_item->getQuantity()->willReturn(90);
+    $second_order_item = $this->prophesize(OrderInterface::class);
+    $second_order_item->getEntityTypeId()->willReturn('commerce_order');
+    $second_order_item->getTotalPrice()->willReturn(new Price('90', 'USD'));
     $second_order_item = $second_order_item->reveal();
 
     $empty_condition_group = new ConditionGroup([], 'AND');
-    $this->assertTrue($empty_condition_group->evaluate($first_order_item));
+    $this->assertTrue($empty_condition_group->evaluate($first_order));
 
     $and_condition_group = new ConditionGroup($conditions, 'AND');
-    $this->assertFalse($and_condition_group->evaluate($first_order_item));
+    $this->assertFalse($and_condition_group->evaluate($first_order));
     $this->assertTrue($and_condition_group->evaluate($second_order_item));
 
     $or_condition_group = new ConditionGroup($conditions, 'OR');
-    $this->assertTrue($or_condition_group->evaluate($first_order_item));
+    $this->assertTrue($or_condition_group->evaluate($first_order));
     $this->assertTrue($or_condition_group->evaluate($second_order_item));
   }
 
