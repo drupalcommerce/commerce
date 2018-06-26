@@ -6,6 +6,7 @@ use Drupal\commerce\ConditionGroup;
 use Drupal\commerce\Entity\CommerceContentEntityBase;
 use Drupal\commerce\Plugin\Commerce\Condition\ConditionInterface;
 use Drupal\commerce_order\Entity\OrderInterface;
+use Drupal\commerce_promotion\Plugin\Commerce\PromotionOffer\OrderItemPromotionOfferInterface;
 use Drupal\commerce_promotion\Plugin\Commerce\PromotionOffer\PromotionOfferInterface;
 use Drupal\Core\Datetime\DrupalDateTime;
 use Drupal\Core\Entity\EntityStorageInterface;
@@ -456,43 +457,15 @@ class Promotion extends CommerceContentEntityBase implements PromotionInterface 
       // Promotions without conditions always apply.
       return TRUE;
     }
-    $order_conditions = array_filter($conditions, function ($condition) {
+    // Filter the conditions just in case there are leftover order item
+    // conditions (which have been moved to offer conditions).
+    $conditions = array_filter($conditions, function ($condition) {
       /** @var \Drupal\commerce\Plugin\Commerce\Condition\ConditionInterface $condition */
       return $condition->getEntityTypeId() == 'commerce_order';
     });
-    $order_item_conditions = array_filter($conditions, function ($condition) {
-      /** @var \Drupal\commerce\Plugin\Commerce\Condition\ConditionInterface $condition */
-      return $condition->getEntityTypeId() == 'commerce_order_item';
-    });
-    $condition_operator = $this->getConditionOperator();
-    $order_conditions = new ConditionGroup($order_conditions, $condition_operator);
-    $order_item_conditions = new ConditionGroup($order_item_conditions, $condition_operator);
+    $condition_group = new ConditionGroup($conditions, $this->getConditionOperator());
 
-    $order_conditions_apply = $order_conditions->evaluate($order);
-    if ($condition_operator == 'AND' && !$order_conditions_apply) {
-      return FALSE;
-    }
-
-    $order_item_conditions_apply = FALSE;
-    foreach ($order->getItems() as $order_item) {
-      // Order item conditions must match at least one order item.
-      if ($order_item_conditions->evaluate($order_item)) {
-        $order_item_conditions_apply = TRUE;
-        break;
-      }
-    }
-
-    if ($condition_operator == 'AND') {
-      return $order_conditions_apply && $order_item_conditions_apply;
-    }
-    elseif ($condition_operator == 'OR') {
-      // Empty condition groups are TRUE by default, which leads to incorrect
-      // logic with ORed groups due to false positives.
-      $order_conditions_apply = $order_conditions->getConditions() && $order_conditions_apply;
-      $order_item_conditions_apply = $order_item_conditions->getConditions() && $order_item_conditions_apply;
-
-      return $order_conditions_apply || $order_item_conditions_apply;
-    }
+    return $condition_group->evaluate($order);
   }
 
   /**
@@ -500,21 +473,17 @@ class Promotion extends CommerceContentEntityBase implements PromotionInterface 
    */
   public function apply(OrderInterface $order) {
     $offer = $this->getOffer();
-    if ($offer->getEntityTypeId() == 'commerce_order') {
-      $offer->apply($order, $this);
-    }
-    elseif ($offer->getEntityTypeId() == 'commerce_order_item') {
-      $order_item_conditions = array_filter($this->getConditions(), function ($condition) {
-        /** @var \Drupal\commerce\Plugin\Commerce\Condition\ConditionInterface $condition */
-        return $condition->getEntityTypeId() == 'commerce_order_item';
-      });
-      $order_item_conditions = new ConditionGroup($order_item_conditions, $this->getConditionOperator());
+    if ($offer instanceof OrderItemPromotionOfferInterface) {
+      $offer_conditions = new ConditionGroup($offer->getConditions(), 'OR');
       // Apply the offer to order items that pass the conditions.
       foreach ($order->getItems() as $order_item) {
-        if ($order_item_conditions->evaluate($order_item)) {
+        if ($offer_conditions->evaluate($order_item)) {
           $offer->apply($order_item, $this);
         }
       }
+    }
+    else {
+      $offer->apply($order, $this);
     }
   }
 
@@ -634,7 +603,7 @@ class Promotion extends CommerceContentEntityBase implements PromotionInterface 
         'type' => 'commerce_conditions',
         'weight' => 3,
         'settings' => [
-          'entity_types' => ['commerce_order', 'commerce_order_item'],
+          'entity_types' => ['commerce_order'],
         ],
       ]);
 

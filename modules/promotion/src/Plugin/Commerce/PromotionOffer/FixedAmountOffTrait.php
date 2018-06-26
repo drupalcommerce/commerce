@@ -23,7 +23,7 @@ trait FixedAmountOffTrait {
    * {@inheritdoc}
    */
   public function buildConfigurationForm(array $form, FormStateInterface $form_state) {
-    $form += parent::buildConfigurationForm($form, $form_state);
+    $form = parent::buildConfigurationForm($form, $form_state);
 
     $amount = $this->configuration['amount'];
     // A bug in the plugin_select form element causes $amount to be incomplete.

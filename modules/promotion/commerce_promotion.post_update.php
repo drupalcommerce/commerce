@@ -6,6 +6,7 @@
  */
 
 use Drupal\commerce_promotion\Entity\PromotionInterface;
+use Drupal\commerce_promotion\Plugin\Commerce\PromotionOffer\OrderItemPromotionOfferInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
 
 /**
@@ -231,5 +232,155 @@ function commerce_promotion_post_update_8(&$sandbox = NULL) {
   }
   else {
     $sandbox['#finished'] = ($sandbox['total_count'] - $sandbox['current_count']) / $sandbox['total_count'];
+  }
+}
+
+/**
+ * Update offers and conditions.
+ */
+function commerce_promotion_post_update_9(&$sandbox = NULL) {
+  $promotion_storage = \Drupal::entityTypeManager()->getStorage('commerce_promotion');
+  if (!isset($sandbox['current_count'])) {
+    $query = $promotion_storage->getQuery();
+    $sandbox['total_count'] = $query->count()->execute();
+    $sandbox['current_count'] = 0;
+    $sandbox['disabled_offers'] = [];
+    $sandbox['disabled_conditions'] = [];
+
+    if (empty($sandbox['total_count'])) {
+      $sandbox['#finished'] = 1;
+      return;
+    }
+  }
+
+  $query = $promotion_storage->getQuery();
+  $query->range($sandbox['current_count'], 25);
+  $result = $query->execute();
+  if (empty($result)) {
+    $sandbox['#finished'] = 1;
+    return;
+  }
+
+  /** @var \Drupal\commerce_promotion\Entity\PromotionInterface[] $promotions */
+  $promotions = $promotion_storage->loadMultiple($result);
+  foreach ($promotions as $promotion) {
+    $needs_save = FALSE;
+    $needs_disable = FALSE;
+
+    $conditions = $promotion->getConditions();
+    $order_item_conditions = array_filter($conditions, function ($condition) {
+      /** @var \Drupal\commerce\Plugin\Commerce\Condition\ConditionInterface $condition */
+      return $condition->getEntityTypeId() == 'commerce_order_item' && $condition->getPluginId() != 'order_item_quantity';
+    });
+    $condition_map = [
+      'order_item_product' => 'order_product',
+      'order_item_product_type' => 'order_product_type',
+      'order_item_variation_type' => 'order_variation_type',
+    ];
+    $condition_items = $promotion->get('conditions')->getValue();
+
+    $known_order_item_offers = [
+      'order_item_fixed_amount_off',
+      'order_item_percentage_off',
+    ];
+    $offer = $promotion->getOffer();
+    $offer_item = $promotion->get('offer')->first()->getValue();
+
+    if ($offer->getEntityTypeId() == 'commerce_order_item') {
+      $needs_save = TRUE;
+      // Transfer order item conditions to the offer.
+      // Modify the offer item directly to be able to upgrade offers that
+      // haven't yet been converted to extend OfferItemPromotionOfferBase.
+      $offer_item['target_plugin_configuration']['conditions'] = [];
+      foreach ($order_item_conditions as $condition) {
+        $offer_item['target_plugin_configuration']['conditions'][] = [
+          'plugin' => $condition->getPluginId(),
+          'configuration' => $condition->getConfiguration(),
+        ];
+      }
+
+      // The promotion is using a custom offer which hasn't been updated yet,
+      // disable it so that it can get updated without crashing everything.
+      if (!in_array($offer->getPluginId(), $known_order_item_offers)) {
+        if (!($offer instanceof OrderItemPromotionOfferInterface)) {
+          $needs_disable = TRUE;
+          $sandbox['disabled_offers'][] = $promotion->label();
+        }
+      }
+    }
+
+    // Convert known order item conditions to order conditions.
+    if ($order_item_conditions) {
+      foreach ($condition_items as $index => $condition_item) {
+        if (array_key_exists($condition_item['target_plugin_id'], $condition_map)) {
+          $condition_items[$index]['target_plugin_id'] = $condition_map[$condition_item['target_plugin_id']];
+          $needs_save = TRUE;
+        }
+      }
+      $promotion->set('conditions', $condition_items);
+    }
+
+    // Drop unknown order item conditions.
+    $conditions = $promotion->getConditions();
+    $order_item_conditions = array_filter($conditions, function ($condition) {
+      /** @var \Drupal\commerce\Plugin\Commerce\Condition\ConditionInterface $condition */
+      return $condition->getEntityTypeId() == 'commerce_order_item' && $condition->getPluginId() != 'order_item_quantity';
+    });
+    foreach ($order_item_conditions as $condition) {
+      foreach ($condition_items as $index => $condition_item) {
+        if ($condition_item['target_plugin_id'] == $condition->getPluginId()) {
+          unset($condition_items[$index]);
+          $needs_save = TRUE;
+          // An unrecognized offer was dropped, but because the offer applies
+          // to the order, wasn't transferred there. Disable the promotion
+          // to allow the merchant to double check the new configuration.
+          if ($offer->getEntityTypeId() == 'commerce_order') {
+            $needs_disable = TRUE;
+            $sandbox['disabled_conditions'][$promotion->id()] = [$promotion->label(), $condition->getPluginId()];
+          }
+        }
+      }
+    }
+
+    if ($needs_disable) {
+      $promotion->setEnabled(FALSE);
+    }
+    if ($needs_save) {
+      $promotion->set('offer', $offer_item);
+      $promotion->set('conditions', array_values($condition_items));
+      $promotion->save();
+    }
+  }
+
+  $sandbox['current_count'] += 25;
+  if ($sandbox['current_count'] >= $sandbox['total_count']) {
+    $sandbox['#finished'] = 1;
+  }
+  else {
+    $sandbox['#finished'] = ($sandbox['total_count'] - $sandbox['current_count']) / $sandbox['total_count'];
+  }
+
+  if ($sandbox['#finished']) {
+    $message = '';
+    if ($sandbox['disabled_offers']) {
+      $message .= 'These promotions have been disabled because their offers need to be updated for Commerce 2.8: <br>';
+      foreach ($sandbox['disabled_offers'] as $promotion_title) {
+        $message .= '- ' . $promotion_title . '<br>';
+      }
+    }
+    if ($sandbox['disabled_conditions']) {
+      $message .= 'These promotions have been disabled because their conditions need to be updated for Commerce 2.8: <br>';
+      foreach ($sandbox['disabled_conditions'] as $item) {
+        $message .= '- ' . $item[0] . ' (Condition: ' . $item[1] . ') <br>';
+      }
+    }
+    if ($message) {
+      $message .= 'Please see https://www.drupal.org/node/2982334 for more information.';
+    }
+    else {
+      $message .= 'Successfully updated all promotions';
+    }
+
+    return $message;
   }
 }
