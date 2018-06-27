@@ -86,6 +86,11 @@ abstract class PromotionOfferBase extends PluginBase implements PromotionOfferIn
    * {@inheritdoc}
    */
   public function buildConfigurationForm(array $form, FormStateInterface $form_state) {
+    // Wrap the offer configuration in a fieldset by default.
+    $form['#type'] = 'fieldset';
+    $form['#title'] = $this->t('Offer');
+    $form['#collapsible'] = FALSE;
+
     return $form;
   }
 

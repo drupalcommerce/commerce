@@ -40,7 +40,7 @@ trait PercentageOffTrait {
 
     $form['percentage'] = [
       '#type' => 'commerce_number',
-      '#title' => $this->t('Percentage'),
+      '#title' => $this->t('Percentage off'),
       '#default_value' => Calculator::multiply($this->getPercentage(), '100'),
       '#maxlength' => 255,
       '#min' => 0,
@@ -48,6 +48,7 @@ trait PercentageOffTrait {
       '#size' => 4,
       '#field_suffix' => $this->t('%'),
       '#required' => TRUE,
+      '#weight' => -1,
     ];
 
     return $form;

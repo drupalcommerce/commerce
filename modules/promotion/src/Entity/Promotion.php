@@ -618,7 +618,7 @@ class Promotion extends CommerceContentEntityBase implements PromotionInterface 
       ]);
 
     $fields['offer'] = BaseFieldDefinition::create('commerce_plugin_item:commerce_promotion_offer')
-      ->setLabel(t('Offer'))
+      ->setLabel(t('Offer type'))
       ->setCardinality(1)
       ->setRequired(TRUE)
       ->setDisplayOptions('form', [

@@ -33,9 +33,10 @@ trait FixedAmountOffTrait {
 
     $form['amount'] = [
       '#type' => 'commerce_price',
-      '#title' => $this->t('Amount'),
+      '#title' => $this->t('Amount off'),
       '#default_value' => $amount,
       '#required' => TRUE,
+      '#weight' => -1,
     ];
 
     return $form;
