@@ -15,7 +15,9 @@ use Drupal\Core\Entity\EntityInterface;
  *   entity_type = "commerce_order_item",
  * )
  */
-class OrderItemFixedAmountOff extends FixedAmountOffBase {
+class OrderItemFixedAmountOff extends OrderItemPromotionOfferBase {
+
+  use FixedAmountOffTrait;
 
   /**
    * {@inheritdoc}
@@ -25,11 +27,11 @@ class OrderItemFixedAmountOff extends FixedAmountOffBase {
     /** @var \Drupal\commerce_order\Entity\OrderItemInterface $order_item */
     $order_item = $entity;
     $total_price = $order_item->getTotalPrice();
-    $adjustment_amount = $this->getAmount();
-    if ($total_price->getCurrencyCode() != $adjustment_amount->getCurrencyCode()) {
+    $amount = $this->getAmount();
+    if ($total_price->getCurrencyCode() != $amount->getCurrencyCode()) {
       return;
     }
-    $adjustment_amount = $adjustment_amount->multiply($order_item->getQuantity());
+    $adjustment_amount = $amount->multiply($order_item->getQuantity());
     $adjustment_amount = $this->rounder->round($adjustment_amount);
     // Don't reduce the order item total price past zero.
     if ($adjustment_amount->greaterThan($total_price)) {

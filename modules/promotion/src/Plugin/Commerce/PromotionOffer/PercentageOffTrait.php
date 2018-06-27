@@ -6,9 +6,9 @@ use Drupal\commerce_price\Calculator;
 use Drupal\Core\Form\FormStateInterface;
 
 /**
- * Provides the base class for percentage off offers.
+ * Provides common configuration for percentage off offers.
  */
-abstract class PercentageOffBase extends PromotionOfferBase {
+trait PercentageOffTrait {
 
   /**
    * {@inheritdoc}
@@ -30,16 +30,6 @@ abstract class PercentageOffBase extends PromotionOfferBase {
       $this->configuration['percentage'] = $this->configuration['amount'];
       unset($this->configuration['amount']);
     }
-  }
-
-  /**
-   * Gets the percentage.
-   *
-   * @return string
-   *   The percentage.
-   */
-  public function getPercentage() {
-    return (string) $this->configuration['percentage'];
   }
 
   /**
@@ -79,8 +69,20 @@ abstract class PercentageOffBase extends PromotionOfferBase {
   public function submitConfigurationForm(array &$form, FormStateInterface $form_state) {
     parent::submitConfigurationForm($form, $form_state);
 
-    $values = $form_state->getValue($form['#parents']);
-    $this->configuration['percentage'] = (string) ($values['percentage'] / 100);
+    if (!$form_state->getErrors()) {
+      $values = $form_state->getValue($form['#parents']);
+      $this->configuration['percentage'] = (string) ($values['percentage'] / 100);
+    }
+  }
+
+  /**
+   * Gets the percentage.
+   *
+   * @return string
+   *   The percentage.
+   */
+  protected function getPercentage() {
+    return (string) $this->configuration['percentage'];
   }
 
 }
