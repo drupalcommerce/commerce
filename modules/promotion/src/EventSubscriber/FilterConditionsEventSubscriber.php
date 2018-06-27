@@ -31,6 +31,10 @@ class FilterConditionsEventSubscriber implements EventSubscriberInterface {
       $definitions = $event->getDefinitions();
       unset($definitions['order_store']);
       unset($definitions['order_type']);
+      // Remove until #2980700 lands.
+      unset($definitions['order_product']);
+      unset($definitions['order_product_type']);
+      unset($definitions['order_variation_type']);
       $event->setDefinitions($definitions);
     }
   }

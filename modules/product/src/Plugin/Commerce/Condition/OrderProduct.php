@@ -9,23 +9,23 @@ use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * Provides the product condition for order items.
+ * Provides the product condition for orders.
  *
  * @CommerceCondition(
- *   id = "order_item_product",
+ *   id = "order_product",
  *   label = @Translation("Product"),
- *   display_label = @Translation("Specific products"),
+ *   display_label = @Translation("Order contains specific products"),
  *   category = @Translation("Products"),
- *   entity_type = "commerce_order_item",
+ *   entity_type = "commerce_order",
  *   weight = -1,
  * )
  */
-class OrderItemProduct extends ConditionBase implements ContainerFactoryPluginInterface {
+class OrderProduct extends ConditionBase implements ContainerFactoryPluginInterface {
 
   use ProductTrait;
 
   /**
-   * Constructs a new OrderItemProduct object.
+   * Constructs a new OrderProduct object.
    *
    * @param array $configuration
    *   The plugin configuration, i.e. an array with configuration values keyed
@@ -60,16 +60,21 @@ class OrderItemProduct extends ConditionBase implements ContainerFactoryPluginIn
    */
   public function evaluate(EntityInterface $entity) {
     $this->assertEntity($entity);
-    /** @var \Drupal\commerce_order\Entity\OrderItemInterface $order_item */
-    $order_item = $entity;
-    /** @var \Drupal\commerce_product\Entity\ProductVariationInterface $purchasable_entity */
-    $purchasable_entity = $order_item->getPurchasedEntity();
-    if (!$purchasable_entity || $purchasable_entity->getEntityTypeId() != 'commerce_product_variation') {
-      return FALSE;
-    }
+    /** @var \Drupal\commerce_order\Entity\OrderInterface $order */
+    $order = $entity;
     $product_ids = array_column($this->configuration['products'], 'product_id');
+    foreach ($order->getItems() as $order_item) {
+      /** @var \Drupal\commerce_product\Entity\ProductVariationInterface $purchased_entity */
+      $purchased_entity = $order_item->getPurchasedEntity();
+      if (!$purchased_entity || $purchased_entity->getEntityTypeId() != 'commerce_product_variation') {
+        continue;
+      }
+      if (in_array($purchased_entity->getProductId(), $product_ids)) {
+        return TRUE;
+      }
+    }
 
-    return in_array($purchasable_entity->getProductId(), $product_ids);
+    return FALSE;
   }
 
 }
