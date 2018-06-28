@@ -117,20 +117,18 @@ class PluginSelectTest extends CommerceBrowserTestBase {
       'name' => 'Test',
     ]);
     $this->drupalGet($entity->toUrl('edit-form'));
-    $this->getSession()->getPage()->fillField('test_plugin[0][target_plugin_id]', 'order_item_quantity');
+    $this->getSession()->getPage()->fillField('test_plugin[0][target_plugin_id]', 'order_email');
     $this->waitForAjaxToFinish();
 
     $this->submitForm([
-      'test_plugin[0][target_plugin_configuration][order_item_quantity][operator]' => '==',
-      'test_plugin[0][target_plugin_configuration][order_item_quantity][quantity]' => '99',
+      'test_plugin[0][target_plugin_configuration][order_email][mail]' => 'test@example.com',
     ], 'Save');
     $this->assertSession()->pageTextContains('entity_test 1 has been updated.');
 
     $this->entityTestStorage->resetCache([$entity->id()]);
     $entity = $this->entityTestStorage->load($entity->id());
     $this->assertEquals([
-      'operator' => '==',
-      'quantity' => 99,
+      'mail' => 'test@example.com',
     ], $entity->test_plugin->target_plugin_configuration);
 
     // Select the other condition.

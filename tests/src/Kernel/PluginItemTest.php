@@ -2,7 +2,7 @@
 
 namespace Drupal\Tests\commerce\Kernel;
 
-use Drupal\commerce_order\Plugin\Commerce\Condition\OrderItemQuantity;
+use Drupal\commerce_order\Plugin\Commerce\Condition\OrderTotalPrice;
 use Drupal\entity_test\Entity\EntityTest;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
@@ -55,12 +55,15 @@ class PluginItemTest extends CommerceKernelTestBase {
   public function testField() {
     $plugin_configuration = [
       'operator' => '>',
-      'quantity' => 10,
+      'amount' => [
+        'number' => '9.99',
+        'currency_code' => 'USD',
+      ],
     ];
     $entity = EntityTest::create([
       'test_conditions' => [
         [
-          'target_plugin_id' => 'order_item_quantity',
+          'target_plugin_id' => 'order_total_price',
           'target_plugin_configuration' => $plugin_configuration,
         ],
       ],
@@ -70,7 +73,7 @@ class PluginItemTest extends CommerceKernelTestBase {
     $condition_field = $entity->test_conditions->first();
 
     $condition = $condition_field->getTargetInstance();
-    $this->assertInstanceOf(OrderItemQuantity::class, $condition);
+    $this->assertInstanceOf(OrderTotalPrice::class, $condition);
     $this->assertEquals($condition->getConfiguration(), $plugin_configuration);
     $this->assertEquals($condition->getPluginDefinition(), $condition_field->getTargetDefinition());
   }

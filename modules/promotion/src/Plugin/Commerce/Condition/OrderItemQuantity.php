@@ -1,26 +1,29 @@
 <?php
 
-namespace Drupal\commerce_order\Plugin\Commerce\Condition;
+namespace Drupal\commerce_promotion\Plugin\Commerce\Condition;
 
+use Drupal\commerce\ConditionGroup;
 use Drupal\commerce\Plugin\Commerce\Condition\ConditionBase;
 use Drupal\commerce\Plugin\Commerce\Condition\ParentEntityAwareInterface;
 use Drupal\commerce\Plugin\Commerce\Condition\ParentEntityAwareTrait;
 use Drupal\commerce_price\Calculator;
+use Drupal\commerce_promotion\Plugin\Commerce\PromotionOffer\OrderItemPromotionOfferInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Form\FormStateInterface;
 
 /**
- * Provides the total product quantity condition.
+ * Provides the total discounted product quantity condition.
  *
  * Implemented as an order condition to be able to count products across
  * non-combined order items.
  *
  * @CommerceCondition(
  *   id = "order_item_quantity",
- *   label = @Translation("Total product quantity"),
- *   category = @Translation("Order"),
+ *   label = @Translation("Total discounted product quantity"),
+ *   category = @Translation("Products"),
  *   entity_type = "commerce_order",
  *   parent_entity_type = "commerce_promotion",
+ *   weight = 10,
  * )
  */
 class OrderItemQuantity extends ConditionBase implements ParentEntityAwareInterface {
@@ -81,10 +84,18 @@ class OrderItemQuantity extends ConditionBase implements ParentEntityAwareInterf
     $order = $entity;
     /** @var \Drupal\commerce_promotion\Entity\PromotionInterface $promotion */
     $promotion = $this->parentEntity;
+    $offer = $promotion->getOffer();
 
     $quantity = '0';
     foreach ($order->getItems() as $order_item) {
-      // @todo Filter by offer conditions here, once available.
+      // If the offer has conditions, skip order items that don't match.
+      if ($offer instanceof OrderItemPromotionOfferInterface) {
+        $conditions = $offer->getConditions();
+        $condition_group = new ConditionGroup($conditions, 'OR');
+        if (!$condition_group->evaluate($order_item)) {
+          continue;
+        }
+      }
       $quantity = Calculator::add($quantity, $order_item->getQuantity());
     }
 
