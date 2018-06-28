@@ -5,6 +5,7 @@ namespace Drupal\Tests\commerce_order\Unit\Plugin\Commerce\Condition;
 use Drupal\commerce_order\Entity\OrderInterface;
 use Drupal\commerce_order\Entity\OrderItemInterface;
 use Drupal\commerce_order\Plugin\Commerce\Condition\OrderItemQuantity;
+use Drupal\commerce_promotion\Entity\PromotionInterface;
 use Drupal\Tests\UnitTestCase;
 
 /**
@@ -19,10 +20,15 @@ class OrderItemQuantityTest extends UnitTestCase {
    * @dataProvider quantityProvider
    */
   public function testEvaluate($operator, $quantity, $given_quantity, $result) {
+    $parent_entity = $this->prophesize(PromotionInterface::class);
+    $parent_entity = $parent_entity->reveal();
+
     $condition = new OrderItemQuantity([
       'operator' => $operator,
       'quantity' => $quantity,
     ], 'order_item_quantity', ['entity_type' => 'commerce_order']);
+    $condition->setParentEntity($parent_entity);
+
     $order_item = $this->prophesize(OrderItemInterface::class);
     $order_item->getEntityTypeId()->willReturn('commerce_order_item');
     $order_item->getQuantity()->willReturn($given_quantity);

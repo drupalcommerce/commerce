@@ -82,10 +82,21 @@ class ConditionManager extends DefaultPluginManager implements ConditionManagerI
    * {@inheritdoc}
    */
   public function getFilteredDefinitions($parent_entity_type_id, array $entity_type_ids) {
-    $definitions = array_filter($this->getDefinitions(), function ($definition) use ($entity_type_ids) {
-      return in_array($definition['entity_type'], $entity_type_ids);
-    });
-    // Certain conditions might be unavailable to the given parent entity type.
+    $definitions = $this->getDefinitions();
+    foreach ($definitions as $plugin_id => $definition) {
+      // Filter by entity type.
+      if (!in_array($definition['entity_type'], $entity_type_ids)) {
+        unset($definitions[$plugin_id]);
+        continue;
+      }
+      // Filter by parent_entity_type, if specified by the plugin.
+      if (!empty($definition['parent_entity_type'])) {
+        if ($definition['parent_entity_type'] != $parent_entity_type_id) {
+          unset($definitions[$plugin_id]);
+        }
+      }
+    }
+    // Allow modules to filter the condition list.
     $event = new FilterConditionsEvent($definitions, $parent_entity_type_id);
     $this->eventDispatcher->dispatch(CommerceEvents::FILTER_CONDITIONS, $event);
     $definitions = $event->getDefinitions();

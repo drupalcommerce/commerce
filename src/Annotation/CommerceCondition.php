@@ -61,6 +61,18 @@ class CommerceCondition extends Plugin {
   public $entity_type;
 
   /**
+   * The parent entity type ID.
+   *
+   * This is the entity type ID of the entity that embeds the conditions.
+   * For example: 'commerce_promotion'.
+   *
+   * When specified, a condition will only be available on that entity type.
+   *
+   * @var string
+   */
+  public $parent_entity_type;
+
+  /**
    * The condition weight.
    *
    * Used when sorting the condition list in the UI.

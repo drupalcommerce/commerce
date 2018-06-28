@@ -5,6 +5,7 @@ namespace Drupal\commerce_promotion\Entity;
 use Drupal\commerce\ConditionGroup;
 use Drupal\commerce\Entity\CommerceContentEntityBase;
 use Drupal\commerce\Plugin\Commerce\Condition\ConditionInterface;
+use Drupal\commerce\Plugin\Commerce\Condition\ParentEntityAwareInterface;
 use Drupal\commerce_order\Entity\OrderInterface;
 use Drupal\commerce_promotion\Plugin\Commerce\PromotionOffer\OrderItemPromotionOfferInterface;
 use Drupal\commerce_promotion\Plugin\Commerce\PromotionOffer\PromotionOfferInterface;
@@ -193,7 +194,11 @@ class Promotion extends CommerceContentEntityBase implements PromotionInterface 
     $conditions = [];
     foreach ($this->get('conditions') as $field_item) {
       /** @var \Drupal\commerce\Plugin\Field\FieldType\PluginItemInterface $field_item */
-      $conditions[] = $field_item->getTargetInstance();
+      $condition = $field_item->getTargetInstance();
+      if ($condition instanceof ParentEntityAwareInterface) {
+        $condition->setParentEntity($this);
+      }
+      $conditions[] = $condition;
     }
     return $conditions;
   }

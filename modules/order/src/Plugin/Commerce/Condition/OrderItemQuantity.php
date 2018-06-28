@@ -3,6 +3,8 @@
 namespace Drupal\commerce_order\Plugin\Commerce\Condition;
 
 use Drupal\commerce\Plugin\Commerce\Condition\ConditionBase;
+use Drupal\commerce\Plugin\Commerce\Condition\ParentEntityAwareInterface;
+use Drupal\commerce\Plugin\Commerce\Condition\ParentEntityAwareTrait;
 use Drupal\commerce_price\Calculator;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Form\FormStateInterface;
@@ -18,9 +20,12 @@ use Drupal\Core\Form\FormStateInterface;
  *   label = @Translation("Total product quantity"),
  *   category = @Translation("Order"),
  *   entity_type = "commerce_order",
+ *   parent_entity_type = "commerce_promotion",
  * )
  */
-class OrderItemQuantity extends ConditionBase {
+class OrderItemQuantity extends ConditionBase implements ParentEntityAwareInterface {
+
+  use ParentEntityAwareTrait;
 
   /**
    * {@inheritdoc}
@@ -74,6 +79,9 @@ class OrderItemQuantity extends ConditionBase {
     $this->assertEntity($entity);
     /** @var \Drupal\commerce_order\Entity\OrderInterface $order */
     $order = $entity;
+    /** @var \Drupal\commerce_promotion\Entity\PromotionInterface $promotion */
+    $promotion = $this->parentEntity;
+
     $quantity = '0';
     foreach ($order->getItems() as $order_item) {
       // @todo Filter by offer conditions here, once available.
