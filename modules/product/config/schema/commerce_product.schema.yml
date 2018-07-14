@@ -13,6 +13,20 @@ commerce.commerce_condition.plugin.order_product:
 commerce.commerce_condition.plugin.order_item_product:
   type: commerce.commerce_condition.plugin.order_product
 
+commerce.commerce_condition.plugin.order_product_category:
+  type: commerce_condition_configuration
+  mapping:
+    terms:
+      type: sequence
+      label: 'Categories'
+      orderby: value
+      sequence:
+        type: string
+        label: 'Category'
+
+commerce.commerce_condition.plugin.order_item_product_category:
+  type: commerce.commerce_condition.plugin.order_product_category
+
 commerce.commerce_condition.plugin.order_product_type:
   type: commerce_condition_configuration
   mapping:
