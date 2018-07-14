@@ -27,12 +27,12 @@ class OrderItemProductType extends ConditionBase {
     $this->assertEntity($entity);
     /** @var \Drupal\commerce_order\Entity\OrderItemInterface $order_item */
     $order_item = $entity;
-    /** @var \Drupal\commerce_product\Entity\ProductVariationInterface $purchasable_entity */
-    $purchasable_entity = $order_item->getPurchasedEntity();
-    if (!$purchasable_entity || $purchasable_entity->getEntityTypeId() != 'commerce_product_variation') {
+    /** @var \Drupal\commerce_product\Entity\ProductVariationInterface $purchased_entity */
+    $purchased_entity = $order_item->getPurchasedEntity();
+    if (!$purchased_entity || $purchased_entity->getEntityTypeId() != 'commerce_product_variation') {
       return FALSE;
     }
-    $product_type = $purchasable_entity->getProduct()->bundle();
+    $product_type = $purchased_entity->getProduct()->bundle();
 
     return in_array($product_type, $this->configuration['product_types']);
   }
