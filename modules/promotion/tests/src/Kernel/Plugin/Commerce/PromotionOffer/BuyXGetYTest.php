@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\Tests\commerce_promotion\Plugin\Commerce\PromotionOffer;
+namespace Drupal\Tests\commerce_promotion\Kernel\Plugin\Commerce\PromotionOffer;
 
 use Drupal\commerce_order\Entity\Order;
 use Drupal\commerce_price\Calculator;

@@ -377,6 +377,9 @@ class BuyXGetY extends OrderPromotionOfferBase {
         $remaining_quantity = Calculator::subtract($remaining_quantity, $quantity);
         $slice[$order_item_id] = $quantity;
         unset($quantities[$order_item_id]);
+        if ($remaining_quantity === '0') {
+          break;
+        }
       }
       else {
         $slice[$order_item_id] = $remaining_quantity;
