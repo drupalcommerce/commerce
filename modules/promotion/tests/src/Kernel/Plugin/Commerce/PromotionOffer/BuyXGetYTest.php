@@ -160,8 +160,8 @@ class BuyXGetYTest extends CommerceKernelTestBase {
               'plugin' => 'order_item_product',
               'configuration' => [
                 'products' => [
-                  ['product_id' => $third_product->id()],
-                  ['product_id' => $fourth_product->id()],
+                  ['product' => $third_product->uuid()],
+                  ['product' => $fourth_product->uuid()],
                 ],
               ],
             ],

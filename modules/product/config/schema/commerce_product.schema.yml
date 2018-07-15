@@ -7,8 +7,9 @@ commerce.commerce_condition.plugin.order_product:
       sequence:
         type: mapping
         mapping:
-          product_id:
-            type: integer
+          product:
+            type: uuid
+            label: 'Product'
 
 commerce.commerce_condition.plugin.order_item_product:
   type: commerce.commerce_condition.plugin.order_product
@@ -21,7 +22,7 @@ commerce.commerce_condition.plugin.order_product_category:
       label: 'Categories'
       orderby: value
       sequence:
-        type: string
+        type: uuid
         label: 'Category'
 
 commerce.commerce_condition.plugin.order_item_product_category:

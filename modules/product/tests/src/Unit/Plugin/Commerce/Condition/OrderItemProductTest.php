@@ -2,6 +2,7 @@
 
 namespace Drupal\Tests\commerce_product\Unit\Plugin\Commerce\Condition;
 
+use Drupal\commerce\EntityUuidMapperInterface;
 use Drupal\commerce_order\Entity\OrderItemInterface;
 use Drupal\commerce_product\Entity\ProductVariationInterface;
 use Drupal\commerce_product\Plugin\Commerce\Condition\OrderItemProduct;
@@ -20,11 +21,21 @@ class OrderItemProductTest extends UnitTestCase {
   public function testEvaluate() {
     $entity_type_manager = $this->prophesize(EntityTypeManagerInterface::class);
     $entity_type_manager = $entity_type_manager->reveal();
+
+    $uuid_map = [
+      '1' => '62e428e1-88a6-478c-a8c6-a554ca2332ae',
+      '2' => '30df59bd-7b03-4cf7-bb35-d42fc49f0651',
+    ];
+    $entity_uuid_mapper = $this->prophesize(EntityUuidMapperInterface::class);
+    $entity_uuid_mapper->mapToIds('commerce_product', [$uuid_map['1']])->willReturn(['1']);
+    $entity_uuid_mapper->mapToIds('commerce_product', [$uuid_map['2']])->willReturn(['2']);
+    $entity_uuid_mapper = $entity_uuid_mapper->reveal();
+
     $configuration = [];
     $configuration['products'] = [
-      ['product_id' => 1],
+      ['product' => '62e428e1-88a6-478c-a8c6-a554ca2332ae'],
     ];
-    $condition = new OrderItemProduct($configuration, 'order_item_product', ['entity_type' => 'commerce_order_item'], $entity_type_manager);
+    $condition = new OrderItemProduct($configuration, 'order_item_product', ['entity_type' => 'commerce_order_item'], $entity_type_manager, $entity_uuid_mapper);
 
     // Order item with no purchasable entity.
     $order_item = $this->prophesize(OrderItemInterface::class);
@@ -44,7 +55,14 @@ class OrderItemProductTest extends UnitTestCase {
     $order_item = $order_item->reveal();
     $this->assertFalse($condition->evaluate($order_item));
 
-    $configuration['products'][0]['product_id'] = 2;
+    $configuration['products'][0]['product'] = '30df59bd-7b03-4cf7-bb35-d42fc49f0651';
+    $condition->setConfiguration($configuration);
+    $this->assertTrue($condition->evaluate($order_item));
+
+    // Test legacy configuration.
+    $configuration['products'] = [
+      ['product_id' => '2'],
+    ];
     $condition->setConfiguration($configuration);
     $this->assertTrue($condition->evaluate($order_item));
   }

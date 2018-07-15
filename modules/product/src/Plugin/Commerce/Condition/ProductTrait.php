@@ -17,6 +17,13 @@ trait ProductTrait {
   protected $productStorage;
 
   /**
+   * The entity UUID mapper.
+   *
+   * @var \Drupal\commerce\EntityUuidMapperInterface
+   */
+  protected $entityUuidMapper;
+
+  /**
    * {@inheritdoc}
    */
   public function defaultConfiguration() {
@@ -32,7 +39,7 @@ trait ProductTrait {
     $form = parent::buildConfigurationForm($form, $form_state);
 
     $products = NULL;
-    $product_ids = array_column($this->configuration['products'], 'product_id');
+    $product_ids = $this->getProductIds();
     if (!empty($product_ids)) {
       $products = $this->productStorage->loadMultiple($product_ids);
     }
@@ -55,12 +62,34 @@ trait ProductTrait {
   public function submitConfigurationForm(array &$form, FormStateInterface $form_state) {
     parent::submitConfigurationForm($form, $form_state);
 
+    // Convert selected IDs into UUIDs, and store them.
     $values = $form_state->getValue($form['#parents']);
+    $product_ids = array_column($values['products'], 'target_id');
+    $product_uuids = $this->entityUuidMapper->mapFromIds('commerce_product', $product_ids);
     $this->configuration['products'] = [];
-    foreach ($values['products'] as $value) {
+    foreach ($product_uuids as $uuid) {
       $this->configuration['products'][] = [
-        'product_id' => $value['target_id'],
+        'product' => $uuid,
       ];
+    }
+  }
+
+  /**
+   * Gets the configured product IDs.
+   *
+   * @return array
+   *   The product IDs.
+   */
+  protected function getProductIds() {
+    $product_ids = array_column($this->configuration['products'], 'product_id');
+    if (!empty($product_ids)) {
+      // Legacy configuration found, with explicit product IDs.
+      return $product_ids;
+    }
+    else {
+      // Map the UUIDs.
+      $product_uuids = array_column($this->configuration['products'], 'product');
+      return $this->entityUuidMapper->mapToIds('commerce_product', $product_uuids);
     }
   }
 

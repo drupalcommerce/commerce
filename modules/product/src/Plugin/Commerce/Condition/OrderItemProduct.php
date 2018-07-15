@@ -2,6 +2,7 @@
 
 namespace Drupal\commerce_product\Plugin\Commerce\Condition;
 
+use Drupal\commerce\EntityUuidMapperInterface;
 use Drupal\commerce\Plugin\Commerce\Condition\ConditionBase;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
@@ -36,11 +37,14 @@ class OrderItemProduct extends ConditionBase implements ContainerFactoryPluginIn
    *   The plugin implementation definition.
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
+   * @param \Drupal\commerce\EntityUuidMapperInterface $entity_uuid_mapper
+   *   The entity UUID mapper.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityTypeManagerInterface $entity_type_manager) {
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityTypeManagerInterface $entity_type_manager, EntityUuidMapperInterface $entity_uuid_mapper) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
 
     $this->productStorage = $entity_type_manager->getStorage('commerce_product');
+    $this->entityUuidMapper = $entity_uuid_mapper;
   }
 
   /**
@@ -51,7 +55,8 @@ class OrderItemProduct extends ConditionBase implements ContainerFactoryPluginIn
       $configuration,
       $plugin_id,
       $plugin_definition,
-      $container->get('entity_type.manager')
+      $container->get('entity_type.manager'),
+      $container->get('commerce.entity_uuid_mapper')
     );
   }
 
@@ -67,7 +72,7 @@ class OrderItemProduct extends ConditionBase implements ContainerFactoryPluginIn
     if (!$purchased_entity || $purchased_entity->getEntityTypeId() != 'commerce_product_variation') {
       return FALSE;
     }
-    $product_ids = array_column($this->configuration['products'], 'product_id');
+    $product_ids = $this->getProductIds();
 
     return in_array($purchased_entity->getProductId(), $product_ids);
   }
