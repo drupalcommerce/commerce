@@ -139,7 +139,7 @@ class OrderItemTest extends CommerceKernelTestBase {
    * @covers ::getAdjustedTotalPrice
    * @covers ::getAdjustedUnitPrice
    */
-  public function testLegacyAdjustments() {
+  public function testHandlingLegacyAdjustments() {
     $order_item = OrderItem::create([
       'type' => 'test',
       'title' => 'My order item',

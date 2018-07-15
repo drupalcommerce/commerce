@@ -249,7 +249,7 @@ class OrderTest extends CommerceKernelTestBase {
    * @covers ::clearAdjustments
    * @covers ::collectAdjustments
    */
-  public function testLegacyOrderItemAdjustments() {
+  public function testHandlingLegacyOrderItemAdjustments() {
     /** @var \Drupal\commerce_order\Entity\OrderItemInterface $order_item */
     $order_item = OrderItem::create([
       'type' => 'test',
