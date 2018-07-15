@@ -2,6 +2,7 @@
 
 namespace Drupal\commerce_product\Plugin\Commerce\Condition;
 
+use Drupal\commerce\EntityUuidMapperInterface;
 use Drupal\commerce\Plugin\Commerce\Condition\ConditionBase;
 use Drupal\Core\Entity\EntityFieldManagerInterface;
 use Drupal\Core\Entity\EntityInterface;
@@ -38,12 +39,15 @@ class OrderItemProductCategory extends ConditionBase implements ContainerFactory
    *   The entity field manager.
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
+   * @param \Drupal\commerce\EntityUuidMapperInterface $entity_uuid_mapper
+   *   The entity UUID mapper.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityFieldManagerInterface $entity_field_manager, EntityTypeManagerInterface $entity_type_manager) {
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityFieldManagerInterface $entity_field_manager, EntityTypeManagerInterface $entity_type_manager, EntityUuidMapperInterface $entity_uuid_mapper) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
 
     $this->entityFieldManager = $entity_field_manager;
     $this->entityTypeManager = $entity_type_manager;
+    $this->entityUuidMapper = $entity_uuid_mapper;
   }
 
   /**
@@ -55,7 +59,8 @@ class OrderItemProductCategory extends ConditionBase implements ContainerFactory
       $plugin_id,
       $plugin_definition,
       $container->get('entity_field.manager'),
-      $container->get('entity_type.manager')
+      $container->get('entity_type.manager'),
+      $container->get('commerce.entity_uuid_mapper')
     );
   }
 
@@ -71,9 +76,10 @@ class OrderItemProductCategory extends ConditionBase implements ContainerFactory
     if (!$purchased_entity || $purchased_entity->getEntityTypeId() != 'commerce_product_variation') {
       return FALSE;
     }
+    $term_ids = $this->getTermIds();
     $referenced_ids = $this->getReferencedIds($purchased_entity->getProduct());
 
-    return (bool) array_intersect($this->configuration['terms'], $referenced_ids);
+    return (bool) array_intersect($term_ids, $referenced_ids);
   }
 
 }

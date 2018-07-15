@@ -2,6 +2,7 @@
 
 namespace Drupal\Tests\commerce_product\Unit\Plugin\Commerce\Condition;
 
+use Drupal\commerce\EntityUuidMapperInterface;
 use Drupal\commerce_order\Entity\OrderItemInterface;
 use Drupal\commerce_product\Entity\ProductInterface;
 use Drupal\commerce_product\Entity\ProductVariationInterface;
@@ -33,9 +34,20 @@ class OrderItemProductCategoryTest extends UnitTestCase {
 
     $entity_type_manager = $this->prophesize(EntityTypeManagerInterface::class);
     $entity_type_manager = $entity_type_manager->reveal();
+
+    $uuid_map = [
+      '2' => '62e428e1-88a6-478c-a8c6-a554ca2332ae',
+      '3' => '30df59bd-7b03-4cf7-bb35-d42fc49f0651',
+      '4' => 'a019d89b-c4d9-4ed4-b859-894e4e2e93cf',
+    ];
+    $entity_uuid_mapper = $this->prophesize(EntityUuidMapperInterface::class);
+    $entity_uuid_mapper->mapToIds('taxonomy_term', [$uuid_map['3']])->willReturn(['3']);
+    $entity_uuid_mapper->mapToIds('taxonomy_term', [$uuid_map['4']])->willReturn(['4']);
+    $entity_uuid_mapper = $entity_uuid_mapper->reveal();
+
     $configuration = [];
-    $configuration['terms'] = [3];
-    $condition = new OrderItemProductCategory($configuration, 'order_item_product_category', ['entity_type' => 'commerce_order_item'], $entity_field_manager, $entity_type_manager);
+    $configuration['terms'] = ['30df59bd-7b03-4cf7-bb35-d42fc49f0651'];
+    $condition = new OrderItemProductCategory($configuration, 'order_item_product_category', ['entity_type' => 'commerce_order_item'], $entity_field_manager, $entity_type_manager, $entity_uuid_mapper);
 
     // Order item with no purchasable entity.
     $order_item = $this->prophesize(OrderItemInterface::class);
@@ -70,7 +82,7 @@ class OrderItemProductCategoryTest extends UnitTestCase {
     $this->assertFalse($condition->evaluate($order_item));
 
     // Matching product category.
-    $configuration['terms'] = ['4'];
+    $configuration['terms'] = ['a019d89b-c4d9-4ed4-b859-894e4e2e93cf'];
     $condition->setConfiguration($configuration);
     $this->assertTrue($condition->evaluate($order_item));
   }

@@ -25,6 +25,13 @@ trait ProductCategoryTrait {
   protected $entityTypeManager;
 
   /**
+   * The entity UUID mapper.
+   *
+   * @var \Drupal\commerce\EntityUuidMapperInterface
+   */
+  protected $entityUuidMapper;
+
+  /**
    * {@inheritdoc}
    */
   public function defaultConfiguration() {
@@ -40,7 +47,7 @@ trait ProductCategoryTrait {
     $form = parent::buildConfigurationForm($form, $form_state);
 
     $terms = NULL;
-    $ids = $this->configuration['terms'];
+    $ids = $this->getTermIds();
     if (!empty($ids)) {
       $term_storage = $this->entityTypeManager->getStorage('taxonomy_term');
       $terms = $term_storage->loadMultiple($ids);
@@ -67,11 +74,21 @@ trait ProductCategoryTrait {
   public function submitConfigurationForm(array &$form, FormStateInterface $form_state) {
     parent::submitConfigurationForm($form, $form_state);
 
+    // Convert selected IDs into UUIDs, and store them.
     $values = $form_state->getValue($form['#parents']);
-    $this->configuration['terms'] = [];
-    foreach ($values['terms'] as $value) {
-      $this->configuration['terms'][] = $value['target_id'];
-    }
+    $term_ids = array_column($values['terms'], 'target_id');
+    $this->configuration['terms'] = $this->entityUuidMapper->mapFromIds('taxonomy_term', $term_ids);
+    $this->configuration['terms'] = array_values($this->configuration['terms']);
+  }
+
+  /**
+   * Gets the configured term IDs.
+   *
+   * @return array
+   *   The term IDs.
+   */
+  protected function getTermIds() {
+    return $this->entityUuidMapper->mapToIds('taxonomy_term', $this->configuration['terms']);
   }
 
   /**

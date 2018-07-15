@@ -2,6 +2,7 @@
 
 namespace Drupal\commerce_product\Plugin\Commerce\Condition;
 
+use Drupal\commerce\EntityUuidMapperInterface;
 use Drupal\commerce\Plugin\Commerce\Condition\ConditionBase;
 use Drupal\Core\Entity\EntityFieldManagerInterface;
 use Drupal\Core\Entity\EntityInterface;
@@ -38,12 +39,15 @@ class OrderProductCategory extends ConditionBase implements ContainerFactoryPlug
    *   The entity field manager.
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
+   * @param \Drupal\commerce\EntityUuidMapperInterface $entity_uuid_mapper
+   *   The entity UUID mapper.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityFieldManagerInterface $entity_field_manager, EntityTypeManagerInterface $entity_type_manager) {
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityFieldManagerInterface $entity_field_manager, EntityTypeManagerInterface $entity_type_manager, EntityUuidMapperInterface $entity_uuid_mapper) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
 
     $this->entityFieldManager = $entity_field_manager;
     $this->entityTypeManager = $entity_type_manager;
+    $this->entityUuidMapper = $entity_uuid_mapper;
   }
 
   /**
@@ -55,7 +59,8 @@ class OrderProductCategory extends ConditionBase implements ContainerFactoryPlug
       $plugin_id,
       $plugin_definition,
       $container->get('entity_field.manager'),
-      $container->get('entity_type.manager')
+      $container->get('entity_type.manager'),
+      $container->get('commerce.entity_uuid_mapper')
     );
   }
 
@@ -66,6 +71,7 @@ class OrderProductCategory extends ConditionBase implements ContainerFactoryPlug
     $this->assertEntity($entity);
     /** @var \Drupal\commerce_order\Entity\OrderInterface $order */
     $order = $entity;
+    $term_ids = $this->getTermIds();
     foreach ($order->getItems() as $order_item) {
       /** @var \Drupal\commerce_product\Entity\ProductVariationInterface $purchased_entity */
       $purchased_entity = $order_item->getPurchasedEntity();
@@ -73,7 +79,7 @@ class OrderProductCategory extends ConditionBase implements ContainerFactoryPlug
         continue;
       }
       $referenced_ids = $this->getReferencedIds($purchased_entity->getProduct());
-      if (array_intersect($this->configuration['terms'], $referenced_ids)) {
+      if (array_intersect($term_ids, $referenced_ids)) {
         return TRUE;
       }
     }

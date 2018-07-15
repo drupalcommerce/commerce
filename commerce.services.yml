@@ -46,6 +46,10 @@ services:
     class: Drupal\commerce\Config\ConfigUpdater
     arguments: ['@entity_type.manager', '@config.storage', '@config.factory']
 
+  commerce.entity_uuid_mapper:
+    class: Drupal\commerce\EntityUuidMapper
+    arguments: ['@database', '@entity_type.manager']
+
   commerce.twig_extension:
     class: Drupal\commerce\TwigExtension\CommerceTwigExtension
     tags:
