@@ -344,11 +344,17 @@ class BuyXGetY extends OrderPromotionOfferBase {
     }
     uasort($selected_order_items, function (OrderItemInterface $a, OrderItemInterface $b) use ($sort_direction) {
       if ($sort_direction == 'ASC') {
-        return $a->getUnitPrice()->compareTo($b->getUnitPrice());
+        $result = $a->getUnitPrice()->compareTo($b->getUnitPrice());
       }
       else {
-        return $b->getUnitPrice()->compareTo($a->getUnitPrice());
+        $result = $b->getUnitPrice()->compareTo($a->getUnitPrice());
       }
+      // PHP5 workaround, maintain existing sort order when items are equal.
+      if ($result === 0) {
+        $result = ($a->id() < $b->id()) ? -1 : 1;
+      }
+
+      return $result;
     });
 
     return $selected_order_items;
