@@ -236,3 +236,18 @@ function commerce_order_form_field_config_edit_form_alter(array &$form, FormStat
     $form['settings']['available_countries']['#access'] = FALSE;
   }
 }
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ */
+function commerce_order_form_profile_type_edit_form_alter(&$form, FormStateInterface $form_state, $form_id) {
+  // Hide the use_revisions field for the 'customer' profile as we always want
+  // to use revisions for this profile.
+  /** @var \Drupal\profile\Entity\ProfileTypeInterface $entity */
+  $entity = $form_state->getFormObject()->getEntity();
+  if ($entity->id() != 'customer') {
+    return;
+  }
+
+  $form['use_revisions']['#access'] = FALSE;
+}
