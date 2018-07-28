@@ -111,7 +111,7 @@ class UnitPriceWidget extends WidgetBase {
       /** @var \Drupal\commerce_order\Entity\OrderItemInterface $order_item */
       $order_item = $items[0]->getEntity();
       if (!$this->getSetting('require_confirmation') || !empty($values['override'])) {
-        $unit_price = new Price($values['amount']['number'], $values['amount']['currency_code']);
+        $unit_price = Price::fromArray($values['amount']);
         $order_item->setUnitPrice($unit_price, TRUE);
       }
 

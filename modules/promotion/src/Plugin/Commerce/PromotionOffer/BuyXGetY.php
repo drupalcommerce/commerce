@@ -476,8 +476,7 @@ class BuyXGetY extends OrderPromotionOfferBase {
       $adjustment_amount = $total_price->multiply($percentage);
     }
     else {
-      $amount = $this->configuration['offer_amount'];
-      $amount = new Price($amount['number'], $amount['currency_code']);
+      $amount = Price::fromArray($this->configuration['offer_amount']);
       $adjustment_amount = $amount->multiply($quantity);
     }
     $adjustment_amount = $this->rounder->round($adjustment_amount);

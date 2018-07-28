@@ -42,6 +42,21 @@ final class Price {
   }
 
   /**
+   * Creates a new price from the given array.
+   *
+   * @param array $price
+   *   The price array, with the "number" and "currency_code" keys.
+   *
+   * @return static
+   */
+  public static function fromArray(array $price) {
+    if (!isset($price['number'], $price['currency_code'])) {
+      throw new \InvalidArgumentException('Price::fromArray() called with a malformed array.');
+    }
+    return new static($price['number'], $price['currency_code']);
+  }
+
+  /**
    * Gets the number.
    *
    * @return string
