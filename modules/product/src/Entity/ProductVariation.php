@@ -133,6 +133,22 @@ class ProductVariation extends CommerceContentEntityBase implements ProductVaria
   /**
    * {@inheritdoc}
    */
+  public function getListPrice() {
+    if (!$this->get('list_price')->isEmpty()) {
+      return $this->get('list_price')->first()->toPrice();
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setListPrice(Price $list_price) {
+    return $this->set('list_price', $list_price);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function getPrice() {
     if (!$this->get('price')->isEmpty()) {
       return $this->get('price')->first()->toPrice();
@@ -412,9 +428,24 @@ class ProductVariation extends CommerceContentEntityBase implements ProductVaria
       ->setDisplayConfigurable('form', TRUE)
       ->setDisplayConfigurable('view', TRUE);
 
+    $fields['list_price'] = BaseFieldDefinition::create('commerce_price')
+      ->setLabel(t('List price'))
+      ->setDescription(t('The list price.'))
+      ->setDisplayOptions('view', [
+        'label' => 'above',
+        'type' => 'commerce_price_default',
+        'weight' => -1,
+      ])
+      ->setDisplayOptions('form', [
+        'type' => 'commerce_list_price',
+        'weight' => -1,
+      ])
+      ->setDisplayConfigurable('form', TRUE)
+      ->setDisplayConfigurable('view', TRUE);
+
     $fields['price'] = BaseFieldDefinition::create('commerce_price')
       ->setLabel(t('Price'))
-      ->setDescription(t('The variation price'))
+      ->setDescription(t('The price'))
       ->setRequired(TRUE)
       ->setDisplayOptions('view', [
         'label' => 'above',

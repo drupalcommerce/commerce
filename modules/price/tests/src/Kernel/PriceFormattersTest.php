@@ -71,6 +71,7 @@ class PriceFormattersTest extends CommerceKernelTestBase {
     $variation = ProductVariation::create([
       'type' => 'default',
       'sku' => strtolower($this->randomMachineName()),
+      'list_price' => new Price('14.00', 'USD'),
       'price' => new Price('12.00', 'USD'),
     ]);
     $variation->save();
@@ -79,6 +80,7 @@ class PriceFormattersTest extends CommerceKernelTestBase {
     $variation = ProductVariation::create([
       'type' => 'default',
       'sku' => 'TEST_' . strtolower($this->randomMachineName()),
+      'list_price' => new Price('26.00', 'USD'),
       'price' => new Price('24.00', 'USD'),
     ]);
     $variation->save();
@@ -89,16 +91,30 @@ class PriceFormattersTest extends CommerceKernelTestBase {
    * Tests the default formatter.
    */
   public function testDefaultFormatter() {
+    $this->productVariationDefaultDisplay->setComponent('list_price', [
+      'type' => 'commerce_price_default',
+      'settings' => [],
+    ]);
     $this->productVariationDefaultDisplay->setComponent('price', [
       'type' => 'commerce_price_default',
       'settings' => [],
     ]);
     $this->productVariationDefaultDisplay->save();
 
+    $build = $this->productVariationViewBuilder->viewField($this->variation1->list_price, 'default');
+    $this->render($build);
+    $this->assertText('$14.00');
+
     $build = $this->productVariationViewBuilder->viewField($this->variation1->price, 'default');
     $this->render($build);
     $this->assertText('$12.00');
 
+    $this->productVariationDefaultDisplay->setComponent('list_price', [
+      'type' => 'commerce_price_default',
+      'settings' => [
+        'currency_display' => 'code',
+      ],
+    ]);
     $this->productVariationDefaultDisplay->setComponent('price', [
       'type' => 'commerce_price_default',
       'settings' => [
@@ -106,6 +122,10 @@ class PriceFormattersTest extends CommerceKernelTestBase {
       ],
     ]);
     $this->productVariationDefaultDisplay->save();
+
+    $build = $this->productVariationViewBuilder->viewField($this->variation2->list_price, 'default');
+    $this->render($build);
+    $this->assertText('USD26.00');
 
     $build = $this->productVariationViewBuilder->viewField($this->variation2->price, 'default');
     $this->render($build);
@@ -116,16 +136,30 @@ class PriceFormattersTest extends CommerceKernelTestBase {
    * Tests the calculated price formatter.
    */
   public function testCalculatedFormatter() {
+    $this->productVariationDefaultDisplay->setComponent('list_price', [
+      'type' => 'commerce_price_calculated',
+      'settings' => [],
+    ]);
     $this->productVariationDefaultDisplay->setComponent('price', [
       'type' => 'commerce_price_calculated',
       'settings' => [],
     ]);
     $this->productVariationDefaultDisplay->save();
 
+    $build = $this->productVariationViewBuilder->viewField($this->variation1->list_price, 'default');
+    $this->render($build);
+    $this->assertText('$14.00');
+
     $build = $this->productVariationViewBuilder->viewField($this->variation1->price, 'default');
     $this->render($build);
     $this->assertText('$12.00');
 
+    $this->productVariationDefaultDisplay->setComponent('list_price', [
+      'type' => 'commerce_price_calculated',
+      'settings' => [
+        'currency_display' => 'code',
+      ],
+    ]);
     $this->productVariationDefaultDisplay->setComponent('price', [
       'type' => 'commerce_price_calculated',
       'settings' => [
@@ -133,6 +167,10 @@ class PriceFormattersTest extends CommerceKernelTestBase {
       ],
     ]);
     $this->productVariationDefaultDisplay->save();
+
+    $build = $this->productVariationViewBuilder->viewField($this->variation2->list_price, 'default');
+    $this->render($build);
+    $this->assertText('USD23.00');
 
     $build = $this->productVariationViewBuilder->viewField($this->variation2->price, 'default');
     $this->render($build);
