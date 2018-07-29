@@ -6,7 +6,7 @@ use Drupal\commerce\Context;
 use Drupal\commerce\PurchasableEntityInterface;
 
 /**
- * Returns the price based on the purchasable entity's price field.
+ * Provides the default price, taking it directly from the purchasable entity.
  */
 class DefaultPriceResolver implements PriceResolverInterface {
 
@@ -14,7 +14,10 @@ class DefaultPriceResolver implements PriceResolverInterface {
    * {@inheritdoc}
    */
   public function resolve(PurchasableEntityInterface $entity, $quantity, Context $context) {
-    return $entity->getPrice();
+    $field_name = $context->getData('field_name', 'price');
+    if ($entity->hasField($field_name) && !$entity->get($field_name)->isEmpty()) {
+      return $entity->get($field_name)->first()->toPrice();
+    }
   }
 
 }
