@@ -221,6 +221,13 @@ function commerce_order_entity_operation_alter(array &$operations, EntityInterfa
   if ($entity->getEntityTypeId() == 'field_config' && $entity->id() == 'profile.customer.address') {
     unset($operations['storage-settings']);
   }
+
+  // Remove the default delete button to dis-allow the user from deleting
+  // profiles as we want to preserve the order references. The delete will be
+  // replaced by the deactivate action.
+  if ($entity->bundle() === 'customer') {
+    unset($operations['delete']);
+  }
 }
 
 /**
@@ -235,4 +242,29 @@ function commerce_order_form_field_config_edit_form_alter(array &$form, FormStat
   if ($entity->id() == 'profile.customer.address') {
     $form['settings']['available_countries']['#access'] = FALSE;
   }
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ */
+function commerce_order_form_profile_type_edit_form_alter(&$form, FormStateInterface $form_state, $form_id) {
+  // Hide the use_revisions field for the 'customer' profile as we always want
+  // to use revisions for this profile.
+  /** @var \Drupal\profile\Entity\ProfileTypeInterface $entity */
+  $entity = $form_state->getFormObject()->getEntity();
+  if ($entity->id() != 'customer') {
+    return;
+  }
+
+  $form['use_revisions']['#access'] = FALSE;
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ */
+function commerce_order_form_profile_customer_edit_form_alter(&$form, FormStateInterface $form_state, $form_id) {
+  // Remove the default delete button to dis-allow the user from deleting
+  // profiles as we want to preserve the order references. The delete will be
+  // replaced by the deactivate action.
+  $form['actions']['delete']['#access'] = FALSE;
 }

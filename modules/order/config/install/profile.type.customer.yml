@@ -9,3 +9,4 @@ label: Customer
 registration: false
 multiple: true
 weight: 0
+use_revisions: true
