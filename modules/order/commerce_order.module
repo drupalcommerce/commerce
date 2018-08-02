@@ -221,6 +221,13 @@ function commerce_order_entity_operation_alter(array &$operations, EntityInterfa
   if ($entity->getEntityTypeId() == 'field_config' && $entity->id() == 'profile.customer.address') {
     unset($operations['storage-settings']);
   }
+
+  // Remove the default delete button to dis-allow the user from deleting
+  // profiles as we want to preserve the order references. The delete will be
+  // replaced by the deactivate action.
+  if ($entity->bundle() === 'customer') {
+    unset($operations['delete']);
+  }
 }
 
 /**
@@ -250,4 +257,14 @@ function commerce_order_form_profile_type_edit_form_alter(&$form, FormStateInter
   }
 
   $form['use_revisions']['#access'] = FALSE;
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ */
+function commerce_order_form_profile_customer_edit_form_alter(&$form, FormStateInterface $form_state, $form_id) {
+  // Remove the default delete button to dis-allow the user from deleting
+  // profiles as we want to preserve the order references. The delete will be
+  // replaced by the deactivate action.
+  $form['actions']['delete']['#access'] = FALSE;
 }
