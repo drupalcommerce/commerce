@@ -19,6 +19,13 @@ use Drupal\Tests\commerce\Kernel\CommerceKernelTestBase;
 class PaymentTest extends CommerceKernelTestBase {
 
   /**
+   * A sample order.
+   *
+   * @var \Drupal\commerce_order\Entity\OrderInterface
+   */
+  protected $order;
+
+  /**
    * A sample user.
    *
    * @var \Drupal\user\UserInterface
@@ -61,6 +68,15 @@ class PaymentTest extends CommerceKernelTestBase {
 
     $user = $this->createUser();
     $this->user = $this->reloadEntity($user);
+
+    $order = Order::create([
+      'type' => 'default',
+      'mail' => $this->user->getEmail(),
+      'uid' => $this->user->id(),
+      'store_id' => $this->store->id(),
+    ]);
+    $order->save();
+    $this->order = $this->reloadEntity($order);
   }
 
   /**
@@ -80,6 +96,8 @@ class PaymentTest extends CommerceKernelTestBase {
    * @covers ::setRefundedAmount
    * @covers ::getState
    * @covers ::setState
+   * @covers ::getAuthorizedTime
+   * @covers ::setAuthorizedTime
    * @covers ::isExpired
    * @covers ::getExpiresTime
    * @covers ::setExpiresTime
@@ -88,20 +106,11 @@ class PaymentTest extends CommerceKernelTestBase {
    * @covers ::setCompletedTime
    */
   public function testPayment() {
-    $order = Order::create([
-      'type' => 'default',
-      'mail' => $this->user->getEmail(),
-      'uid' => $this->user->id(),
-      'store_id' => $this->store->id(),
-    ]);
-    $order->save();
-    $order = $this->reloadEntity($order);
-
     /** @var \Drupal\commerce_payment\Entity\PaymentInterface $payment */
     $payment = Payment::create([
       'type' => 'payment_default',
       'payment_gateway' => 'example',
-      'order_id' => $order,
+      'order_id' => $this->order->id(),
       'amount' => new Price('30', 'USD'),
       'refunded_amount' => new Price('10', 'USD'),
       'state' => 'refunded',
@@ -112,8 +121,8 @@ class PaymentTest extends CommerceKernelTestBase {
     $this->assertEquals('example', $payment->getPaymentGatewayId());
     $this->assertEquals('test', $payment->getPaymentGatewayMode());
 
-    $this->assertEquals($order, $payment->getOrder());
-    $this->assertEquals($order->id(), $payment->getOrderId());
+    $this->assertEquals($this->order, $payment->getOrder());
+    $this->assertEquals($this->order->id(), $payment->getOrderId());
 
     $payment->setRemoteId('123456');
     $this->assertEquals('123456', $payment->getRemoteId());
@@ -134,15 +143,44 @@ class PaymentTest extends CommerceKernelTestBase {
     $payment->setState('completed');
     $this->assertEquals('completed', $payment->getState()->value);
 
-    $this->assertFalse($payment->isExpired());
+    $this->assertEmpty($payment->getAuthorizedTime());
+    $payment->setAuthorizedTime(635879600);
+    $this->assertEquals(635879600, $payment->getAuthorizedTime());
+
+    $this->assertEmpty($payment->isExpired());
     $payment->setExpiresTime(635879700);
     $this->assertTrue($payment->isExpired());
     $this->assertEquals(635879700, $payment->getExpiresTime());
 
-    $this->assertFalse($payment->isCompleted());
+    $this->assertEmpty($payment->isCompleted());
     $payment->setCompletedTime(635879700);
     $this->assertEquals(635879700, $payment->getCompletedTime());
     $this->assertTrue($payment->isCompleted());
+  }
+
+  /**
+   * Tests the timestamp generation on preSave.
+   *
+   * @covers ::preSave
+   */
+  public function testTimestamps() {
+    $request_time = \Drupal::time()->getRequestTime();
+    /** @var \Drupal\commerce_payment\Entity\PaymentInterface $payment */
+    $payment = Payment::create([
+      'type' => 'payment_default',
+      'payment_gateway' => 'example',
+      'order_id' => $this->order->id(),
+      'amount' => new Price('30', 'USD'),
+      'state' => 'authorization',
+    ]);
+    $payment->save();
+
+    $this->assertEquals($request_time, $payment->getAuthorizedTime());
+    $this->assertEmpty($payment->getCompletedTime());
+
+    $payment->setState('completed');
+    $payment->save();
+    $this->assertEquals($request_time, $payment->getCompletedTime());
   }
 
 }
