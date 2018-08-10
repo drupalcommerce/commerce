@@ -52,8 +52,6 @@ class PaymentMethodAddForm extends PaymentGatewayFormBase {
       $form['payment_details'] = $this->buildPayPalForm($form['payment_details'], $form_state);
     }
 
-    /** @var \Drupal\commerce_payment\Entity\PaymentMethodInterface $payment_method */
-    $payment_method = $this->entity;
     /** @var \Drupal\profile\Entity\ProfileInterface $billing_profile */
     $billing_profile = $payment_method->getBillingProfile();
     if (!$billing_profile) {
@@ -112,8 +110,6 @@ class PaymentMethodAddForm extends PaymentGatewayFormBase {
     elseif ($payment_method->bundle() == 'paypal') {
       $this->submitPayPalForm($form['payment_details'], $form_state);
     }
-    /** @var \Drupal\commerce_payment\Entity\PaymentMethodInterface $payment_method */
-    $payment_method = $this->entity;
     $payment_method->setBillingProfile($form['billing_information']['#profile']);
 
     $values = $form_state->getValue($form['#parents']);
