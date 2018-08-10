@@ -39,8 +39,6 @@ class OrderAdminTest extends OrderBrowserTestBase {
 
   /**
    * Tests creating/editing an Order.
-   *
-   * @group failing
    */
   public function testCreateOrder() {
     // Create an order through the add form.
