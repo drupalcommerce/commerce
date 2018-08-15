@@ -10,3 +10,12 @@ commerce_checkout.form:
     parameters:
       commerce_order:
         type: entity:commerce_order
+
+commerce_checkout.checkout:
+  path: '/checkout'
+  defaults:
+    _controller: '\Drupal\commerce_checkout\Controller\CheckoutController::checkoutRedirect'
+  requirements:
+    _access: 'TRUE'
+  options:
+    no_cache: TRUE
