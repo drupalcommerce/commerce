@@ -309,6 +309,29 @@ class Payment extends ContentEntityBase implements PaymentInterface {
         $this->setCompletedTime(\Drupal::time()->getRequestTime());
       }
     }
+    // Add or subtract payments from order.
+    if ($this->isNew()) {
+      $this->getOrder()->addPayment($this->getAmount())->save();
+    }
+    elseif (in_array($state, ['partially_refunded', 'refunded']) &&
+        in_array($original_state, ['completed', 'partially_refunded'])) {
+      $original = $this->values['original'];
+      $net_refund = $this->getRefundedAmount()->subtract($original->getRefundedAmount());
+      $this->getOrder()->subtractPayment($net_refund)->save();
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function preDelete(EntityStorageInterface $storage, array $entities) {
+    parent::preDelete($storage, $entities);
+
+    // Subtract each payment from order.
+    foreach ($entities as $payment) {
+      $net_payment = $payment->getAmount()->subtract($payment->getRefundedAmount());
+      $payment->getOrder()->subtractPayment($net_payment)->save();
+    }
   }
 
   /**

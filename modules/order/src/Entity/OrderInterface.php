@@ -3,6 +3,7 @@
 namespace Drupal\commerce_order\Entity;
 
 use Drupal\commerce_order\EntityAdjustableInterface;
+use Drupal\commerce_price\Price;
 use Drupal\commerce_store\Entity\StoreInterface;
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\EntityChangedInterface;
@@ -272,6 +273,50 @@ interface OrderInterface extends ContentEntityInterface, EntityAdjustableInterfa
    *   The order total price, or NULL.
    */
   public function getTotalPrice();
+
+  /**
+   * Adds an amount to the order total paid.
+   *
+   * @param \Drupal\commerce_price\Price $amount
+   *   The amount to add to the total paid.
+   *
+   * @return $this
+   */
+  public function addPayment(Price $amount);
+
+  /**
+   * Subtracts an amount from the order total paid.
+   *
+   * @param \Drupal\commerce_price\Price $amount
+   *   The amount to subtract from the total paid.
+   *
+   * @return $this
+   */
+  public function subtractPayment(Price $amount);
+
+  /**
+   * Gets the total amount paid on the order.
+   *
+   * @return \Drupal\commerce_price\Price
+   *   The order total paid amount.
+   */
+  public function getTotalPaid();
+
+  /**
+   * Sets the total amount paid on the order.
+   *
+   * @param \Drupal\commerce_price\Price $amount
+   *   The amount to set as the order total paid.
+   */
+  public function setTotalPaid(Price $amount);
+
+  /**
+   * Gets the amount unpaid on the order.
+   *
+   * @return \Drupal\commerce_price\Price|null
+   *   The total order amount minus the total paid, or NULL.
+   */
+  public function getBalance();
 
   /**
    * Gets the order state.
