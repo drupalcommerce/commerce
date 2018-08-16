@@ -4,11 +4,14 @@ namespace Drupal\commerce_checkout;
 
 use Drupal\commerce_checkout\Resolver\ChainCheckoutFlowResolverInterface;
 use Drupal\commerce_order\Entity\OrderInterface;
+use Drupal\Core\StringTranslation\StringTranslationTrait;
+use Drupal\Core\Url;
 
 /**
  * Manages checkout flows for orders.
  */
 class CheckoutOrderManager implements CheckoutOrderManagerInterface {
+  use StringTranslationTrait;
 
   /**
    * The chain checkout flow resolver.
@@ -36,7 +39,12 @@ class CheckoutOrderManager implements CheckoutOrderManagerInterface {
       $order->set('checkout_flow', $checkout_flow);
       $order->save();
     }
-
+    // If no checkout flow found.
+    if (!isset($order->get('checkout_flow')->entity)) {
+      $add_checkout_flow_link = URL::fromRoute('entity.commerce_checkout_flow.add_form')->toString();
+      drupal_set_message($this->t('No checkout flows are defined, <a href=":url">create</a> one first.', [':url' => $add_checkout_flow_link]), 'error');
+      return '';
+    }
     return $order->get('checkout_flow')->entity;
   }
 

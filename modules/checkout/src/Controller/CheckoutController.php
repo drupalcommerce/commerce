@@ -82,16 +82,21 @@ class CheckoutController implements ContainerInjectionInterface {
   public function formPage(RouteMatchInterface $route_match) {
     /** @var \Drupal\commerce_order\Entity\OrderInterface $order */
     $order = $route_match->getParameter('commerce_order');
-    $requested_step_id = $route_match->getParameter('step');
-    $step_id = $this->checkoutOrderManager->getCheckoutStepId($order, $requested_step_id);
-    if ($requested_step_id != $step_id) {
-      $url = Url::fromRoute('commerce_checkout.form', ['commerce_order' => $order->id(), 'step' => $step_id]);
-      return new RedirectResponse($url->toString());
-    }
     $checkout_flow = $this->checkoutOrderManager->getCheckoutFlow($order);
-    $checkout_flow_plugin = $checkout_flow->getPlugin();
-
-    return $this->formBuilder->getForm($checkout_flow_plugin, $step_id);
+    // We move ahead only if we have a checkout flow for the order.
+    if (!empty($checkout_flow)) {
+      $requested_step_id = $route_match->getParameter('step');
+      $step_id = $this->checkoutOrderManager->getCheckoutStepId($order, $requested_step_id);
+      if ($requested_step_id != $step_id) {
+        $url = Url::fromRoute('commerce_checkout.form', ['commerce_order' => $order->id(), 'step' => $step_id]);
+        return new RedirectResponse($url->toString());
+      }
+      $checkout_flow_plugin = $checkout_flow->getPlugin();
+      return $this->formBuilder->getForm($checkout_flow_plugin, $step_id);
+    }
+    else {
+      return [];
+    }
   }
 
   /**
