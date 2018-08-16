@@ -94,12 +94,15 @@ class OrderItemMatcher implements OrderItemMatcherInterface {
    *   The field names.
    */
   protected function getCustomFields(OrderItemInterface $order_item) {
+    $field_names = [];
     $storage = $this->entityTypeManager->getStorage('entity_form_display');
     /** @var \Drupal\Core\Entity\Display\EntityFormDisplayInterface $form_display */
     $form_display = $storage->load('commerce_order_item.' . $order_item->bundle() . '.' . 'add_to_cart');
-    $field_names = array_keys($form_display->getComponents());
-    // Remove base fields.
-    $field_names = array_diff($field_names, ['purchased_entity', 'quantity', 'created']);
+    if ($form_display) {
+      $field_names = array_keys($form_display->getComponents());
+      // Remove base fields.
+      $field_names = array_diff($field_names, ['purchased_entity', 'quantity', 'created']);
+    }
 
     return $field_names;
   }
