@@ -216,7 +216,7 @@ class CouponRedemptionForm extends FormElement {
     $order = $order_storage->load($element['#order_id']);
     foreach ($order->get('coupons') as $item) {
       if ($item->target_id == $coupon->id()) {
-        $form_state->setErrorByName($coupon_code_path, t('The provided coupon code is invalid.'));
+        drupal_set_message(t('Coupon %code already applied.', ['%code' => $coupon->getCode()]));
         return;
       }
     }
