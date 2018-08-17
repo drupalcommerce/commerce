@@ -379,7 +379,7 @@ class Order extends CommerceContentEntityBase implements OrderInterface {
         $adjustments = $adjustment_transformer->roundAdjustments($adjustments);
         foreach ($adjustments as $adjustment) {
           if (!$adjustment->isIncluded()) {
-            $total_price = $total_price->add($adjustment->getAmount());
+            $total_price = NULL !== $total_price ? $total_price->add($adjustment->getAmount()) : $adjustment->getAmount();
           }
         }
       }
