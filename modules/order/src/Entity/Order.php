@@ -349,11 +349,9 @@ class Order extends CommerceContentEntityBase implements OrderInterface {
   public function getSubtotalPrice() {
     /** @var \Drupal\commerce_price\Price $subtotal_price */
     $subtotal_price = NULL;
-    if ($this->hasItems()) {
-      foreach ($this->getItems() as $order_item) {
-        if ($order_item_total = $order_item->getTotalPrice()) {
-          $subtotal_price = $subtotal_price ? $subtotal_price->add($order_item_total) : $order_item_total;
-        }
+    foreach ($this->getItems() as $order_item) {
+      if ($order_item_total = $order_item->getTotalPrice()) {
+        $subtotal_price = $subtotal_price ? $subtotal_price->add($order_item_total) : $order_item_total;
       }
     }
     return $subtotal_price;
@@ -365,12 +363,12 @@ class Order extends CommerceContentEntityBase implements OrderInterface {
   public function recalculateTotalPrice() {
     /** @var \Drupal\commerce_price\Price $total_price */
     $total_price = NULL;
-    if ($this->hasItems()) {
-      foreach ($this->getItems() as $order_item) {
-        if ($order_item_total = $order_item->getTotalPrice()) {
-          $total_price = $total_price ? $total_price->add($order_item_total) : $order_item_total;
-        }
+    foreach ($this->getItems() as $order_item) {
+      if ($order_item_total = $order_item->getTotalPrice()) {
+        $total_price = $total_price ? $total_price->add($order_item_total) : $order_item_total;
       }
+    }
+    if ($total_price) {
       $adjustments = $this->collectAdjustments();
       if ($adjustments) {
         /** @var \Drupal\commerce_order\AdjustmentTransformerInterface $adjustment_transformer */

@@ -352,6 +352,9 @@ class OrderTest extends CommerceKernelTestBase {
     $order_item->addAdjustment($adjustments[1]);
     $another_order_item->addAdjustment($adjustments[2]);
     $order->setItems([$order_item, $another_order_item]);
+    $order->save();
+    /** @var \Drupal\commerce_order\Entity\OrderInterface $order */
+    $order = $this->reloadEntity($order);
 
     $collected_adjustments = $order->collectAdjustments();
     $this->assertCount(3, $collected_adjustments);
@@ -361,6 +364,13 @@ class OrderTest extends CommerceKernelTestBase {
     // The total will be correct only if the adjustments were correctly
     // combined, and rounded.
     $this->assertEquals(new Price('14.47', 'USD'), $order->getTotalPrice());
+
+    // Test handling deleted order items + non-inclusive adjustments.
+    $order->addAdjustment($adjustments[1]);
+    $order_item->delete();
+    $another_order_item->delete();
+    $order->recalculateTotalPrice();
+    $this->assertNull($order->getTotalPrice());
   }
 
   /**
