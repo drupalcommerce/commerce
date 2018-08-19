@@ -23,7 +23,8 @@ class CommerceContentEntityBase extends ContentEntityBase implements CommerceCon
    */
   public function getTranslatedReferencedEntity($field_name) {
     $referenced_entities = $this->getTranslatedReferencedEntities($field_name);
-    return reset($referenced_entities);
+    $referenced_entity = reset($referenced_entities);
+    return $referenced_entity ?: NULL;
   }
 
   /**
