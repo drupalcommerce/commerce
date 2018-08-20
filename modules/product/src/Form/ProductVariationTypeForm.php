@@ -92,14 +92,35 @@ class ProductVariationTypeForm extends CommerceBundleEntityFormBase {
       ];
     }
 
-    $used_attributes = [];
+    $used_attributes = $attribute_field = [];
+    $path = $definitions = '';
     if (!$variation_type->isNew()) {
       $attribute_map = $this->attributeFieldManager->getFieldMap($variation_type->id());
       $used_attributes = array_column($attribute_map, 'attribute_id');
+      if (!empty($used_attributes)) {
+        $attribute_field = array_combine($used_attributes, array_column($attribute_map, 'field_name'));
+        $bundle = $variation_type->getEntityType()->getBundleOf();
+        $path = $this->getDestinationArray()['destination'] . "/fields/{$bundle}.{$variation_type->id()}.";
+        $definitions = $this->attributeFieldManager->getFieldDefinitions($variation_type->id());
+      }
     }
     /** @var \Drupal\commerce_product\Entity\ProductAttributeInterface[] $attributes */
     $attributes = $this->entityTypeManager->getStorage('commerce_product_attribute')->loadMultiple();
-    $attribute_options = EntityHelper::extractLabels($attributes);
+    $attribute_options = array_map(function ($attribute) use ($path, $attribute_field, $definitions) {
+       /** @var \Drupal\commerce_product\Entity\ProductAttributeInterface $attribute */
+      $id = $attribute->id();
+      $url = $attribute->url();
+      $label = $attribute->label();
+
+      if (isset($attribute_field[$id])) {
+        $label = $definitions[$attribute_field[$id]]->label();
+        $label = $this->t('<a href=":href" target="_blank">%label</a>', ['%label' => $label, ':href' => $path . $attribute_field[$id]]);
+
+        return $label . ' => ' . $this->t('<a href=":href" target="_blank">@id</a>', [':href' => $url, '@id' => $id]);
+      }
+
+      return $this->t('%label => <a href=":href" target="_blank">@id</a>', ['%label' => $label, ':href' => $url, '@id' => $id]);
+     }, $attributes);
 
     $form['original_attributes'] = [
       '#type' => 'value',

@@ -37,11 +37,13 @@ use Drupal\Core\Entity\EntityStorageInterface;
  *   entity_keys = {
  *     "id" = "id",
  *     "label" = "label",
+ *     "elementLabel" = "elementLabel",
  *     "uuid" = "uuid"
  *   },
  *   config_export = {
  *     "id",
  *     "label",
+ *     "elementLabel",
  *     "elementType"
  *   },
  *   links = {
@@ -67,6 +69,13 @@ class ProductAttribute extends ConfigEntityBundleBase implements ProductAttribut
    * @var string
    */
   protected $label;
+
+  /**
+   * The customer facing attribute label.
+   *
+   * @var string
+   */
+  protected $elementLabel;
 
   /**
    * The attribute element type.
@@ -107,6 +116,13 @@ class ProductAttribute extends ConfigEntityBundleBase implements ProductAttribut
     /** @var \Drupal\Core\Entity\EntityStorageInterface $value_storage */
     $value_storage = \Drupal::service('entity_type.manager')->getStorage('commerce_product_attribute_value');
     $value_storage->delete($values);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getElementLabel() {
+    return $this->elementLabel;
   }
 
 }

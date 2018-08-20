@@ -183,10 +183,11 @@ class ProductAttributeFieldManager implements ProductAttributeFieldManagerInterf
       $field_storage->save();
     }
     if (empty($field)) {
+      $label = $attribute->getElementLabel();
       $field = FieldConfig::create([
         'field_storage' => $field_storage,
         'bundle' => $variation_type_id,
-        'label' => $attribute->label(),
+        'label' => empty($label) ? $attribute->label() : $label,
         'required' => TRUE,
         'settings' => [
           'handler' => 'default',
