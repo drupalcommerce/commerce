@@ -27,7 +27,7 @@ class ProductVariationTitleWidget extends ProductVariationWidgetBase implements 
   public static function defaultSettings() {
     return [
       'label_display' => TRUE,
-      'label_text' => 'Please select',
+      'label_text' => t('Please select'),
     ] + parent::defaultSettings();
   }
 
