@@ -19,9 +19,9 @@ class CouponAccessControlHandler extends EntityAccessControlHandler {
     /** @var \Drupal\Core\Access\AccessResult $result */
     $result = parent::checkAccess($entity, $operation, $account);
 
-    if ($result->isNeutral()) {
+    if ($result->isNeutral() && $promotion = $entity->getPromotion()) {
       /** @var \Drupal\commerce_promotion\Entity\CouponInterface $entity */
-      $result = $entity->getPromotion()->access('update', $account, TRUE);
+      $result = $promotion->access('update', $account, TRUE);
     }
 
     return $result;
