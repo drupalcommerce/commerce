@@ -290,85 +290,168 @@ class Login extends CheckoutPaneBase implements CheckoutPaneInterface, Container
    * {@inheritdoc}
    */
   public function validatePaneForm(array &$pane_form, FormStateInterface $form_state, array &$complete_form) {
-    $values = $form_state->getValue($pane_form['#parents']);
     $triggering_element = $form_state->getTriggeringElement();
+
     switch ($triggering_element['#op']) {
       case 'continue':
         return;
 
       case 'login':
-        $name_element = $pane_form['returning_customer']['name'];
-        $username = $values['returning_customer']['name'];
-        $password = trim($values['returning_customer']['password']);
-        // Generate the "reset password" url.
-        $query = !empty($username) ? ['name' => $username] : [];
-        $password_url = Url::fromRoute('user.pass', [], ['query' => $query])->toString();
-
-        if (empty($username) || empty($password)) {
-          $form_state->setError($pane_form['returning_customer'], $this->t('Unrecognized username or password. <a href=":url">Have you forgotten your password?</a>', [':url' => $password_url]));
-          return;
-        }
-        if (user_is_blocked($username)) {
-          $form_state->setError($name_element, $this->t('The username %name has not been activated or is blocked.', ['%name' => $username]));
-          return;
-        }
-        if (!$this->credentialsCheckFlood->isAllowedHost($this->clientIp)) {
-          $form_state->setErrorByName($name_element, $this->t('Too many failed login attempts from your IP address. This IP address is temporarily blocked. Try again later or <a href=":url">request a new password</a>.', [':url' => Url::fromRoute('user.pass')]));
-          $this->credentialsCheckFlood->register($this->clientIp, $username);
-          return;
-        }
-        elseif (!$this->credentialsCheckFlood->isAllowedAccount($this->clientIp, $username)) {
-          $form_state->setErrorByName($name_element, $this->t('Too many failed login attempts for this account. It is temporarily blocked. Try again later or <a href=":url">request a new password</a>.', [':url' => Url::fromRoute('user.pass')]));
-          $this->credentialsCheckFlood->register($this->clientIp, $username);
-          return;
-        }
-
-        $uid = $this->userAuth->authenticate($username, $password);
-        if (!$uid) {
-          $this->credentialsCheckFlood->register($this->clientIp, $username);
-          $form_state->setError($name_element, $this->t('Unrecognized username or password. <a href=":url">Have you forgotten your password?</a>', [':url' => $password_url]));
-        }
-        $form_state->set('logged_in_uid', $uid);
+        $this->validateReturningCustomer($pane_form, $form_state, $complete_form);
         break;
 
       case 'register':
-        $email = $values['register']['mail'];
-        $username = $values['register']['name'];
-        $password = trim($values['register']['password']);
-        if (empty($email)) {
-          $form_state->setError($pane_form['register']['mail'], $this->t('Email field is required.'));
-          return;
-        }
-        if (empty($username)) {
-          $form_state->setError($pane_form['register']['name'], $this->t('Username field is required.'));
-          return;
-        }
-        if (empty($password)) {
-          $form_state->setError($pane_form['register']['password'], $this->t('Password field is required.'));
-          return;
-        }
+        $this->validateRegister($pane_form, $form_state, $complete_form);
 
-        /** @var \Drupal\user\UserInterface $account */
-        $account = $this->entityTypeManager->getStorage('user')->create([
-          'mail' => $email,
-          'name' => $username,
-          'pass' => $password,
-          'status' => TRUE,
-        ]);
-        // Validate the entity. This will ensure that the username and email
-        // are in the right format and not already taken.
-        $violations = $account->validate();
-        foreach ($violations->getByFields(['name', 'mail']) as $violation) {
-          list($field_name) = explode('.', $violation->getPropertyPath(), 2);
-          $form_state->setError($pane_form['register'][$field_name], $violation->getMessage());
-        }
-
-        if (!$form_state->hasAnyErrors()) {
-          $account->save();
-          $form_state->set('logged_in_uid', $account->id());
-        }
         break;
     }
+  }
+
+  /**
+   * Validates a returning customers username and password.
+   *
+   * @param array $pane_form
+   *   The pane form, containing the following basic properties:
+   *   - #parents: Identifies the position of the pane form in the overall
+   *     parent form, and identifies the location where the field values are
+   *     placed within $form_state->getValues().
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   *   The form state of the parent form.
+   * @param array $complete_form
+   *   The complete form structure.
+   */
+  protected function validateReturningCustomer(array &$pane_form, FormStateInterface $form_state, array &$complete_form) {
+    $values = $form_state->getValue($pane_form['#parents']);
+    $name_element = $pane_form['returning_customer']['name'];
+    $username = $values['returning_customer']['name'];
+    $password = trim($values['returning_customer']['password']);
+    // Generate the "reset password" url.
+    $query = !empty($username) ? ['name' => $username] : [];
+    $password_url = Url::fromRoute('user.pass', [], ['query' => $query])->toString();
+
+    if (empty($username) || empty($password)) {
+      $form_state->setError($pane_form['returning_customer'], $this->t('Unrecognized username or password. <a href=":url">Have you forgotten your password?</a>', [':url' => $password_url]));
+      return;
+    }
+    if (user_is_blocked($username)) {
+      $form_state->setError($name_element, $this->t('The username %name has not been activated or is blocked.', ['%name' => $username]));
+      return;
+    }
+    if (!$this->credentialsCheckFlood->isAllowedHost($this->clientIp)) {
+      $form_state->setErrorByName($name_element, $this->t('Too many failed login attempts from your IP address. This IP address is temporarily blocked. Try again later or <a href=":url">request a new password</a>.', [':url' => Url::fromRoute('user.pass')]));
+      $this->credentialsCheckFlood->register($this->clientIp, $username);
+      return;
+    }
+    elseif (!$this->credentialsCheckFlood->isAllowedAccount($this->clientIp, $username)) {
+      $form_state->setErrorByName($name_element, $this->t('Too many failed login attempts for this account. It is temporarily blocked. Try again later or <a href=":url">request a new password</a>.', [':url' => Url::fromRoute('user.pass')]));
+      $this->credentialsCheckFlood->register($this->clientIp, $username);
+      return;
+    }
+
+    $uid = $this->userAuth->authenticate($username, $password);
+    if (!$uid) {
+      $this->credentialsCheckFlood->register($this->clientIp, $username);
+      $form_state->setError($name_element, $this->t('Unrecognized username or password. <a href=":url">Have you forgotten your password?</a>', [':url' => $password_url]));
+    }
+    $form_state->set('logged_in_uid', $uid);
+  }
+
+  /**
+   * Validates the registration form and creates a new user.
+   *
+   * @param array $pane_form
+   *   The pane form, containing the following basic properties:
+   *   - #parents: Identifies the position of the pane form in the overall
+   *     parent form, and identifies the location where the field values are
+   *     placed within $form_state->getValues().
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   *   The form state of the parent form.
+   * @param array $complete_form
+   *   The complete form structure.
+   */
+  protected function validateRegister(array &$pane_form, FormStateInterface $form_state, array &$complete_form) {
+    if ($user_values = $this->getAndValidateRegisterUserValues($pane_form, $form_state)) {
+
+      /** @var \Drupal\user\UserInterface $account */
+      $account = $this->entityTypeManager->getStorage('user')->create($user_values);
+
+      // Validate the entity. This will ensure that the username and email
+      // are in the right format and not already taken.
+      $violations = $account->validate();
+      foreach ($violations->getByFields(['name', 'mail']) as $violation) {
+        list($field_name) = explode('.', $violation->getPropertyPath(), 2);
+        $form_state->setError($pane_form['register'][$field_name], $violation->getMessage());
+      }
+
+      if (!$form_state->hasAnyErrors()) {
+        $account->save();
+        $form_state->set('logged_in_uid', $account->id());
+      }
+    }
+  }
+
+  /**
+   * Validates form values for the register form.
+   *
+   * @param array $pane_form
+   *   The pane form, containing the following basic properties:
+   *   - #parents: Identifies the position of the pane form in the overall
+   *     parent form, and identifies the location where the field values are
+   *     placed within $form_state->getValues().
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   *   The form state of the parent form.
+   *
+   * @return array|null
+   *   Either an array of values that can be used to create a new user or NULL
+   *   if there are validation errors.
+   */
+  protected function getAndValidateRegisterUserValues(array &$pane_form, FormStateInterface $form_state) {
+    $values = $form_state->getValue($pane_form['#parents']);
+
+    $user_values = [
+      'status' => TRUE
+    ];
+
+    // If the e-mail, username and password fields are visible, ensure they
+    // have a value and add them to the user values. This allows subclasses and
+    // form alters to hide certain form elements and then provide alternative
+    // values, for example to set the username based on the e-mail.
+    $email_element = $pane_form['register']['mail'];
+    if (!isset($email_element['#access']) || $email_element['#access']) {
+      $email = $values['register']['mail'];
+      if (empty($email)) {
+        $form_state->setError($email_element, $this->t('Email field is required.'));
+        return NULL;
+      }
+      else {
+        $user_values['mail'] = $email;
+      }
+    }
+
+    $name_element = $pane_form['register']['name'];
+    if (!isset($name_element['#access']) || $name_element['#access']) {
+      $username = $values['register']['name'];
+      if (empty($username)) {
+        $form_state->setError($name_element, $this->t('Username field is required.'));
+        return NULL;
+      }
+      else {
+        $user_values['name'] = $username;
+      }
+    }
+
+    $password_element = $pane_form['register']['password'];
+    if (!isset($password_element['#access']) || $password_element['#access']) {
+      $password = trim($values['register']['password']);
+      if (empty($password)) {
+        $form_state->setError($pane_form['register']['password'], $this->t('Password field is required.'));
+        return NULL;
+      }
+      else {
+        $user_values['pass'] = $password;
+      }
+    }
+    return $user_values;
   }
 
   /**
