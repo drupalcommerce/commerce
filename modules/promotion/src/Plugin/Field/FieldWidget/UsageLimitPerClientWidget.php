@@ -50,7 +50,7 @@ class UsageLimitPerClientWidget extends WidgetBase {
     $element['usage_limit_per_client'] = [
       '#type' => 'number',
       '#title' => $this->t('Number of uses per client'),
-      '#default_value' => $value,
+      '#default_value' => $value?: NULL,
       '#description' => $this->t('Limit the number of uses per client.'),
       '#states' => [
         'invisible' => [
