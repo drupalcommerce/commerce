@@ -120,9 +120,9 @@ class OrderForm extends ContentEntityForm {
     if (isset($form['uid'])) {
       $form['uid']['#group'] = 'customer';
     }
-    else {
-      $user_link = $order->getCustomer()->toLink()->toString();
-      $form['customer']['uid'] = $this->fieldAsReadOnly($this->t('Customer'), $user_link);
+    elseif ($customer = $order->getCustomer()) {
+      $customer_link = $customer->toLink()->toString();
+      $form['customer']['uid'] = $this->fieldAsReadOnly($this->t('Customer'), $customer_link);
     }
     if (isset($form['mail'])) {
       $form['mail']['#group'] = 'customer';
