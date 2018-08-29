@@ -211,3 +211,27 @@ function commerce_order_post_update_8() {
   $field->setLocked(FALSE);
   $field->save();
 }
+
+/**
+ * Grants the "manage order items" permission to roles that can update orders.
+ */
+function commerce_order_post_update_9() {
+  $entity_type_manager = \Drupal::entityTypeManager();
+  /** @var \Drupal\commerce_order\Entity\OrderItemTypeInterface[] $order_item_types */
+  $order_item_types = $entity_type_manager->getStorage('commerce_order_item_type')->loadMultiple();
+  /** @var \Drupal\user\RoleInterface[] $roles */
+  $roles = $entity_type_manager->getStorage('user_role')->loadMultiple();
+
+  $order_type_storage = $entity_type_manager->getStorage('commerce_order_type');
+  foreach ($roles as $role) {
+    foreach ($order_item_types as $order_item_type) {
+      $order_type = $order_type_storage->load($order_item_type->getOrderTypeId());
+      // If the role can update the order type, then it can also manage the
+      // order items of this bundle.
+      if ($role->hasPermission("update {$order_type->id()} commerce_order")) {
+        $role->grantPermission("manage {$order_item_type->id()} commerce_order_item");
+      }
+    }
+    $role->save();
+  }
+}

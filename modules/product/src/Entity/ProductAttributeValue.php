@@ -23,7 +23,7 @@ use Drupal\Core\Field\BaseFieldDefinition;
  *   handlers = {
  *     "event" = "Drupal\commerce_product\Event\ProductAttributeValueEvent",
  *     "storage" = "Drupal\commerce_product\ProductAttributeValueStorage",
- *     "access" = "Drupal\commerce\EmbeddedEntityAccessControlHandler",
+ *     "access" = "Drupal\commerce_product\ProductAttributeValueAccessControlHandler",
  *     "view_builder" = "Drupal\Core\Entity\EntityViewBuilder",
  *     "views_data" = "Drupal\commerce\CommerceEntityViewsData",
  *     "translation" = "Drupal\content_translation\ContentTranslationHandler"

@@ -30,7 +30,8 @@ use Drupal\user\UserInterface;
  *   handlers = {
  *     "event" = "Drupal\commerce_product\Event\ProductVariationEvent",
  *     "storage" = "Drupal\commerce_product\ProductVariationStorage",
- *     "access" = "Drupal\commerce\EmbeddedEntityAccessControlHandler",
+ *     "access" = "Drupal\commerce_product\ProductVariationAccessControlHandler",
+ *     "permission_provider" = "Drupal\commerce_product\ProductVariationPermissionProvider",
  *     "view_builder" = "Drupal\Core\Entity\EntityViewBuilder",
  *     "views_data" = "Drupal\commerce\CommerceEntityViewsData",
  *     "form" = {

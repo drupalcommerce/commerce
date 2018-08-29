@@ -19,13 +19,14 @@ use Drupal\Core\Field\BaseFieldDefinition;
  *     plural = "@count logs",
  *   ),
  *   handlers = {
- *     "access" = "Drupal\commerce\EmbeddedEntityAccessControlHandler",
+ *     "access" = "Drupal\commerce_log\LogAccessControlHandler",
  *     "list_builder" = "Drupal\commerce_log\LogListBuilder",
  *     "storage" = "Drupal\commerce_log\LogStorage",
  *     "view_builder" = "Drupal\commerce_log\LogViewBuilder",
  *     "views_data" = "Drupal\commerce\CommerceEntityViewsData",
  *   },
  *   base_table = "commerce_log",
+ *   internal = TRUE,
  *   entity_keys = {
  *     "id" = "log_id",
  *     "uuid" = "uuid",

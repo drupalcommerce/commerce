@@ -22,11 +22,12 @@ use Drupal\Core\Field\BaseFieldDefinition;
  *     singular = "@count order item",
  *     plural = "@count order items",
  *   ),
- *   bundle_label = @Translation("order item type"),
+ *   bundle_label = @Translation("Order item type"),
  *   handlers = {
  *     "event" = "Drupal\commerce_order\Event\OrderItemEvent",
  *     "storage" = "Drupal\commerce_order\OrderItemStorage",
- *     "access" = "Drupal\commerce\EmbeddedEntityAccessControlHandler",
+ *     "access" = "Drupal\commerce_order\OrderItemAccessControlHandler",
+ *     "permission_provider" = "Drupal\commerce_order\OrderItemPermissionProvider",
  *     "views_data" = "Drupal\commerce_order\OrderItemViewsData",
  *     "form" = {
  *       "default" = "Drupal\Core\Entity\ContentEntityForm",

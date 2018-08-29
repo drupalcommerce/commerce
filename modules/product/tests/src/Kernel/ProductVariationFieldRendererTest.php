@@ -109,6 +109,9 @@ class ProductVariationFieldRendererTest extends CommerceKernelTestBase {
     $attribute->save();
 
     $this->container->get('commerce_product.attribute_field_manager')->createField($attribute, $this->secondVariationType->id());
+
+    $user = $this->createUser([], ['administer commerce_product']);
+    $this->container->get('current_user')->setAccount($user);
   }
 
   /**

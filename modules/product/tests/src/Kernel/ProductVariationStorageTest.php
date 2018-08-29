@@ -42,6 +42,9 @@ class ProductVariationStorageTest extends CommerceKernelTestBase {
     $this->installConfig(['commerce_product']);
 
     $this->variationStorage = $this->container->get('entity_type.manager')->getStorage('commerce_product_variation');
+
+    $user = $this->createUser([], ['administer commerce_product']);
+    $this->container->get('current_user')->setAccount($user);
   }
 
   /**
