@@ -183,6 +183,9 @@ class AddToCartForm extends ContentEntityForm implements AddToCartFormInterface 
       '#type' => 'submit',
       '#value' => $this->t('Add to cart'),
       '#submit' => ['::submitForm'],
+      '#attributes' => [
+        'class' => ['button--add-to-cart'],
+      ],
     ];
 
     return $actions;
