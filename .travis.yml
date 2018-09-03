@@ -41,7 +41,7 @@ env:
 
     # The environment to use, supported are: drupal-7, drupal-8
     - DRUPAL_TI_ENVIRONMENT="drupal-8"
-    - DRUPAL_TI_CORE_BRANCH="8.5.x"
+    - DRUPAL_TI_CORE_BRANCH="8.6.x"
 
     # Drupal specific variables.
     - DRUPAL_TI_DB="drupal_travis_db"
