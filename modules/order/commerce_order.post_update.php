@@ -208,8 +208,10 @@ function commerce_order_post_update_7() {
  */
 function commerce_order_post_update_8() {
   $field = FieldStorageConfig::loadByName('profile', 'address');
-  $field->setLocked(FALSE);
-  $field->save();
+  if ($field) {
+    $field->setLocked(FALSE);
+    $field->save();
+  }
 }
 
 /**
