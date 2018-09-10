@@ -4,7 +4,7 @@ namespace Drupal\Tests\commerce\Functional;
 
 use Drupal\Component\Render\FormattableMarkup;
 use Drupal\commerce_store\StoreCreationTrait;
-use Drupal\simpletest\BlockCreationTrait;
+use Drupal\Tests\block\Traits\BlockCreationTrait;
 use Drupal\Tests\BrowserTestBase;
 
 /**
