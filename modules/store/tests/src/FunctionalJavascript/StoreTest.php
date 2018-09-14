@@ -44,6 +44,7 @@ class StoreTest extends CommerceBrowserTestBase {
     $this->assertSession()->fieldExists('address[0][address][country_code]');
     $this->assertSession()->fieldExists('billing_countries[]');
     $this->assertSession()->fieldExists('uid[0][target_id]');
+    $this->assertSession()->fieldExists('status[value]');
     $this->assertSession()->fieldExists('default');
 
     $this->getSession()->getPage()->fillField('address[0][address][country_code]', 'US');
@@ -78,9 +79,12 @@ class StoreTest extends CommerceBrowserTestBase {
     $store = $this->createStore();
 
     $this->drupalGet($store->toUrl('edit-form'));
+    $this->assertSession()->fieldExists('status[value]');
+
     $new_store_name = $this->randomMachineName(8);
     $edit = [
       'name[0][value]' => $new_store_name,
+      'status[value]' => 1,
     ];
     $this->submitForm($edit, 'Save');
 

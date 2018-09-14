@@ -16,6 +16,14 @@ class StoreTypeForm extends CommerceBundleEntityFormBase {
     $form = parent::form($form, $form_state);
     /** @var \Drupal\commerce_store\Entity\StoreTypeInterface $store_type */
     $store_type = $this->entity;
+    // Create an empty store to get the default status value.
+    // @todo Clean up once https://www.drupal.org/node/2318187 is fixed.
+    if ($this->operation == 'add') {
+      $store = $this->entityTypeManager->getStorage('commerce_store')->create(['type' => $store_type->uuid()]);
+    }
+    else {
+      $store = $this->entityTypeManager->getStorage('commerce_store')->create(['type' => $store_type->id()]);
+    }
 
     $form['label'] = [
       '#type' => 'textfield',
@@ -36,6 +44,12 @@ class StoreTypeForm extends CommerceBundleEntityFormBase {
       '#type' => 'textfield',
       '#title' => $this->t('Description'),
       '#default_value' => $store_type->getDescription(),
+    ];
+
+    $form['store_status'] = [
+      '#type' => 'checkbox',
+      '#title' => t('Publish new stores of this type by default.'),
+      '#default_value' => $store->isPublished(),
     ];
     $form = $this->buildTraitForm($form, $form_state);
 
@@ -70,7 +84,15 @@ class StoreTypeForm extends CommerceBundleEntityFormBase {
    * {@inheritdoc}
    */
   public function save(array $form, FormStateInterface $form_state) {
-    $this->entity->save();
+    $status = $this->entity->save();
+    // Update the default value of the status field.
+    $store = $this->entityTypeManager->getStorage('commerce_store')->create(['type' => $this->entity->id()]);
+    $value = (bool) $form_state->getValue('store_status');
+    if ($store->status->value != $value) {
+      $fields = $this->entityFieldManager->getFieldDefinitions('commerce_store', $this->entity->id());
+      $fields['status']->getConfig($this->entity->id())->setDefaultValue($value)->save();
+      $this->entityFieldManager->clearCachedFieldDefinitions();
+    }
     $this->submitTraitForm($form, $form_state);
 
     $this->messenger()->addMessage($this->t('Saved the %label store type.', [

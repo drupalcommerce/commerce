@@ -17,6 +17,7 @@ class StoreListBuilder extends EntityListBuilder {
   public function buildHeader() {
     $header['name'] = t('Name');
     $header['type'] = t('Type');
+    $header['status'] = t('Status');
     return $header + parent::buildHeader();
   }
 
@@ -32,6 +33,7 @@ class StoreListBuilder extends EntityListBuilder {
       '#title' => $entity->label(),
     ] + $entity->toUrl()->toRenderArray();
     $row['type'] = $store_type->label();
+    $row['status'] = $entity->isPublished() ? $this->t('Published') : $this->t('Unpublished');
 
     return $row + parent::buildRow($entity);
   }
