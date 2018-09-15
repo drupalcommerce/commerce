@@ -30,7 +30,7 @@ class PromotionUsage implements PromotionUsageInterface {
   /**
    * {@inheritdoc}
    */
-  public function addUsage(OrderInterface $order, PromotionInterface $promotion, CouponInterface $coupon = NULL) {
+  public function register(OrderInterface $order, PromotionInterface $promotion, CouponInterface $coupon = NULL) {
     $this->connection->insert('commerce_promotion_usage')
       ->fields([
         'promotion_id' => $promotion->id(),
@@ -44,7 +44,7 @@ class PromotionUsage implements PromotionUsageInterface {
   /**
    * {@inheritdoc}
    */
-  public function deleteUsage(array $promotions) {
+  public function delete(array $promotions) {
     $this->connection->delete('commerce_promotion_usage')
       ->condition('promotion_id', EntityHelper::extractIds($promotions), 'IN')
       ->execute();
@@ -53,16 +53,32 @@ class PromotionUsage implements PromotionUsageInterface {
   /**
    * {@inheritdoc}
    */
-  public function getUsage(PromotionInterface $promotion, CouponInterface $coupon = NULL, $mail = NULL) {
-    $coupons = $coupon ? [$coupon] : [];
-    $usages = $this->getUsageMultiple([$promotion], $coupons, $mail);
+  public function deleteByCoupon(array $coupons) {
+    $this->connection->delete('commerce_promotion_usage')
+      ->condition('coupon_id', EntityHelper::extractIds($coupons), 'IN')
+      ->execute();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function load(PromotionInterface $promotion, $mail = NULL) {
+    $usages = $this->loadMultiple([$promotion], $mail);
     return $usages[$promotion->id()];
   }
 
   /**
    * {@inheritdoc}
    */
-  public function getUsageMultiple(array $promotions, array $coupons = [], $mail = NULL) {
+  public function loadByCoupon(CouponInterface $coupon, $mail = NULL) {
+    $usages = $this->loadMultipleByCoupon([$coupon], $mail);
+    return $usages[$coupon->id()];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function loadMultiple(array $promotions, $mail = NULL) {
     if (empty($promotions)) {
       return [];
     }
@@ -71,9 +87,6 @@ class PromotionUsage implements PromotionUsageInterface {
     $query->addField('cpu', 'promotion_id');
     $query->addExpression('COUNT(promotion_id)', 'count');
     $query->condition('promotion_id', $promotion_ids, 'IN');
-    if (!empty($coupons)) {
-      $query->condition('coupon_id', EntityHelper::extractIds($coupons), 'IN');
-    }
     if (!empty($mail)) {
       $query->condition('mail', $mail);
     }
@@ -86,6 +99,36 @@ class PromotionUsage implements PromotionUsageInterface {
       $counts[$promotion_id] = 0;
       if (isset($result[$promotion_id])) {
         $counts[$promotion_id] = $result[$promotion_id]['count'];
+      }
+    }
+
+    return $counts;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function loadMultipleByCoupon(array $coupons, $mail = NULL) {
+    if (empty($coupons)) {
+      return [];
+    }
+    $coupon_ids = EntityHelper::extractIds($coupons);
+    $query = $this->connection->select('commerce_promotion_usage', 'cpu');
+    $query->addField('cpu', 'coupon_id');
+    $query->addExpression('COUNT(coupon_id)', 'count');
+    $query->condition('coupon_id', $coupon_ids, 'IN');
+    if (!empty($mail)) {
+      $query->condition('mail', $mail);
+    }
+    $query->groupBy('coupon_id');
+    $result = $query->execute()->fetchAllAssoc('coupon_id', \PDO::FETCH_ASSOC);
+    // Ensure that each coupon ID gets a count, even if it's not present
+    // in the query due to non-existent usage.
+    $counts = [];
+    foreach ($coupon_ids as $coupon_id) {
+      $counts[$coupon_id] = 0;
+      if (isset($result[$coupon_id])) {
+        $counts[$coupon_id] = $result[$coupon_id]['count'];
       }
     }
 

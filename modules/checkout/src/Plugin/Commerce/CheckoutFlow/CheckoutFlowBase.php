@@ -4,6 +4,7 @@ namespace Drupal\commerce_checkout\Plugin\Commerce\CheckoutFlow;
 
 use Drupal\commerce\Response\NeedsRedirectException;
 use Drupal\Component\Utility\NestedArray;
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Link;
@@ -44,6 +45,15 @@ abstract class CheckoutFlowBase extends PluginBase implements CheckoutFlowInterf
   protected $order;
 
   /**
+   * The ID of the parent config entity.
+   *
+   * Not available while the plugin is being configured.
+   *
+   * @var string
+   */
+  protected $entityId;
+
+  /**
    * Constructs a new CheckoutFlowBase object.
    *
    * @param array $configuration
@@ -62,10 +72,14 @@ abstract class CheckoutFlowBase extends PluginBase implements CheckoutFlowInterf
   public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityTypeManagerInterface $entity_type_manager, EventDispatcherInterface $event_dispatcher, RouteMatchInterface $route_match) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
 
-    $this->setConfiguration($configuration);
     $this->entityTypeManager = $entity_type_manager;
     $this->eventDispatcher = $event_dispatcher;
     $this->order = $route_match->getParameter('commerce_order');
+    if (array_key_exists('_entity_id', $configuration)) {
+      $this->entityId = $configuration['_entity_id'];
+      unset($configuration['_entity_id']);
+    }
+    $this->setConfiguration($configuration);
   }
 
   /**
@@ -112,11 +126,9 @@ abstract class CheckoutFlowBase extends PluginBase implements CheckoutFlowInterf
    */
   public function redirectToStep($step_id) {
     $this->order->set('checkout_step', $step_id);
-    if ($step_id == 'complete') {
-      $transition = $this->order->getState()->getWorkflow()->getTransition('place');
-      $this->order->getState()->applyTransition($transition);
-    }
+    $this->onStepChange($step_id);
     $this->order->save();
+
     throw new NeedsRedirectException(Url::fromRoute('commerce_checkout.form', [
       'commerce_order' => $this->order->id(),
       'step' => $step_id,
@@ -138,7 +150,7 @@ abstract class CheckoutFlowBase extends PluginBase implements CheckoutFlowInterf
       ],
       'complete' => [
         'label' => $this->t('Complete'),
-        'next_label' => $this->t('Pay and complete purchase'),
+        'next_label' => $this->t('Complete checkout'),
         'has_sidebar' => FALSE,
       ],
     ];
@@ -207,6 +219,7 @@ abstract class CheckoutFlowBase extends PluginBase implements CheckoutFlowInterf
   public function submitConfigurationForm(array &$form, FormStateInterface $form_state) {
     if (!$form_state->getErrors()) {
       $values = $form_state->getValue($form['#parents']);
+      $this->configuration = [];
       $this->configuration['display_checkout_progress'] = $values['display_checkout_progress'];
     }
   }
@@ -234,6 +247,11 @@ abstract class CheckoutFlowBase extends PluginBase implements CheckoutFlowInterf
     if (empty($step_id)) {
       throw new \InvalidArgumentException('The $step_id cannot be empty.');
     }
+    if ($form_state->isRebuilding()) {
+      // Ensure a fresh order, in case an ajax submit has modified it.
+      $order_storage = $this->entityTypeManager->getStorage('commerce_order');
+      $this->order = $order_storage->load($this->order->id());
+    }
 
     $steps = $this->getVisibleSteps();
     $form['#tree'] = TRUE;
@@ -243,14 +261,19 @@ abstract class CheckoutFlowBase extends PluginBase implements CheckoutFlowInterf
     $form['#attached']['library'][] = 'commerce_checkout/form';
     if ($this->hasSidebar($step_id)) {
       $form['sidebar']['order_summary'] = [
-        '#type' => 'view',
-        '#name' => 'commerce_checkout_order_summary',
-        '#display_id' => 'default',
-        '#arguments' => [$this->order->id()],
-        '#embed' => TRUE,
+        '#theme' => 'commerce_checkout_order_summary',
+        '#order_entity' => $this->order,
+        '#checkout_step' => $step_id,
       ];
     }
     $form['actions'] = $this->actions($form, $form_state);
+
+    // Make sure the cache is removed if the parent entity or the order change.
+    $parent_entity = $this->entityTypeManager->getStorage('commerce_checkout_flow')->load($this->entityId);
+    CacheableMetadata::createFromRenderArray($form)
+      ->addCacheableDependency($parent_entity)
+      ->addCacheableDependency($this->order)
+      ->applyTo($form);
 
     return $form;
   }
@@ -266,19 +289,43 @@ abstract class CheckoutFlowBase extends PluginBase implements CheckoutFlowInterf
   public function submitForm(array &$form, FormStateInterface $form_state) {
     if ($next_step_id = $this->getNextStepId($form['#step_id'])) {
       $this->order->set('checkout_step', $next_step_id);
+      $this->onStepChange($next_step_id);
+
       $form_state->setRedirect('commerce_checkout.form', [
         'commerce_order' => $this->order->id(),
         'step' => $next_step_id,
       ]);
-
-      if ($next_step_id == 'complete') {
-        // Place the order.
-        $transition = $this->order->getState()->getWorkflow()->getTransition('place');
-        $this->order->getState()->applyTransition($transition);
-      }
     }
 
     $this->order->save();
+  }
+
+  /**
+   * Reacts to the current step changing.
+   *
+   * Called before saving the order and redirecting.
+   *
+   * Handles the following logic
+   * 1) Locks the order before the payment page,
+   * 2) Unlocks the order when leaving the payment page
+   * 3) Places the order before the complete page.
+   *
+   * @param string $step_id
+   *   The new step ID.
+   */
+  protected function onStepChange($step_id) {
+    // Lock the order while on the 'payment' checkout step. Unlock elsewhere.
+    if ($step_id == 'payment') {
+      $this->order->lock();
+    }
+    elseif ($step_id != 'payment') {
+      $this->order->unlock();
+    }
+    // Place the order.
+    if ($step_id == 'complete') {
+      $transition = $this->order->getState()->getWorkflow()->getTransition('place');
+      $this->order->getState()->applyTransition($transition);
+    }
   }
 
   /**

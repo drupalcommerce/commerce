@@ -3,6 +3,7 @@ status: true
 dependencies:
   enforced:
     module:
+      - commerce_checkout
       - commerce_order
   module:
     - commerce_order
@@ -266,7 +267,7 @@ display:
           type: commerce_price_default
           settings:
             strip_trailing_zeroes: false
-            display_currency_code: false
+            currency_display: symbol
           group_column: ''
           group_columns: {  }
           group_rows: true

@@ -2,12 +2,12 @@
 
 namespace Drupal\commerce_order;
 
-use Drupal\views\EntityViewsData;
+use Drupal\commerce\CommerceEntityViewsData;
 
 /**
  * Provides views data for order items.
  */
-class OrderItemViewsData extends EntityViewsData {
+class OrderItemViewsData extends CommerceEntityViewsData {
 
   /**
    * {@inheritdoc}

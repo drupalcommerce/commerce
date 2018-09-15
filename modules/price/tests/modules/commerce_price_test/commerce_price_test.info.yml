@@ -3,5 +3,5 @@ type: module
 package: Testing
 core: 8.x
 dependencies:
-  - commerce_store
-  - commerce_price
+  - commerce:commerce_store
+  - commerce:commerce_price

@@ -49,24 +49,24 @@ class OrderEventSubscriber implements EventSubscriberInterface {
    */
   public static function getSubscribedEvents() {
     $events = [
-      'commerce_order.place.pre_transition' => 'addUsage',
+      'commerce_order.place.pre_transition' => 'registerUsage',
     ];
     return $events;
   }
 
   /**
-   * Adds promotion usage when the order is placed.
+   * Registers promotion usage when the order is placed.
    *
    * @param \Drupal\state_machine\Event\WorkflowTransitionEvent $event
    *   The workflow transition event.
    */
-  public function addUsage(WorkflowTransitionEvent $event) {
+  public function registerUsage(WorkflowTransitionEvent $event) {
     /** @var \Drupal\commerce_order\Entity\OrderInterface $order */
     $order = $event->getEntity();
     $coupon_promotion_ids = [];
     foreach ($order->coupons->referencedEntities() as $coupon) {
       /** @var \Drupal\commerce_promotion\Entity\CouponInterface $coupon */
-      $this->usage->addUsage($order, $coupon->getPromotion(), $coupon);
+      $this->usage->register($order, $coupon->getPromotion(), $coupon);
       $coupon_promotion_ids[] = $coupon->getPromotionId();
     }
 
@@ -79,7 +79,11 @@ class OrderEventSubscriber implements EventSubscriberInterface {
       $promotion_id = $adjustment->getSourceId();
       if ($promotion_id && !in_array($promotion_id, $coupon_promotion_ids)) {
         $promotion = $this->promotionStorage->load($promotion_id);
-        $this->usage->addUsage($order, $promotion);
+        // Not every adjustment can be mapped to a promotion (because the
+        // the promotion was deleted, or because the adjustment is custom).
+        if ($promotion) {
+          $this->usage->register($order, $promotion);
+        }
       }
     }
   }

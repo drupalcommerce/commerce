@@ -71,8 +71,7 @@ class ProductVariationTitleWidget extends ProductVariationWidgetBase implements 
   public function formElement(FieldItemListInterface $items, $delta, array $element, array &$form, FormStateInterface $form_state) {
     /** @var \Drupal\commerce_product\Entity\ProductInterface $product */
     $product = $form_state->get('product');
-    /** @var \Drupal\commerce_product\Entity\ProductVariationInterface[] $variations */
-    $variations = $this->variationStorage->loadEnabled($product);
+    $variations = $this->loadEnabledVariations($product);
     if (count($variations) === 0) {
       // Nothing to purchase, tell the parent form to hide itself.
       $form_state->set('hide_form', TRUE);
@@ -105,11 +104,7 @@ class ProductVariationTitleWidget extends ProductVariationWidgetBase implements 
       $selected_variation = $this->selectVariationFromUserInput($variations, $user_input);
     }
     else {
-      $selected_variation = $this->variationStorage->loadFromContext($product);
-      // The returned variation must also be enabled.
-      if (!in_array($selected_variation, $variations)) {
-        $selected_variation = reset($variations);
-      }
+      $selected_variation = $this->getDefaultVariation($product, $variations);
     }
 
     // Set the selected variation in the form state for our AJAX callback.

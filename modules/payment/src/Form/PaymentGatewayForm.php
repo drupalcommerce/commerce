@@ -2,13 +2,13 @@
 
 namespace Drupal\commerce_payment\Form;
 
-use Drupal\commerce\Form\CommercePluginEntityFormBase;
 use Drupal\commerce_payment\PaymentGatewayManager;
 use Drupal\Component\Utility\Html;
+use Drupal\Core\Entity\EntityForm;
 use Drupal\Core\Form\FormStateInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
-class PaymentGatewayForm extends CommercePluginEntityFormBase {
+class PaymentGatewayForm extends EntityForm {
 
   /**
    * The payment gateway plugin manager.
@@ -68,6 +68,8 @@ class PaymentGatewayForm extends CommercePluginEntityFormBase {
     }
     // The form state will have a plugin value if #ajax was used.
     $plugin = $form_state->getValue('plugin', $gateway->getPluginId());
+    // Pass the plugin configuration only if the plugin hasn't been changed via #ajax.
+    $plugin_configuration = $gateway->getPluginId() == $plugin ? $gateway->getPluginConfiguration() : [];
 
     $wrapper_id = Html::getUniqueId('shipping-method-form');
     $form['#tree'] = TRUE;
@@ -88,6 +90,7 @@ class PaymentGatewayForm extends CommercePluginEntityFormBase {
       '#machine_name' => [
         'exists' => '\Drupal\commerce_payment\Entity\PaymentGateway::load',
       ],
+      '#disabled' => !$gateway->isNew(),
     ];
     $form['plugin'] = [
       '#type' => 'radios',
@@ -102,16 +105,39 @@ class PaymentGatewayForm extends CommercePluginEntityFormBase {
       ],
     ];
     $form['configuration'] = [
-      '#parents' => ['configuration'],
+      '#type' => 'commerce_plugin_configuration',
+      '#plugin_type' => 'commerce_payment_gateway',
+      '#plugin_id' => $plugin,
+      '#default_value' => $plugin_configuration,
     ];
-    $form['configuration'] = $gateway->getPlugin()->buildConfigurationForm($form['configuration'], $form_state);
+    $form['conditions'] = [
+      '#type' => 'commerce_conditions',
+      '#title' => $this->t('Conditions'),
+      '#parent_entity_type' => 'commerce_payment_gateway',
+      '#entity_types' => ['commerce_order'],
+      '#default_value' => $gateway->get('conditions'),
+    ];
+    $form['conditionOperator'] = [
+      '#type' => 'radios',
+      '#title' => $this->t('Condition operator'),
+      '#title_display' => 'invisible',
+      '#options' => [
+        'AND' => $this->t('All conditions must pass'),
+        'OR' => $this->t('Only one condition must pass'),
+      ],
+      '#default_value' => $gateway->getConditionOperator(),
+    ];
     $form['status'] = [
-      '#type' => 'checkbox',
-      '#title' => $this->t('Enabled'),
-      '#default_value' => $gateway->status(),
+      '#type' => 'radios',
+      '#title' => $this->t('Status'),
+      '#options' => [
+        0 => $this->t('Disabled'),
+        1  => $this->t('Enabled'),
+      ],
+      '#default_value' => (int) $gateway->status(),
     ];
 
-    return $this->protectPluginIdElement($form);
+    return $form;
   }
 
   /**
@@ -124,23 +150,12 @@ class PaymentGatewayForm extends CommercePluginEntityFormBase {
   /**
    * {@inheritdoc}
    */
-  public function validateForm(array &$form, FormStateInterface $form_state) {
-    parent::validateForm($form, $form_state);
-
-    /** @var \Drupal\commerce_payment\Entity\PaymentGatewayInterface $gateway */
-    $gateway = $this->entity;
-    $gateway->getPlugin()->validateConfigurationForm($form['configuration'], $form_state);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function submitForm(array &$form, FormStateInterface $form_state) {
     parent::submitForm($form, $form_state);
 
     /** @var \Drupal\commerce_payment\Entity\PaymentGatewayInterface $gateway */
     $gateway = $this->entity;
-    $gateway->getPlugin()->submitConfigurationForm($form['configuration'], $form_state);
+    $gateway->setPluginConfiguration($form_state->getValue(['configuration']));
   }
 
   /**
@@ -148,7 +163,7 @@ class PaymentGatewayForm extends CommercePluginEntityFormBase {
    */
   public function save(array $form, FormStateInterface $form_state) {
     $this->entity->save();
-    drupal_set_message($this->t('Saved the %label payment gateway.', ['%label' => $this->entity->label()]));
+    $this->messenger()->addMessage($this->t('Saved the %label payment gateway.', ['%label' => $this->entity->label()]));
     $form_state->setRedirect('entity.commerce_payment_gateway.collection');
   }
 

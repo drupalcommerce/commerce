@@ -2,7 +2,7 @@
 
 namespace Drupal\commerce_payment\Plugin\Commerce\PaymentMethodType;
 
-use Drupal\commerce\BundleFieldDefinition;
+use Drupal\entity\BundleFieldDefinition;
 use Drupal\commerce_payment\Entity\PaymentMethodInterface;
 
 /**
@@ -10,8 +10,7 @@ use Drupal\commerce_payment\Entity\PaymentMethodInterface;
  *
  * @CommercePaymentMethodType(
  *   id = "paypal",
- *   label = @Translation("PayPal account"),
- *   create_label = @Translation("New PayPal account"),
+ *   label = @Translation("PayPal"),
  * )
  */
 class PayPal extends PaymentMethodTypeBase {
@@ -23,7 +22,7 @@ class PayPal extends PaymentMethodTypeBase {
     $args = [
       '@paypal_mail' => $payment_method->paypal_mail->value,
     ];
-    return $this->t('PayPal account (@paypal_mail)', $args);
+    return $this->t('PayPal (@paypal_mail)', $args);
   }
 
   /**

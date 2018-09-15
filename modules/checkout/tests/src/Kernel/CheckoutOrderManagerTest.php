@@ -90,6 +90,11 @@ class CheckoutOrderManagerTest extends CommerceKernelTestBase {
     $checkout_flow = $this->checkoutOrderManager->getCheckoutFlow($this->order);
     $this->assertInstanceOf(CheckoutFlow::class, $checkout_flow);
     $this->assertEquals('default', $checkout_flow->id());
+
+    $this->order->checkout_flow->target_id = 'deleted';
+    $checkout_flow = $this->checkoutOrderManager->getCheckoutFlow($this->order);
+    $this->assertInstanceOf(CheckoutFlow::class, $checkout_flow);
+    $this->assertEquals('default', $checkout_flow->id());
   }
 
   /**

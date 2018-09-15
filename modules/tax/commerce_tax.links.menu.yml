@@ -1,0 +1,5 @@
+entity.commerce_tax_type.collection:
+  title: 'Tax types'
+  route_name: 'entity.commerce_tax_type.collection'
+  parent: 'commerce.store_configuration'
+  description: 'Define the taxes you collect.'

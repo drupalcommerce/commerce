@@ -101,14 +101,14 @@ class PromotionOrderProcessorTest extends CommerceKernelTestBase {
       'stores' => [$this->store->id()],
       'status' => TRUE,
       'offer' => [
-        'target_plugin_id' => 'commerce_promotion_order_percentage_off',
+        'target_plugin_id' => 'order_percentage_off',
         'target_plugin_configuration' => [
-          'amount' => '0.10',
+          'percentage' => '0.10',
         ],
       ],
       'conditions' => [
         [
-          'target_plugin_id' => 'commerce_promotion_order_total_price',
+          'target_plugin_id' => 'order_total_price',
           'target_plugin_configuration' => [
             'amount' => [
               'number' => '20.00',
@@ -120,10 +120,11 @@ class PromotionOrderProcessorTest extends CommerceKernelTestBase {
     ]);
     $promotion->save();
 
-    $this->assertNotEmpty($promotion->applies($this->order));
+    $this->assertTrue($promotion->applies($this->order));
     $this->container->get('commerce_order.order_refresh')->refresh($this->order);
+    $this->order->recalculateTotalPrice();
 
-    $this->assertEquals(1, count($this->order->getAdjustments()));
+    $this->assertEquals(1, count($this->order->collectAdjustments()));
     $this->assertEquals(new Price('36.00', 'USD'), $this->order->getTotalPrice());
   }
 
@@ -150,14 +151,14 @@ class PromotionOrderProcessorTest extends CommerceKernelTestBase {
       'order_types' => [$this->order->bundle()],
       'stores' => [$this->store->id()],
       'offer' => [
-        'target_plugin_id' => 'commerce_promotion_order_percentage_off',
+        'target_plugin_id' => 'order_percentage_off',
         'target_plugin_configuration' => [
-          'amount' => '0.10',
+          'percentage' => '0.10',
         ],
       ],
       'conditions' => [
         [
-          'target_plugin_id' => 'commerce_promotion_order_total_price',
+          'target_plugin_id' => 'order_total_price',
           'target_plugin_configuration' => [
             'amount' => [
               'number' => '20.00',
@@ -186,8 +187,9 @@ class PromotionOrderProcessorTest extends CommerceKernelTestBase {
     $this->order->get('coupons')->appendItem($coupon);
     $this->order->save();
     $this->container->get('commerce_order.order_refresh')->refresh($this->order);
+    $this->order->recalculateTotalPrice();
 
-    $this->assertEquals(1, count($this->order->getAdjustments()));
+    $this->assertEquals(1, count($this->order->collectAdjustments()));
     $this->assertEquals(new Price('36.00', 'USD'), $this->order->getTotalPrice());
   }
 

@@ -139,7 +139,7 @@ class OrderTypeForm extends CommerceBundleEntityFormBase {
     $status = $this->entity->save();
     $this->submitTraitForm($form, $form_state);
 
-    drupal_set_message($this->t('Saved the %label order type.', ['%label' => $this->entity->label()]));
+    $this->messenger()->addMessage($this->t('Saved the %label order type.', ['%label' => $this->entity->label()]));
     $form_state->setRedirect('entity.commerce_order_type.collection');
 
     if ($status == SAVED_NEW) {

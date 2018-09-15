@@ -45,6 +45,27 @@ interface CouponInterface extends ContentEntityInterface {
   public function setCode($code);
 
   /**
+   * Gets the coupon usage limit.
+   *
+   * Represents the maximum number of times the coupon can be used.
+   * 0 for unlimited.
+   *
+   * @return int
+   *   The coupon usage limit.
+   */
+  public function getUsageLimit();
+
+  /**
+   * Sets the coupon usage limit.
+   *
+   * @param int $usage_limit
+   *   The coupon usage limit.
+   *
+   * @return $this
+   */
+  public function setUsageLimit($usage_limit);
+
+  /**
    * Gets whether the coupon is enabled.
    *
    * @return bool

@@ -25,7 +25,7 @@ class FilterVariationsEvent extends Event {
    * Constructs a new FilterVariationsEvent object.
    *
    * @param \Drupal\commerce_product\Entity\ProductInterface $product
-   *   The product.
+   *   The parent product.
    * @param array $variations
    *   The enabled variations.
    */
@@ -35,13 +35,13 @@ class FilterVariationsEvent extends Event {
   }
 
   /**
-   * Sets the enabled variations.
+   * Gets the parent product.
    *
-   * @param array $variations
-   *   The enabled variations.
+   * @return \Drupal\commerce_product\Entity\ProductInterface
+   *   The parent product.
    */
-  public function setVariations(array $variations) {
-    $this->variations = $variations;
+  public function getProduct() {
+    return $this->product;
   }
 
   /**
@@ -52,6 +52,19 @@ class FilterVariationsEvent extends Event {
    */
   public function getVariations() {
     return $this->variations;
+  }
+
+  /**
+   * Sets the enabled variations.
+   *
+   * @param array $variations
+   *   The enabled variations.
+   *
+   * @return $this
+   */
+  public function setVariations(array $variations) {
+    $this->variations = $variations;
+    return $this;
   }
 
 }

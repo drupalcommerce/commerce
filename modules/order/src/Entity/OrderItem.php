@@ -2,9 +2,9 @@
 
 namespace Drupal\commerce_order\Entity;
 
+use Drupal\commerce\Entity\CommerceContentEntityBase;
 use Drupal\commerce_order\Adjustment;
 use Drupal\commerce_price\Price;
-use Drupal\Core\Entity\ContentEntityBase;
 use Drupal\Core\Entity\EntityChangedTrait;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
@@ -22,11 +22,12 @@ use Drupal\Core\Field\BaseFieldDefinition;
  *     singular = "@count order item",
  *     plural = "@count order items",
  *   ),
- *   bundle_label = @Translation("order item type"),
+ *   bundle_label = @Translation("Order item type"),
  *   handlers = {
  *     "event" = "Drupal\commerce_order\Event\OrderItemEvent",
  *     "storage" = "Drupal\commerce_order\OrderItemStorage",
- *     "access" = "Drupal\commerce\EmbeddedEntityAccessControlHandler",
+ *     "access" = "Drupal\commerce_order\OrderItemAccessControlHandler",
+ *     "permission_provider" = "Drupal\commerce_order\OrderItemPermissionProvider",
  *     "views_data" = "Drupal\commerce_order\OrderItemViewsData",
  *     "form" = {
  *       "default" = "Drupal\Core\Entity\ContentEntityForm",
@@ -35,7 +36,6 @@ use Drupal\Core\Field\BaseFieldDefinition;
  *   },
  *   base_table = "commerce_order_item",
  *   admin_permission = "administer commerce_order",
- *   fieldable = TRUE,
  *   entity_keys = {
  *     "id" = "order_item_id",
  *     "uuid" = "uuid",
@@ -46,7 +46,7 @@ use Drupal\Core\Field\BaseFieldDefinition;
  *   field_ui_base_route = "entity.commerce_order_item_type.edit_form",
  * )
  */
-class OrderItem extends ContentEntityBase implements OrderItemInterface {
+class OrderItem extends CommerceContentEntityBase implements OrderItemInterface {
 
   use EntityChangedTrait;
 
@@ -67,8 +67,15 @@ class OrderItem extends ContentEntityBase implements OrderItemInterface {
   /**
    * {@inheritdoc}
    */
+  public function hasPurchasedEntity() {
+    return !$this->get('purchased_entity')->isEmpty();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function getPurchasedEntity() {
-    return $this->get('purchased_entity')->entity;
+    return $this->getTranslatedReferencedEntity('purchased_entity');
   }
 
   /**
@@ -105,6 +112,7 @@ class OrderItem extends ContentEntityBase implements OrderItemInterface {
    */
   public function setQuantity($quantity) {
     $this->set('quantity', (string) $quantity);
+    $this->recalculateTotalPrice();
     return $this;
   }
 
@@ -120,10 +128,27 @@ class OrderItem extends ContentEntityBase implements OrderItemInterface {
   /**
    * {@inheritdoc}
    */
-  public function setUnitPrice(Price $unit_price) {
+  public function setUnitPrice(Price $unit_price, $override = FALSE) {
     $this->set('unit_price', $unit_price);
+    $this->set('overridden_unit_price', $override);
     $this->recalculateTotalPrice();
     return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function isUnitPriceOverridden() {
+    return $this->get('overridden_unit_price')->value;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getTotalPrice() {
+    if (!$this->get('total_price')->isEmpty()) {
+      return $this->get('total_price')->first()->toPrice();
+    }
   }
 
   /**
@@ -160,10 +185,82 @@ class OrderItem extends ContentEntityBase implements OrderItemInterface {
   /**
    * {@inheritdoc}
    */
-  public function getTotalPrice() {
-    if (!$this->get('total_price')->isEmpty()) {
-      return $this->get('total_price')->first()->toPrice();
+  public function usesLegacyAdjustments() {
+    return $this->get('uses_legacy_adjustments')->value;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getAdjustedTotalPrice(array $adjustment_types = []) {
+    $total_price = $this->getTotalPrice();
+    if (!$total_price) {
+      return NULL;
     }
+
+    if ($this->usesLegacyAdjustments()) {
+      $adjusted_unit_price = $this->getAdjustedUnitPrice($adjustment_types);
+      $adjusted_total_price = $adjusted_unit_price->multiply($this->getQuantity());
+    }
+    else {
+      $adjusted_total_price = $this->applyAdjustments($total_price, $adjustment_types);
+    }
+
+    $rounder = \Drupal::service('commerce_price.rounder');
+    $adjusted_total_price = $rounder->round($adjusted_total_price);
+
+    return $adjusted_total_price;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getAdjustedUnitPrice(array $adjustment_types = []) {
+    $unit_price = $this->getUnitPrice();
+    if (!$unit_price) {
+      return NULL;
+    }
+
+    if ($this->usesLegacyAdjustments()) {
+      $adjusted_unit_price = $this->applyAdjustments($unit_price, $adjustment_types);
+    }
+    else {
+      $adjusted_total_price = $this->getAdjustedTotalPrice($adjustment_types);
+      $adjusted_unit_price = $adjusted_total_price->divide($this->getQuantity());
+    }
+
+    $rounder = \Drupal::service('commerce_price.rounder');
+    $adjusted_unit_price = $rounder->round($adjusted_unit_price);
+
+    return $adjusted_unit_price;
+  }
+
+  /**
+   * Applies adjustments to the given price.
+   *
+   * @param \Drupal\commerce_price\Price $price
+   *   The price.
+   * @param string[] $adjustment_types
+   *   The adjustment types to include in the adjusted price.
+   *   Examples: fee, promotion, tax. Defaults to all adjustment types.
+   *
+   * @return \Drupal\commerce_price\Price
+   *   The adjusted price.
+   */
+  protected function applyAdjustments(Price $price, array $adjustment_types = []) {
+    $adjusted_price = $price;
+    foreach ($this->getAdjustments() as $adjustment) {
+      if ($adjustment_types && !in_array($adjustment->getType(), $adjustment_types)) {
+        continue;
+      }
+      if ($adjustment->isIncluded()) {
+        continue;
+      }
+
+      $adjusted_price = $adjusted_price->add($adjustment->getAmount());
+    }
+
+    return $adjusted_price;
   }
 
   /**
@@ -261,9 +358,10 @@ class OrderItem extends ContentEntityBase implements OrderItemInterface {
       ->setDescription(t('The number of purchased units.'))
       ->setReadOnly(TRUE)
       ->setSetting('unsigned', TRUE)
+      ->setSetting('min', 0)
       ->setDefaultValue(1)
       ->setDisplayOptions('form', [
-        'type' => 'number',
+        'type' => 'commerce_quantity',
         'weight' => 1,
       ])
       ->setDisplayConfigurable('form', TRUE)
@@ -274,10 +372,25 @@ class OrderItem extends ContentEntityBase implements OrderItemInterface {
       ->setDescription(t('The price of a single unit.'))
       ->setRequired(TRUE)
       ->setDisplayOptions('form', [
-        'type' => 'commerce_price_default',
+        'type' => 'commerce_unit_price',
         'weight' => 2,
+        'settings' => [
+          'require_confirmation' => TRUE,
+        ],
       ])
       ->setDisplayConfigurable('form', TRUE)
+      ->setDisplayConfigurable('view', TRUE);
+
+    $fields['overridden_unit_price'] = BaseFieldDefinition::create('boolean')
+      ->setLabel(t('Overridden unit price'))
+      ->setDescription(t('Whether the unit price is overridden.'))
+      ->setDefaultValue(FALSE);
+
+    $fields['total_price'] = BaseFieldDefinition::create('commerce_price')
+      ->setLabel(t('Total price'))
+      ->setDescription(t('The total price of the order item.'))
+      ->setReadOnly(TRUE)
+      ->setDisplayConfigurable('form', FALSE)
       ->setDisplayConfigurable('view', TRUE);
 
     $fields['adjustments'] = BaseFieldDefinition::create('commerce_adjustment')
@@ -287,12 +400,13 @@ class OrderItem extends ContentEntityBase implements OrderItemInterface {
       ->setDisplayConfigurable('form', FALSE)
       ->setDisplayConfigurable('view', TRUE);
 
-    $fields['total_price'] = BaseFieldDefinition::create('commerce_price')
-      ->setLabel(t('Total price'))
-      ->setDescription(t('The total price of the order item.'))
-      ->setReadOnly(TRUE)
-      ->setDisplayConfigurable('form', FALSE)
-      ->setDisplayConfigurable('view', TRUE);
+    $fields['uses_legacy_adjustments'] = BaseFieldDefinition::create('boolean')
+      ->setLabel(t('Uses legacy adjustments'))
+      ->setSettings([
+        'on_label' => t('Yes'),
+        'off_label' => t('No'),
+      ])
+      ->setDefaultValue(FALSE);
 
     $fields['data'] = BaseFieldDefinition::create('map')
       ->setLabel(t('Data'))
@@ -307,7 +421,8 @@ class OrderItem extends ContentEntityBase implements OrderItemInterface {
         'type' => 'timestamp',
         'weight' => 0,
       ])
-      ->setDisplayConfigurable('form', TRUE);
+      ->setDisplayConfigurable('form', TRUE)
+      ->setDisplayConfigurable('view', TRUE);
 
     $fields['changed'] = BaseFieldDefinition::create('changed')
       ->setLabel(t('Changed'))
@@ -335,7 +450,7 @@ class OrderItem extends ContentEntityBase implements OrderItemInterface {
       // hidden instead. https://www.drupal.org/node/2346347#comment-10254087.
       $fields['purchased_entity']->setRequired(FALSE);
       $fields['purchased_entity']->setDisplayOptions('form', [
-        'type' => 'hidden',
+        'region' => 'hidden',
       ]);
       $fields['purchased_entity']->setDisplayConfigurable('form', FALSE);
       $fields['purchased_entity']->setDisplayConfigurable('view', FALSE);
@@ -350,6 +465,16 @@ class OrderItem extends ContentEntityBase implements OrderItemInterface {
       ]);
       $fields['title']->setDisplayConfigurable('form', TRUE);
       $fields['title']->setDisplayConfigurable('view', TRUE);
+
+      // The unit price is always an override when there's no purchased entity.
+      $fields['unit_price'] = clone $base_field_definitions['unit_price'];
+      $fields['unit_price']->setDisplayOptions('form', [
+        'type' => 'commerce_unit_price',
+        'weight' => 2,
+        'settings' => [
+          'require_confirmation' => FALSE,
+        ],
+      ]);
     }
 
     return $fields;

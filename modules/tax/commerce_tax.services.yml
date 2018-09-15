@@ -1,0 +1,20 @@
+services:
+  plugin.manager.commerce_tax_type:
+    class: Drupal\commerce_tax\TaxTypeManager
+    parent: default_plugin_manager
+
+  commerce_tax.chain_tax_rate_resolver:
+    class: Drupal\commerce_tax\Resolver\ChainTaxRateResolver
+    tags:
+      - { name: service_collector, call: addResolver, tag: commerce_tax.tax_rate_resolver }
+
+  commerce_tax.default_tax_rate_resolver:
+    class: Drupal\commerce_tax\Resolver\DefaultTaxRateResolver
+    tags:
+      - { name: commerce_tax.tax_rate_resolver, priority: -100 }
+
+  commerce_tax.tax_order_processor:
+    class: Drupal\commerce_tax\TaxOrderProcessor
+    arguments: ['@entity_type.manager', '@commerce_price.rounder', '@commerce_tax.chain_tax_rate_resolver']
+    tags:
+      - { name: commerce_order.order_processor, priority: 50, adjustment_type: tax }

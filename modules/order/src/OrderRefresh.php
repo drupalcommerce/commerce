@@ -128,14 +128,7 @@ class OrderRefresh implements OrderRefreshInterface {
   public function refresh(OrderInterface $order) {
     $current_time = $this->time->getCurrentTime();
     $order->setChangedTime($current_time);
-    // Do not remove adjustments added in the user interface.
-    $adjustments = $order->getAdjustments();
-    foreach ($adjustments as $key => $adjustment) {
-      if ($adjustment->getType() != 'custom') {
-        unset($adjustments[$key]);
-      }
-    }
-    $order->setAdjustments($adjustments);
+    $order->clearAdjustments();
     // Nothing else can be done while the order is empty.
     if (!$order->hasItems()) {
       return;
@@ -143,14 +136,18 @@ class OrderRefresh implements OrderRefreshInterface {
 
     $context = new Context($order->getCustomer(), $order->getStore());
     foreach ($order->getItems() as $order_item) {
-      $order_item->setAdjustments([]);
-
       $purchased_entity = $order_item->getPurchasedEntity();
       if ($purchased_entity) {
         $order_item->setTitle($purchased_entity->getOrderItemTitle());
-        $unit_price = $this->chainPriceResolver->resolve($purchased_entity, $order_item->getQuantity(), $context);
-        $order_item->setUnitPrice($unit_price);
+        if (!$order_item->isUnitPriceOverridden()) {
+          $unit_price = $this->chainPriceResolver->resolve($purchased_entity, $order_item->getQuantity(), $context);
+          $order_item->setUnitPrice($unit_price);
+        }
       }
+      // If the order refresh is running during order preSave(),
+      // $order_item->getOrder() will point to the original order (or
+      // NULL, in case the order item is new).
+      $order_item->order_id->entity = $order;
     }
 
     // Allow the processors to modify the order and its items.
@@ -158,10 +155,14 @@ class OrderRefresh implements OrderRefreshInterface {
       $processor->process($order);
     }
 
-    // @todo Evaluate which order items have changed.
     foreach ($order->getItems() as $order_item) {
-      $order_item->setChangedTime($current_time);
-      $order_item->save();
+      if ($order_item->hasTranslationChanges()) {
+        // Remove the order that was set above, to avoid
+        // crashes during the entity save process.
+        $order_item->order_id->entity = NULL;
+        $order_item->setChangedTime($current_time);
+        $order_item->save();
+      }
     }
   }
 

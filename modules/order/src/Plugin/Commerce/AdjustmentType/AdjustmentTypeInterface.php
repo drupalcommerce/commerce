@@ -24,6 +24,22 @@ interface AdjustmentTypeInterface {
   public function getLabel();
 
   /**
+   * Gets the adjustment type singular label.
+   *
+   * @return string
+   *   The adjustment type singular label.
+   */
+  public function getSingularLabel();
+
+  /**
+   * Gets the adjustment type plural label.
+   *
+   * @return string
+   *   The adjustment type plural label.
+   */
+  public function getPluralLabel();
+
+  /**
    * Gets the adjustment type weight.
    *
    * @return int

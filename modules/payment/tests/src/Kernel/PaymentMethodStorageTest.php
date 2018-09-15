@@ -79,6 +79,11 @@ class PaymentMethodStorageTest extends CommerceKernelTestBase {
       'label' => 'Example',
       'plugin' => 'example_onsite',
     ]);
+    $payment_gateway->getPlugin()->setConfiguration([
+      'api_key' => '2342fewfsfs',
+      'mode' => 'test',
+      'payment_method_types' => ['credit_card'],
+    ]);
     $payment_gateway->save();
     $this->paymentGateway = $this->reloadEntity($payment_gateway);
 
@@ -96,29 +101,51 @@ class PaymentMethodStorageTest extends CommerceKernelTestBase {
     $payment_method_expired = PaymentMethod::create([
       'type' => 'credit_card',
       'payment_gateway' => 'example',
+      'payment_gateway_mode' => 'test',
       // Sat, 16 Jan 2016.
       'expires' => '1452902400',
       'uid' => $this->user->id(),
     ]);
     $payment_method_expired->save();
-    /** @var \Drupal\commerce_payment\Entity\PaymentMethodInterface $payment_method */
+    /** @var \Drupal\commerce_payment\Entity\PaymentMethodInterface $payment_method_active */
     $payment_method_active = PaymentMethod::create([
       'type' => 'credit_card',
       'payment_gateway' => 'example',
+      'payment_gateway_mode' => 'test',
       // Thu, 16 Jan 2020.
       'expires' => '1579132800',
       'uid' => $this->user->id(),
     ]);
     $payment_method_active->save();
-    // Confirm that only the active payment method was loaded.
+    /** @var \Drupal\commerce_payment\Entity\PaymentMethodInterface $payment_method_unlimited */
+    $payment_method_unlimited = PaymentMethod::create([
+      'type' => 'credit_card',
+      'payment_gateway' => 'example',
+      'payment_gateway_mode' => 'test',
+      'expires' => 0,
+      'uid' => $this->user->id(),
+    ]);
+    $payment_method_unlimited->save();
+    // Confirm that the expired payment method was not loaded.
     $reusable_payment_methods = $this->storage->loadReusable($this->user, $this->paymentGateway);
-    $this->assertEquals([$payment_method_active->id()], array_keys($reusable_payment_methods));
+    $this->assertEquals([$payment_method_unlimited->id(), $payment_method_active->id()], array_keys($reusable_payment_methods));
 
     // Confirm that anonymous users cannot have reusable payment methods.
     $payment_method_active->setOwnerId(0);
     $payment_method_active->save();
+    $payment_method_unlimited->setOwnerId(0);
+    $payment_method_unlimited->save();
     $this->assertEmpty($this->storage->loadReusable(User::getAnonymousUser(), $this->paymentGateway));
     $this->assertEmpty($this->storage->loadReusable($this->user, $this->paymentGateway));
+
+    // Changing the gateway from test to live should cause all of the testing
+    // payment methods to be ignored.
+    $payment_gateway_configuration = $this->paymentGateway->getPluginConfiguration();
+    $payment_gateway_configuration['mode'] = 'live';
+    $this->paymentGateway->getPlugin()->setConfiguration($payment_gateway_configuration);
+    $this->paymentGateway->save();
+    $reusable_payment_methods = $this->storage->loadReusable($this->user, $this->paymentGateway);
+    $this->assertEmpty($reusable_payment_methods);
   }
 
   /**

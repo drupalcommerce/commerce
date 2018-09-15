@@ -6,6 +6,7 @@ use Drupal\commerce_order\Entity\OrderInterface;
 use Drupal\commerce_store\Entity\EntityStoresInterface;
 use Drupal\Core\Datetime\DrupalDateTime;
 use Drupal\Core\Entity\ContentEntityInterface;
+use Drupal\commerce_promotion\Plugin\Commerce\PromotionOffer\PromotionOfferInterface;
 
 /**
  * Defines the interface for promotions.
@@ -86,6 +87,60 @@ interface PromotionInterface extends ContentEntityInterface, EntityStoresInterfa
    * @return $this
    */
   public function setOrderTypeIds(array $order_type_ids);
+
+  /**
+   * Gets the offer.
+   *
+   * @return \Drupal\commerce_promotion\Plugin\Commerce\PromotionOffer\PromotionOfferInterface|null
+   *   The offer, or NULL if not yet available.
+   */
+  public function getOffer();
+
+  /**
+   * Sets the offer.
+   *
+   * @param \Drupal\commerce_promotion\Plugin\Commerce\PromotionOffer\PromotionOfferInterface $offer
+   *   The offer.
+   *
+   * @return $this
+   */
+  public function setOffer(PromotionOfferInterface $offer);
+
+  /**
+   * Gets the conditions.
+   *
+   * @return \Drupal\commerce\Plugin\Commerce\Condition\ConditionInterface[]
+   *   The conditions.
+   */
+  public function getConditions();
+
+  /**
+   * Sets the conditions.
+   *
+   * @param \Drupal\commerce\Plugin\Commerce\Condition\ConditionInterface[] $conditions
+   *   The conditions.
+   *
+   * @return $this
+   */
+  public function setConditions(array $conditions);
+
+  /**
+   * Gets the condition operator.
+   *
+   * @return string
+   *   The condition operator. Possible values: AND, OR.
+   */
+  public function getConditionOperator();
+
+  /**
+   * Sets the condition operator.
+   *
+   * @param string $condition_operator
+   *   The condition operator.
+   *
+   * @return $this
+   */
+  public function setConditionOperator($condition_operator);
 
   /**
    * Gets the coupon IDs.

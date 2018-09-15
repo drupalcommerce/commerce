@@ -8,7 +8,7 @@ use Drupal\Core\Session\AccountInterface;
 /**
  * Contains known global information (customer, store, time).
  *
- * Passed to price resolvers, order processors, availability checkers.
+ * Passed to price resolvers and availability checkers.
  */
 final class Context {
 
@@ -34,6 +34,16 @@ final class Context {
   protected $time;
 
   /**
+   * The data.
+   *
+   * Used to provide additional information for a specific set of consumers
+   * (e.g. price resolvers).
+   *
+   * @var array
+   */
+  protected $data;
+
+  /**
    * Constructs a new Context object.
    *
    * @param \Drupal\Core\Session\AccountInterface $customer
@@ -42,11 +52,14 @@ final class Context {
    *   The store.
    * @param int|null $time
    *   The unix timestamp, or NULL to use the current time.
+   * @param array $data
+   *   The data.
    */
-  public function __construct(AccountInterface $customer, StoreInterface $store, $time = NULL) {
+  public function __construct(AccountInterface $customer, StoreInterface $store, $time = NULL, array $data = []) {
     $this->customer = $customer;
     $this->store = $store;
     $this->time = $time ?: time();
+    $this->data = $data;
   }
 
   /**
@@ -62,7 +75,7 @@ final class Context {
   /**
    * Gets the store.
    *
-   * @return \Drupal\commerce_store\Entity\Store
+   * @return \Drupal\commerce_store\Entity\StoreInterface
    *   The store.
    */
   public function getStore() {
@@ -77,6 +90,21 @@ final class Context {
    */
   public function getTime() {
     return $this->time;
+  }
+
+  /**
+   * Gets a data value with the given key.
+   *
+   * @param string $key
+   *   The key.
+   * @param mixed $default
+   *   The default value.
+   *
+   * @return mixed
+   *   The value.
+   */
+  public function getData($key, $default = NULL) {
+    return isset($this->data[$key]) ? $this->data[$key] : $default;
   }
 
 }

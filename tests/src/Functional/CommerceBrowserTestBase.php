@@ -4,7 +4,7 @@ namespace Drupal\Tests\commerce\Functional;
 
 use Drupal\Component\Render\FormattableMarkup;
 use Drupal\commerce_store\StoreCreationTrait;
-use Drupal\simpletest\BlockCreationTrait;
+use Drupal\Tests\block\Traits\BlockCreationTrait;
 use Drupal\Tests\BrowserTestBase;
 
 /**
@@ -61,9 +61,6 @@ abstract class CommerceBrowserTestBase extends BrowserTestBase {
 
     $this->adminUser = $this->drupalCreateUser($this->getAdministratorPermissions());
     $this->drupalLogin($this->adminUser);
-
-    $currency_importer = \Drupal::service('commerce_price.currency_importer');
-    $currency_importer->import('USD');
   }
 
   /**

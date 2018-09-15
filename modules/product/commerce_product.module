@@ -5,9 +5,8 @@
  * Defines the Product entity and associated features.
  */
 
-use Drupal\commerce\BundleFieldDefinition;
+use Drupal\entity\BundleFieldDefinition;
 use Drupal\commerce_product\Entity\ProductTypeInterface;
-use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Entity\EntityInterface;
@@ -22,7 +21,7 @@ function commerce_product_config_translation_info_alter(&$info) {
 }
 
 /**
- * Implements hook_ENTITY_TYPE_presave().
+ * Implements hook_ENTITY_TYPE_update().
  */
 function commerce_product_entity_form_display_update(EntityFormDisplayInterface $form_display) {
   // Reset the cached attribute field map when the 'default' product variation
@@ -45,20 +44,27 @@ function commerce_product_entity_view_display_update(EntityInterface $entity) {
 }
 
 /**
- * Implements hook_entity_access().
+ * Implements hook_theme_registry_alter().
  */
-function commerce_product_entity_access(EntityInterface $entity, $operation, $account) {
-  // Allow published products to be viewed by all users for now.
-  // @todo Remove once we implement the full product permissions.
-  if ($operation == 'view') {
-    if ($entity->getEntityTypeId() == 'commerce_product' && $entity->isPublished()) {
-      return AccessResult::allowed();
-    }
-    elseif ($entity->getEntityTypeId() == 'commerce_product_variation' && $entity->isActive()) {
-      return AccessResult::allowed();
-    }
+function commerce_product_theme_registry_alter(&$theme_registry) {
+  // The preprocess function must run after quickedit_preprocess_field().
+  $theme_registry['field']['preprocess functions'][] = 'commerce_product_remove_quickedit';
+}
+
+/**
+ * Turn off Quick Edit for injected variation fields, to avoid warnings.
+ */
+function commerce_product_remove_quickedit(&$variables) {
+  $entity_type_id = $variables['element']['#entity_type'];
+  if ($entity_type_id != 'commerce_product_variation' || empty($variables['element']['#ajax_replace_class'])) {
+    return;
   }
-  return AccessResult::neutral();
+
+  if (isset($variables['attributes']['data-quickedit-field-id'])) {
+    unset($variables['attributes']['data-quickedit-field-id']);
+    $context_key = array_search('user.permissions', $variables['#cache']['contexts']);
+    unset($variables['#cache']['contexts'][$context_key]);
+  }
 }
 
 /**
@@ -117,7 +123,7 @@ function template_preprocess_commerce_product(array &$variables) {
   $product = $variables['elements']['#commerce_product'];
 
   $variables['product_entity'] = $product;
-  $variables['product_url'] = $product->toUrl();
+  $variables['product_url'] = $product->isNew() ? '' : $product->toUrl();
   $variables['product'] = [];
   foreach (Element::children($variables['elements']) as $key) {
     $variables['product'][$key] = $variables['elements'][$key];
@@ -140,7 +146,11 @@ function template_preprocess_commerce_product_variation(array &$variables) {
   $product = $product_variation->getProduct();
 
   $variables['product_variation_entity'] = $product_variation;
-  $variables['product_url'] = $product->toUrl();
+  $variables['product_url'] = '';
+  if ($product && !$product->isNew()) {
+    $variables['product_url'] = $product->toUrl();
+  }
+
   $variables['product_variation'] = [];
   foreach (Element::children($variables['elements']) as $key) {
     $variables['product_variation'][$key] = $variables['elements'][$key];
@@ -211,6 +221,7 @@ function commerce_product_add_body_field(ProductTypeInterface $product_type, $la
     ->setTargetBundle($product_type->id())
     ->setName('body')
     ->setLabel($label)
+    ->setTranslatable(TRUE)
     ->setSetting('display_summary', FALSE)
     ->setDisplayOptions('form', [
       'type' => 'text_textarea_with_summary',
@@ -253,6 +264,7 @@ function commerce_product_add_variations_field(ProductTypeInterface $product_typ
       'type' => 'inline_entity_form_complex',
       'weight' => 10,
       'settings' => [
+        'allow_duplicate' => TRUE,
         'override_labels' => TRUE,
         'label_singular' => 'variation',
         'label_plural' => 'variations',
@@ -284,5 +296,25 @@ function commerce_product_field_widget_form_alter(&$element, FormStateInterface 
     // The title field is optional only when its value is automatically
     // generated, in which case the widget needs to be hidden.
     $element['#access'] = FALSE;
+  }
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter() for 'entity_form_display_edit_form'.
+ *
+ * Don't allow referencing existing variations, since a variation must
+ * always belong to a single product only.
+ */
+function commerce_product_form_entity_form_display_edit_form_alter(array &$form, FormStateInterface $form_state) {
+  if ($form['#entity_type'] != 'commerce_product') {
+    return;
+  }
+
+  if (isset($form['fields']['variations']['plugin']['settings_edit_form']['settings'])) {
+    $settings = &$form['fields']['variations']['plugin']['settings_edit_form']['settings'];
+    if (isset($settings['allow_existing'])) {
+      $settings['allow_existing']['#access'] = FALSE;
+      $settings['match_operator']['#access'] = FALSE;
+    }
   }
 }

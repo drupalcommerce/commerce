@@ -18,6 +18,22 @@ class AddToCartMultiAttributeTest extends CartBrowserTestBase {
   use JavascriptTestTrait;
 
   /**
+   * {@inheritdoc}
+   */
+  protected function setUp() {
+    parent::setUp();
+
+    /** @var \Drupal\Core\Entity\Entity\EntityViewDisplay $variation_view_display */
+    $variation_view_display = commerce_get_entity_display('commerce_product_variation', 'default', 'view');
+    // Show the SKU by default.
+    $variation_view_display->setComponent('sku', [
+      'label' => 'hidden',
+      'type' => 'string',
+    ]);
+    $variation_view_display->save();
+  }
+
+  /**
    * Tests adding a product to the cart when there are multiple variations.
    */
   public function testMultipleVariations() {
@@ -150,6 +166,16 @@ class AddToCartMultiAttributeTest extends CartBrowserTestBase {
     $this->getSession()->getPage()->selectFieldOption('purchased_entity[0][attributes][attribute_color]', 'Magenta');
     $this->waitForAjaxToFinish();
     $this->assertSession()->pageTextContains($variation2->getSku());
+    $this->assertAttributeSelected('purchased_entity[0][attributes][attribute_color]', 'Magenta');
+
+    // Load variation2 directly via the url (?v=).
+    $this->drupalGet($variation2->toUrl());
+    $this->assertSession()->pageTextContains($variation2->getSku());
+    $this->assertAttributeSelected('purchased_entity[0][attributes][attribute_color]', 'Magenta');
+    $this->getSession()->getPage()->selectFieldOption('purchased_entity[0][attributes][attribute_color]', 'Cyan');
+    $this->waitForAjaxToFinish();
+    $this->assertSession()->pageTextContains($variation1->getSku());
+    $this->assertAttributeSelected('purchased_entity[0][attributes][attribute_color]', 'Cyan');
   }
 
 }

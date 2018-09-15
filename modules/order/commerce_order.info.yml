@@ -4,13 +4,13 @@ description: 'Defines the Order entity and associated features.'
 package: Commerce
 core: 8.x
 dependencies:
-  - commerce
+  - commerce:commerce
   - commerce:commerce_price
   - commerce:commerce_store
-  - entity_reference_revisions
-  - options
-  - profile
-  - state_machine
+  - entity_reference_revisions:entity_reference_revisions
+  - profile:profile
+  - state_machine:state_machine
+  - drupal:options
 config_devel:
   install:
     - commerce_order.commerce_order_type.default

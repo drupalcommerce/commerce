@@ -4,11 +4,14 @@ namespace Drupal\Tests\commerce_product\Kernel;
 
 use Drupal\commerce_product\Entity\Product;
 use Drupal\commerce_product\Entity\ProductAttribute;
+use Drupal\commerce_product\Entity\ProductAttributeValue;
 use Drupal\commerce_product\Entity\ProductVariation;
 use Drupal\commerce_product\Entity\ProductVariationType;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
+use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\Tests\commerce\Kernel\CommerceKernelTestBase;
+use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Tests the product variation field renderer.
@@ -48,6 +51,8 @@ class ProductVariationFieldRendererTest extends CommerceKernelTestBase {
   public static $modules = [
     'path',
     'commerce_product',
+    'language',
+    'content_translation',
   ];
 
   /**
@@ -58,7 +63,14 @@ class ProductVariationFieldRendererTest extends CommerceKernelTestBase {
 
     $this->installEntitySchema('commerce_product_variation');
     $this->installEntitySchema('commerce_product');
+    $this->installEntitySchema('commerce_product_attribute_value');
     $this->installConfig(['commerce_product']);
+
+    ConfigurableLanguage::createFromLangcode('fr')->save();
+    // We must have two languages installed. Otherwise it is not considered
+    // multilingual because `en` is not installed as a configurable language.
+    // @see \Drupal\language\ConfigurableLanguageManager::isMultilingual
+    ConfigurableLanguage::createFromLangcode('de')->save();
 
     $this->variationFieldRenderer = $this->container->get('commerce_product.variation_field_renderer');
 
@@ -96,8 +108,10 @@ class ProductVariationFieldRendererTest extends CommerceKernelTestBase {
     ]);
     $attribute->save();
 
-    $this->container->get('commerce_product.attribute_field_manager')
-      ->createField($attribute, $this->secondVariationType->id());
+    $this->container->get('commerce_product.attribute_field_manager')->createField($attribute, $this->secondVariationType->id());
+
+    $user = $this->createUser([], ['administer commerce_product']);
+    $this->container->get('current_user')->setAccount($user);
   }
 
   /**
@@ -126,10 +140,16 @@ class ProductVariationFieldRendererTest extends CommerceKernelTestBase {
    * @covers ::renderField
    */
   public function testRenderFields() {
+    $attribute_value = ProductAttributeValue::create([
+      'attribute' => 'color',
+      'name' => 'Blue',
+    ]);
+    $attribute_value->save();
     $variation = ProductVariation::create([
       'type' => $this->secondVariationType->id(),
       'sku' => strtolower($this->randomMachineName()),
       'title' => $this->randomString(),
+      'attribute_color' => $attribute_value->id(),
       'status' => 1,
     ]);
     $variation->save();
@@ -144,6 +164,10 @@ class ProductVariationFieldRendererTest extends CommerceKernelTestBase {
       'label' => 'above',
       'type' => 'entity_reference_label',
     ]);
+    $product_display->setComponent('title', [
+      'label' => 'above',
+      'type' => 'string',
+    ]);
     $product_display->save();
 
     $rendered_fields = $this->variationFieldRenderer->renderFields($variation);
@@ -157,8 +181,106 @@ class ProductVariationFieldRendererTest extends CommerceKernelTestBase {
     $product_build = $product_view_builder->view($product);
     $this->render($product_build);
 
+    // Attributes are excluded by default in twig template, verify.
     $this->assertEmpty($this->cssSelect('.product--variation-field--variation_attribute_color__' . $variation->getProductId()));
-    $this->assertNotEmpty($this->cssSelect('.product--variation-field--variation_sku__' . $variation->getProductId()));
+    $this->assertEmpty($this->cssSelect('.product--variation-field--variation_sku__' . $variation->getProductId()));
+    // Verify that the title was displayed.
+    $this->assertEscaped($variation->label(), 'Variation title was injected and displayed.');
+  }
+
+  /**
+   * Tests renderFields in multilingual context.
+   *
+   * @covers ::renderFields
+   * @covers ::renderField
+   */
+  public function testRenderFieldsMultilingual() {
+    $this->secondVariationType->setGenerateTitle(TRUE);
+    $this->secondVariationType->save();
+
+    $this->container->get('content_translation.manager')
+      ->setEnabled('commerce_product_variation', $this->secondVariationType->id(), TRUE);
+    $this->container->get('content_translation.manager')
+      ->setEnabled('commerce_product', 'default', TRUE);
+    $this->container->get('content_translation.manager')
+      ->setEnabled('commerce_product_attribute_value', 'color', TRUE);
+
+    $blue = ProductAttributeValue::create([
+      'attribute' => 'color',
+      'name' => 'Blue',
+    ]);
+    $blue->addTranslation('fr', [
+      'name' => 'Bleu',
+    ]);
+    $blue->save();
+    $black = ProductAttributeValue::create([
+      'attribute' => 'color',
+      'name' => 'Black',
+      'weight' => 3,
+    ]);
+    $black->addTranslation('fr', [
+      'name' => 'Noir',
+    ]);
+    $black->save();
+
+    $variation1 = ProductVariation::create([
+      'type' => $this->secondVariationType->id(),
+      'sku' => strtolower($this->randomMachineName()),
+      'attribute_color' => $blue->id(),
+      'status' => 1,
+    ]);
+    $variation1->save();
+    $variation2 = ProductVariation::create([
+      'type' => $this->secondVariationType->id(),
+      'sku' => strtolower($this->randomMachineName()),
+      'attribute_color' => $black->id(),
+      'status' => 1,
+    ]);
+    $variation2->save();
+    $product = Product::create([
+      'type' => 'default',
+      'title' => 'My Super Product',
+      'variations' => [$variation1, $variation2],
+    ]);
+    $product->addTranslation('fr', [
+      'title' => 'Mon super produit',
+    ]);
+    $product->save();
+
+    $variation1->addTranslation('fr', [])->save();
+    $variation2->addTranslation('fr', [])->save();
+    $this->assertEquals('Mon super produit - Bleu', $variation1->getTranslation('fr')->label());
+    $this->assertEquals('Mon super produit - Noir', $variation2->getTranslation('fr')->label());
+
+    $product_display = commerce_get_entity_display('commerce_product_variation', $this->secondVariationType->id(), 'view');
+    $product_display->setComponent('attribute_color', [
+      'label' => 'above',
+      'type' => 'entity_reference_label',
+    ]);
+    $product_display->setComponent('title', [
+      'label' => 'above',
+      'type' => 'string',
+    ]);
+    $product_display->save();
+
+    // Make sure loadFromContext does not return the default variation, which is
+    // always translated via ::getDefaultVariation on the product entity.
+    $request = Request::create('');
+    $request->query->add([
+      'v' => $variation2->id(),
+    ]);
+    // Push the request to the request stack so `current_route_match` works.
+    $this->container->get('request_stack')->push($request);
+    $this->assertNotEquals($request->query->get('v'), $product->getDefaultVariation()->id());
+
+    $this->config('system.site')->set('default_langcode', 'fr')->save();
+
+    $product_view_builder = $this->container->get('entity_type.manager')->getViewBuilder('commerce_product');
+    $product_build = $product_view_builder->view($product);
+    $this->render($product_build);
+
+    $this->assertEscaped('Mon super produit');
+    $this->assertEscaped('Mon super produit - Noir');
   }
 
   /**

@@ -6,6 +6,15 @@
  */
 
 use Drupal\Core\Field\BaseFieldDefinition;
+use Drupal\Core\Session\AccountInterface;
+
+/**
+ * Implements hook_install().
+ */
+function commerce_order_install() {
+  // Allow authenticated users to view own orders.
+  user_role_grant_permissions(AccountInterface::AUTHENTICATED_ROLE, ['view own commerce_order']);
+}
 
 /**
  * Add the 'data' field to 'commerce_order_item' entities.
@@ -17,4 +26,50 @@ function commerce_order_update_8201() {
 
   $update_manager = \Drupal::entityDefinitionUpdateManager();
   $update_manager->installFieldStorageDefinition('data', 'commerce_order_item', 'commerce_order', $storage_definition);
+}
+
+/**
+ * Add the 'overridden_unit_price' field to 'commerce_order_item' entities.
+ */
+function commerce_order_update_8202() {
+  $storage_definition = BaseFieldDefinition::create('boolean')
+    ->setLabel(t('Overridden unit price'))
+    ->setDescription(t('Whether the unit price is overridden.'))
+    ->setDefaultValue(FALSE);
+
+  $update_manager = \Drupal::entityDefinitionUpdateManager();
+  $update_manager->installFieldStorageDefinition('overridden_unit_price', 'commerce_order_item', 'commerce_order', $storage_definition);
+}
+
+/**
+ * Add the 'locked' field to 'commerce_order' entities.
+ */
+function commerce_order_update_8203() {
+  $storage_definition = BaseFieldDefinition::create('boolean')
+    ->setLabel(t('Locked'))
+    ->setSettings([
+      'on_label' => t('Yes'),
+      'off_label' => t('No'),
+    ])
+    ->setDefaultValue(FALSE);
+
+  $update_manager = \Drupal::entityDefinitionUpdateManager();
+  $update_manager->installFieldStorageDefinition('locked', 'commerce_order', 'commerce_order', $storage_definition);
+}
+
+/**
+ * Add the 'uses_legacy_adjustments' field to 'commerce_order_item' entities.
+ */
+function commerce_order_update_8204() {
+  $storage_definition = BaseFieldDefinition::create('boolean')
+    ->setLabel(t('Uses legacy adjustments'))
+    ->setSettings([
+      'on_label' => t('Yes'),
+      'off_label' => t('No'),
+    ])
+    ->setDefaultValue(FALSE)
+    ->setInitialValue(TRUE);
+
+  $update_manager = \Drupal::entityDefinitionUpdateManager();
+  $update_manager->installFieldStorageDefinition('uses_legacy_adjustments', 'commerce_order_item', 'commerce_order', $storage_definition);
 }

@@ -10,7 +10,7 @@ use Drupal\commerce_payment\Entity\PaymentMethodInterface;
 interface SupportsUpdatingStoredPaymentMethodsInterface {
 
   /**
-   * Updates the given payment.
+   * Updates the given payment method.
    *
    * @param \Drupal\commerce_payment\Entity\PaymentMethodInterface $payment_method
    *   The payment method.

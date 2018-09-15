@@ -2,9 +2,11 @@
 
 namespace Drupal\commerce_product\Plugin\Field\FieldWidget;
 
+use Drupal\commerce_product\Entity\ProductInterface;
 use Drupal\commerce_product\Entity\ProductVariation;
 use Drupal\commerce_product\Event\ProductVariationAjaxChangeEvent;
 use Drupal\commerce_product\Event\ProductEvents;
+use Drupal\Core\Entity\EntityRepositoryInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\WidgetBase;
@@ -30,6 +32,13 @@ abstract class ProductVariationWidgetBase extends WidgetBase implements Containe
   protected $variationStorage;
 
   /**
+   * The entity repository service.
+   *
+   * @var \Drupal\Core\Entity\EntityRepositoryInterface
+   */
+  protected $entityRepository;
+
+  /**
    * Constructs a new ProductVariationWidgetBase object.
    *
    * @param string $plugin_id
@@ -44,10 +53,13 @@ abstract class ProductVariationWidgetBase extends WidgetBase implements Containe
    *   Any third party settings.
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
+   * @param \Drupal\Core\Entity\EntityRepositoryInterface $entity_repository
+   *   The entity repository.
    */
-  public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, array $third_party_settings, EntityTypeManagerInterface $entity_type_manager) {
+  public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, array $third_party_settings, EntityTypeManagerInterface $entity_type_manager, EntityRepositoryInterface $entity_repository) {
     parent::__construct($plugin_id, $plugin_definition, $field_definition, $settings, $third_party_settings);
 
+    $this->entityRepository = $entity_repository;
     $this->variationStorage = $entity_type_manager->getStorage('commerce_product_variation');
   }
 
@@ -61,7 +73,8 @@ abstract class ProductVariationWidgetBase extends WidgetBase implements Containe
       $configuration['field_definition'],
       $configuration['settings'],
       $configuration['third_party_settings'],
-      $container->get('entity_type.manager')
+      $container->get('entity_type.manager'),
+      $container->get('entity.repository')
     );
   }
 
@@ -103,9 +116,14 @@ abstract class ProductVariationWidgetBase extends WidgetBase implements Containe
     $response = $ajax_renderer->renderResponse($form, $request, $route_match);
 
     $variation = ProductVariation::load($form_state->get('selected_variation'));
+    /** @var \Drupal\commerce_product\Entity\ProductInterface $product */
+    $product = $form_state->get('product');
+    if ($variation->hasTranslation($product->language()->getId())) {
+      $variation = $variation->getTranslation($product->language()->getId());
+    }
     /** @var \Drupal\commerce_product\ProductVariationFieldRendererInterface $variation_field_renderer */
     $variation_field_renderer = \Drupal::service('commerce_product.variation_field_renderer');
-    $view_mode = $form_state->get('form_display')->getMode();
+    $view_mode = $form_state->get('view_mode');
     $variation_field_renderer->replaceRenderedFields($response, $variation, $view_mode);
     // Allow modules to add arbitrary ajax commands to the response.
     $event = new ProductVariationAjaxChangeEvent($variation, $response, $view_mode);
@@ -113,6 +131,46 @@ abstract class ProductVariationWidgetBase extends WidgetBase implements Containe
     $event_dispatcher->dispatch(ProductEvents::PRODUCT_VARIATION_AJAX_CHANGE, $event);
 
     return $response;
+  }
+
+  /**
+   * Gets the default variation for the widget.
+   *
+   * @param \Drupal\commerce_product\Entity\ProductInterface $product
+   *   The product.
+   * @param array $variations
+   *   An array of available variations.
+   *
+   * @return \Drupal\commerce_product\Entity\ProductVariationInterface
+   *   The default variation.
+   */
+  protected function getDefaultVariation(ProductInterface $product, array $variations) {
+    $langcode = $product->language()->getId();
+    $selected_variation = $this->variationStorage->loadFromContext($product);
+    $selected_variation = $this->entityRepository->getTranslationFromContext($selected_variation, $langcode);
+    // The returned variation must also be enabled.
+    if (!in_array($selected_variation, $variations)) {
+      $selected_variation = reset($variations);
+    }
+    return $selected_variation;
+  }
+
+  /**
+   * Gets the enabled variations for the product.
+   *
+   * @param \Drupal\commerce_product\Entity\ProductInterface $product
+   *   The product.
+   *
+   * @return \Drupal\commerce_product\Entity\ProductVariationInterface[]
+   *   An array of variations.
+   */
+  protected function loadEnabledVariations(ProductInterface $product) {
+    $langcode = $product->language()->getId();
+    $variations = $this->variationStorage->loadEnabled($product);
+    foreach ($variations as $key => $variation) {
+      $variations[$key] = $this->entityRepository->getTranslationFromContext($variation, $langcode);
+    }
+    return $variations;
   }
 
 }

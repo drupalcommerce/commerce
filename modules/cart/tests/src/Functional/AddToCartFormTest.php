@@ -74,7 +74,7 @@ class AddToCartFormTest extends CartBrowserTestBase {
 
     $variation1 = $this->createEntity('commerce_product_variation', [
       'type' => 'default',
-      'sku' => $this->randomMachineName(),
+      'sku' => 'not-canonical',
       'price' => [
         'number' => '5.00',
         'currency_code' => 'USD',
@@ -113,17 +113,23 @@ class AddToCartFormTest extends CartBrowserTestBase {
     /** @var \Drupal\Core\Entity\Entity\EntityFormDisplay $order_item_form_display */
     $order_item_form_display = EntityFormDisplay::load('commerce_order_item.default.add_to_cart');
     $order_item_form_display->setComponent('quantity', [
-      'type' => 'number',
+      'type' => 'commerce_quantity',
     ]);
     $order_item_form_display->save();
-    // Get the existing product page and submit Add to cart form.
+
+    // Confirm that the given quantity was accepted and saved.
     $this->postAddToCart($this->variation->getProduct(), [
       'quantity[0][value]' => 3,
     ]);
-    // Check if the quantity was increased for the existing order item.
     $this->cart = Order::load($this->cart->id());
     $order_items = $this->cart->getItems();
     $this->assertOrderItemInOrder($this->variation, $order_items[0], 3);
+
+    // Confirm that a zero quantity isn't accepted.
+    $this->postAddToCart($this->variation->getProduct(), [
+      'quantity[0][value]' => 0,
+    ]);
+    $this->assertSession()->pageTextContains('Quantity must be higher than or equal to 1.');
   }
 
   /**

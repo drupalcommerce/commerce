@@ -2,6 +2,7 @@
 
 namespace Drupal\commerce_payment\Entity;
 
+use Drupal\commerce_order\Entity\OrderInterface;
 use Drupal\Core\Config\Entity\ConfigEntityInterface;
 use Drupal\Core\Entity\EntityWithPluginCollectionInterface;
 
@@ -55,5 +56,62 @@ interface PaymentGatewayInterface extends ConfigEntityInterface, EntityWithPlugi
    * @return $this
    */
   public function setPluginId($plugin_id);
+
+  /**
+   * Gets the payment gateway plugin configuration.
+   *
+   * @return array
+   *   The payment gateway plugin configuration.
+   */
+  public function getPluginConfiguration();
+
+  /**
+   * Sets the payment gateway plugin configuration.
+   *
+   * @param array $configuration
+   *   The payment gateway plugin configuration.
+   *
+   * @return $this
+   */
+  public function setPluginConfiguration(array $configuration);
+
+  /**
+   * Gets the payment gateway conditions.
+   *
+   * @return \Drupal\commerce\Plugin\Commerce\Condition\ConditionInterface[]
+   *   The payment gateway conditions.
+   */
+  public function getConditions();
+
+  /**
+   * Gets the payment gateway condition operator.
+   *
+   * @return string
+   *   The condition operator. Possible values: AND, OR.
+   */
+  public function getConditionOperator();
+
+  /**
+   * Sets the payment gateway condition operator.
+   *
+   * @param string $condition_operator
+   *   The condition operator.
+   *
+   * @return $this
+   */
+  public function setConditionOperator($condition_operator);
+
+  /**
+   * Checks whether the payment gateway applies to the given order.
+   *
+   * Ensures that the conditions pass.
+   *
+   * @param \Drupal\commerce_order\Entity\OrderInterface $order
+   *   The order.
+   *
+   * @return bool
+   *   TRUE if payment gateway applies, FALSE otherwise.
+   */
+  public function applies(OrderInterface $order);
 
 }

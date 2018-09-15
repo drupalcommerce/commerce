@@ -1,4 +1,8 @@
 services:
+  plugin.manager.commerce_adjustment_type:
+    class: Drupal\commerce_order\AdjustmentTypeManager
+    arguments: ['@module_handler', '@cache.discovery']
+
   commerce_order.chain_order_type_resolver:
     class: Drupal\commerce_order\Resolver\ChainOrderTypeResolver
     tags:
@@ -9,6 +13,10 @@ services:
     arguments: ['@entity_type.manager']
     tags:
       - { name: commerce_order.order_type_resolver, priority: -100 }
+
+  commerce_order.adjustment_transformer:
+    class: Drupal\commerce_order\AdjustmentTransformer
+    arguments: ['@plugin.manager.commerce_adjustment_type', '@commerce_price.rounder']
 
   commerce_order.order_assignment:
     class: Drupal\commerce_order\OrderAssignment
@@ -34,7 +42,7 @@ services:
 
   commerce_order.timestamp_event_subscriber:
     class: Drupal\commerce_order\EventSubscriber\TimestampEventSubscriber
-    arguments: ['@entity_type.manager']
+    arguments: ['@datetime.time']
     tags:
       - { name: event_subscriber }
 
@@ -49,10 +57,20 @@ services:
     tags:
       - { name: 'event_subscriber' }
 
-  plugin.manager.commerce_adjustment_type:
-    class: Drupal\commerce_order\AdjustmentTypeManager
-    arguments: ['@module_handler', '@cache.discovery']
-
   commerce_order.order_total_summary:
     class: Drupal\commerce_order\OrderTotalSummary
-    arguments: ['@plugin.manager.commerce_adjustment_type']
+    arguments: ['@commerce_order.adjustment_transformer']
+
+  commerce_order.order_store_resolver:
+    class: Drupal\commerce_order\Resolver\OrderStoreResolver
+    arguments: ['@current_route_match']
+    tags:
+      - { name: commerce_store.store_resolver, priority: 100 }
+
+  commerce_order.price_splitter:
+    class: Drupal\commerce_order\PriceSplitter
+    arguments: ['@entity_type.manager', '@commerce_price.rounder']
+
+  commerce_order.price_calculator:
+    class: Drupal\commerce_order\PriceCalculator
+    arguments: ['@commerce_order.adjustment_transformer', '@commerce_order.chain_order_type_resolver', '@commerce_price.chain_price_resolver', '@entity_type.manager', '@request_stack']

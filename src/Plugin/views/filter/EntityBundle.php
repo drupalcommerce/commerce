@@ -61,4 +61,29 @@ class EntityBundle extends Bundle {
     return parent::access($account);
   }
 
+  /**
+   * {@inheritdoc}
+   *
+   * We override the parent method so that it does not cause an unhandled
+   * PluginNotFoundException to be thrown, due to entities which use bundle
+   * plugins.
+   */
+  public function calculateDependencies() {
+    $parents_parent = get_parent_class(get_parent_class($this));
+    $dependencies = $parents_parent::calculateDependencies();
+
+    $bundle_entity_type = $this->entityType->getBundleEntityType();
+    if ($bundle_entity_type) {
+      $bundle_entity_storage = $this->entityManager->getStorage($bundle_entity_type);
+
+      foreach (array_keys($this->value) as $bundle) {
+        if ($bundle_entity = $bundle_entity_storage->load($bundle)) {
+          $dependencies[$bundle_entity->getConfigDependencyKey()][] = $bundle_entity->getConfigDependencyName();
+        }
+      }
+    }
+
+    return $dependencies;
+  }
+
 }

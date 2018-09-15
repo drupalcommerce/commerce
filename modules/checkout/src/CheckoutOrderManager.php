@@ -31,7 +31,7 @@ class CheckoutOrderManager implements CheckoutOrderManagerInterface {
    * {@inheritdoc}
    */
   public function getCheckoutFlow(OrderInterface $order) {
-    if ($order->get('checkout_flow')->isEmpty()) {
+    if (!$order->get('checkout_flow')->entity) {
       $checkout_flow = $this->chainCheckoutFlowResolver->resolve($order);
       $order->set('checkout_flow', $checkout_flow);
       $order->save();

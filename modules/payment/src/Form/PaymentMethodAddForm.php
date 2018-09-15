@@ -2,7 +2,6 @@
 
 namespace Drupal\commerce_payment\Form;
 
-use Drupal\commerce\EntityHelper;
 use Drupal\commerce_payment\Plugin\Commerce\PaymentGateway\SupportsStoredPaymentMethodsInterface;
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
@@ -102,10 +101,15 @@ class PaymentMethodAddForm extends FormBase implements ContainerInjectionInterfa
    */
   protected function buildPaymentMethodTypeForm(array $form, FormStateInterface $form_state) {
     $payment_method_types = $form_state->get('payment_gateway')->getPlugin()->getPaymentMethodTypes();
+    $payment_method_type_options = array_map(function ($payment_method_type) {
+      /** @var \Drupal\commerce_payment\Plugin\Commerce\PaymentMethodType\PaymentMethodTypeInterface $payment_method_type */
+      return $payment_method_type->getLabel();
+    }, $payment_method_types);
+
     $form['payment_method_type'] = [
       '#type' => 'radios',
       '#title' => $this->t('Payment method type'),
-      '#options' => EntityHelper::extractLabels($payment_method_types),
+      '#options' => $payment_method_type_options,
       '#default_value' => '',
       '#required' => TRUE,
     ];
@@ -164,7 +168,7 @@ class PaymentMethodAddForm extends FormBase implements ContainerInjectionInterfa
     elseif ($step == 'payment_method') {
       /** @var \Drupal\commerce_payment\Entity\PaymentMethodInterface $payment_method */
       $payment_method = $form_state->getValue('payment_method');
-      drupal_set_message($this->t('%label saved to your payment methods.', ['%label' => $payment_method->label()]));
+      $this->messenger()->addMessage($this->t('%label saved to your payment methods.', ['%label' => $payment_method->label()]));
       $form_state->setRedirect('entity.commerce_payment_method.collection', ['user' => $payment_method->getOwnerId()]);
     }
   }

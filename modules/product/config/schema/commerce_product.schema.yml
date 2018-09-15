@@ -1,3 +1,61 @@
+commerce.commerce_condition.plugin.order_product:
+  type: commerce_condition_configuration
+  mapping:
+    products:
+      type: sequence
+      label: 'Products'
+      sequence:
+        type: mapping
+        mapping:
+          product:
+            type: uuid
+            label: 'Product'
+
+commerce.commerce_condition.plugin.order_item_product:
+  type: commerce.commerce_condition.plugin.order_product
+
+commerce.commerce_condition.plugin.order_product_category:
+  type: commerce_condition_configuration
+  mapping:
+    terms:
+      type: sequence
+      label: 'Categories'
+      orderby: value
+      sequence:
+        type: uuid
+        label: 'Category'
+
+commerce.commerce_condition.plugin.order_item_product_category:
+  type: commerce.commerce_condition.plugin.order_product_category
+
+commerce.commerce_condition.plugin.order_product_type:
+  type: commerce_condition_configuration
+  mapping:
+    product_types:
+      type: sequence
+      label: 'Product types'
+      orderby: value
+      sequence:
+        type: string
+        label: 'Product type'
+
+commerce.commerce_condition.plugin.order_item_product_type:
+  type: commerce.commerce_condition.plugin.order_product_type
+
+commerce.commerce_condition.plugin.order_variation_type:
+  type: commerce_condition_configuration
+  mapping:
+    variation_types:
+      type: sequence
+      label: 'Product variation types'
+      orderby: value
+      sequence:
+        type: string
+        label: 'Product variation type'
+
+commerce.commerce_condition.plugin.order_item_variation_type:
+  type: commerce.commerce_condition.plugin.order_variation_type
+
 commerce_product.commerce_product_type.*:
   type: commerce_config_entity_bundle
   label: 'Product type'
@@ -56,6 +114,7 @@ field.formatter.settings.commerce_product_attributes_overview:
     attributes:
       type: sequence
       label: 'Attributes to render.'
+      orderby: value
       sequence:
         type: string
         label: 'Attribute ID'
@@ -81,3 +140,7 @@ action.configuration.commerce_publish_product:
 action.configuration.commerce_unpublish_product:
   type: action_configuration_default
   label: 'Configuration for the Unpublish product action'
+
+views.filter.commerce_product_attribute_value:
+  type: views.filter.in_operator
+  label: 'Product attribute filter'

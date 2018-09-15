@@ -26,10 +26,8 @@ class PaymentMethodEditForm extends EntityForm {
   /**
    * {@inheritdoc}
    */
-  public function validateForm(array &$form, FormStateInterface $form_state) {
-    parent::validateForm($form, $form_state);
-
-    $this->entity = $form_state->getValue('payment_method');
+  public function buildEntity(array $form, FormStateInterface $form_state) {
+    return $form_state->getValue('payment_method');
   }
 
   /**
@@ -37,11 +35,11 @@ class PaymentMethodEditForm extends EntityForm {
    */
   public function save(array $form, FormStateInterface $form_state) {
     // The entity was saved by the plugin form. Redirect.
-    drupal_set_message($this->t('Saved the %label @entity-type.', [
+    $this->messenger()->addMessage($this->t('Saved the %label @entity-type.', [
       '%label' => $this->entity->label(),
       '@entity-type' => $this->entity->getEntityType()->getLowercaseLabel(),
     ]));
-    $form_state->setRedirect($this->entity->toUrl('collection'));
+    $form_state->setRedirectUrl($this->entity->toUrl('collection'));
   }
 
 }

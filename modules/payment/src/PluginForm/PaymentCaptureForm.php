@@ -30,7 +30,7 @@ class PaymentCaptureForm extends PaymentGatewayFormBase {
    */
   public function submitConfigurationForm(array &$form, FormStateInterface $form_state) {
     $values = $form_state->getValue($form['#parents']);
-    $amount = new Price($values['amount']['number'], $values['amount']['currency_code']);
+    $amount = Price::fromArray($values['amount']);
     /** @var \Drupal\commerce_payment\Entity\PaymentInterface $payment */
     $payment = $this->entity;
     /** @var \Drupal\commerce_payment\Plugin\Commerce\PaymentGateway\SupportsAuthorizationsInterface $payment_gateway_plugin */

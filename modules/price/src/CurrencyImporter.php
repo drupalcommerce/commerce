@@ -2,7 +2,7 @@
 
 namespace Drupal\commerce_price;
 
-use CommerceGuys\Intl\Country\CountryRepository;
+use CommerceGuys\Addressing\Country\CountryRepository;
 use CommerceGuys\Intl\Currency\CurrencyRepository;
 use CommerceGuys\Intl\Exception\UnknownLocaleException;
 use Drupal\commerce_price\Entity\CurrencyInterface;

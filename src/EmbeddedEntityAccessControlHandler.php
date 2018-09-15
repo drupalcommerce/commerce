@@ -10,10 +10,8 @@ use Drupal\Core\Session\AccountInterface;
 /**
  * Provides an access control handler for embedded entities.
  *
- * Embedded entities (product variations, order items) are always managed in
- * the context of their parent entity (product, order). For simplicity's sake,
- * we always grant access to the embedded entity, assuming that the parent
- * access control handling has already happened.
+ * @deprecated in Commerce 2.8. See ProductVariationAccessControlHandler
+ *             for an example replacement.
  */
 class EmbeddedEntityAccessControlHandler extends CoreEntityAccessControlHandler {
 
@@ -21,18 +19,14 @@ class EmbeddedEntityAccessControlHandler extends CoreEntityAccessControlHandler 
    * {@inheritdoc}
    */
   protected function checkAccess(EntityInterface $entity, $operation, AccountInterface $account) {
-    // Forbid deleting unsaved entities, matching the parent method logic.
-    if ($operation == 'delete' && $entity->isNew()) {
-      return AccessResult::forbidden()->addCacheableDependency($entity);
-    }
-    return AccessResult::allowed();
+    return AccessResult::forbidden();
   }
 
   /**
    * {@inheritdoc}
    */
   protected function checkCreateAccess(AccountInterface $account, array $context, $entity_bundle = NULL) {
-    return AccessResult::allowed();
+    return AccessResult::forbidden();
   }
 
 }

@@ -52,11 +52,11 @@ interface OrderRefreshInterface {
   /**
    * Refreshes the given order.
    *
+   * Any modified order items will be automatically saved.
+   * The order itself will not be saved.
+   *
    * @param \Drupal\commerce_order\Entity\OrderInterface $order
    *   The order.
-   *
-   * @return \Drupal\commerce_order\Entity\OrderInterface
-   *   The refreshed, unsaved order.
    */
   public function refresh(OrderInterface $order);
 

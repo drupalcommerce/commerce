@@ -41,7 +41,7 @@ class ProductAdminTest extends ProductBrowserTestBase {
       'variations[form][inline_entity_form][status][value]' => 1,
     ];
     $this->submitForm($variations_edit, t('Create variation'));
-    $this->submitForm($edit, t('Save and publish'));
+    $this->submitForm($edit, t('Save'));
 
     $result = \Drupal::entityQuery('commerce_product')
       ->condition("title", $edit['title[0][value]'])
@@ -108,7 +108,7 @@ class ProductAdminTest extends ProductBrowserTestBase {
       'variations[form][inline_entity_form][entities][0][form][status][value]' => 1,
     ];
     $this->submitForm($variations_edit, 'Update variation');
-    $this->submitForm($edit, 'Save and keep published');
+    $this->submitForm($edit, 'Save');
 
     \Drupal::service('entity_type.manager')->getStorage('commerce_product_variation')->resetCache([$variation->id()]);
     $variation = ProductVariation::load($variation->id());
@@ -140,13 +140,67 @@ class ProductAdminTest extends ProductBrowserTestBase {
   }
 
   /**
-   * Tests that anonymous users cannot see the admin/commerce/products page.
+   * Tests viewing the admin/commerce/products page.
    */
   public function testAdminProducts() {
     $this->drupalGet('admin/commerce/products');
     $this->assertSession()->statusCodeEquals(200);
     $this->assertSession()->pageTextNotContains('You are not authorized to access this page.');
     $this->assertNotEmpty($this->getSession()->getPage()->hasLink('Add product'));
+
+    // Create a default type product.
+    $product = $this->createEntity('commerce_product', [
+      'type' => 'default',
+      'title' => 'First product',
+      'status' => TRUE,
+    ]);
+    // Create a second product type and products for that type.
+    $values = [
+      'id' => 'random',
+      'label' => 'Random',
+      'description' => 'My random product type',
+      'variationType' => 'default',
+    ];
+    $product_type = $this->createEntity('commerce_product_type', $values);
+    commerce_product_add_stores_field($product_type);
+    commerce_product_add_variations_field($product_type);
+    $this->createEntity('commerce_product', [
+      'type' => 'random',
+      'title' => 'Second product',
+      'status' => FALSE,
+    ]);
+    $this->createEntity('commerce_product', [
+      'type' => 'random',
+      'title' => 'Third product',
+      'status' => TRUE,
+    ]);
+
+    $this->drupalGet('admin/commerce/products');
+    $this->assertSession()->statusCodeEquals(200);
+    $this->assertSession()->pageTextNotContains('You are not authorized to access this page.');
+    $row_count = $this->getSession()->getPage()->findAll('xpath', '//table/tbody/tr');
+    $this->assertEquals(3, count($row_count), 'Table has 3 rows.');
+
+    // Confirm that product titles are displayed.
+    $page = $this->getSession()->getPage();
+    $product_count = $page->findAll('xpath', '//table/tbody/tr/td/a[text()="First product"]');
+    $this->assertEquals(1, count($product_count), 'First product is displayed.');
+    $product_count = $page->findAll('xpath', '//table/tbody/tr/td/a[text()="Second product"]');
+    $this->assertEquals(1, count($product_count), 'Second product is displayed.');
+    $product_count = $page->findAll('xpath', '//table/tbody/tr/td/a[text()="Third product"]');
+    $this->assertEquals(1, count($product_count), 'Third product is displayed.');
+
+    // Confirm that product types are displayed.
+    $product_count = $page->findAll('xpath', '//table/tbody/tr/td[starts-with(text(), "Default")]');
+    $this->assertEquals(1, count($product_count), 'Default product type exists in the table.');
+    $product_count = $page->findAll('xpath', '//table/tbody/tr/td[starts-with(text(), "Random")]');
+    $this->assertEquals(2, count($product_count), 'Random product types exist in the table.');
+
+    // Confirm that product statuses are displayed.
+    $product_count = $page->findAll('xpath', '//table/tbody/tr/td[starts-with(text(), "Unpublished")]');
+    $this->assertEquals(1, count($product_count), 'Unpublished product exists in the table.');
+    $product_count = $page->findAll('xpath', '//table/tbody/tr/td[starts-with(text(), "Published")]');
+    $this->assertEquals(2, count($product_count), 'Published products exist in the table.');
 
     // Logout and check that anonymous users cannot see the products page
     // and receive a 403 error code.
@@ -155,6 +209,37 @@ class ProductAdminTest extends ProductBrowserTestBase {
     $this->assertSession()->statusCodeEquals(403);
     $this->assertSession()->pageTextContains('You are not authorized to access this page.');
     $this->assertNotEmpty(!$this->getSession()->getPage()->hasLink('Add product'));
+
+    // Login and confirm access for 'access commerce_product overview' permission.
+    $user = $this->drupalCreateUser(['access commerce_product overview']);
+    $this->drupalLogin($user);
+    $this->drupalGet('admin/commerce/products');
+    $this->assertSession()->statusCodeEquals(200);
+    $this->assertSession()->pageTextNotContains('You are not authorized to access this page.');
+    $this->assertNotEmpty(!$this->getSession()->getPage()->hasLink('Add product'));
+    $row_count = $this->getSession()->getPage()->findAll('xpath', '//table/tbody/tr');
+    $this->assertEquals(3, count($row_count), 'Table has 3 rows.');
+
+    // Confirm that product titles are displayed.
+    $page = $this->getSession()->getPage();
+    $product_count = $page->findAll('xpath', '//table/tbody/tr/td/a[text()="First product"]');
+    $this->assertEquals(1, count($product_count), 'First product is displayed.');
+    $product_count = $page->findAll('xpath', '//table/tbody/tr/td/a[text()="Second product"]');
+    $this->assertEquals(1, count($product_count), 'Second product is displayed.');
+    $product_count = $page->findAll('xpath', '//table/tbody/tr/td/a[text()="Third product"]');
+    $this->assertEquals(1, count($product_count), 'Third product is displayed.');
+
+    // Confirm that product types are displayed.
+    $product_count = $page->findAll('xpath', '//table/tbody/tr/td[starts-with(text(), "Default")]');
+    $this->assertEquals(1, count($product_count), 'Default product type exists in the table.');
+    $product_count = $page->findAll('xpath', '//table/tbody/tr/td[starts-with(text(), "Random")]');
+    $this->assertEquals(2, count($product_count), 'Random product types exist in the table.');
+
+    // Confirm that product statuses are displayed.
+    $product_count = $page->findAll('xpath', '//table/tbody/tr/td[starts-with(text(), "Unpublished")]');
+    $this->assertEquals(1, count($product_count), 'Unpublished product exists in the table.');
+    $product_count = $page->findAll('xpath', '//table/tbody/tr/td[starts-with(text(), "Published")]');
+    $this->assertEquals(2, count($product_count), 'Published products exist in the table.');
   }
 
 }

@@ -2,8 +2,7 @@
 
 namespace Drupal\Tests\commerce\Kernel;
 
-use Drupal\Core\Plugin\Context\Context;
-use Drupal\Core\Plugin\Context\ContextDefinition;
+use Drupal\commerce_order\Plugin\Commerce\Condition\OrderTotalPrice;
 use Drupal\entity_test\Entity\EntityTest;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
@@ -20,6 +19,10 @@ class PluginItemTest extends CommerceKernelTestBase {
    * {@inheritdoc}
    */
   public static $modules = [
+    'entity_reference_revisions',
+    'profile',
+    'state_machine',
+    'commerce_order',
     'commerce_test',
   ];
 
@@ -34,7 +37,7 @@ class PluginItemTest extends CommerceKernelTestBase {
     $field_storage = FieldStorageConfig::create([
       'field_name' => 'test_conditions',
       'entity_type' => 'entity_test',
-      'type' => 'commerce_plugin_item:condition',
+      'type' => 'commerce_plugin_item:commerce_condition',
     ]);
     $field_storage->save();
 
@@ -44,80 +47,35 @@ class PluginItemTest extends CommerceKernelTestBase {
       'bundle' => 'entity_test',
     ]);
     $field->save();
-
-    $field_storage = FieldStorageConfig::create([
-      'field_name' => 'test_actions',
-      'entity_type' => 'entity_test',
-      'type' => 'commerce_plugin_item:action',
-    ]);
-    $field_storage->save();
-
-    $field = FieldConfig::create([
-      'field_name' => 'test_actions',
-      'entity_type' => 'entity_test',
-      'bundle' => 'entity_test',
-    ]);
-    $field->save();
   }
 
   /**
-   * Tests the condition derivative of the exectuable plugin item field.
+   * Tests the plugin item field.
    */
-  public function testConditionFieldDerivative() {
-    $test_user1 = $this->createUser([
-      'name' => 'Test user 1',
-      'status' => TRUE,
-      'roles' => ['test_role'],
-    ]);
-    $test_user2 = $this->createUser([
-      'name' => 'Test user 2',
-      'status' => TRUE,
-      'roles' => [],
-    ]);
-
+  public function testField() {
+    $plugin_configuration = [
+      'operator' => '>',
+      'amount' => [
+        'number' => '9.99',
+        'currency_code' => 'USD',
+      ],
+    ];
     $entity = EntityTest::create([
       'test_conditions' => [
         [
-          'target_plugin_id' => 'commerce_test_user_role',
-          'target_plugin_configuration' => [
-            'roles' => ['test_role'],
-          ],
+          'target_plugin_id' => 'order_total_price',
+          'target_plugin_configuration' => $plugin_configuration,
         ],
       ],
     ]);
     $entity->save();
-
     /** @var \Drupal\commerce\Plugin\Field\FieldType\PluginItem $condition_field */
     $condition_field = $entity->test_conditions->first();
 
-    // Executes and returns TRUE that user1 has role.
-    $user1_context = new Context(new ContextDefinition('entity:user'), $test_user1);
-    $this->assertNotEmpty($condition_field->getTargetInstance(['user' => $user1_context])->execute());
-
-    // Execute and returns FALSE that user2 does not have the role.
-    $user2_context = new Context(new ContextDefinition('entity:user'), $test_user2);
-    $this->assertEmpty($condition_field->getTargetInstance(['user' => $user2_context])->execute());
-  }
-
-  /**
-   * Tests the action derivative of the exectuable plugin item field.
-   */
-  public function testActionFieldDerivative() {
-    $entity = EntityTest::create([
-      'test_actions' => [
-        [
-          'target_plugin_id' => 'commerce_test_throw_exception',
-          'target_plugin_configuration' => [],
-        ],
-      ],
-    ]);
-    $entity->save();
-
-    /** @var \Drupal\commerce\Plugin\Field\FieldType\PluginItem $condition_field */
-    $condition_field = $entity->test_actions->first();
-
-    $this->setExpectedException(\Exception::class, 'Test exception action.');
-    $condition_field->getTargetInstance()->execute();
+    $condition = $condition_field->getTargetInstance();
+    $this->assertInstanceOf(OrderTotalPrice::class, $condition);
+    $this->assertEquals($condition->getConfiguration(), $plugin_configuration);
+    $this->assertEquals($condition->getPluginDefinition(), $condition_field->getTargetDefinition());
   }
 
 }

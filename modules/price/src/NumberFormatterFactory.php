@@ -2,50 +2,39 @@
 
 namespace Drupal\commerce_price;
 
-use Drupal\commerce\CurrentLocaleInterface;
-use CommerceGuys\Intl\NumberFormat\NumberFormatRepositoryInterface;
-use CommerceGuys\Intl\Formatter\NumberFormatter;
+use CommerceGuys\Intl\Formatter\CurrencyFormatterInterface;
+
+@trigger_error('The ' . __NAMESPACE__ . '\NumberFormatterFactory is deprecated. Instead, use \Drupal\commerce_price\CurrencyFormatter. See https://www.drupal.org/node/2975672.', E_USER_DEPRECATED);
 
 /**
  * Defines the NumberFormatter factory.
+ *
+ * @deprecated Use \Drupal\commerce_price\CurrencyFormatter instead.
  */
 class NumberFormatterFactory implements NumberFormatterFactoryInterface {
 
   /**
-   * The current locale.
+   * The currency formatter.
    *
-   * @var \Drupal\commerce\CurrentLocaleInterface
+   * @var \CommerceGuys\Intl\Formatter\CurrencyFormatterInterface
    */
-  protected $currentLocale;
-
-  /**
-   * The number format repository.
-   *
-   * @var \CommerceGuys\Intl\NumberFormat\NumberFormatRepositoryInterface
-   */
-  protected $numberFormatRepository;
+  protected $currencyFormatter;
 
   /**
    * Constructs a new NumberFormatterFactory object.
    *
-   * @param \Drupal\commerce\CurrentLocaleInterface $current_locale
-   *   The current locale.
-   * @param \CommerceGuys\Intl\NumberFormat\NumberFormatRepositoryInterface $number_format_repository
-   *   The number format repository..
+   * @param \CommerceGuys\Intl\Formatter\CurrencyFormatterInterface $currency_formatter
+   *   The currency formatter.
    */
-  public function __construct(CurrentLocaleInterface $current_locale, NumberFormatRepositoryInterface $number_format_repository) {
-    $this->currentLocale = $current_locale;
-    $this->numberFormatRepository = $number_format_repository;
+  public function __construct(CurrencyFormatterInterface $currency_formatter) {
+    $this->currencyFormatter = $currency_formatter;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function createInstance($style = NumberFormatter::CURRENCY) {
-    $locale = $this->currentLocale->getLocale();
-    $number_format = $this->numberFormatRepository->get($locale);
-
-    return new NumberFormatter($number_format, $style);
+  public function createInstance() {
+    return new LegacyNumberFormatter($this->currencyFormatter);
   }
 
 }

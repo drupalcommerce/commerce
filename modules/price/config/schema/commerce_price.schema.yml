@@ -36,8 +36,9 @@ field.field_settings.commerce_price:
     available_currencies:
       type: sequence
       label: 'Available currencies'
+      orderby: value
       sequence:
-        - type: string
+        type: string
 
 field.formatter.settings.commerce_price_default:
   type: mapping
@@ -46,9 +47,9 @@ field.formatter.settings.commerce_price_default:
     strip_trailing_zeroes:
       type: boolean
       label: 'Strip trailing zeroes after the decimal point'
-    display_currency_code:
-      type: boolean
-      label: 'Display the currency code instead of the currency symbol'
+    currency_display:
+      type: string
+      label: 'Currency display'
 
 field.formatter.settings.commerce_price_calculated:
   type: mapping
@@ -57,6 +58,13 @@ field.formatter.settings.commerce_price_calculated:
     strip_trailing_zeroes:
       type: boolean
       label: 'Strip trailing zeroes after the decimal point'
-    display_currency_code:
-      type: boolean
-      label: 'Display the currency code instead of the currency symbol'
+    currency_display:
+      type: string
+      label: 'Currency display'
+    # Needed by the commerce_order version of the formatter.
+    adjustment_types:
+      type: sequence
+      label: 'Adjustment types'
+      sequence:
+        type: string
+        label: 'Adjustment type'

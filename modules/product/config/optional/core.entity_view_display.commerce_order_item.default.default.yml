@@ -18,7 +18,7 @@ content:
     weight: 3
     settings:
       strip_trailing_zeroes: false
-      display_currency_code: false
+      currency_display: symbol
     third_party_settings: {  }
     label: above
   purchased_entity:
@@ -44,7 +44,7 @@ content:
     weight: 2
     settings:
       strip_trailing_zeroes: false
-      display_currency_code: false
+      currency_display: symbol
     third_party_settings: {  }
     label: above
 hidden: {  }

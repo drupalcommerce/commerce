@@ -8,11 +8,18 @@ use Drupal\commerce_order\Entity\OrderItemInterface;
  * Finds matching order items.
  *
  * Used for combining order items in the add to cart process.
+ *
+ * By default, takes into account the order item type, purchased entity ID,
+ * and any custom fields shown on the add to cart form.
+ *
+ * For example, when a custom "engraving" field is shown on the add to cart
+ * form, two order items will be combined if they have the same
+ * engraving, type, purchased entity ID.
  */
 interface OrderItemMatcherInterface {
 
   /**
-   * Finds the best matching order item for the given order item.
+   * Finds the first matching order item for the given order item.
    *
    * @param \Drupal\commerce_order\Entity\OrderItemInterface $order_item
    *   The order item.

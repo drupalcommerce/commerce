@@ -33,7 +33,7 @@ class Review extends CheckoutPaneBase implements CheckoutPaneInterface {
           ];
         }
 
-        $label = $pane->getLabel();
+        $label = isset($summary['#title']) ? $summary['#title'] : $pane->getDisplayLabel();
         if ($pane->isVisible()) {
           $edit_link = Link::createFromRoute($this->t('Edit'), 'commerce_checkout.form', [
             'commerce_order' => $this->order->id(),

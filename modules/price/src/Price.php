@@ -6,6 +6,8 @@ use Drupal\commerce_price\Exception\CurrencyMismatchException;
 
 /**
  * Provides a value object for monetary values.
+ *
+ * Use the commerce_price.currency_formatter service to format prices.
  */
 final class Price {
 
@@ -37,6 +39,21 @@ final class Price {
 
     $this->number = (string) $number;
     $this->currencyCode = strtoupper($currency_code);
+  }
+
+  /**
+   * Creates a new price from the given array.
+   *
+   * @param array $price
+   *   The price array, with the "number" and "currency_code" keys.
+   *
+   * @return static
+   */
+  public static function fromArray(array $price) {
+    if (!isset($price['number'], $price['currency_code'])) {
+      throw new \InvalidArgumentException('Price::fromArray() called with a malformed array.');
+    }
+    return new static($price['number'], $price['currency_code']);
   }
 
   /**

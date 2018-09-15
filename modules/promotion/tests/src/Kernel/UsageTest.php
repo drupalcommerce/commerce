@@ -113,10 +113,13 @@ class UsageTest extends CommerceKernelTestBase {
   /**
    * Tests the usage API.
    *
-   * @covers ::addUsage
-   * @covers ::deleteUsage
-   * @covers ::getUsage
-   * @covers ::getUsageMultiple
+   * @covers ::register
+   * @covers ::delete
+   * @covers ::deleteByCoupon
+   * @covers ::load
+   * @covers ::loadByCoupon
+   * @covers ::loadMultiple
+   * @covers ::loadMultipleByCoupon
    */
   public function testUsage() {
     $promotion = $this->prophesize(PromotionInterface::class);
@@ -135,29 +138,36 @@ class UsageTest extends CommerceKernelTestBase {
     $another_order->getEmail()->willReturn('customer@example.com');
     $another_order = $another_order->reveal();
 
-    $this->usage->addUsage($order, $promotion);
-    $this->assertEquals(1, $this->usage->getUsage($promotion));
-    $this->usage->addUsage($another_order, $promotion);
-    $this->assertEquals(2, $this->usage->getUsage($promotion));
+    $this->usage->register($order, $promotion);
+    $this->assertEquals(1, $this->usage->load($promotion));
+    $this->usage->register($another_order, $promotion);
+    $this->assertEquals(2, $this->usage->load($promotion));
     // Test filtering by coupon.
-    $this->usage->addUsage($order, $promotion, $coupon);
-    $this->assertEquals(1, $this->usage->getUsage($promotion, $coupon));
-    $this->assertEquals(3, $this->usage->getUsage($promotion));
+    $this->usage->register($order, $promotion, $coupon);
+    $this->assertEquals(1, $this->usage->loadByCoupon($coupon));
+    $this->assertEquals(3, $this->usage->load($promotion));
     // Test filtering by customer email.
-    $this->assertEquals(2, $this->usage->getUsage($promotion, NULL, 'admin@example.com'));
-    $this->assertEquals(1, $this->usage->getUsage($promotion, NULL, 'customer@example.com'));
+    $this->assertEquals(1, $this->usage->loadByCoupon($coupon, 'admin@example.com'));
+    $this->assertEquals(0, $this->usage->loadByCoupon($coupon, 'customer@example.com'));
+    $this->assertEquals(2, $this->usage->load($promotion, 'admin@example.com'));
+    $this->assertEquals(1, $this->usage->load($promotion, 'customer@example.com'));
 
-    $this->usage->deleteUsage([$promotion]);
-    $this->assertEquals(0, $this->usage->getUsage($promotion));
+    $this->usage->deleteByCoupon([$coupon]);
+    $this->assertEquals(0, $this->usage->loadByCoupon($coupon));
+    $this->assertEquals(2, $this->usage->load($promotion));
+
+    $this->usage->delete([$promotion]);
+    $this->assertEquals(0, $this->usage->load($promotion));
   }
 
   /**
    * Tests the order integration.
    *
-   * @covers ::addUsage
-   * @covers ::deleteUsage
-   * @covers ::getUsage
-   * @covers ::getUsageMultiple
+   * @covers ::register
+   * @covers ::delete
+   * @covers ::deleteByCoupon
+   * @covers ::load
+   * @covers ::loadMultiple
    */
   public function testOrderIntegration() {
     $first_promotion = Promotion::create([
@@ -165,9 +175,9 @@ class UsageTest extends CommerceKernelTestBase {
       'order_types' => [$this->order->bundle()],
       'stores' => [$this->store->id()],
       'offer' => [
-        'target_plugin_id' => 'commerce_promotion_order_percentage_off',
+        'target_plugin_id' => 'order_percentage_off',
         'target_plugin_configuration' => [
-          'amount' => '0.10',
+          'percentage' => '0.10',
         ],
       ],
       'start_date' => '2017-01-01',
@@ -186,20 +196,23 @@ class UsageTest extends CommerceKernelTestBase {
     $this->order->get('coupons')->appendItem($coupon);
     $this->order->save();
     $this->container->get('commerce_order.order_refresh')->refresh($this->order);
-    $this->assertEquals(2, count($this->order->getAdjustments()));
+    $this->assertEquals(2, count($this->order->collectAdjustments()));
     $this->order->save();
 
     $this->order->getState()->applyTransition($this->order->getState()->getTransitions()['place']);
     $this->order->save();
-    $this->assertEquals(1, $this->usage->getUsage($first_promotion));
-    $this->assertEquals(1, $this->usage->getUsage($second_promotion));
-    $this->assertEquals([1 => 1, 2 => 1], $this->usage->getUsageMultiple([$first_promotion, $second_promotion]));
+    $this->assertEquals(1, $this->usage->load($first_promotion));
+    $this->assertEquals(1, $this->usage->load($second_promotion));
+    $this->assertEquals([1 => 1, 2 => 1], $this->usage->loadMultiple([$first_promotion, $second_promotion]));
+
+    // Deleting a coupon should delete its usage.
+    $second_promotion->delete();
+    $this->assertEquals(0, $this->usage->load($second_promotion));
 
     // Deleting a promotion should delete its usage.
     $first_promotion->delete();
-    $this->assertEquals(0, $this->usage->getUsage($first_promotion));
-    $this->assertEquals(1, $this->usage->getUsage($second_promotion));
-    $this->assertEquals([1 => 0, 2 => 1], $this->usage->getUsageMultiple([$first_promotion, $second_promotion]));
+    $this->assertEquals(0, $this->usage->load($first_promotion));
+    $this->assertEquals([1 => 0, 2 => 0], $this->usage->loadMultiple([$first_promotion, $second_promotion]));
   }
 
   /**
@@ -211,9 +224,9 @@ class UsageTest extends CommerceKernelTestBase {
       'order_types' => [$this->order->bundle()],
       'stores' => [$this->store->id()],
       'offer' => [
-        'target_plugin_id' => 'commerce_promotion_order_percentage_off',
+        'target_plugin_id' => 'order_percentage_off',
         'target_plugin_configuration' => [
-          'amount' => '0.10',
+          'percentage' => '0.10',
         ],
       ],
       'usage_limit' => 1,
@@ -224,16 +237,16 @@ class UsageTest extends CommerceKernelTestBase {
 
     $this->assertTrue($promotion->applies($this->order));
     $this->container->get('commerce_order.order_refresh')->refresh($this->order);
-    $this->assertEquals(1, count($this->order->getAdjustments()));
+    $this->assertEquals(1, count($this->order->collectAdjustments()));
     $this->order->save();
 
     $this->order->getState()->applyTransition($this->order->getState()->getTransitions()['place']);
     $this->order->save();
-    $usage = $this->usage->getUsage($promotion);
+    $usage = $this->usage->load($promotion);
     $this->assertEquals(1, $usage);
 
     $order_type = OrderType::load($this->order->bundle());
-    $valid_promotions = $this->promotionStorage->loadAvailable($order_type, $this->store);
+    $valid_promotions = $this->promotionStorage->loadAvailable($this->order);
     $this->assertEmpty($valid_promotions);
   }
 

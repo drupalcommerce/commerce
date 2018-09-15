@@ -2,7 +2,9 @@
 
 namespace Drupal\Tests\commerce_product\Functional;
 
+use Drupal\commerce_order\Entity\OrderItemType;
 use Drupal\commerce_product\Entity\ProductType;
+use Drupal\commerce_product\Entity\ProductVariationType;
 
 /**
  * Ensure the product type works correctly.
@@ -54,10 +56,84 @@ class ProductTypeTest extends ProductBrowserTestBase {
     ];
     $this->submitForm($edit, t('Save'));
     $product_type = ProductType::load($edit['id']);
-    $this->assertNotEmpty(!empty($product_type), 'The new product type has been created.');
-    $this->assertEquals($product_type->label(), $edit['label'], 'The new product type has the correct label.');
-    $this->assertEquals($product_type->getDescription(), $edit['description'], 'The new product type has the correct label.');
-    $this->assertEquals($product_type->getVariationTypeId(), $edit['variationType'], 'The new product type has the correct associated variation type.');
+    $this->assertNotEmpty($product_type);
+    $this->assertEquals($product_type->label(), $edit['label']);
+    $this->assertEquals($product_type->getDescription(), $edit['description']);
+    $this->assertEquals($product_type->getVariationTypeId(), $edit['variationType']);
+
+    // Automatic variation type creation option.
+    $this->drupalGet('admin/commerce/config/product-types/add');
+    $edit = [
+      'id' => strtolower($this->randomMachineName(8)),
+      'label' => $this->randomMachineName(),
+      'description' => 'My even more random product type',
+      'variationType' => '',
+    ];
+    $this->submitForm($edit, t('Save'));
+    $product_type = ProductType::load($edit['id']);
+    $this->assertNotEmpty($product_type);
+    $this->assertEquals($product_type->label(), $edit['label']);
+    $this->assertEquals($product_type->getDescription(), $edit['description']);
+    $this->assertEquals($product_type->getVariationTypeId(), $edit['id']);
+    $product_variation_type = ProductVariationType::load($edit['id']);
+    $this->assertNotEmpty($product_variation_type);
+    $this->assertEquals($product_variation_type->label(), $edit['label']);
+    $this->assertEquals($product_variation_type->getOrderItemTypeId(), 'default');
+
+    // Confirm that a conflicting product variation type ID is detected.
+    $product_type_id = $product_type->id();
+    $product_type->delete();
+    $this->drupalGet('admin/commerce/config/product-types/add');
+    $edit = [
+      'id' => $product_type_id,
+      'label' => $this->randomMachineName(),
+      'description' => 'My even more random product type',
+      'variationType' => '',
+    ];
+    $this->submitForm($edit, t('Save'));
+    $this->assertSession()->pageTextContains(t('A product variation type with the machine name @name already exists. Select an existing product variation type or change the machine name for this product type.', ['@name' => $product_type_id]));
+
+    // Confirm that the form can't be submitted with no order item types.
+    $default_order_item_type = OrderItemType::load('default');
+    $this->assertNotEmpty(!empty($default_order_item_type), 'The default order item type has been loaded.');
+    $default_order_item_type->delete();
+
+    $this->drupalGet('admin/commerce/config/product-types/add');
+    $edit = [
+      'id' => strtolower($this->randomMachineName(8)),
+      'label' => $this->randomMachineName(),
+      'description' => 'Another random product type',
+      'variationType' => '',
+    ];
+    $this->submitForm($edit, t('Save'));
+    $this->assertSession()->pageTextContains(t('A new product variation type cannot be created, because no order item types were found. Select an existing product variation type or retry after creating a new order item type.'));
+
+    // Confirm that a non-default order item type can be selected.
+    $default_order_item_type->delete();
+    OrderItemType::create([
+      'id' => 'test',
+      'label' => 'Test',
+      'orderType' => 'default',
+      'purchasableEntityType' => 'commerce_product_variation',
+    ])->save();
+
+    $this->drupalGet('admin/commerce/config/product-types/add');
+    $edit = [
+      'id' => strtolower($this->randomMachineName(8)),
+      'label' => $this->randomMachineName(),
+      'description' => 'My even more random product type',
+      'variationType' => '',
+    ];
+    $this->submitForm($edit, t('Save'));
+    $product_type = ProductType::load($edit['id']);
+    $this->assertNotEmpty($product_type);
+    $this->assertEquals($product_type->label(), $edit['label']);
+    $this->assertEquals($product_type->getDescription(), $edit['description']);
+    $this->assertEquals($product_type->getVariationTypeId(), $edit['id']);
+    $product_variation_type = ProductVariationType::load($edit['id']);
+    $this->assertNotEmpty($product_variation_type);
+    $this->assertEquals($product_variation_type->label(), $edit['label']);
+    $this->assertEquals($product_variation_type->getOrderItemTypeId(), 'test');
   }
 
   /**
@@ -83,6 +159,7 @@ class ProductTypeTest extends ProductBrowserTestBase {
       'id' => 'foo',
       'label' => 'foo',
     ]);
+    /** @var \Drupal\commerce_product\Entity\ProductTypeInterface $product_type */
     $product_type = $this->createEntity('commerce_product_type', [
       'id' => 'foo',
       'label' => 'foo',
@@ -90,23 +167,32 @@ class ProductTypeTest extends ProductBrowserTestBase {
     ]);
     commerce_product_add_stores_field($product_type);
     commerce_product_add_variations_field($product_type);
-
     $product = $this->createEntity('commerce_product', [
       'type' => $product_type->id(),
       'title' => $this->randomMachineName(),
     ]);
 
+    // Confirm that the type can't be deleted while there's a product.
     // @todo Make sure $product_type->delete() also does nothing if there's
     // a product of that type. Right now the check is done on the form level.
-    $this->drupalGet('admin/commerce/config/product-types/' . $product_type->id() . '/delete');
+    $this->drupalGet($product_type->toUrl('delete-form'));
     $this->assertSession()->pageTextContains(
       t('@type is used by 1 product on your site. You cannot remove this product type until you have removed all of the @type products.', ['@type' => $product_type->label()]),
       'The product type will not be deleted until all products of that type are deleted.'
     );
     $this->assertSession()->pageTextNotContains(t('This action cannot be undone.'));
 
+    // Confirm that the delete page is not available when the type is locked.
+    $product_type->lock();
+    $product_type->save();
+    $this->drupalGet($product_type->toUrl('delete-form'));
+    $this->assertSession()->statusCodeEquals('403');
+
+    // Delete the product, unlock the type, confirm that deletion works.
     $product->delete();
-    $this->drupalGet('admin/commerce/config/product-types/' . $product_type->id() . '/delete');
+    $product_type->unlock();
+    $product_type->save();
+    $this->drupalGet($product_type->toUrl('delete-form'));
     $this->assertSession()->pageTextContains(
       t('Are you sure you want to delete the product type @type?', ['@type' => $product_type->label()]),
       'The product type is available for deletion'
@@ -114,7 +200,7 @@ class ProductTypeTest extends ProductBrowserTestBase {
     $this->assertSession()->pageTextContains(t('This action cannot be undone.'));
     $this->submitForm([], 'Delete');
     $exists = (bool) ProductType::load($product_type->id());
-    $this->assertEmpty($exists, 'The new product type has been deleted from the database.');
+    $this->assertEmpty($exists);
   }
 
 }

@@ -27,3 +27,5 @@ form:
   css:
     theme:
       css/commerce_checkout.form.css: {}
+  dependencies:
+    - core/drupal.form

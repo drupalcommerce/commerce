@@ -5,12 +5,20 @@ namespace Drupal\commerce_cart;
 use Drupal\commerce_cart\Event\CartEvents;
 use Drupal\commerce_cart\Event\OrderItemComparisonFieldsEvent;
 use Drupal\commerce_order\Entity\OrderItemInterface;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
  * Default implementation of the order item matcher.
  */
 class OrderItemMatcher implements OrderItemMatcherInterface {
+
+  /**
+   * The entity type manager.
+   *
+   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   */
+  protected $entityTypeManager;
 
   /**
    * The event dispatcher.
@@ -22,10 +30,13 @@ class OrderItemMatcher implements OrderItemMatcherInterface {
   /**
    * Constructs a new OrderItemMatcher object.
    *
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   *   The entity type manager.
    * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface $event_dispatcher
    *   The event dispatcher.
    */
-  public function __construct(EventDispatcherInterface $event_dispatcher) {
+  public function __construct(EntityTypeManagerInterface $entity_type_manager, EventDispatcherInterface $event_dispatcher) {
+    $this->entityTypeManager = $entity_type_manager;
     $this->eventDispatcher = $event_dispatcher;
   }
 
@@ -48,9 +59,11 @@ class OrderItemMatcher implements OrderItemMatcherInterface {
     }
 
     $comparison_fields = ['type', 'purchased_entity'];
+    $comparison_fields = array_merge($comparison_fields, $this->getCustomFields($order_item));
     $event = new OrderItemComparisonFieldsEvent($comparison_fields, $order_item);
     $this->eventDispatcher->dispatch(CartEvents::ORDER_ITEM_COMPARISON_FIELDS, $event);
     $comparison_fields = $event->getComparisonFields();
+    $comparison_fields = array_unique($comparison_fields);
 
     $matched_order_items = [];
     /** @var \Drupal\commerce_order\Entity\OrderItemInterface $existing_order_item */
@@ -60,7 +73,7 @@ class OrderItemMatcher implements OrderItemMatcherInterface {
           // The field is missing on one of the order items.
           continue 2;
         }
-        if ($existing_order_item->get($comparison_field)->getValue() !== $order_item->get($comparison_field)->getValue()) {
+        if (!$existing_order_item->get($comparison_field)->equals($order_item->get($comparison_field))) {
           // Order item doesn't match.
           continue 2;
         }
@@ -69,6 +82,29 @@ class OrderItemMatcher implements OrderItemMatcherInterface {
     }
 
     return $matched_order_items;
+  }
+
+  /**
+   * Gets the names of custom fields shown on the add to cart form.
+   *
+   * @param \Drupal\commerce_order\Entity\OrderItemInterface $order_item
+   *   The order item.
+   *
+   * @return string[]
+   *   The field names.
+   */
+  protected function getCustomFields(OrderItemInterface $order_item) {
+    $field_names = [];
+    $storage = $this->entityTypeManager->getStorage('entity_form_display');
+    /** @var \Drupal\Core\Entity\Display\EntityFormDisplayInterface $form_display */
+    $form_display = $storage->load('commerce_order_item.' . $order_item->bundle() . '.' . 'add_to_cart');
+    if ($form_display) {
+      $field_names = array_keys($form_display->getComponents());
+      // Remove base fields.
+      $field_names = array_diff($field_names, ['purchased_entity', 'quantity', 'created']);
+    }
+
+    return $field_names;
   }
 
 }

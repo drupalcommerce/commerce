@@ -13,7 +13,7 @@ entity_type: profile
 type: address
 settings: {  }
 module: address
-locked: true
+locked: false
 cardinality: 1
 translatable: true
 indexes: {  }

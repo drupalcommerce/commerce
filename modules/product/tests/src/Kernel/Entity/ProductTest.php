@@ -42,15 +42,14 @@ class ProductTest extends CommerceKernelTestBase {
     $this->installEntitySchema('commerce_product');
     $this->installConfig(['commerce_product']);
 
-    $user = $this->createUser();
+    $user = $this->createUser([], ['administer commerce_product']);
     $this->user = $this->reloadEntity($user);
+    $this->container->get('current_user')->setAccount($user);
   }
 
   /**
    * @covers ::getTitle
    * @covers ::setTitle
-   * @covers ::isPublished
-   * @covers ::setPublished
    * @covers ::getCreatedTime
    * @covers ::setCreatedTime
    * @covers ::getStores
@@ -70,10 +69,6 @@ class ProductTest extends CommerceKernelTestBase {
 
     $product->setTitle('My title');
     $this->assertEquals('My title', $product->getTitle());
-
-    $this->assertEquals(TRUE, $product->isPublished());
-    $product->setPublished(FALSE);
-    $this->assertEquals(FALSE, $product->isPublished());
 
     $product->setCreatedTime(635879700);
     $this->assertEquals(635879700, $product->getCreatedTime());

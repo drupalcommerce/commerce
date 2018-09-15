@@ -3,10 +3,11 @@
 namespace Drupal\commerce_payment\Element;
 
 use Drupal\commerce\Element\CommerceElementTrait;
+use Drupal\commerce\Response\NeedsRedirectException;
 use Drupal\commerce_payment\Entity\EntityWithPaymentGatewayInterface;
 use Drupal\commerce_payment\Exception\PaymentGatewayException;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\Core\Render\Element\FormElement;
+use Drupal\Core\Render\Element\RenderElement;
 
 /**
  * Provides a form element for embedding the payment gateway forms.
@@ -25,7 +26,7 @@ use Drupal\Core\Render\Element\FormElement;
  *
  * @RenderElement("commerce_payment_gateway_form")
  */
-class PaymentGatewayForm extends FormElement {
+class PaymentGatewayForm extends RenderElement {
 
   use CommerceElementTrait;
 
@@ -38,6 +39,11 @@ class PaymentGatewayForm extends FormElement {
       '#operation' => '',
       // The entity operated on. Instance of EntityWithPaymentGatewayInterface.
       '#default_value' => NULL,
+      // The url to which the user will be redirected if an exception is thrown
+      // while building the form. If empty, the error will be shown inline.
+      '#exception_url' => '',
+      '#exception_message' => t('An error occurred while contacting the gateway. Please try again later.'),
+
       '#process' => [
         [$class, 'attachElementSubmit'],
         [$class, 'processForm'],
@@ -66,6 +72,8 @@ class PaymentGatewayForm extends FormElement {
    * @throws \InvalidArgumentException
    *   Thrown when the #operation or #default_value properties are empty, or
    *   when the #default_value property is not a valid entity.
+   * @throws \Drupal\commerce\Response\NeedsRedirectException
+   *   Thrown if an exception was caught, and $element['#exception_url'] is not empty.
    *
    * @return array
    *   The processed form element.
@@ -81,10 +89,25 @@ class PaymentGatewayForm extends FormElement {
       throw new \InvalidArgumentException('The commerce_payment_gateway_form #default_value property must be a payment or a payment method entity.');
     }
     $plugin_form = static::createPluginForm($element);
-    $element = $plugin_form->buildConfigurationForm($element, $form_state);
-    // Allow the plugin form to override the page title.
-    if (isset($element['#page_title'])) {
-      $complete_form['#title'] = $element['#page_title'];
+    try {
+      $element = $plugin_form->buildConfigurationForm($element, $form_state);
+      // Allow the plugin form to override the page title.
+      if (isset($element['#page_title'])) {
+        $complete_form['#title'] = $element['#page_title'];
+      }
+    }
+    catch (PaymentGatewayException $e) {
+      \Drupal::logger('commerce_payment')->error($e->getMessage());
+      if (!empty($element['#exception_url'])) {
+        \Drupal::messenger()->addError($element['#exception_message']);
+        throw new NeedsRedirectException($element['#exception_url']);
+      }
+      else {
+        $element['error'] = [
+          '#markup' => $element['#exception_message'],
+        ];
+        $complete_form['actions']['#access'] = FALSE;
+      }
     }
 
     return $element;
@@ -100,7 +123,14 @@ class PaymentGatewayForm extends FormElement {
    */
   public static function validateForm(array &$element, FormStateInterface $form_state) {
     $plugin_form = self::createPluginForm($element);
-    $plugin_form->validateConfigurationForm($element, $form_state);
+
+    try {
+      $plugin_form->validateConfigurationForm($element, $form_state);
+    }
+    catch (PaymentGatewayException $e) {
+      $error_element = $plugin_form->getErrorElement($element, $form_state);
+      $form_state->setError($error_element, $e->getMessage());
+    }
   }
 
   /**

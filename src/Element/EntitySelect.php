@@ -9,16 +9,18 @@ use Drupal\Core\Render\Element\FormElement;
 /**
  * Provides a form input element for selecting one or multiple entities.
  *
+ * The element is transformed based on the number of available entities:
+ *   1..#autocomplete_threshold: Checkboxes/radios element, based on #multiple.
+ *   >#autocomplete_threshold: entity autocomplete element.
  * If the element is required, and there's only one available entity, a hidden
- * form element is used. Otherwise the element is transformed based on just the
- * number of available entities:
- * 1..#autocomplete_threshold: Checkboxes/radios element, based on #multiple.
- * >#autocomplete_treshold: entity autocomplete element.
+ * form element can be used instead of checkboxes/radios.
  *
  * Properties:
  * - #target_type: The entity type being selected.
  * - #multiple: Whether the user may select more than one item.
  * - #default_value: An entity ID or an array of entity IDs.
+ * - #hide_single_entity: Whether to use a hidden element when there's only one
+ *                       available entity and the element is required.
  * - #autocomplete_threshold: Determines when to use the autocomplete.
  * - #autocomplete_size: The size of the autocomplete element in characters.
  * - #autocomplete_placeholder: The placeholder for the autocomplete element.
@@ -47,6 +49,7 @@ class EntitySelect extends FormElement {
       '#input' => TRUE,
       '#target_type' => '',
       '#multiple' => FALSE,
+      '#hide_single_entity' => TRUE,
       '#autocomplete_threshold' => 7,
       '#autocomplete_size' => 60,
       '#autocomplete_placeholder' => '',
@@ -73,7 +76,7 @@ class EntitySelect extends FormElement {
     $entity_count = $storage->getQuery()->count()->execute();
     $element['#tree'] = TRUE;
     // No need to show anything, there's only one possible value.
-    if ($element['#required'] && $entity_count == 1) {
+    if ($element['#required'] && $entity_count == 1 && $element['#hide_single_entity']) {
       $entity_ids = $storage->getQuery()->execute();
       $element['value'] = [
         '#type' => 'hidden',
@@ -120,6 +123,7 @@ class EntitySelect extends FormElement {
         '#default_value' => $default_value,
         '#size' => $element['#autocomplete_size'],
         '#placeholder' => $element['#autocomplete_placeholder'],
+        '#maxlength' => NULL,
       ];
     }
 

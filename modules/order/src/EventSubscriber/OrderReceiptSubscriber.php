@@ -106,7 +106,8 @@ class OrderReceiptSubscriber implements EventSubscriberInterface {
 
     $params = [
       'headers' => [
-        'Content-Type' => 'text/html',
+        'Content-Type' => 'text/html; charset=UTF-8;',
+        'Content-Transfer-Encoding' => '8Bit',
       ],
       'from' => $order->getStore()->getEmail(),
       'subject' => $this->t('Order #@number confirmed', ['@number' => $order->getOrderNumber()]),

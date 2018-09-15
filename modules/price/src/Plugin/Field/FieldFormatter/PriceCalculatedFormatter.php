@@ -2,13 +2,12 @@
 
 namespace Drupal\commerce_price\Plugin\Field\FieldFormatter;
 
+use CommerceGuys\Intl\Formatter\CurrencyFormatterInterface;
 use Drupal\commerce\Context;
 use Drupal\commerce\PurchasableEntityInterface;
-use Drupal\commerce_price\NumberFormatterFactoryInterface;
 use Drupal\commerce_price\Resolver\ChainPriceResolverInterface;
-use Drupal\commerce_store\StoreContextInterface;
+use Drupal\commerce_store\CurrentStoreInterface;
 use Drupal\Core\Cache\Cache;
-use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Language\LanguageInterface;
@@ -21,7 +20,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *
  * @FieldFormatter(
  *   id = "commerce_price_calculated",
- *   label = @Translation("Calculated price"),
+ *   label = @Translation("Calculated"),
  *   field_types = {
  *     "commerce_price"
  *   }
@@ -37,13 +36,6 @@ class PriceCalculatedFormatter extends PriceDefaultFormatter implements Containe
   protected $chainPriceResolver;
 
   /**
-   * The currency storage.
-   *
-   * @var \Drupal\Core\Entity\EntityStorageInterface
-   */
-  protected $currencyStorage;
-
-  /**
    * The current user.
    *
    * @var \Drupal\Core\Session\AccountInterface
@@ -51,11 +43,11 @@ class PriceCalculatedFormatter extends PriceDefaultFormatter implements Containe
   protected $currentUser;
 
   /**
-   * The store context.
+   * The current store.
    *
-   * @var \Drupal\commerce_store\StoreContextInterface
+   * @var \Drupal\commerce_store\CurrentStoreInterface
    */
-  protected $storeContext;
+  protected $currentStore;
 
   /**
    * Constructs a new PriceCalculatedFormatter object.
@@ -74,23 +66,20 @@ class PriceCalculatedFormatter extends PriceDefaultFormatter implements Containe
    *   The view mode.
    * @param array $third_party_settings
    *   Any third party settings settings.
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
-   *   The entity type manager.
-   * @param \Drupal\commerce_price\NumberFormatterFactoryInterface $number_formatter_factory
-   *   The number formatter factory.
+   * @param \CommerceGuys\Intl\Formatter\CurrencyFormatterInterface $currency_formatter
+   *   The currency formatter.
    * @param \Drupal\commerce_price\Resolver\ChainPriceResolverInterface $chain_price_resolver
    *   The chain price resolver.
-   * @param \Drupal\commerce_store\StoreContextInterface $store_context
-   *   The store context.
+   * @param \Drupal\commerce_store\CurrentStoreInterface $current_store
+   *   The current store.
    * @param \Drupal\Core\Session\AccountInterface $current_user
    *   The current user.
    */
-  public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, $label, $view_mode, array $third_party_settings, EntityTypeManagerInterface $entity_type_manager, NumberFormatterFactoryInterface $number_formatter_factory, ChainPriceResolverInterface $chain_price_resolver, StoreContextInterface $store_context, AccountInterface $current_user) {
-    parent::__construct($plugin_id, $plugin_definition, $field_definition, $settings, $label, $view_mode, $third_party_settings, $entity_type_manager, $number_formatter_factory);
+  public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, $label, $view_mode, array $third_party_settings, CurrencyFormatterInterface $currency_formatter, ChainPriceResolverInterface $chain_price_resolver, CurrentStoreInterface $current_store, AccountInterface $current_user) {
+    parent::__construct($plugin_id, $plugin_definition, $field_definition, $settings, $label, $view_mode, $third_party_settings, $currency_formatter);
 
     $this->chainPriceResolver = $chain_price_resolver;
-    $this->storeContext = $store_context;
-    $this->currencyStorage = $entity_type_manager->getStorage('commerce_currency');
+    $this->currentStore = $current_store;
     $this->currentUser = $current_user;
   }
 
@@ -106,10 +95,9 @@ class PriceCalculatedFormatter extends PriceDefaultFormatter implements Containe
       $configuration['label'],
       $configuration['view_mode'],
       $configuration['third_party_settings'],
-      $container->get('entity_type.manager'),
-      $container->get('commerce_price.number_formatter_factory'),
+      $container->get('commerce_price.currency_formatter'),
       $container->get('commerce_price.chain_price_resolver'),
-      $container->get('commerce_store.store_context'),
+      $container->get('commerce_store.current_store'),
       $container->get('current_user')
     );
   }
@@ -118,19 +106,20 @@ class PriceCalculatedFormatter extends PriceDefaultFormatter implements Containe
    * {@inheritdoc}
    */
   public function viewElements(FieldItemListInterface $items, $langcode) {
-    $store = $this->storeContext->getStore();
-    $context = new Context($this->currentUser, $store);
     $elements = [];
-    /** @var \Drupal\commerce_price\Plugin\Field\FieldType\PriceItem $item */
-    foreach ($items as $delta => $item) {
+    if (!$items->isEmpty()) {
+      $context = new Context($this->currentUser, $this->currentStore->getStore(), NULL, [
+        'field_name' => $items->getName(),
+      ]);
       /** @var \Drupal\commerce\PurchasableEntityInterface $purchasable_entity */
       $purchasable_entity = $items->getEntity();
       $resolved_price = $this->chainPriceResolver->resolve($purchasable_entity, 1, $context);
       $number = $resolved_price->getNumber();
-      $currency = $this->currencyStorage->load($resolved_price->getCurrencyCode());
+      $currency_code = $resolved_price->getCurrencyCode();
+      $options = $this->getFormattingOptions();
 
-      $elements[$delta] = [
-        '#markup' => $this->numberFormatter->formatCurrency($number, $currency),
+      $elements[0] = [
+        '#markup' => $this->currencyFormatter->format($number, $currency_code, $options),
         '#cache' => [
           'tags' => $purchasable_entity->getCacheTags(),
           'contexts' => Cache::mergeContexts($purchasable_entity->getCacheContexts(), [
@@ -149,7 +138,7 @@ class PriceCalculatedFormatter extends PriceDefaultFormatter implements Containe
    */
   public static function isApplicable(FieldDefinitionInterface $field_definition) {
     $entity_type = \Drupal::entityTypeManager()->getDefinition($field_definition->getTargetEntityTypeId());
-    return $entity_type->isSubclassOf(PurchasableEntityInterface::class);
+    return $entity_type->entityClassImplements(PurchasableEntityInterface::class);
   }
 
 }

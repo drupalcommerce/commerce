@@ -25,6 +25,10 @@ function commerce_product_field_views_data_alter(array &$data, FieldStorageConfi
     $bundle = reset($bundles);
     $field_name = $field_storage->getName();
     $field = FieldConfig::loadByName($entity_type_id, $bundle, $field_name);
+    if (!$field) {
+      // There is no field yet, probably because a migration is in progress.
+      return;
+    }
     $handler_settings = $field->getSetting('handler_settings');
     $target_bundles = array_values($handler_settings['target_bundles']);
     $attribute = reset($target_bundles);

@@ -405,13 +405,13 @@ class ProductAttributeForm extends BundleEntityFormBase {
     }
 
     if ($status == SAVED_NEW) {
-      drupal_set_message($this->t('Created the %label product attribute.', ['%label' => $this->entity->label()]));
+      $this->messenger()->addMessage($this->t('Created the %label product attribute.', ['%label' => $this->entity->label()]));
       // Send the user to the edit form to create the attribute values.
       $form_state->setRedirectUrl($this->entity->toUrl('edit-form'));
     }
     else {
       $this->saveValues($form, $form_state);
-      drupal_set_message($this->t('Updated the %label product attribute.', ['%label' => $this->entity->label()]));
+      $this->messenger()->addMessage($this->t('Updated the %label product attribute.', ['%label' => $this->entity->label()]));
       $form_state->setRedirectUrl($this->entity->toUrl('collection'));
     }
   }

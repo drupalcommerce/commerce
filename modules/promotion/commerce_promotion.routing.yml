@@ -1,0 +1,25 @@
+entity.commerce_promotion_coupon.collection:
+  path: '/promotion/{commerce_promotion}/coupons'
+  defaults:
+    _entity_list: 'commerce_promotion_coupon'
+    _title: 'Coupons'
+  options:
+    _admin_route: TRUE
+    parameters:
+      commerce_promotion:
+        type: 'entity:commerce_promotion'
+  requirements:
+    _entity_access: 'commerce_promotion.update'
+
+entity.commerce_promotion_coupon.generate_form:
+  path: '/promotion/{commerce_promotion}/coupons/generate'
+  defaults:
+    _form: '\Drupal\commerce_promotion\Form\CouponGenerateForm'
+    _title: 'Generate coupons'
+  options:
+    _admin_route: TRUE
+    parameters:
+      commerce_promotion:
+        type: 'entity:commerce_promotion'
+  requirements:
+    _permission: 'bulk generate commerce_promotion_coupon'

@@ -56,7 +56,7 @@ function template_preprocess_commerce_store(array &$variables) {
   $store = $variables['elements']['#commerce_store'];
 
   $variables['store_entity'] = $store;
-  $variables['store_url'] = $store->toUrl();
+  $variables['store_url'] = $store->isNew() ? '' : $store->toUrl();
   $variables['store'] = [];
   foreach (Element::children($variables['elements']) as $key) {
     $variables['store'][$key] = $variables['elements'][$key];

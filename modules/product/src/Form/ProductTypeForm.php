@@ -5,6 +5,7 @@ namespace Drupal\commerce_product\Form;
 use Drupal\commerce\EntityHelper;
 use Drupal\commerce\EntityTraitManagerInterface;
 use Drupal\commerce\Form\CommerceBundleEntityFormBase;
+use Drupal\commerce_order\Entity\OrderItemTypeInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Entity\EntityFieldManagerInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
@@ -99,9 +100,12 @@ class ProductTypeForm extends CommerceBundleEntityFormBase {
       '#title' => $this->t('Product variation type'),
       '#default_value' => $product_type->getVariationTypeId(),
       '#options' => EntityHelper::extractLabels($variation_types),
-      '#required' => TRUE,
       '#disabled' => !$product_type->isNew(),
     ];
+    if ($product_type->isNew()) {
+      $form['variationType']['#empty_option'] = $this->t('- Create new -');
+      $form['variationType']['#description'] = $this->t('If an existing product variation type is not selected, a new one will be created.');
+    }
     $form['injectVariationFields'] = [
       '#type' => 'checkbox',
       '#title' => $this->t('Inject product variation fields into the rendered product.'),
@@ -139,6 +143,47 @@ class ProductTypeForm extends CommerceBundleEntityFormBase {
    */
   public function validateForm(array &$form, FormStateInterface $form_state) {
     $this->validateTraitForm($form, $form_state);
+
+    if (empty($form_state->getValue('variationType'))) {
+      $id = $form_state->getValue('id');
+      if (!empty($this->entityTypeManager->getStorage('commerce_product_variation_type')->load($id))) {
+        $form_state->setError($form['variationType'], $this->t('A product variation type with the machine name @id already exists. Select an existing product variation type or change the machine name for this product type.', [
+          '@id' => $id,
+        ]));
+      }
+
+      if ($this->moduleHandler->moduleExists('commerce_order')) {
+        $order_item_type_ids = $this->getOrderItemTypeIds();
+        if (empty($order_item_type_ids)) {
+          $form_state->setError($form['variationType'], $this->t('A new product variation type cannot be created, because no order item types were found. Select an existing product variation type or retry after creating a new order item type.'));
+        }
+      }
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function submitForm(array &$form, FormStateInterface $form_state) {
+    parent::submitForm($form, $form_state);
+
+    /** @var \Drupal\commerce_product\Entity\ProductTypeInterface $product_type */
+    $product_type = $this->entity;
+    // Create a new product variation type.
+    if (empty($form_state->getValue('variationType'))) {
+      /** @var \Drupal\commerce_product\Entity\ProductVariationTypeInterface $variation_type */
+      $variation_type = $this->entityTypeManager->getStorage('commerce_product_variation_type')->create([
+        'id' => $form_state->getValue('id'),
+        'label' => $form_state->getValue('label'),
+      ]);
+      if ($this->moduleHandler->moduleExists('commerce_order')) {
+        $order_item_type_ids = $this->getOrderItemTypeIds();
+        $order_item_type_id = isset($types['default']) ? 'default' : reset($order_item_type_ids);
+        $variation_type->setOrderItemTypeId($order_item_type_id);
+      }
+      $variation_type->save();
+      $product_type->setVariationTypeId($form_state->getValue('id'));
+    }
   }
 
   /**
@@ -156,13 +201,32 @@ class ProductTypeForm extends CommerceBundleEntityFormBase {
     }
     $this->submitTraitForm($form, $form_state);
 
-    drupal_set_message($this->t('The product type %label has been successfully saved.', ['%label' => $this->entity->label()]));
+    $this->messenger()->addMessage($this->t('The product type %label has been successfully saved.', ['%label' => $this->entity->label()]));
     $form_state->setRedirect('entity.commerce_product_type.collection');
     if ($status == SAVED_NEW) {
       commerce_product_add_stores_field($this->entity);
       commerce_product_add_body_field($this->entity);
       commerce_product_add_variations_field($this->entity);
     }
+  }
+
+  /**
+   * Gets the available order item type IDs.
+   *
+   * Only order item types that can be used to purchase product variations
+   * are included.
+   *
+   * @return string[]
+   *   The order item type IDs.
+   */
+  protected function getOrderItemTypeIds() {
+    $order_item_type_storage = $this->entityTypeManager->getStorage('commerce_order_item_type');
+    $order_item_types = $order_item_type_storage->loadMultiple();
+    $order_item_types = array_filter($order_item_types, function (OrderItemTypeInterface $type) {
+      return $type->getPurchasableEntityTypeId() == 'commerce_product_variation';
+    });
+
+    return array_keys($order_item_types);
   }
 
 }

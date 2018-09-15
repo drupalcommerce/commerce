@@ -14,7 +14,6 @@
  *   {{ payment_method|without('label') }}
  *   @endcode
  * - payment_method_entity: The payment_method entity.
- * - payment_method_url: The payment_method URL.
  *
  * @ingroup themeable
  */
@@ -24,8 +23,10 @@
     {{ payment_method.label }}
     <span class="payment-method-icon payment-method-icon--{{ payment_method_entity.card_type.value }}"></span>
   </div>
-  <div class="field field--name-expires">
-    {{ 'Expires'|t }} {{ payment_method_entity.expiresTime|format_date('custom', 'n/Y') }}
-  </div>
+  {% if payment_method_entity.expiresTime %}
+    <div class="field field--name-expires">
+      {{ 'Expires'|t }} {{ payment_method_entity.expiresTime|format_date('custom', 'n/Y') }}
+    </div>
+  {% endif %}
   {{ payment_method.billing_profile }}
 </article>

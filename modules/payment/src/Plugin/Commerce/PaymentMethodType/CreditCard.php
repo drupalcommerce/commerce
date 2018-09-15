@@ -2,7 +2,7 @@
 
 namespace Drupal\commerce_payment\Plugin\Commerce\PaymentMethodType;
 
-use Drupal\commerce\BundleFieldDefinition;
+use Drupal\entity\BundleFieldDefinition;
 use Drupal\commerce_payment\CreditCard as CreditCardHelper;
 use Drupal\commerce_payment\Entity\PaymentMethodInterface;
 
@@ -12,7 +12,6 @@ use Drupal\commerce_payment\Entity\PaymentMethodInterface;
  * @CommercePaymentMethodType(
  *   id = "credit_card",
  *   label = @Translation("Credit card"),
- *   create_label = @Translation("New credit card"),
  * )
  */
 class CreditCard extends PaymentMethodTypeBase {

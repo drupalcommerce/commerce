@@ -6,12 +6,15 @@ use Drupal\commerce\Context;
 use Drupal\commerce\PurchasableEntityInterface;
 
 /**
- * Defines the interface for base price resolvers.
+ * Defines the interface for price resolvers.
  */
 interface PriceResolverInterface {
 
   /**
-   * Resolves the base price of a given purchasable entity.
+   * Resolves a price for the given purchasable entity.
+   *
+   * Use $context->getData('field_name', 'price') to get the name of the field
+   * for which the price is being resolved (e.g "list_price", "price").
    *
    * @param \Drupal\commerce\PurchasableEntityInterface $entity
    *   The purchasable entity.

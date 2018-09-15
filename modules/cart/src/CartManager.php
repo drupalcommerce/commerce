@@ -113,6 +113,7 @@ class CartManager implements CartManagerInterface {
       $saved_order_item = $matching_order_item;
     }
     else {
+      $order_item->set('order_id', $cart->id());
       $order_item->save();
       $cart->addItem($order_item);
       $saved_order_item = $order_item;

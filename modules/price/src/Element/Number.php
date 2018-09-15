@@ -2,7 +2,6 @@
 
 namespace Drupal\commerce_price\Element;
 
-use CommerceGuys\Intl\Formatter\NumberFormatterInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\Element\FormElement;
 use Drupal\Core\Render\Element;
@@ -35,8 +34,8 @@ class Number extends FormElement {
   public function getInfo() {
     $class = get_class($this);
     return [
-      '#min_fraction_digits' => NULL,
-      '#max_fraction_digits' => NULL,
+      '#min_fraction_digits' => 0,
+      '#max_fraction_digits' => 6,
       '#min' => 0,
       '#max' => NULL,
 
@@ -74,8 +73,15 @@ class Number extends FormElement {
     elseif (!empty($element['#default_value'])) {
       // Convert the stored number to the local format. For example, "9.99"
       // becomes "9,99" in many locales. This also strips any extra zeroes.
-      $number_formatter = self::getNumberFormatter($element);
-      return $number_formatter->format($element['#default_value']);
+      $number_formatter = \Drupal::service('commerce_price.number_formatter');
+      $number = (string) $element['#default_value'];
+      $number = $number_formatter->format($number, [
+        'use_grouping' => FALSE,
+        'minimum_fraction_digits' => $element['#min_fraction_digits'],
+        'maximum_fraction_digits' => $element['#max_fraction_digits'],
+      ]);
+
+      return $number;
     }
 
     return NULL;
@@ -95,9 +101,13 @@ class Number extends FormElement {
    *   The built commerce_number form element.
    */
   public static function processElement(array $element, FormStateInterface $form_state, array &$complete_form) {
+    // Add a sensible default AJAX event.
+    if (isset($element['#ajax']) && !isset($element['#ajax']['event'])) {
+      $element['#ajax']['event'] = 'blur';
+    }
     // Provide an example to the end user so that they know which decimal
     // separator to use. This is the same pattern Drupal core uses.
-    $number_formatter = self::getNumberFormatter($element);
+    $number_formatter = \Drupal::service('commerce_price.number_formatter');
     $element['#placeholder'] = $number_formatter->format('9.99');
 
     return $element;
@@ -114,12 +124,12 @@ class Number extends FormElement {
    *   The current state of the form.
    */
   public static function validateNumber(array $element, FormStateInterface $form_state) {
-    $value = $form_state->getValue($element['#parents']);
+    $value = trim($element['#value']);
     if ($value === '') {
       return;
     }
     $title = empty($element['#title']) ? $element['#parents'][0] : $element['#title'];
-    $number_formatter = self::getNumberFormatter($element);
+    $number_formatter = \Drupal::service('commerce_price.number_formatter');
 
     $value = $number_formatter->parse($value);
     if ($value === FALSE) {
@@ -165,30 +175,6 @@ class Number extends FormElement {
     static::setAttributes($element, ['form-text']);
 
     return $element;
-  }
-
-  /**
-   * Gets an instance of the number formatter for the given form element.
-   *
-   * @param array $element
-   *   The form element.
-   *
-   * @return \CommerceGuys\Intl\Formatter\NumberFormatterInterface
-   *   The number formatter instance.
-   */
-  protected static function getNumberFormatter(array $element) {
-    $number_formatter_factory = \Drupal::service('commerce_price.number_formatter_factory');
-    /** @var \CommerceGuys\Intl\Formatter\NumberFormatterInterface $number_formatter */
-    $number_formatter = $number_formatter_factory->createInstance(NumberFormatterInterface::DECIMAL);
-    $number_formatter->setGroupingUsed(FALSE);
-    if (isset($element['#min_fraction_digits'])) {
-      $number_formatter->setMinimumFractionDigits($element['#min_fraction_digits']);
-    }
-    if (isset($element['#max_fraction_digits'])) {
-      $number_formatter->setMaximumFractionDigits($element['#max_fraction_digits']);
-    }
-
-    return $number_formatter;
   }
 
 }
