@@ -167,16 +167,21 @@ class PaymentProcess extends CheckoutPaneBase {
     $next_step_id = $this->checkoutFlow->getNextStepId($this->getStepId());
 
     if ($payment_gateway_plugin instanceof OnsitePaymentGatewayInterface) {
+      /** @var \Drupal\commerce_payment\Entity\PaymentMethodInterface $payment_method */
+      $payment_method = $this->order->payment_method->entity;
       try {
-        $payment->payment_method = $this->order->payment_method->entity;
+        $payment->payment_method = $payment_method;
         $payment_gateway_plugin->createPayment($payment, $this->configuration['capture']);
         $this->redirectToStep($next_step_id);
       }
       catch (DeclineException $e) {
-        $message = $this->t('We encountered an error processing your payment method. Please verify your details and try again.');
+        $message = $this->t('"We encountered an error processing your payment method. Please re-enter your payment information.');
         $this->messenger->addError($message);
         $this->order->get('payment_gateway')->setValue(NULL);
         $this->order->get('payment_method')->setValue(NULL);
+        if (!$payment_method->isReusable() || $payment_method->getOwner()->isAnonymous()) {
+          $payment_method->delete();
+        }
         $this->redirectToPreviousStep();
       }
       catch (PaymentGatewayException $e) {
