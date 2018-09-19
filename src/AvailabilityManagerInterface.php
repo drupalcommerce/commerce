@@ -31,7 +31,12 @@ interface AvailabilityManagerInterface {
   public function getCheckers();
 
   /**
-   * Checks the availability of the given purchasable entity.
+   * Gets an availability response from the aggregate of all checkers.
+   *
+   * Possible \Drupal\commerce\AvailabilityResponseInterface classes:
+   * - Neutral: when no checker has an opinion about availability.
+   * - Available: when at lease one checker responds with availability.
+   * - Unavailable: when one of the checkers responds with unavailability.
    *
    * @param \Drupal\commerce\PurchasableEntityInterface $entity
    *   The purchasable entity.
@@ -40,8 +45,8 @@ interface AvailabilityManagerInterface {
    * @param \Drupal\commerce\Context $context
    *   The context.
    *
-   * @return bool
-   *   TRUE if the purchasable entity is available, FALSE otherwise.
+   * @return \Drupal\commerce\AvailabilityResponseInterface
+   *   The availability response.
    */
   public function check(PurchasableEntityInterface $entity, $quantity, Context $context);
 

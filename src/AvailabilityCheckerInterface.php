@@ -20,7 +20,7 @@ interface AvailabilityCheckerInterface {
   public function applies(PurchasableEntityInterface $entity);
 
   /**
-   * Checks the availability of the given purchasable entity.
+   * Checks the availability of a given purchasable entity with given context.
    *
    * @param \Drupal\commerce\PurchasableEntityInterface $entity
    *   The purchasable entity.
@@ -29,9 +29,8 @@ interface AvailabilityCheckerInterface {
    * @param \Drupal\commerce\Context $context
    *   The context.
    *
-   * @return bool|null
-   *   TRUE if the entity is available, FALSE if it's unavailable,
-   *   or NULL if it has no opinion.
+   * @return \Drupal\commerce\AvailabilityResponseInterface
+   *   An AvailabilityResponse object.
    */
   public function check(PurchasableEntityInterface $entity, $quantity, Context $context);
 

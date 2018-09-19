@@ -3,6 +3,7 @@
 namespace Drupal\commerce_test;
 
 use Drupal\commerce\AvailabilityCheckerInterface;
+use Drupal\commerce\AvailabilityResponse;
 use Drupal\commerce\Context;
 use Drupal\commerce\PurchasableEntityInterface;
 use Drupal\commerce_product\Entity\ProductVariationInterface;
@@ -23,8 +24,8 @@ class TestAvailabilityChecker implements AvailabilityCheckerInterface {
    * {@inheritdoc}
    */
   public function check(PurchasableEntityInterface $entity, $quantity, Context $context) {
-    // Always return false.
-    return FALSE;
+    // Always return unavailable.
+    return AvailabilityResponse::unavailable(0, 0);
   }
 
 }

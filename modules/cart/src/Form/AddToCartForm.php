@@ -2,6 +2,7 @@
 
 namespace Drupal\commerce_cart\Form;
 
+use Drupal\commerce\AvailabilityManagerInterface;
 use Drupal\commerce\Context;
 use Drupal\commerce\PurchasableEntityInterface;
 use Drupal\commerce_cart\CartManagerInterface;
@@ -22,6 +23,13 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * Provides the order item add to cart form.
  */
 class AddToCartForm extends ContentEntityForm implements AddToCartFormInterface {
+
+  /**
+   * The availability manager.
+   *
+   * @var \Drupal\commerce_cart\Form\AvailabilityManagerInterface
+   */
+  protected $availabilityManager;
 
   /**
    * The cart manager.
@@ -81,6 +89,8 @@ class AddToCartForm extends ContentEntityForm implements AddToCartFormInterface 
    *   The entity type bundle info.
    * @param \Drupal\Component\Datetime\TimeInterface $time
    *   The time.
+   * @param \Drupal\commerce\AvailabilityManagerInterface $availability_manager
+   *   The availability manager.
    * @param \Drupal\commerce_cart\CartManagerInterface $cart_manager
    *   The cart manager.
    * @param \Drupal\commerce_cart\CartProviderInterface $cart_provider
@@ -94,9 +104,10 @@ class AddToCartForm extends ContentEntityForm implements AddToCartFormInterface 
    * @param \Drupal\Core\Session\AccountInterface $current_user
    *   The current user.
    */
-  public function __construct(EntityManagerInterface $entity_manager, EntityTypeBundleInfoInterface $entity_type_bundle_info, TimeInterface $time, CartManagerInterface $cart_manager, CartProviderInterface $cart_provider, OrderTypeResolverInterface $order_type_resolver, CurrentStoreInterface $current_store, ChainPriceResolverInterface $chain_price_resolver, AccountInterface $current_user) {
+  public function __construct(EntityManagerInterface $entity_manager, EntityTypeBundleInfoInterface $entity_type_bundle_info, TimeInterface $time, AvailabilityManagerInterface $availability_manager, CartManagerInterface $cart_manager, CartProviderInterface $cart_provider, OrderTypeResolverInterface $order_type_resolver, CurrentStoreInterface $current_store, ChainPriceResolverInterface $chain_price_resolver, AccountInterface $current_user) {
     parent::__construct($entity_manager, $entity_type_bundle_info, $time);
 
+    $this->availabilityManager = $availability_manager;
     $this->cartManager = $cart_manager;
     $this->cartProvider = $cart_provider;
     $this->orderTypeResolver = $order_type_resolver;
@@ -113,6 +124,7 @@ class AddToCartForm extends ContentEntityForm implements AddToCartFormInterface 
       $container->get('entity.manager'),
       $container->get('entity_type.bundle.info'),
       $container->get('datetime.time'),
+      $container->get('commerce.availability_manager'),
       $container->get('commerce_cart.cart_manager'),
       $container->get('commerce_cart.cart_provider'),
       $container->get('commerce_order.chain_order_type_resolver'),
@@ -159,6 +171,26 @@ class AddToCartForm extends ContentEntityForm implements AddToCartFormInterface 
   public function setFormId($form_id) {
     $this->formId = $form_id;
     return $this;
+  }
+
+  /**
+   * Gets the current user.
+   *
+   * @return \Drupal\Core\Session\AccountInterface
+   *   The current user;
+   */
+  public function getCurrentUser() {
+    return $this->currentUser;
+  }
+
+  /**
+   * Gets the availability manager.
+   *
+   * @return \Drupal\commerce\AvailabilityManagerInterface
+   *   The availability manager.
+   */
+  public function getAvailabilityManager() {
+    return $this->availabilityManager;
   }
 
   /**
