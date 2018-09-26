@@ -353,6 +353,37 @@ class ProductVariation extends CommerceContentEntityBase implements ProductVaria
   }
 
   /**
+   * {@inheritdoc}
+   */
+  public function postSave(EntityStorageInterface $storage, $update = TRUE) {
+    parent::postSave($storage, $update);
+
+    // Ensure there's a reference on the parent product.
+    $product = $this->getProduct();
+    if ($product && !$product->hasVariation($this)) {
+      $product->addVariation($this);
+      $product->save();
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function postDelete(EntityStorageInterface $storage, array $entities) {
+    parent::postDelete($storage, $entities);
+
+    /** @var \Drupal\commerce_product\Entity\ProductVariationInterface[] $entities */
+    foreach ($entities as $variation) {
+      // Remove the reference from the parent product.
+      $product = $variation->getProduct();
+      if ($product && $product->hasVariation($variation)) {
+        $product->removeVariation($variation);
+        $product->save();
+      }
+    }
+  }
+
+  /**
    * Generates the variation title based on attribute values.
    *
    * @return string
