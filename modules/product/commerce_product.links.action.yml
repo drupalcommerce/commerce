@@ -21,3 +21,9 @@ entity.commerce_product_variation_type.add_form:
   title: 'Add product variation type'
   appears_on:
     - entity.commerce_product_variation_type.collection
+
+entity.commerce_product_variation.add_form:
+  route_name: entity.commerce_product_variation.add_form
+  title: 'Add variation'
+  appears_on:
+    - entity.commerce_product_variation.collection

@@ -19,12 +19,6 @@ class ProductAdminTest extends ProductBrowserTestBase {
   public function testCreateProduct() {
     $this->drupalGet('admin/commerce/products');
     $this->getSession()->getPage()->clickLink('Add product');
-    // Check the integrity of the add form.
-    $this->assertSession()->fieldExists('title[0][value]');
-    $this->assertSession()->fieldExists('variations[form][inline_entity_form][sku][0][value]');
-    $this->assertSession()->fieldExists('variations[form][inline_entity_form][price][0][number]');
-    $this->assertSession()->fieldExists('variations[form][inline_entity_form][status][value]');
-    $this->assertSession()->buttonExists('Create variation');
 
     $store_ids = EntityHelper::extractIds($this->stores);
     $title = $this->randomMachineName();
@@ -34,13 +28,7 @@ class ProductAdminTest extends ProductBrowserTestBase {
     foreach ($store_ids as $store_id) {
       $edit['stores[target_id][value][' . $store_id . ']'] = $store_id;
     }
-    $variation_sku = $this->randomMachineName();
-    $variations_edit = [
-      'variations[form][inline_entity_form][sku][0][value]' => $variation_sku,
-      'variations[form][inline_entity_form][price][0][number]' => '9.99',
-      'variations[form][inline_entity_form][status][value]' => 1,
-    ];
-    $this->submitForm($variations_edit, t('Create variation'));
+
     $this->submitForm($edit, t('Save'));
 
     $result = \Drupal::entityQuery('commerce_product')
@@ -58,39 +46,20 @@ class ProductAdminTest extends ProductBrowserTestBase {
     $this->drupalGet($product->toUrl('canonical'));
     $this->assertSession()->statusCodeEquals(200);
     $this->assertSession()->pageTextContains($product->getTitle());
-
-    $variation = \Drupal::entityQuery('commerce_product_variation')
-      ->condition('sku', $variation_sku)
-      ->range(0, 1)
-      ->execute();
-
-    $variation = ProductVariation::load(current($variation));
-    $this->assertNotNull($variation, 'The new product variation has been created.');
   }
 
   /**
    * Tests editing a product.
    */
   public function testEditProduct() {
-    $variation = $this->createEntity('commerce_product_variation', [
-      'type' => 'default',
-      'sku' => strtolower($this->randomMachineName()),
-    ]);
     $product = $this->createEntity('commerce_product', [
       'type' => 'default',
-      'variations' => [$variation],
     ]);
 
     // Check the integrity of the edit form.
     $this->drupalGet($product->toUrl('edit-form'));
     $this->assertSession()->statusCodeEquals(200);
     $this->assertSession()->fieldExists('title[0][value]');
-    $this->assertSession()->buttonExists('edit-variations-entities-0-actions-ief-entity-edit');
-    $this->submitForm([], t('Edit'));
-    $this->assertSession()->fieldExists('variations[form][inline_entity_form][entities][0][form][sku][0][value]');
-    $this->assertSession()->fieldExists('variations[form][inline_entity_form][entities][0][form][price][0][number]');
-    $this->assertSession()->fieldExists('variations[form][inline_entity_form][entities][0][form][status][value]');
-    $this->assertSession()->buttonExists('Update variation');
 
     $title = $this->randomMachineName();
     $store_ids = EntityHelper::extractIds($this->stores);
@@ -100,20 +69,8 @@ class ProductAdminTest extends ProductBrowserTestBase {
     foreach ($store_ids as $store_id) {
       $edit['stores[target_id][value][' . $store_id . ']'] = $store_id;
     }
-    $new_sku = strtolower($this->randomMachineName());
-    $new_price_amount = '1.11';
-    $variations_edit = [
-      'variations[form][inline_entity_form][entities][0][form][sku][0][value]' => $new_sku,
-      'variations[form][inline_entity_form][entities][0][form][price][0][number]' => $new_price_amount,
-      'variations[form][inline_entity_form][entities][0][form][status][value]' => 1,
-    ];
-    $this->submitForm($variations_edit, 'Update variation');
     $this->submitForm($edit, 'Save');
 
-    \Drupal::service('entity_type.manager')->getStorage('commerce_product_variation')->resetCache([$variation->id()]);
-    $variation = ProductVariation::load($variation->id());
-    $this->assertEquals($variation->getSku(), $new_sku, 'The variation sku successfully updated.');
-    $this->assertEquals($variation->get('price')->number, $new_price_amount, 'The variation price successfully updated.');
     \Drupal::service('entity_type.manager')->getStorage('commerce_product')->resetCache([$product->id()]);
     $product = Product::load($product->id());
     $this->assertEquals($product->getTitle(), $title, 'The product title successfully updated.');
@@ -240,6 +197,162 @@ class ProductAdminTest extends ProductBrowserTestBase {
     $this->assertEquals(1, count($product_count), 'Unpublished product exists in the table.');
     $product_count = $page->findAll('xpath', '//table/tbody/tr/td[starts-with(text(), "Published")]');
     $this->assertEquals(2, count($product_count), 'Published products exist in the table.');
+  }
+
+  /**
+   * Tests creating a product and its variations.
+   */
+  public function testVariationsTab() {
+    $this->drupalGet('admin/commerce/products');
+    $this->getSession()->getPage()->clickLink('Add product');
+
+    // Create a product.
+    $store_ids = EntityHelper::extractIds($this->stores);
+    $title = $this->randomMachineName();
+    $edit = [
+      'title[0][value]' => $title,
+    ];
+    foreach ($store_ids as $store_id) {
+      $edit['stores[target_id][value][' . $store_id . ']'] = $store_id;
+    }
+    $this->submitForm($edit, t('Save and add variations'));
+
+    $this->assertSession()->pageTextContains(t('The product @title has been successfully saved', ['@title' => $title]));
+    $this->assertSession()->pageTextContains(t('There are no product variations yet.'));
+    $this->assertNotEmpty($this->getSession()->getPage()->hasLink('Add variation'));
+
+    // Create a variation.
+    $this->getSession()->getPage()->clickLink('Add variation');
+    $this->assertSession()->pageTextContains(t('Add variation'));
+    $this->assertSession()->fieldExists('sku[0][value]');
+    $this->assertSession()->fieldExists('price[0][number]');
+    $this->assertSession()->fieldExists('status[value]');
+    $this->assertSession()->buttonExists('Save');
+
+    $variation_sku = $this->randomMachineName();
+    $this->getSession()->getPage()->fillField('sku[0][value]', $variation_sku);
+    $this->getSession()->getPage()->fillField('price[0][number]', '9.99');
+    $this->submitForm([], t('Save'));
+    $this->assertSession()->pageTextContains("Saved the $title variation.");
+    $variation_in_table = $this->getSession()->getPage()->find('xpath', '//table/tbody/tr/td[text()="' . $variation_sku . '"]');
+    $this->assertNotEmpty($variation_in_table);
+
+    $product = Product::load(1);
+    $variation = ProductVariation::load(1);
+    $this->assertEquals($product->id(), $variation->getProductId());
+    $this->assertEquals($variation_sku, $variation->getSku());
+
+    \Drupal::service('entity_type.manager')->getStorage('commerce_product')->resetCache([$product->id()]);
+    $product = Product::load($product->id());
+    $this->assertTrue($product->hasVariation($variation));
+  }
+
+  /**
+   * Tests editing a product variation.
+   */
+  public function testEditVariation() {
+    $product = $this->createEntity('commerce_product', [
+      'type' => 'default',
+    ]);
+    $variation = $this->createEntity('commerce_product_variation', [
+      'type' => 'default',
+      'product_id' => $product->id(),
+      'sku' => strtolower($this->randomMachineName()),
+    ]);
+
+    // Check the integrity of the variation form.
+    $this->drupalGet($variation->toUrl('edit-form'));
+    $this->assertSession()->statusCodeEquals(200);
+    $this->assertSession()->fieldExists('sku[0][value]');
+    $this->assertSession()->fieldExists('price[0][number]');
+    $this->assertSession()->buttonExists('Save');
+
+    $new_sku = strtolower($this->randomMachineName());
+    $new_price_amount = '1.11';
+    $variations_edit = [
+      'sku[0][value]' => $new_sku,
+      'price[0][number]' => $new_price_amount,
+      'status[value]' => 1,
+    ];
+    $this->submitForm($variations_edit, 'Save');
+    $this->assertSession()->addressEquals($variation->toUrl('collection'));
+
+    \Drupal::service('entity_type.manager')->getStorage('commerce_product_variation')->resetCache([$variation->id()]);
+    $variation = ProductVariation::load($variation->id());
+    $this->assertEquals($variation->getSku(), $new_sku);
+    $this->assertEquals($variation->getPrice()->getNumber(), $new_price_amount);
+  }
+
+  /**
+   * Tests duplicating a product variation.
+   */
+  public function testDuplicateVariation() {
+    $sku = strtolower($this->randomMachineName());
+    $product = $this->createEntity('commerce_product', [
+      'type' => 'default',
+    ]);
+    $variation = $this->createEntity('commerce_product_variation', [
+      'type' => 'default',
+      'product_id' => $product->id(),
+      'sku' => $sku,
+      'price' => [
+        'number' => '12.00',
+        'currency_code' => 'USD',
+      ],
+      'status' => TRUE,
+    ]);
+
+    // Check the integrity of the variation form.
+    $this->drupalGet($variation->toUrl('duplicate-form'));
+    $this->assertSession()->statusCodeEquals(200);
+    $this->assertSession()->fieldExists('sku[0][value]');
+    $this->assertSession()->fieldExists('price[0][number]');
+    $this->assertSession()->buttonExists('Save');
+
+    // Confirm that we can't save the duplicate form with the existing SKU.
+    $this->submitForm([], 'Save');
+    $this->assertSession()->addressEquals($variation->toUrl('duplicate-form'));
+    $this->assertSession()->pageTextContains(sprintf('The SKU "%s" is already in use and must be unique.', $sku));
+
+    $new_sku = strtolower($this->randomMachineName());
+    $variations_edit = [
+      'sku[0][value]' => $new_sku,
+    ];
+    $this->submitForm($variations_edit, 'Save');
+    $this->assertSession()->addressEquals($variation->toUrl('collection'));
+
+    $expected_variation_id = $variation->id() + 1;
+    $variation = ProductVariation::load($expected_variation_id);
+    $this->assertEquals($variation->getSku(), $new_sku);
+    $this->assertEquals($variation->getPrice()->getNumber(), '12.00');
+    $this->assertTrue($variation->isActive());
+  }
+
+  /**
+   * Tests deleting a product variation.
+   */
+  public function testDeleteVariation() {
+    $product = $this->createEntity('commerce_product', [
+      'title' => $this->randomMachineName(),
+      'type' => 'default',
+    ]);
+    $variation = $this->createEntity('commerce_product_variation', [
+      'type' => 'default',
+      'product_id' => $product->id(),
+      'sku' => strtolower($this->randomMachineName()),
+    ]);
+
+    $this->drupalGet($variation->toUrl('delete-form'));
+    $this->assertSession()->pageTextContains(t("Are you sure you want to delete the @variation variation?", [
+      '@variation' => $variation->label(),
+    ]));
+    $this->assertSession()->pageTextContains(t('This action cannot be undone.'));
+    $this->submitForm([], 'Delete');
+    $this->assertSession()->addressEquals($variation->toUrl('collection'));
+
+    \Drupal::service('entity_type.manager')->getStorage('commerce_product_variation')->resetCache();
+    $variation_exists = (bool) ProductVariation::load($variation->id());
+    $this->assertEmpty($variation_exists, 'The new variation has been deleted from the database.');
   }
 
 }

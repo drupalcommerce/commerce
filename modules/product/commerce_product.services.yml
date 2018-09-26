@@ -1,4 +1,16 @@
 services:
+  access_check.product_variation_collection:
+    class: Drupal\commerce_product\Access\ProductVariationCollectionAccessCheck
+    arguments: ['@entity_type.manager']
+    tags:
+    - { name: access_check, applies_to: _product_variation_collection_access }
+
+  access_check.product_variation_create:
+    class: Drupal\commerce_product\Access\ProductVariationCreateAccessCheck
+    arguments: ['@entity_type.manager']
+    tags:
+    - { name: access_check, applies_to: _product_variation_create_access }
+
   commerce_product.attribute_field_manager:
     class: Drupal\commerce_product\ProductAttributeFieldManager
     arguments: ['@entity_field.manager', '@entity_type.bundle.info', '@entity_type.manager', '@cache.data']

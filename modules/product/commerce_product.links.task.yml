@@ -22,3 +22,8 @@ entity.commerce_product_variation_type.edit_form:
   route_name: entity.commerce_product_variation_type.edit_form
   base_route: entity.commerce_product_variation_type.edit_form
   title: Edit
+
+entity.commerce_product_variation.collection:
+  route_name: entity.commerce_product_variation.collection
+  base_route: entity.commerce_product.canonical
+  title: Variations

@@ -1,0 +1,56 @@
+<?php
+
+namespace Drupal\commerce_product\Form;
+
+use Drupal\Core\Entity\ContentEntityForm;
+use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Routing\RouteMatchInterface;
+
+/**
+ * Defines the add/edit/duplicate form for product variations.
+ */
+class ProductVariationForm extends ContentEntityForm {
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getEntityFromRouteMatch(RouteMatchInterface $route_match, $entity_type_id) {
+    if ($route_match->getRawParameter('commerce_product_variation') !== NULL) {
+      $entity = $route_match->getParameter('commerce_product_variation');
+    }
+    else {
+      /** @var \Drupal\commerce_product\Entity\ProductInterface $product */
+      $product = $route_match->getParameter('commerce_product');
+      /** @var \Drupal\commerce_product\Entity\ProductTypeInterface $product_type */
+      $product_type = $this->entityTypeManager->getStorage('commerce_product_type')->load($product->bundle());
+      $values = [
+        'type' => $product_type->getVariationTypeId(),
+        'product_id' => $product->id(),
+      ];
+      $entity = $this->entityTypeManager->getStorage('commerce_product_variation')->create($values);
+    }
+
+    return $entity;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function prepareEntity() {
+    parent::prepareEntity();
+
+    if ($this->operation == 'duplicate') {
+      $this->entity = $this->entity->createDuplicate();
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function save(array $form, FormStateInterface $form_state) {
+    $this->entity->save();
+    $this->messenger()->addMessage($this->t('Saved the %label variation.', ['%label' => $this->entity->label()]));
+    $form_state->setRedirectUrl($this->entity->toUrl('collection'));
+  }
+
+}
