@@ -4,6 +4,7 @@ namespace Drupal\commerce_order;
 
 use Drupal\commerce\CommerceContentEntityStorage;
 use Drupal\commerce_order\Entity\OrderInterface;
+use Drupal\Core\Cache\MemoryCache\MemoryCacheInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Cache\CacheBackendInterface;
@@ -49,9 +50,11 @@ class OrderStorage extends CommerceContentEntityStorage {
    *   The event dispatcher.
    * @param \Drupal\commerce_order\OrderRefreshInterface $order_refresh
    *   The order refresh process.
+   * @param \Drupal\Core\Cache\MemoryCache\MemoryCacheInterface $memory_cache
+   *   The memory cache object.
    */
-  public function __construct(EntityTypeInterface $entity_type, Connection $database, EntityManagerInterface $entity_manager, CacheBackendInterface $cache, LanguageManagerInterface $language_manager, EventDispatcherInterface $event_dispatcher, OrderRefreshInterface $order_refresh) {
-    parent::__construct($entity_type, $database, $entity_manager, $cache, $language_manager, $event_dispatcher);
+  public function __construct(EntityTypeInterface $entity_type, Connection $database, EntityManagerInterface $entity_manager, CacheBackendInterface $cache, LanguageManagerInterface $language_manager, EventDispatcherInterface $event_dispatcher, OrderRefreshInterface $order_refresh, MemoryCacheInterface $memory_cache) {
+    parent::__construct($entity_type, $database, $entity_manager, $cache, $language_manager, $event_dispatcher, $memory_cache);
     $this->orderRefresh = $order_refresh;
   }
 
@@ -66,7 +69,8 @@ class OrderStorage extends CommerceContentEntityStorage {
       $container->get('cache.entity'),
       $container->get('language_manager'),
       $container->get('event_dispatcher'),
-      $container->get('commerce_order.order_refresh')
+      $container->get('commerce_order.order_refresh'),
+      $container->get('entity.memory_cache')
     );
   }
 
