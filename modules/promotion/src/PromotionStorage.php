@@ -6,6 +6,7 @@ use Drupal\commerce\CommerceContentEntityStorage;
 use Drupal\commerce_order\Entity\OrderInterface;
 use Drupal\Component\Datetime\TimeInterface;
 use Drupal\Core\Cache\CacheBackendInterface;
+use Drupal\Core\Cache\MemoryCache\MemoryCacheInterface;
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Entity\EntityManagerInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
@@ -51,9 +52,11 @@ class PromotionStorage extends CommerceContentEntityStorage implements Promotion
    *   The usage.
    * @param \Drupal\Component\Datetime\TimeInterface $time
    *   The time.
+   * @param \Drupal\Core\Cache\MemoryCache\MemoryCacheInterface $memory_cache
+   *   The memory cache object.
    */
-  public function __construct(EntityTypeInterface $entity_type, Connection $database, EntityManagerInterface $entity_manager, CacheBackendInterface $cache, LanguageManagerInterface $language_manager, EventDispatcherInterface $event_dispatcher, PromotionUsageInterface $usage, TimeInterface $time) {
-    parent::__construct($entity_type, $database, $entity_manager, $cache, $language_manager, $event_dispatcher);
+  public function __construct(EntityTypeInterface $entity_type, Connection $database, EntityManagerInterface $entity_manager, CacheBackendInterface $cache, LanguageManagerInterface $language_manager, EventDispatcherInterface $event_dispatcher, PromotionUsageInterface $usage, TimeInterface $time, MemoryCacheInterface $memory_cache) {
+    parent::__construct($entity_type, $database, $entity_manager, $cache, $language_manager, $event_dispatcher, $memory_cache);
 
     $this->usage = $usage;
     $this->time = $time;
@@ -71,7 +74,8 @@ class PromotionStorage extends CommerceContentEntityStorage implements Promotion
       $container->get('language_manager'),
       $container->get('event_dispatcher'),
       $container->get('commerce_promotion.usage'),
-      $container->get('datetime.time')
+      $container->get('datetime.time'),
+      $container->get('entity.memory_cache')
     );
   }
 
