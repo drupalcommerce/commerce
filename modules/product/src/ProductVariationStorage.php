@@ -7,6 +7,7 @@ use Drupal\commerce_product\Entity\ProductInterface;
 use Drupal\commerce_product\Event\FilterVariationsEvent;
 use Drupal\commerce_product\Event\ProductEvents;
 use Drupal\Core\Cache\CacheBackendInterface;
+use Drupal\Core\Cache\MemoryCache\MemoryCacheInterface;
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Entity\EntityManagerInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
@@ -44,9 +45,11 @@ class ProductVariationStorage extends CommerceContentEntityStorage implements Pr
    *   The event dispatcher.
    * @param \Symfony\Component\HttpFoundation\RequestStack $request_stack
    *   The request stack.
+   * @param \Drupal\Core\Cache\MemoryCache\MemoryCacheInterface $memory_cache
+   *   The memory cache object.
    */
-  public function __construct(EntityTypeInterface $entity_type, Connection $database, EntityManagerInterface $entity_manager, CacheBackendInterface $cache, LanguageManagerInterface $language_manager, EventDispatcherInterface $event_dispatcher, RequestStack $request_stack) {
-    parent::__construct($entity_type, $database, $entity_manager, $cache, $language_manager, $event_dispatcher);
+  public function __construct(EntityTypeInterface $entity_type, Connection $database, EntityManagerInterface $entity_manager, CacheBackendInterface $cache, LanguageManagerInterface $language_manager, EventDispatcherInterface $event_dispatcher, RequestStack $request_stack, MemoryCacheInterface $memory_cache) {
+    parent::__construct($entity_type, $database, $entity_manager, $cache, $language_manager, $event_dispatcher, $memory_cache);
 
     $this->requestStack = $request_stack;
   }
@@ -62,7 +65,8 @@ class ProductVariationStorage extends CommerceContentEntityStorage implements Pr
       $container->get('cache.entity'),
       $container->get('language_manager'),
       $container->get('event_dispatcher'),
-      $container->get('request_stack')
+      $container->get('request_stack'),
+      $container->get('entity.memory_cache')
     );
   }
 

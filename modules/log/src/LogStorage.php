@@ -3,6 +3,7 @@
 namespace Drupal\commerce_log;
 
 use Drupal\commerce\CommerceContentEntityStorage;
+use Drupal\Core\Cache\MemoryCache\MemoryCacheInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Cache\CacheBackendInterface;
@@ -38,9 +39,11 @@ class LogStorage extends CommerceContentEntityStorage implements LogStorageInter
    *   The event dispatcher.
    * @param \Drupal\commerce_log\LogTemplateManagerInterface $log_template_manager
    *   The log template manager.
+   * @param \Drupal\Core\Cache\MemoryCache\MemoryCacheInterface $memory_cache
+   *   The memory cache object.
    */
-  public function __construct(EntityTypeInterface $entity_type, Connection $database, EntityManagerInterface $entity_manager, CacheBackendInterface $cache, LanguageManagerInterface $language_manager, EventDispatcherInterface $event_dispatcher, LogTemplateManagerInterface $log_template_manager) {
-    parent::__construct($entity_type, $database, $entity_manager, $cache, $language_manager, $event_dispatcher);
+  public function __construct(EntityTypeInterface $entity_type, Connection $database, EntityManagerInterface $entity_manager, CacheBackendInterface $cache, LanguageManagerInterface $language_manager, EventDispatcherInterface $event_dispatcher, LogTemplateManagerInterface $log_template_manager, MemoryCacheInterface $memory_cache) {
+    parent::__construct($entity_type, $database, $entity_manager, $cache, $language_manager, $event_dispatcher, $memory_cache);
     $this->logTemplateManager = $log_template_manager;
   }
 
@@ -55,7 +58,8 @@ class LogStorage extends CommerceContentEntityStorage implements LogStorageInter
       $container->get('cache.entity'),
       $container->get('language_manager'),
       $container->get('event_dispatcher'),
-      $container->get('plugin.manager.commerce_log_template')
+      $container->get('plugin.manager.commerce_log_template'),
+      $container->get('entity.memory_cache')
     );
   }
 

@@ -3,6 +3,7 @@
 namespace Drupal\commerce;
 
 use Drupal\Core\Cache\CacheBackendInterface;
+use Drupal\Core\Cache\MemoryCache\MemoryCacheInterface;
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Entity\EntityManagerInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
@@ -41,9 +42,11 @@ class CommerceContentEntityStorage extends SqlContentEntityStorage {
    *   The language manager.
    * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface $event_dispatcher
    *   The event dispatcher.
+   * @param \Drupal\Core\Cache\MemoryCache\MemoryCacheInterface $memory_cache
+   *   The memory cache object.
    */
-  public function __construct(EntityTypeInterface $entity_type, Connection $database, EntityManagerInterface $entity_manager, CacheBackendInterface $cache, LanguageManagerInterface $language_manager, EventDispatcherInterface $event_dispatcher) {
-    parent::__construct($entity_type, $database, $entity_manager, $cache, $language_manager);
+  public function __construct(EntityTypeInterface $entity_type, Connection $database, EntityManagerInterface $entity_manager, CacheBackendInterface $cache, LanguageManagerInterface $language_manager, EventDispatcherInterface $event_dispatcher, MemoryCacheInterface $memory_cache) {
+    parent::__construct($entity_type, $database, $entity_manager, $cache, $language_manager, $memory_cache);
 
     $this->eventDispatcher = $event_dispatcher;
   }
@@ -58,7 +61,8 @@ class CommerceContentEntityStorage extends SqlContentEntityStorage {
       $container->get('entity.manager'),
       $container->get('cache.entity'),
       $container->get('language_manager'),
-      $container->get('event_dispatcher')
+      $container->get('event_dispatcher'),
+      $container->get('entity.memory_cache')
     );
   }
 
