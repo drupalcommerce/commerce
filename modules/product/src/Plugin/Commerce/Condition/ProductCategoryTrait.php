@@ -132,10 +132,12 @@ trait ProductCategoryTrait {
   protected function getReferencedIds(ProductInterface $product) {
     $ids = [];
     foreach ($this->getEntityReferenceFieldMap() as $field_name => $field_info) {
-      $field = $product->get($field_name);
-      if (!$field->isEmpty()) {
-        foreach ($field->getValue() as $index => $field_item) {
-          $ids[] = $field_item['target_id'];
+      if ($product->hasField($field_name)) {
+        $field = $product->get($field_name);
+        if (!$field->isEmpty()) {
+          foreach ($field->getValue() as $index => $field_item) {
+            $ids[] = $field_item['target_id'];
+          }
         }
       }
     }

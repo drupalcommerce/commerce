@@ -69,6 +69,7 @@ class OrderItemProductCategoryTest extends UnitTestCase {
     ]);
     $entity_reference_item_list = $entity_reference_item_list->reveal();
     $product = $this->prophesize(ProductInterface::class);
+    $product->hasField('field_product_category')->willReturn(TRUE);
     $product->get('field_product_category')->willReturn($entity_reference_item_list);
     $product = $product->reveal();
     $purchased_entity = $this->prophesize(ProductVariationInterface::class);
