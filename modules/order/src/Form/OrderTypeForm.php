@@ -2,15 +2,49 @@
 
 namespace Drupal\commerce_order\Form;
 
+use Drupal\commerce\EntityTraitManagerInterface;
 use Drupal\commerce_order\Entity\OrderType;
 use Drupal\commerce\Form\CommerceBundleEntityFormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
+use Drupal\state_machine\WorkflowManagerInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Provides an order type form.
  */
 class OrderTypeForm extends CommerceBundleEntityFormBase {
+
+  /**
+   * The workflow manager.
+   *
+   * @var \Drupal\state_machine\WorkflowManagerInterface
+   */
+  protected $workflowManager;
+
+  /**
+   * Constructs a new OrderTypeForm object.
+   *
+   * @param \Drupal\commerce\EntityTraitManagerInterface $trait_manager
+   *   The entity trait manager.
+   * @param \Drupal\state_machine\WorkflowManagerInterface $workflow_manager
+   *   The workflow manager.
+   */
+  public function __construct(EntityTraitManagerInterface $trait_manager, WorkflowManagerInterface $workflow_manager) {
+    parent::__construct($trait_manager);
+
+    $this->workflowManager = $workflow_manager;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container) {
+    return new static(
+      $container->get('plugin.manager.commerce_entity_trait'),
+      $container->get('plugin.manager.workflow')
+    );
+  }
 
   /**
    * {@inheritdoc}
@@ -19,8 +53,7 @@ class OrderTypeForm extends CommerceBundleEntityFormBase {
     $form = parent::form($form, $form_state);
     /** @var \Drupal\commerce_order\Entity\OrderTypeInterface $order_type */
     $order_type = $this->entity;
-    $workflow_manager = \Drupal::service('plugin.manager.workflow');
-    $workflows = $workflow_manager->getGroupedLabels('commerce_order');
+    $workflows = $this->workflowManager->getGroupedLabels('commerce_order');
 
     $form['#tree'] = TRUE;
     $form['label'] = [
@@ -113,10 +146,8 @@ class OrderTypeForm extends CommerceBundleEntityFormBase {
    * {@inheritdoc}
    */
   public function validateForm(array &$form, FormStateInterface $form_state) {
-    /** @var \Drupal\state_machine\WorkflowManager $workflow_manager */
-    $workflow_manager = \Drupal::service('plugin.manager.workflow');
     /** @var \Drupal\state_machine\Plugin\Workflow\WorkflowInterface $workflow */
-    $workflow = $workflow_manager->createInstance($form_state->getValue('workflow'));
+    $workflow = $this->workflowManager->createInstance($form_state->getValue('workflow'));
     // Verify "Place" transition.
     if (!$workflow->getTransition('place')) {
       $form_state->setError($form['workflow'], $this->t('The @workflow workflow does not have a "Place" transition.', [
