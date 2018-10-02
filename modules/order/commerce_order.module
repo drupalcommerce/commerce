@@ -176,14 +176,6 @@ function commerce_order_add_order_items_field(OrderTypeInterface $order_type) {
 }
 
 /**
- * Implements hook_views_data_alter().
- */
-function commerce_order_views_data_alter(array &$data) {
-  $data['commerce_order']['store_id']['field']['id'] = 'commerce_store';
-  $data['commerce_order']['state']['filter']['id'] = 'state_machine_state';
-}
-
-/**
  * Implements hook_mail().
  *
  * Captures the outgoing mail and sets appropriate message body and headers.
