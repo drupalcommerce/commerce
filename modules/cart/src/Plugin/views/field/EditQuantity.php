@@ -133,6 +133,9 @@ class EditQuantity extends FieldPluginBase {
       return;
     }
 
+    $form['#attached'] = [
+      'library' => ['commerce_cart/cart_form'],
+    ];
     $form[$this->options['id']]['#tree'] = TRUE;
     foreach ($this->view->result as $row_index => $row) {
       /** @var \Drupal\commerce_order\Entity\OrderItemInterface $order_item */
