@@ -89,6 +89,9 @@ class CouponRedemptionForm extends FormElement {
 
     $element = [
       '#tree' => TRUE,
+      '#attached' => [
+        'library' => ['commerce_promotion/coupon_redemption_form'],
+      ],
       '#theme' => 'commerce_coupon_redemption_form',
       '#prefix' => '<div id="' . $wrapper_id . '">',
       '#suffix' => '</div>',
