@@ -68,12 +68,20 @@ class OrderItemMatcher implements OrderItemMatcherInterface {
     $matched_order_items = [];
     /** @var \Drupal\commerce_order\Entity\OrderItemInterface $existing_order_item */
     foreach ($order_items as $existing_order_item) {
-      foreach ($comparison_fields as $comparison_field) {
-        if (!$existing_order_item->hasField($comparison_field) || !$order_item->hasField($comparison_field)) {
+      foreach ($comparison_fields as $field_name) {
+        if (!$existing_order_item->hasField($field_name) || !$order_item->hasField($field_name)) {
           // The field is missing on one of the order items.
           continue 2;
         }
-        if (!$existing_order_item->get($comparison_field)->equals($order_item->get($comparison_field))) {
+
+        $existing_order_item_field = $existing_order_item->get($field_name);
+        $order_item_field = $order_item->get($field_name);
+        // Two empty fields should be considered identical, but an empty item
+        // can affect the comparison and cause a false mismatch.
+        $existing_order_item_field = $existing_order_item_field->filterEmptyItems();
+        $order_item_field = $order_item_field->filterEmptyItems();
+
+        if (!$existing_order_item_field->equals($order_item_field)) {
           // Order item doesn't match.
           continue 2;
         }
