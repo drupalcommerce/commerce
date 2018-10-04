@@ -81,7 +81,7 @@ class BillingProfileWidget extends WidgetBase implements ContainerFactoryPluginI
     else {
       $profile = $this->entityTypeManager->getStorage('profile')->create([
         'type' => 'customer',
-        'uid' => $order->getCustomerId(),
+        'uid' => $order->getCustomer(),
       ]);
     }
 

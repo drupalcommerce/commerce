@@ -76,8 +76,10 @@ interface OrderInterface extends ContentEntityInterface, EntityAdjustableInterfa
   /**
    * Gets the customer user.
    *
-   * @return \Drupal\user\UserInterface|null
-   *   The customer user entity, or NULL in case the order is anonymous,
+   * @return \Drupal\user\UserInterface
+   *   The customer user entity. If the order is anonymous (customer
+   *   unspecified or deleted), an anonymous user will be returned. Use
+   *   $customer->isAnonymous() to check.
    */
   public function getCustomer();
 
@@ -94,8 +96,8 @@ interface OrderInterface extends ContentEntityInterface, EntityAdjustableInterfa
   /**
    * Gets the customer user ID.
    *
-   * @return int|null
-   *   The customer user ID, or NULL in case the order is anonymous.
+   * @return int
+   *   The customer user ID ('0' if anonymous).
    */
   public function getCustomerId();
 

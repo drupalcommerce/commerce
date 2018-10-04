@@ -16,24 +16,7 @@ class OrderCustomerRoleTest extends UnitTestCase {
   /**
    * ::covers evaluate.
    */
-  public function testAnonymousCustomer() {
-    $condition = new OrderCustomerRole([
-      'roles' => ['authenticated'],
-    ], 'order_customer_role', ['entity_type' => 'commerce_order']);
-    $order = $this->prophesize(OrderInterface::class);
-    $order->getEntityTypeId()->willReturn('commerce_order');
-    $order->getCustomer()->willReturn(NULL);
-    $order = $order->reveal();
-
-    $this->assertFalse($condition->evaluate($order));
-    $condition->setConfiguration(['roles' => ['anonymous', 'authenticated']]);
-    $this->assertTrue($condition->evaluate($order));
-  }
-
-  /**
-   * ::covers evaluate.
-   */
-  public function testAuthenticatedCustomer() {
+  public function testEvaluate() {
     $condition = new OrderCustomerRole([
       'roles' => ['merchant'],
     ], 'order_customer_role', ['entity_type' => 'commerce_order']);

@@ -51,7 +51,7 @@ class PaymentOptionsBuilder implements PaymentOptionsBuilderInterface {
     $options = [];
     // 1) Add options to reuse stored payment methods for known customers.
     $customer = $order->getCustomer();
-    if ($customer) {
+    if ($customer->isAuthenticated()) {
       $billing_countries = $order->getStore()->getBillingCountries();
       /** @var \Drupal\commerce_payment\PaymentMethodStorageInterface $payment_method_storage */
       $payment_method_storage = $this->entityTypeManager->getStorage('commerce_payment_method');

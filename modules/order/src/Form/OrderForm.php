@@ -117,10 +117,11 @@ class OrderForm extends ContentEntityForm {
       $form['meta']['store'] = $this->fieldAsReadOnly($this->t('Store'), $store_link);
     }
     // Move uid/mail widgets to the sidebar, or provide read-only alternatives.
+    $customer = $order->getCustomer();
     if (isset($form['uid'])) {
       $form['uid']['#group'] = 'customer';
     }
-    elseif ($customer = $order->getCustomer()) {
+    elseif ($customer->isAuthenticated()) {
       $customer_link = $customer->toLink()->toString();
       $form['customer']['uid'] = $this->fieldAsReadOnly($this->t('Customer'), $customer_link);
     }

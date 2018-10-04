@@ -10,6 +10,7 @@ use Drupal\commerce_price\Exception\CurrencyMismatchException;
 use Drupal\commerce_price\Price;
 use Drupal\profile\Entity\Profile;
 use Drupal\Tests\commerce\Kernel\CommerceKernelTestBase;
+use Drupal\user\UserInterface;
 
 /**
  * Tests the Order entity.
@@ -135,6 +136,7 @@ class OrderTest extends CommerceKernelTestBase {
     $another_order_item->save();
     $another_order_item = $this->reloadEntity($another_order_item);
 
+    /** @var \Drupal\commerce_order\Entity\OrderInterface $order */
     $order = Order::create([
       'type' => 'default',
       'state' => 'completed',
@@ -149,15 +151,22 @@ class OrderTest extends CommerceKernelTestBase {
     $this->assertEquals($this->store->id(), $order->getStoreId());
     $order->setStoreId(0);
     $this->assertEquals(NULL, $order->getStore());
-    $order->setStoreId([$this->store->id()]);
+    $order->setStoreId($this->store->id());
     $this->assertEquals($this->store, $order->getStore());
     $this->assertEquals($this->store->id(), $order->getStoreId());
 
+    $this->assertInstanceOf(UserInterface::class, $order->getCustomer());
+    $this->assertTrue($order->getCustomer()->isAnonymous());
+    $this->assertEquals(0, $order->getCustomerId());
     $order->setCustomer($this->user);
     $this->assertEquals($this->user, $order->getCustomer());
     $this->assertEquals($this->user->id(), $order->getCustomerId());
-    $order->setCustomerId(0);
-    $this->assertEquals(NULL, $order->getCustomer());
+    $this->assertTrue($order->getCustomer()->isAuthenticated());
+    // Non-existent/deleted user ID.
+    $order->setCustomerId(888);
+    $this->assertInstanceOf(UserInterface::class, $order->getCustomer());
+    $this->assertTrue($order->getCustomer()->isAnonymous());
+    $this->assertEquals(888, $order->getCustomerId());
     $order->setCustomerId($this->user->id());
     $this->assertEquals($this->user, $order->getCustomer());
     $this->assertEquals($this->user->id(), $order->getCustomerId());
@@ -241,6 +250,11 @@ class OrderTest extends CommerceKernelTestBase {
 
     $order->setCompletedTime(635879900);
     $this->assertEquals(635879900, $order->getCompletedTime());
+
+    // Confirm that saving the order clears an invalid customer ID.
+    $order->setCustomerId(888);
+    $order->save();
+    $this->assertEquals(0, $order->getCustomerId());
   }
 
   /**

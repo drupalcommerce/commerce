@@ -130,7 +130,8 @@ class OrderReceiptSubscriber implements EventSubscriberInterface {
     });
 
     // Replicated logic from EmailAction and contact's MailHandler.
-    if ($customer = $order->getCustomer()) {
+    $customer = $order->getCustomer();
+    if ($customer->isAuthenticated()) {
       $langcode = $customer->getPreferredLangcode();
     }
     else {

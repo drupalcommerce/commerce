@@ -9,6 +9,7 @@ use Drupal\Core\Entity\EntityChangedTrait;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
+use Drupal\user\Entity\User;
 use Drupal\user\UserInterface;
 use Drupal\profile\Entity\ProfileInterface;
 
@@ -120,7 +121,12 @@ class Order extends CommerceContentEntityBase implements OrderInterface {
    * {@inheritdoc}
    */
   public function getCustomer() {
-    return $this->get('uid')->entity;
+    $customer = $this->get('uid')->entity;
+    // Handle deleted customers.
+    if (!$customer) {
+      $customer = User::getAnonymousUser();
+    }
+    return $customer;
   }
 
   /**
@@ -516,10 +522,15 @@ class Order extends CommerceContentEntityBase implements OrderInterface {
       }
     }
 
-    if (!$this->getEmail() && $customer = $this->getCustomer()) {
+    $customer = $this->getCustomer();
+    // The customer has been deleted, clear the reference.
+    if ($this->getCustomerId() && $customer->isAnonymous()) {
+      $this->set('uid', 0);
+    }
+    // Maintain the order email.
+    if (!$this->getEmail() && $customer->isAuthenticated()) {
       $this->setEmail($customer->getEmail());
     }
-
     // Maintain the completed timestamp.
     $state = $this->getState()->value;
     $original_state = isset($this->original) ? $this->original->getState()->value : '';

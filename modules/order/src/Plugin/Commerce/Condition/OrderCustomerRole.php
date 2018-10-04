@@ -63,9 +63,8 @@ class OrderCustomerRole extends ConditionBase {
     /** @var \Drupal\commerce_order\Entity\OrderInterface $order */
     $order = $entity;
     $customer = $order->getCustomer();
-    $roles = $customer ? $customer->getRoles() : ['anonymous'];
 
-    return (bool) array_intersect($this->configuration['roles'], $roles);
+    return (bool) array_intersect($this->configuration['roles'], $customer->getRoles());
   }
 
 }
