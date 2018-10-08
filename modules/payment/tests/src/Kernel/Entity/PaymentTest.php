@@ -3,6 +3,8 @@
 namespace Drupal\Tests\commerce_payment\Kernel\Entity;
 
 use Drupal\commerce_order\Entity\Order;
+use Drupal\commerce_order\Entity\OrderItem;
+use Drupal\commerce_order\Entity\OrderItemType;
 use Drupal\commerce_payment\Entity\PaymentGateway;
 use Drupal\commerce_payment\Entity\Payment;
 use Drupal\commerce_payment\Plugin\Commerce\PaymentType\PaymentDefault;
@@ -69,11 +71,29 @@ class PaymentTest extends CommerceKernelTestBase {
     $user = $this->createUser();
     $this->user = $this->reloadEntity($user);
 
+    // An order item type that doesn't need a purchasable entity.
+    OrderItemType::create([
+      'id' => 'test',
+      'label' => 'Test',
+      'orderType' => 'default',
+    ])->save();
+
+    $order_item = OrderItem::create([
+      'title' => 'Membership subscription',
+      'type' => 'test',
+      'quantity' => 1,
+      'unit_price' => [
+        'number' => '30.00',
+        'currency_code' => 'USD',
+      ],
+    ]);
+    $order_item->save();
+
     $order = Order::create([
       'type' => 'default',
-      'mail' => $this->user->getEmail(),
       'uid' => $this->user->id(),
       'store_id' => $this->store->id(),
+      'order_items' => [$order_item],
     ]);
     $order->save();
     $this->order = $this->reloadEntity($order);
@@ -156,6 +176,42 @@ class PaymentTest extends CommerceKernelTestBase {
     $payment->setCompletedTime(635879700);
     $this->assertEquals(635879700, $payment->getCompletedTime());
     $this->assertTrue($payment->isCompleted());
+  }
+
+  /**
+   * Tests the order integration (total_paid field).
+   *
+   * @covers ::postSave
+   * @covers ::postDelete
+   */
+  public function testOrderIntegration() {
+    $this->assertEquals(new Price('0', 'USD'), $this->order->getTotalPaid());
+    $this->assertEquals(new Price('30', 'USD'), $this->order->getBalance());
+
+    /** @var \Drupal\commerce_payment\Entity\PaymentInterface $payment */
+    $payment = Payment::create([
+      'type' => 'payment_default',
+      'payment_gateway' => 'example',
+      'order_id' => $this->order->id(),
+      'amount' => new Price('30', 'USD'),
+      'state' => 'completed',
+    ]);
+    $payment->save();
+    $this->order = $this->reloadEntity($this->order);
+    $this->assertEquals(new Price('30', 'USD'), $this->order->getTotalPaid());
+    $this->assertEquals(new Price('0', 'USD'), $this->order->getBalance());
+
+    $payment->setRefundedAmount(new Price('15', 'USD'));
+    $payment->setState('partially_refunded');
+    $payment->save();
+    $this->order = $this->reloadEntity($this->order);
+    $this->assertEquals(new Price('15', 'USD'), $this->order->getTotalPaid());
+    $this->assertEquals(new Price('15', 'USD'), $this->order->getBalance());
+
+    $payment->delete();
+    $this->order = $this->reloadEntity($this->order);
+    $this->assertEquals(new Price('0', 'USD'), $this->order->getTotalPaid());
+    $this->assertEquals(new Price('30', 'USD'), $this->order->getBalance());
   }
 
   /**

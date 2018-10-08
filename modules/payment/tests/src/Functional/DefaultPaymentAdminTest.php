@@ -153,6 +153,7 @@ class DefaultPaymentAdminTest extends CommerceBrowserTestBase {
     $this->assertSession()->addressEquals($this->paymentUri);
     $this->assertSession()->pageTextContains('Completed');
 
+    \Drupal::entityTypeManager()->getStorage('commerce_payment')->resetCache([1]);
     /** @var \Drupal\commerce_payment\Entity\PaymentInterface $payment */
     $payment = Payment::load(1);
     $this->assertEquals($payment->getOrderId(), $this->order->id());
@@ -182,6 +183,7 @@ class DefaultPaymentAdminTest extends CommerceBrowserTestBase {
     $this->assertSession()->pageTextNotContains('Authorization');
     $this->assertSession()->pageTextContains('Completed');
 
+    \Drupal::entityTypeManager()->getStorage('commerce_payment')->resetCache([$payment->id()]);
     $payment = Payment::load($payment->id());
     $this->assertEquals($payment->getState()->getLabel(), 'Completed');
   }
@@ -208,6 +210,7 @@ class DefaultPaymentAdminTest extends CommerceBrowserTestBase {
     $this->assertSession()->pageTextNotContains('Completed');
     $this->assertSession()->pageTextContains('Refunded');
 
+    \Drupal::entityTypeManager()->getStorage('commerce_payment')->resetCache([$payment->id()]);
     $payment = Payment::load($payment->id());
     $this->assertEquals($payment->getState()->getLabel(), 'Refunded');
   }
@@ -233,6 +236,7 @@ class DefaultPaymentAdminTest extends CommerceBrowserTestBase {
     $this->assertSession()->addressEquals($this->paymentUri);
     $this->assertSession()->pageTextContains('Authorization (Voided)');
 
+    \Drupal::entityTypeManager()->getStorage('commerce_payment')->resetCache([$payment->id()]);
     $payment = Payment::load($payment->id());
     $this->assertEquals($payment->getState()->getLabel(), 'Authorization (Voided)');
   }
@@ -258,6 +262,7 @@ class DefaultPaymentAdminTest extends CommerceBrowserTestBase {
     $this->assertSession()->addressEquals($this->paymentUri);
     $this->assertSession()->pageTextNotContains('Authorization');
 
+    \Drupal::entityTypeManager()->getStorage('commerce_payment')->resetCache([$payment->id()]);
     $payment = Payment::load($payment->id());
     $this->assertNull($payment);
   }

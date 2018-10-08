@@ -314,6 +314,34 @@ class Payment extends ContentEntityBase implements PaymentInterface {
   /**
    * {@inheritdoc}
    */
+  public function postSave(EntityStorageInterface $storage, $update = TRUE) {
+    if ($this->isCompleted()) {
+      $payment_order_manager = \Drupal::service('commerce_payment.order_manager');
+      $payment_order_manager->updateTotalPaid($this->getOrder());
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function postDelete(EntityStorageInterface $storage, array $entities) {
+    parent::postDelete($storage, $entities);
+
+    // Multiple payments might reference the same order, make sure that each
+    // order is only updated once.
+    $orders = [];
+    foreach ($entities as $entity) {
+      $orders[$entity->getOrderId()] = $entity->getOrder();
+    }
+    $payment_order_manager = \Drupal::service('commerce_payment.order_manager');
+    foreach ($orders as $order) {
+      $payment_order_manager->updateTotalPaid($order);
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public static function baseFieldDefinitions(EntityTypeInterface $entity_type) {
     $fields = parent::baseFieldDefinitions($entity_type);
 

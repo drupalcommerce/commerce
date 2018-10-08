@@ -4,6 +4,7 @@ namespace Drupal\commerce_order\Entity;
 
 use Drupal\commerce\Entity\CommerceContentEntityBase;
 use Drupal\commerce_order\Adjustment;
+use Drupal\commerce_price\Price;
 use Drupal\commerce_store\Entity\StoreInterface;
 use Drupal\Core\Entity\EntityChangedTrait;
 use Drupal\Core\Entity\EntityStorageInterface;
@@ -405,6 +406,40 @@ class Order extends CommerceContentEntityBase implements OrderInterface {
   /**
    * {@inheritdoc}
    */
+  public function getTotalPaid() {
+    if (!$this->get('total_paid')->isEmpty()) {
+      return $this->get('total_paid')->first()->toPrice();
+    }
+    elseif ($total_price = $this->getTotalPrice()) {
+      // Provide a default without storing it, to avoid having to update
+      // the field if the order currency changes before the order is placed.
+      return new Price('0', $total_price->getCurrencyCode());
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setTotalPaid(Price $total_paid) {
+    $this->set('total_paid', $total_paid);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getBalance() {
+    if ($total_price = $this->getTotalPrice()) {
+      $balance = $total_price;
+      if ($total_paid = $this->getTotalPaid()) {
+        $balance = $balance->subtract($total_paid);
+      }
+      return $balance;
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function getState() {
     return $this->get('state')->first();
   }
@@ -685,6 +720,12 @@ class Order extends CommerceContentEntityBase implements OrderInterface {
         'type' => 'commerce_order_total_summary',
         'weight' => 0,
       ])
+      ->setDisplayConfigurable('form', FALSE)
+      ->setDisplayConfigurable('view', TRUE);
+
+    $fields['total_paid'] = BaseFieldDefinition::create('commerce_price')
+      ->setLabel(t('Total paid'))
+      ->setDescription(t('The total paid price of the order.'))
       ->setDisplayConfigurable('form', FALSE)
       ->setDisplayConfigurable('view', TRUE);
 

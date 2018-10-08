@@ -97,6 +97,9 @@ class OrderTest extends CommerceKernelTestBase {
    * @covers ::getSubtotalPrice
    * @covers ::recalculateTotalPrice
    * @covers ::getTotalPrice
+   * @covers ::getTotalPaid
+   * @covers ::setTotalPaid
+   * @covers ::getBalance
    * @covers ::getState
    * @covers ::getRefreshState
    * @covers ::setRefreshState
@@ -140,6 +143,7 @@ class OrderTest extends CommerceKernelTestBase {
     $order = Order::create([
       'type' => 'default',
       'state' => 'completed',
+      'store_id' => $this->store->id(),
     ]);
     $order->save();
 
@@ -226,6 +230,15 @@ class OrderTest extends CommerceKernelTestBase {
     ]));
     $order->clearAdjustments();
     $this->assertEquals($adjustments, $order->getAdjustments());
+
+    $this->assertEquals(new Price('0', 'USD'), $order->getTotalPaid());
+    $this->assertEquals(new Price('17.00', 'USD'), $order->getBalance());
+    $order->setTotalPaid(new Price('7.00', 'USD'));
+    $this->assertEquals(new Price('7.00', 'USD'), $order->getTotalPaid());
+    $this->assertEquals(new Price('10.00', 'USD'), $order->getBalance());
+    $order->setTotalPaid(new Price('27.00', 'USD'));
+    $this->assertEquals(new Price('27.00', 'USD'), $order->getTotalPaid());
+    $this->assertEquals(new Price('-10.00', 'USD'), $order->getBalance());
 
     $this->assertEquals('completed', $order->getState()->value);
 

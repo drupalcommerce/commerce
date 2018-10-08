@@ -73,3 +73,17 @@ function commerce_order_update_8204() {
   $update_manager = \Drupal::entityDefinitionUpdateManager();
   $update_manager->installFieldStorageDefinition('uses_legacy_adjustments', 'commerce_order_item', 'commerce_order', $storage_definition);
 }
+
+/**
+ * Add the 'total_paid' field to 'commerce_order' entities.
+ */
+function commerce_order_update_8205() {
+  $storage_definition = BaseFieldDefinition::create('commerce_price')
+    ->setLabel(t('Total paid'))
+    ->setDescription(t('The total paid price of the order.'))
+    ->setDisplayConfigurable('form', FALSE)
+    ->setDisplayConfigurable('view', TRUE);
+
+  $update_manager = \Drupal::entityDefinitionUpdateManager();
+  $update_manager->installFieldStorageDefinition('total_paid', 'commerce_order', 'commerce_order', $storage_definition);
+}
