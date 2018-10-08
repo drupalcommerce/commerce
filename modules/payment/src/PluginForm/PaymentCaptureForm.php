@@ -20,6 +20,7 @@ class PaymentCaptureForm extends PaymentGatewayFormBase {
       '#title' => t('Amount'),
       '#default_value' => $payment->getAmount()->toArray(),
       '#required' => TRUE,
+      '#available_currencies' => [$payment->getAmount()->getCurrencyCode()],
     ];
 
     return $form;
