@@ -112,6 +112,8 @@ class PriceTest extends UnitTestCase {
   /**
    * Tests the comparison methods.
    *
+   * ::covers isPositive
+   * ::covers isNegative
    * ::covers isZero
    * ::covers equals
    * ::covers greaterThan
@@ -121,9 +123,19 @@ class PriceTest extends UnitTestCase {
    * ::covers compareTo.
    */
   public function testComparison() {
-    $this->assertEmpty($this->price->isZero());
+    $this->assertTrue($this->price->isPositive());
+    $this->assertFalse($this->price->isNegative());
+    $this->assertFalse($this->price->isZero());
+
+    $negative_price = new Price('-10', 'USD');
+    $this->assertFalse($negative_price->isPositive());
+    $this->assertTrue($negative_price->isNegative());
+    $this->assertFalse($negative_price->isZero());
+
     $zero_price = new Price('0', 'USD');
-    $this->assertNotEmpty($zero_price->isZero());
+    $this->assertFalse($zero_price->isPositive());
+    $this->assertFalse($zero_price->isNegative());
+    $this->assertTrue($zero_price->isZero());
 
     $this->assertNotEmpty($this->price->equals(new Price('10', 'USD')));
     $this->assertEmpty($this->price->equals(new Price('15', 'USD')));

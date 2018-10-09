@@ -185,6 +185,26 @@ final class Price {
   }
 
   /**
+   * Gets whether the current price is positive.
+   *
+   * @return bool
+   *   TRUE if the price is positive, FALSE otherwise.
+   */
+  public function isPositive() {
+    return Calculator::compare($this->number, '0') == 1;
+  }
+
+  /**
+   * Gets whether the current price is negative.
+   *
+   * @return bool
+   *   TRUE if the price is negative, FALSE otherwise.
+   */
+  public function isNegative() {
+    return Calculator::compare($this->number, '0') == -1;
+  }
+
+  /**
    * Gets whether the current price is zero.
    *
    * @return bool
