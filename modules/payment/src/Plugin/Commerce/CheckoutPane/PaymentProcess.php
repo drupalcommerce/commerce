@@ -129,7 +129,8 @@ class PaymentProcess extends CheckoutPaneBase {
    * {@inheritdoc}
    */
   public function isVisible() {
-    if ($this->order->getTotalPrice()->isZero()) {
+    $totalPrice = $this->order->getTotalPrice();
+    if (!$totalPrice || $totalPrice->isZero()) {
       // Hide the pane for free orders, since they don't need a payment.
       return FALSE;
     }
