@@ -18,7 +18,7 @@ use Drupal\commerce\Entity\CommerceBundleEntityBase;
  *     plural = "@count product variation types",
  *   ),
  *   handlers = {
- *     "access" = "Drupal\commerce\CommerceBundleAccessControlHandler",
+ *     "access" = "Drupal\commerce_product\ProductVariationTypeAccessControlHandler",
  *     "list_builder" = "Drupal\commerce_product\ProductVariationTypeListBuilder",
  *     "form" = {
  *       "add" = "Drupal\commerce_product\Form\ProductVariationTypeForm",
