@@ -436,6 +436,14 @@ class Order extends CommerceContentEntityBase implements OrderInterface {
   /**
    * {@inheritdoc}
    */
+  public function isPaid() {
+    $balance = $this->getBalance();
+    return $balance && ($balance->isNegative() || $balance->isZero());
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function getState() {
     return $this->get('state')->first();
   }
@@ -570,9 +578,16 @@ class Order extends CommerceContentEntityBase implements OrderInterface {
         $this->setCompletedTime(\Drupal::time()->getRequestTime());
       }
     }
-    // Refresh draft orders on every save.
-    if ($this->getState()->value == 'draft' && empty($this->getRefreshState())) {
-      $this->setRefreshState(self::REFRESH_ON_SAVE);
+
+    if ($this->getState()->value == 'draft') {
+      // Refresh draft orders on every save.
+      if (empty($this->getRefreshState())) {
+        $this->setRefreshState(self::REFRESH_ON_SAVE);
+      }
+      // Initialize the flag for OrderStorage::preSave().
+      if ($this->getData('paid_event_dispatched') === NULL) {
+        $this->setData('paid_event_dispatched', FALSE);
+      }
     }
   }
 

@@ -4,6 +4,8 @@ namespace Drupal\commerce_order;
 
 use Drupal\commerce\CommerceContentEntityStorage;
 use Drupal\commerce_order\Entity\OrderInterface;
+use Drupal\commerce_order\Event\OrderEvent;
+use Drupal\commerce_order\Event\OrderEvents;
 use Drupal\Core\Cache\MemoryCache\MemoryCacheInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
@@ -101,6 +103,19 @@ class OrderStorage extends CommerceContentEntityStorage {
       $entity->setRefreshState(NULL);
     }
     $entity->recalculateTotalPrice();
+    // Notify other modules if the order has been fully paid.
+    $original_paid = isset($entity->original) ? $entity->original->isPaid() : FALSE;
+    if ($entity->isPaid() && !$original_paid) {
+      // Order::preSave() initializes the 'paid_event_dispatched' flag to FALSE.
+      // Skip dispatch if it already happened once (flag is TRUE), or if the
+      // order was completed before Commerce 8.x-2.10 (flag is NULL).
+      if ($entity->getData('paid_event_dispatched') === FALSE) {
+        $event = new OrderEvent($entity);
+        $this->eventDispatcher->dispatch(OrderEvents::ORDER_PAID, $event);
+        $entity->setData('paid_event_dispatched', TRUE);
+        $entity->save();
+      }
+    }
 
     return $id;
   }

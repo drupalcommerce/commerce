@@ -39,6 +39,7 @@ class OrderTest extends CommerceKernelTestBase {
     'state_machine',
     'commerce_product',
     'commerce_order',
+    'commerce_order_test',
   ];
 
   /**
@@ -100,6 +101,7 @@ class OrderTest extends CommerceKernelTestBase {
    * @covers ::getTotalPaid
    * @covers ::setTotalPaid
    * @covers ::getBalance
+   * @covers ::isPaid
    * @covers ::getState
    * @covers ::getRefreshState
    * @covers ::setRefreshState
@@ -233,12 +235,22 @@ class OrderTest extends CommerceKernelTestBase {
 
     $this->assertEquals(new Price('0', 'USD'), $order->getTotalPaid());
     $this->assertEquals(new Price('17.00', 'USD'), $order->getBalance());
+    $this->assertFalse($order->isPaid());
+
     $order->setTotalPaid(new Price('7.00', 'USD'));
     $this->assertEquals(new Price('7.00', 'USD'), $order->getTotalPaid());
     $this->assertEquals(new Price('10.00', 'USD'), $order->getBalance());
+    $this->assertFalse($order->isPaid());
+
+    $order->setTotalPaid(new Price('17.00', 'USD'));
+    $this->assertEquals(new Price('17.00', 'USD'), $order->getTotalPaid());
+    $this->assertEquals(new Price('0', 'USD'), $order->getBalance());
+    $this->assertTrue($order->isPaid());
+
     $order->setTotalPaid(new Price('27.00', 'USD'));
     $this->assertEquals(new Price('27.00', 'USD'), $order->getTotalPaid());
     $this->assertEquals(new Price('-10.00', 'USD'), $order->getBalance());
+    $this->assertTrue($order->isPaid());
 
     $this->assertEquals('completed', $order->getState()->value);
 
@@ -473,6 +485,50 @@ class OrderTest extends CommerceKernelTestBase {
     $order_without_customer->setCustomer($customer);
     $order_without_customer->save();
     $this->assertEquals($customer->getEmail(), $order_without_customer->getEmail());
+  }
+
+  /**
+   * Tests that the paid event is dispatched when the balance reaches zero.
+   */
+  public function testPaidEvent() {
+    /** @var \Drupal\commerce_order\Entity\OrderItemInterface $order_item */
+    $order_item = OrderItem::create([
+      'type' => 'test',
+      'quantity' => '2',
+      'unit_price' => new Price('10.00', 'USD'),
+    ]);
+    $order_item->save();
+    $order = Order::create([
+      'type' => 'default',
+      'store_id' => $this->store->id(),
+      'order_items' => [$order_item],
+      'state' => 'draft',
+    ]);
+    $order->save();
+    $this->assertNull($order->getData('order_test_called'));
+
+    $order->setTotalPaid(new Price('20.00', 'USD'));
+    $order->save();
+    $this->assertEquals(1, $order->getData('order_test_called'));
+
+    // Confirm that the event is not dispatched the second time the balance
+    // reaches zero.
+    $order->setTotalPaid(new Price('10.00', 'USD'));
+    $order->save();
+    $order->setTotalPaid(new Price('20.00', 'USD'));
+    $order->save();
+    $this->assertEquals(1, $order->getData('order_test_called'));
+
+    // Confirm that the event is dispatched for orders created as paid.
+    $another_order = Order::create([
+      'type' => 'default',
+      'store_id' => $this->store->id(),
+      'order_items' => [$order_item],
+      'total_paid' => new Price('20.00', 'USD'),
+      'state' => 'draft',
+    ]);
+    $another_order->save();
+    $this->assertEquals(1, $another_order->getData('order_test_called'));
   }
 
 }

@@ -16,6 +16,22 @@ final class OrderEvents {
   const ORDER_ASSIGN = 'commerce_order.order.assign';
 
   /**
+   * Name of the event fired after the order has been fully paid.
+   *
+   * Guaranteed to only fire once, when the order balance reaches zero.
+   * Subsequent changes to the balance won't redispatch the event (e.g. in case
+   * of a refund followed by an additional payment).
+   *
+   * Fired before the order is saved.
+   *
+   * @Event
+   *
+   * @see \Drupal\commerce_order\OrderInterface::getBalance()
+   * @see \Drupal\commerce_order\Event\OrderEvent
+   */
+  const ORDER_PAID = 'commerce_order.order.paid';
+
+  /**
    * Name of the event fired after loading an order.
    *
    * @Event

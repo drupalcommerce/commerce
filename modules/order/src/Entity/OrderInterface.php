@@ -304,6 +304,16 @@ interface OrderInterface extends ContentEntityInterface, EntityAdjustableInterfa
   public function getBalance();
 
   /**
+   * Gets whether the order has been fully paid.
+   *
+   * The order has been fully paid if its balance is zero or negative.
+   *
+   * @return bool
+   *   TRUE if the order has been fully paid, FALSE otherwise.
+   */
+  public function isPaid();
+
+  /**
    * Gets the order state.
    *
    * @return \Drupal\state_machine\Plugin\Field\FieldType\StateItemInterface
