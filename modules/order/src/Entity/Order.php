@@ -429,11 +429,7 @@ class Order extends CommerceContentEntityBase implements OrderInterface {
    */
   public function getBalance() {
     if ($total_price = $this->getTotalPrice()) {
-      $balance = $total_price;
-      if ($total_paid = $this->getTotalPaid()) {
-        $balance = $balance->subtract($total_paid);
-      }
-      return $balance;
+      return $total_price->subtract($this->getTotalPaid());
     }
   }
 
