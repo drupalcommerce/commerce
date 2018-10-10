@@ -129,8 +129,8 @@ class PaymentProcess extends CheckoutPaneBase {
    * {@inheritdoc}
    */
   public function isVisible() {
-    if ($this->order->getTotalPrice()->isZero()) {
-      // Hide the pane for free orders, since they don't need a payment.
+    if ($this->order->isPaid() || $this->order->getTotalPrice()->isZero()) {
+      // No payment is needed if the order is free or has already been paid.
       return FALSE;
     }
     $payment_info_pane = $this->checkoutFlow->getPane('payment_information');
@@ -160,7 +160,7 @@ class PaymentProcess extends CheckoutPaneBase {
     /** @var \Drupal\commerce_payment\Entity\PaymentInterface $payment */
     $payment = $payment_storage->create([
       'state' => 'new',
-      'amount' => $this->order->getTotalPrice(),
+      'amount' => $this->order->getBalance(),
       'payment_gateway' => $payment_gateway->id(),
       'order_id' => $this->order->id(),
     ]);

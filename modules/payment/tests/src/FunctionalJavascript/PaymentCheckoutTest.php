@@ -7,6 +7,7 @@ use Drupal\commerce_order\Adjustment;
 use Drupal\commerce_order\Entity\Order;
 use Drupal\commerce_payment\Entity\Payment;
 use Drupal\commerce_payment\Entity\PaymentGateway;
+use Drupal\commerce_price\Price;
 use Drupal\Tests\commerce\Functional\CommerceBrowserTestBase;
 use Drupal\Tests\commerce\FunctionalJavascript\JavascriptTestTrait;
 
@@ -549,6 +550,13 @@ class PaymentCheckoutTest extends CommerceBrowserTestBase {
     $this->drupalGet($this->product->toUrl()->toString());
     $this->submitForm([], 'Add to cart');
     $this->drupalGet('checkout/1');
+
+    // Make the order partially paid, to confirm that checkout only charges
+    // for the remaining amount.
+    $order = Order::load(1);
+    $order->setTotalPaid(new Price('20', 'USD'));
+    $order->save();
+
     $radio_button = $this->getSession()->getPage()->findField('Cash on delivery');
     $radio_button->click();
     $this->waitForAjaxToFinish();
@@ -575,7 +583,7 @@ class PaymentCheckoutTest extends CommerceBrowserTestBase {
     // Verify that a payment was created.
     $payment = Payment::load(1);
     $this->assertNotNull($payment);
-    $this->assertEquals($payment->getAmount(), $order->getTotalPrice());
+    $this->assertEquals($payment->getAmount(), $order->getBalance());
   }
 
   /**
@@ -593,6 +601,39 @@ class PaymentCheckoutTest extends CommerceBrowserTestBase {
       'amount' => $order->getTotalPrice()->multiply('-1'),
       'locked' => TRUE,
     ]));
+    $order->save();
+
+    $this->drupalGet('checkout/1');
+    $this->assertSession()->pageTextContains('Billing information');
+    $this->assertSession()->pageTextNotContains('Payment information');
+    $this->submitForm([
+      'payment_information[billing_information][address][0][address][given_name]' => 'Johnny',
+      'payment_information[billing_information][address][0][address][family_name]' => 'Appleseed',
+      'payment_information[billing_information][address][0][address][address_line1]' => '123 New York Drive',
+      'payment_information[billing_information][address][0][address][locality]' => 'New York City',
+      'payment_information[billing_information][address][0][address][administrative_area]' => 'NY',
+      'payment_information[billing_information][address][0][address][postal_code]' => '10001',
+    ], 'Continue to review');
+
+    $this->assertSession()->pageTextContains('Billing information');
+    $this->assertSession()->pageTextNotContains('Payment information');
+    $this->assertSession()->pageTextContains('Example');
+    $this->assertSession()->pageTextContains('Johnny Appleseed');
+    $this->assertSession()->pageTextContains('123 New York Drive');
+
+    $this->submitForm([], 'Complete checkout');
+    $this->assertSession()->pageTextContains('Your order number is 1. You can view your order on your account page when logged in.');
+  }
+
+  /**
+   * Tests a paid order, where only the billing information is collected.
+   */
+  public function testPaidOrder() {
+    $this->drupalGet($this->product->toUrl()->toString());
+    $this->submitForm([], 'Add to cart');
+
+    $order = Order::load(1);
+    $order->setTotalPaid($order->getTotalPrice());
     $order->save();
 
     $this->drupalGet('checkout/1');
