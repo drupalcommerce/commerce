@@ -146,10 +146,11 @@ class PaymentProcess extends CheckoutPaneBase {
    * {@inheritdoc}
    */
   public function buildPaneForm(array $pane_form, FormStateInterface $form_state, array &$complete_form) {
+    $error_step_id = $this->getErrorStepId();
     // The payment gateway is currently always required to be set.
     if ($this->order->get('payment_gateway')->isEmpty()) {
       $this->messenger->addError($this->t('No payment gateway selected.'));
-      $this->redirectToPreviousStep();
+      $this->checkoutFlow->redirectToStep($error_step_id);
     }
 
     /** @var \Drupal\commerce_payment\Entity\PaymentGatewayInterface $payment_gateway */
@@ -170,18 +171,18 @@ class PaymentProcess extends CheckoutPaneBase {
       try {
         $payment->payment_method = $this->order->payment_method->entity;
         $payment_gateway_plugin->createPayment($payment, $this->configuration['capture']);
-        $this->redirectToStep($next_step_id);
+        $this->checkoutFlow->redirectToStep($next_step_id);
       }
       catch (DeclineException $e) {
         $message = $this->t('We encountered an error processing your payment method. Please verify your details and try again.');
         $this->messenger->addError($message);
-        $this->redirectToPreviousStep();
+        $this->checkoutFlow->redirectToStep($error_step_id);
       }
       catch (PaymentGatewayException $e) {
         \Drupal::logger('commerce_payment')->error($e->getMessage());
         $message = $this->t('We encountered an unexpected error processing your payment method. Please try again later.');
         $this->messenger->addError($message);
-        $this->redirectToPreviousStep();
+        $this->checkoutFlow->redirectToStep($error_step_id);
       }
     }
     elseif ($payment_gateway_plugin instanceof OffsitePaymentGatewayInterface) {
@@ -191,7 +192,7 @@ class PaymentProcess extends CheckoutPaneBase {
         '#default_value' => $payment,
         '#return_url' => $this->buildReturnUrl()->toString(),
         '#cancel_url' => $this->buildCancelUrl()->toString(),
-        '#exception_url' => $this->buildPaymentInformationStepUrl()->toString(),
+        '#exception_url' => $this->buildErrorUrl()->toString(),
         '#exception_message' => $this->t('We encountered an unexpected error processing your payment. Please try again later.'),
         '#capture' => $this->configuration['capture'],
       ];
@@ -212,17 +213,17 @@ class PaymentProcess extends CheckoutPaneBase {
     elseif ($payment_gateway_plugin instanceof ManualPaymentGatewayInterface) {
       try {
         $payment_gateway_plugin->createPayment($payment);
-        $this->redirectToStep($next_step_id);
+        $this->checkoutFlow->redirectToStep($next_step_id);
       }
       catch (PaymentGatewayException $e) {
         \Drupal::logger('commerce_payment')->error($e->getMessage());
         $message = $this->t('We encountered an unexpected error processing your payment. Please try again later.');
         $this->messenger->addError($message);
-        $this->redirectToPreviousStep();
+        $this->checkoutFlow->redirectToStep($error_step_id);
       }
     }
     else {
-      $this->redirectToStep($next_step_id);
+      $this->checkoutFlow->redirectToStep($next_step_id);
     }
   }
 
@@ -253,38 +254,27 @@ class PaymentProcess extends CheckoutPaneBase {
   }
 
   /**
-   * Builds the URL to the payment information checkout step.
+   * Builds the URL to the "error" page.
    *
    * @return \Drupal\Core\Url
-   *   The URL to the payment information checkout step.
+   *   The "error" page URL.
    */
-  protected function buildPaymentInformationStepUrl() {
+  protected function buildErrorUrl() {
     return Url::fromRoute('commerce_checkout.form', [
       'commerce_order' => $this->order->id(),
-      'step' => $this->checkoutFlow->getPane('payment_information')->getStepId(),
+      'step' => $this->getErrorStepId(),
     ], ['absolute' => TRUE]);
   }
 
   /**
-   * Redirects to a specific checkout step.
+   * Gets the step ID that the customer should be sent to on error.
    *
-   * @param string $step_id
-   *   The step ID to redirect to.
-   *
-   * @throws \Drupal\commerce\Response\NeedsRedirectException
+   * @return string
+   *   The error step ID.
    */
-  protected function redirectToStep($step_id) {
-    $this->checkoutFlow->redirectToStep($step_id);
-  }
-
-  /**
-   * Redirects to a previous checkout step on error.
-   *
-   * @throws \Drupal\commerce\Response\NeedsRedirectException
-   */
-  protected function redirectToPreviousStep() {
-    $step_id = $this->checkoutFlow->getPane('payment_information')->getStepId();
-    return $this->redirectToStep($step_id);
+  protected function getErrorStepId() {
+    // Default to the step that contains the PaymentInformation pane.
+    return $this->checkoutFlow->getPane('payment_information')->getStepId();
   }
 
 }

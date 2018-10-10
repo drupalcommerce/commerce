@@ -19,6 +19,11 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 /**
  * Provides the payment information pane.
  *
+ * Disabling this pane will automatically disable the payment process pane,
+ * since they are always used together. Developers subclassing this pane
+ * should use hook_commerce_checkout_pane_info_alter(array &$panes) to
+ * point $panes['payment_information']['class'] to the new child class.
+ *
  * @CommerceCheckoutPane(
  *   id = "payment_information",
  *   label = @Translation("Payment information"),
