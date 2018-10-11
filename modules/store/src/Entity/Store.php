@@ -296,6 +296,17 @@ class Store extends ContentEntityBase implements StoreInterface {
       ->setDisplayConfigurable('view', TRUE)
       ->setDisplayConfigurable('form', TRUE);
 
+    $fields['path'] = BaseFieldDefinition::create('path')
+      ->setLabel(t('URL alias'))
+      ->setDescription(t('The store URL alias.'))
+      ->setTranslatable(TRUE)
+      ->setDisplayOptions('form', [
+        'type' => 'path',
+        'weight' => 30,
+      ])
+      ->setDisplayConfigurable('form', TRUE)
+      ->setCustomStorage(TRUE);
+
     return $fields;
   }
 

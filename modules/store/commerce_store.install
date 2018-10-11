@@ -1,0 +1,31 @@
+<?php
+
+/**
+ * @file
+ * Contains install and update functions for commerce_store module.
+ */
+
+use Drupal\Core\Field\BaseFieldDefinition;
+
+/**
+ * Add the URL alias path field to stores.
+ */
+function commerce_store_update_8201() {
+  $definition_update_manager = \Drupal::entityDefinitionUpdateManager();
+  if (!\Drupal::moduleHandler()->moduleExists('path')) {
+    \Drupal::service('module_installer')->install(['path']);
+  }
+
+  $storage_definition = BaseFieldDefinition::create('path')
+    ->setLabel(t('URL alias'))
+    ->setDescription(t('The store URL alias.'))
+    ->setTranslatable(TRUE)
+    ->setDisplayOptions('form', [
+      'type' => 'path',
+      'weight' => 30,
+    ])
+    ->setDisplayConfigurable('form', TRUE)
+    ->setCustomStorage(TRUE);
+
+  $definition_update_manager->installFieldStorageDefinition('path', 'commerce_store', 'commerce_store', $storage_definition);
+}

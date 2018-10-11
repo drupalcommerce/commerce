@@ -15,6 +15,21 @@ class StoreForm extends ContentEntityForm {
     /** @var \Drupal\commerce_store\Entity\StoreInterface $store */
     $store = $this->entity;
 
+    $form['path_settings'] = [
+      '#type' => 'details',
+      '#title' => $this->t('URL path settings'),
+      '#open' => !empty($form['path']['widget'][0]['alias']['#default_value']),
+      '#group' => 'advanced',
+      '#attributes' => [
+        'class' => ['path-form'],
+      ],
+      '#attached' => [
+        'library' => ['path/drupal.path'],
+      ],
+      '#weight' => 91,
+    ];
+    $form['path']['#group'] = 'path_settings';
+
     /** @var \Drupal\commerce_store\StoreStorageInterface $store_storage */
     $store_storage = $this->entityTypeManager->getStorage('commerce_store');
     $default_store = $store_storage->loadDefault();
@@ -27,7 +42,7 @@ class StoreForm extends ContentEntityForm {
       '#title' => $this->t('Default'),
       '#default_value' => $isDefault,
       '#disabled' => $isDefault || empty($default_store),
-      '#weight' => 99,
+      '#weight' => 98,
     ];
 
     return $form;

@@ -143,7 +143,7 @@ class ProductForm extends ContentEntityForm {
     $form['path_settings'] = [
       '#type' => 'details',
       '#title' => t('URL path settings'),
-      '#open' => !empty($form['path']['widget'][0]['alias']['#value']),
+      '#open' => !empty($form['path']['widget'][0]['alias']['#default_value']),
       '#group' => 'advanced',
       '#access' => !empty($form['path']['#access']) && $product->get('path')->access('edit'),
       '#attributes' => [

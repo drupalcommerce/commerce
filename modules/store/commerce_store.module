@@ -32,6 +32,9 @@ function commerce_store_field_widget_form_alter(&$element, FormStateInterface $f
     $element['#options']['_none'] = t('- All countries -');
     $element['#size'] = 5;
   }
+  elseif ($field_name == 'path' && $entity_type == 'commerce_store' && $widget_name == 'path') {
+    $element['alias']['#description'] = t('The alternative URL for this store. Use a relative path. For example, "/my-store".');
+  }
 }
 
 /**

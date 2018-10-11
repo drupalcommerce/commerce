@@ -51,7 +51,7 @@ function commerce_tax_form_commerce_store_form_alter(&$form, FormStateInterface 
   if (isset($form['prices_include_tax']) || isset($form['tax_registrations'])) {
     $form['tax_settings'] = [
       '#title' => t('Tax settings'),
-      '#weight' => 99,
+      '#weight' => 90,
       '#type' => 'details',
       '#collapsible' => TRUE,
       '#open' => TRUE,

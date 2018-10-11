@@ -58,7 +58,6 @@ class CheckoutAccessTest extends CommerceKernelTestBase {
    * @var array
    */
   public static $modules = [
-    'path',
     'entity_reference_revisions',
     'profile',
     'state_machine',

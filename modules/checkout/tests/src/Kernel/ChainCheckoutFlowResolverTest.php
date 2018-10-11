@@ -18,7 +18,6 @@ class ChainCheckoutFlowResolverTest extends CommerceKernelTestBase {
    * @var array
    */
   public static $modules = [
-    'path',
     'options',
     'entity',
     'entity_reference_revisions',

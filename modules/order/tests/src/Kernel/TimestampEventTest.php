@@ -21,7 +21,6 @@ class TimestampEventTest extends CommerceKernelTestBase {
    */
   public static $modules = [
     'entity_reference_revisions',
-    'path',
     'profile',
     'state_machine',
     'commerce_product',

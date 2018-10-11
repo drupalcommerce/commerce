@@ -30,6 +30,7 @@ abstract class CommerceKernelTestBase extends EntityKernelTestBase {
     'commerce',
     'commerce_price',
     'commerce_store',
+    'path',
   ];
 
   /**
