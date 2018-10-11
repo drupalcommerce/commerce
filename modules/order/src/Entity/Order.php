@@ -32,6 +32,7 @@ use Drupal\profile\Entity\ProfileInterface;
  *     "event" = "Drupal\commerce_order\Event\OrderEvent",
  *     "storage" = "Drupal\commerce_order\OrderStorage",
  *     "access" = "Drupal\commerce_order\OrderAccessControlHandler",
+ *     "query_access" = "Drupal\commerce_order\OrderQueryAccessHandler",
  *     "permission_provider" = "Drupal\commerce_order\OrderPermissionProvider",
  *     "list_builder" = "Drupal\commerce_order\OrderListBuilder",
  *     "views_data" = "Drupal\commerce\CommerceEntityViewsData",

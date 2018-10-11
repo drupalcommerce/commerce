@@ -29,6 +29,7 @@ use Drupal\user\UserInterface;
  *     "event" = "Drupal\commerce_product\Event\ProductEvent",
  *     "storage" = "Drupal\commerce\CommerceContentEntityStorage",
  *     "access" = "Drupal\entity\EntityAccessControlHandler",
+ *     "query_access" = "Drupal\entity\QueryAccess\QueryAccessHandler",
  *     "permission_provider" = "Drupal\entity\EntityPermissionProvider",
  *     "view_builder" = "Drupal\commerce_product\ProductViewBuilder",
  *     "list_builder" = "Drupal\commerce_product\ProductListBuilder",

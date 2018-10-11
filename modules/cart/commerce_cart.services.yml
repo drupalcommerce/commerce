@@ -32,3 +32,9 @@ services:
     arguments: ['@commerce_cart.cart_provider']
     tags:
       - { name: event_subscriber }
+
+  commerce_cart.query_access_subscriber:
+    class: Drupal\commerce_cart\EventSubscriber\QueryAccessSubscriber
+    arguments: ['@commerce_cart.cart_provider', '@commerce_cart.cart_session']
+    tags:
+    - { name: event_subscriber, priority: 100 }

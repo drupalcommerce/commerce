@@ -72,6 +72,7 @@ class EntitySelect extends FormElement {
       throw new \InvalidArgumentException('Missing required #target_type parameter.');
     }
 
+    /** @var \Drupal\Core\Entity\EntityStorageInterface $storage */
     $storage = \Drupal::service('entity_type.manager')->getStorage($element['#target_type']);
     $entity_count = $storage->getQuery()->count()->execute();
     $element['#tree'] = TRUE;
@@ -87,7 +88,9 @@ class EntitySelect extends FormElement {
     }
 
     if ($entity_count <= $element['#autocomplete_threshold']) {
-      $entities = $storage->loadMultiple();
+      // Start with a query to get only access-filtered results.
+      $entity_ids = $storage->getQuery()->execute();
+      $entities = $storage->loadMultiple($entity_ids);
       $entity_labels = EntityHelper::extractLabels($entities);
       // Radio buttons don't have a None option by default.
       if (!$element['#multiple'] && !$element['#required']) {
