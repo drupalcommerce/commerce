@@ -274,7 +274,15 @@ class PaymentProcess extends CheckoutPaneBase {
    */
   protected function getErrorStepId() {
     // Default to the step that contains the PaymentInformation pane.
-    return $this->checkoutFlow->getPane('payment_information')->getStepId();
+    $step_id = $this->checkoutFlow->getPane('payment_information')->getStepId();
+    if ($step_id == '_disabled') {
+      // Can't redirect to the _disabled step. This could mean that isVisible()
+      // was overridden to allow PaymentProcess to be used without a
+      // payment_information pane, but this method was not modified.
+      throw new \RuntimeException('Cannot get the step ID for the payment_information pane. The pane is disabled.');
+    }
+
+    return $step_id;
   }
 
 }
