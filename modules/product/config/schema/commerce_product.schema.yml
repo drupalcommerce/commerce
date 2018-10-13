@@ -66,6 +66,9 @@ commerce_product.commerce_product_type.*:
     variationType:
       type: string
       label: 'Variation type'
+    multipleVariations:
+      type: boolean
+      label: 'Allow each product to have multiple variations'
     injectVariationFields:
       type: boolean
       label: 'Inject product variation fields into the rendered product'

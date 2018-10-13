@@ -73,6 +73,7 @@ class ProductTypeForm extends CommerceBundleEntityFormBase {
     else {
       $product = $this->entityTypeManager->getStorage('commerce_product')->create(['type' => $product_type->id()]);
     }
+    $form_state->set('original_entity', $this->entity->createDuplicate());
 
     $form['label'] = [
       '#type' => 'textfield',
@@ -106,6 +107,11 @@ class ProductTypeForm extends CommerceBundleEntityFormBase {
       $form['variationType']['#empty_option'] = $this->t('- Create new -');
       $form['variationType']['#description'] = $this->t('If an existing product variation type is not selected, a new one will be created.');
     }
+    $form['multipleVariations'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Allow each product to have multiple variations.'),
+      '#default_value' => $product_type->allowsMultipleVariations(),
+    ];
     $form['injectVariationFields'] = [
       '#type' => 'checkbox',
       '#title' => $this->t('Inject product variation fields into the rendered product.'),
@@ -190,24 +196,47 @@ class ProductTypeForm extends CommerceBundleEntityFormBase {
    * {@inheritdoc}
    */
   public function save(array $form, FormStateInterface $form_state) {
-    $status = $this->entity->save();
+    /** @var \Drupal\commerce_product\Entity\ProductTypeInterface $product_type */
+    $product_type = $this->entity;
+    /** @var \Drupal\commerce_product\Entity\ProductTypeInterface $original_product_type */
+    $original_product_type = $form_state->get('original_entity');
+
+    $status = $product_type->save();
+    $this->submitTraitForm($form, $form_state);
+    // Create the needed fields.
+    if ($status == SAVED_NEW) {
+      commerce_product_add_stores_field($product_type);
+      commerce_product_add_body_field($product_type);
+      commerce_product_add_variations_field($product_type);
+    }
+    // Update the widget for the variations field.
+    $form_display = commerce_get_entity_display('commerce_product', $product_type->id(), 'form');
+    if ($product_type->allowsMultipleVariations() && !$original_product_type->allowsMultipleVariations()) {
+      // When multiple variations are allowed, the variations tab is used
+      // to manage them, no widget is needed.
+      $form_display->removeComponent('variations');
+      $form_display->save();
+    }
+    elseif (!$product_type->allowsMultipleVariations() && $original_product_type->allowsMultipleVariations()) {
+      // When only a single variation is allowed, use the dedicated widget.
+      $form_display->setComponent('variations', [
+        'type' => 'commerce_product_single_variation',
+        'weight' => 2,
+      ]);
+      $form_display->save();
+    }
     // Update the default value of the status field.
-    $product = $this->entityTypeManager->getStorage('commerce_product')->create(['type' => $this->entity->id()]);
+    $product_type_id = $product_type->id();
+    $product = $this->entityTypeManager->getStorage('commerce_product')->create(['type' => $product_type_id]);
     $value = (bool) $form_state->getValue('product_status');
     if ($product->status->value != $value) {
-      $fields = $this->entityFieldManager->getFieldDefinitions('commerce_product', $this->entity->id());
-      $fields['status']->getConfig($this->entity->id())->setDefaultValue($value)->save();
+      $fields = $this->entityFieldManager->getFieldDefinitions('commerce_product', $product_type_id);
+      $fields['status']->getConfig($product_type_id)->setDefaultValue($value)->save();
       $this->entityFieldManager->clearCachedFieldDefinitions();
     }
-    $this->submitTraitForm($form, $form_state);
 
     $this->messenger()->addMessage($this->t('The product type %label has been successfully saved.', ['%label' => $this->entity->label()]));
     $form_state->setRedirect('entity.commerce_product_type.collection');
-    if ($status == SAVED_NEW) {
-      commerce_product_add_stores_field($this->entity);
-      commerce_product_add_body_field($this->entity);
-      commerce_product_add_variations_field($this->entity);
-    }
   }
 
   /**

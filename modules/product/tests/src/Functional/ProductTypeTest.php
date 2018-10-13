@@ -26,24 +26,9 @@ class ProductTypeTest extends ProductBrowserTestBase {
   }
 
   /**
-   * Tests creating a product type programmatically and via a form.
+   * Tests creating a product type.
    */
   public function testProductTypeCreation() {
-    $values = [
-      'id' => strtolower($this->randomMachineName(8)),
-      'label' => $this->randomMachineName(),
-      'description' => 'My random product type',
-      'variationType' => 'default',
-    ];
-    $this->createEntity('commerce_product_type', $values);
-    $product_type = ProductType::load($values['id']);
-    $this->assertEquals($product_type->label(), $values['label'], 'The new product type has the correct label.');
-    $this->assertEquals($product_type->getDescription(), $values['description'], 'The new product type has the correct label.');
-    $this->assertEquals($product_type->getVariationTypeId(), $values['variationType'], 'The new product type has the correct associated variation type.');
-
-    $this->drupalGet('product/add/' . $product_type->id());
-    $this->assertSession()->statusCodeEquals(200);
-
     $user = $this->drupalCreateUser(['administer commerce_product_type']);
     $this->drupalLogin($user);
 
@@ -60,14 +45,20 @@ class ProductTypeTest extends ProductBrowserTestBase {
     $this->assertEquals($product_type->label(), $edit['label']);
     $this->assertEquals($product_type->getDescription(), $edit['description']);
     $this->assertEquals($product_type->getVariationTypeId(), $edit['variationType']);
+    $this->assertTrue($product_type->allowsMultipleVariations());
+    $this->assertTrue($product_type->shouldInjectVariationFields());
+    $form_display = commerce_get_entity_display('commerce_product', $edit['id'], 'form');
+    $this->assertEmpty($form_display->getComponent('variations'));
 
-    // Automatic variation type creation option.
+    // Automatic variation type creation option, single variation mode.
     $this->drupalGet('admin/commerce/config/product-types/add');
     $edit = [
       'id' => strtolower($this->randomMachineName(8)),
       'label' => $this->randomMachineName(),
       'description' => 'My even more random product type',
       'variationType' => '',
+      'multipleVariations' => FALSE,
+      'injectVariationFields' => FALSE,
     ];
     $this->submitForm($edit, t('Save'));
     $product_type = ProductType::load($edit['id']);
@@ -79,6 +70,12 @@ class ProductTypeTest extends ProductBrowserTestBase {
     $this->assertNotEmpty($product_variation_type);
     $this->assertEquals($product_variation_type->label(), $edit['label']);
     $this->assertEquals($product_variation_type->getOrderItemTypeId(), 'default');
+    $this->assertFalse($product_type->allowsMultipleVariations());
+    $this->assertFalse($product_type->shouldInjectVariationFields());
+    $form_display = commerce_get_entity_display('commerce_product', $edit['id'], 'form');
+    $component = $form_display->getComponent('variations');
+    $this->assertNotEmpty($component);
+    $this->assertEquals('commerce_product_single_variation', $component['type']);
 
     // Confirm that a conflicting product variation type ID is detected.
     $product_type_id = $product_type->id();
@@ -137,22 +134,44 @@ class ProductTypeTest extends ProductBrowserTestBase {
   }
 
   /**
-   * Tests editing a product type using the UI.
+   * Tests editing a product type.
    */
   public function testProductTypeEditing() {
     $this->drupalGet('admin/commerce/config/product-types/default/edit');
     $edit = [
       'label' => 'Default2',
       'description' => 'New description.',
+      'multipleVariations' => FALSE,
+      'injectVariationFields' => FALSE,
     ];
     $this->submitForm($edit, t('Save'));
     $product_type = ProductType::load('default');
-    $this->assertEquals($product_type->label(), $edit['label'], 'The label of the product type has been changed.');
-    $this->assertEquals($product_type->getDescription(), $edit['description'], 'The new product type has the correct label.');
+    $this->assertEquals($product_type->label(), $edit['label']);
+    $this->assertEquals($product_type->getDescription(), $edit['description']);
+    $this->assertFalse($product_type->allowsMultipleVariations());
+    $this->assertFalse($product_type->shouldInjectVariationFields());
+    // Confirm that the product display was updated.
+    $form_display = commerce_get_entity_display('commerce_product', 'default', 'form');
+    $component = $form_display->getComponent('variations');
+    $this->assertNotEmpty($component);
+    $this->assertEquals('commerce_product_single_variation', $component['type']);
+
+    // Re-enable multiple variations.
+    $this->drupalGet('admin/commerce/config/product-types/default/edit');
+    $edit = [
+      'multipleVariations' => TRUE,
+    ];
+    $this->submitForm($edit, t('Save'));
+    \Drupal::entityTypeManager()->getStorage('commerce_product_type')->resetCache(['default']);
+    $product_type = ProductType::load('default');
+    $this->assertTrue($product_type->allowsMultipleVariations());
+    // Confirm that the product display was updated.
+    $form_display = commerce_get_entity_display('commerce_product', 'default', 'form');
+    $this->assertEmpty($form_display->getComponent('variations'));
   }
 
   /**
-   * Tests deleting a product type via a form.
+   * Tests deleting a product type.
    */
   public function testProductTypeDeletion() {
     $variation_type = $this->createEntity('commerce_product_variation_type', [
