@@ -59,7 +59,7 @@ class QueryAccessSubscriber implements EventSubscriberInterface {
     $conditions = $event->getConditions();
     // The user already has full access due to a "administer commerce_order"
     // or "view commerce_order" permission.
-    if (!$conditions->count() && !$conditions->alwaysFalse()) {
+    if (!$conditions->count() && !$conditions->isAlwaysFalse()) {
       return;
     }
 
