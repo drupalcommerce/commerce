@@ -241,36 +241,6 @@ class PaymentCheckoutTest extends CommerceBrowserTestBase {
   }
 
   /**
-   * Tests checkout with an existing payment method.
-   */
-  public function testCheckoutWithExistingPaymentMethod() {
-    $this->drupalGet($this->product->toUrl()->toString());
-    $this->submitForm([], 'Add to cart');
-    $this->drupalGet('checkout/1');
-
-    $this->submitForm([
-      'payment_information[payment_method]' => '1',
-    ], 'Continue to review');
-    $this->assertSession()->pageTextContains('Payment information');
-    $this->assertSession()->pageTextContains('Visa ending in 1111');
-    $this->assertSession()->pageTextContains('Expires 3/2028');
-    $this->assertSession()->pageTextContains('Frederick Pabst');
-    $this->assertSession()->pageTextContains('Pabst Blue Ribbon Dr');
-    $this->submitForm([], 'Pay and complete purchase');
-    $this->assertSession()->pageTextContains('Your order number is 1. You can view your order on your account page when logged in.');
-
-    $order = Order::load(1);
-    $this->assertEquals('onsite', $order->get('payment_gateway')->target_id);
-    $this->assertEquals('1', $order->get('payment_method')->target_id);
-    $this->assertFalse($order->isLocked());
-    // Verify that a payment was created.
-    $payment = Payment::load(1);
-    $this->assertNotNull($payment);
-    $this->assertEquals($payment->getAmount(), $order->getTotalPrice());
-    $this->assertEquals('completed', $payment->getState()->value);
-  }
-
-  /**
    * Tests checkout with a new payment method.
    */
   public function testCheckoutWithNewPaymentMethod() {
@@ -322,6 +292,53 @@ class PaymentCheckoutTest extends CommerceBrowserTestBase {
     $this->assertNotNull($payment);
     $this->assertEquals($payment->getAmount(), $order->getTotalPrice());
     $this->assertEquals('authorization', $payment->getState()->value);
+  }
+
+  /**
+   * Tests checkout with an existing payment method.
+   */
+  public function testCheckoutWithExistingPaymentMethod() {
+    $this->drupalGet($this->product->toUrl()->toString());
+    $this->submitForm([], 'Add to cart');
+    $this->drupalGet('checkout/1');
+
+    // Make the order partially paid, to confirm that checkout only charges
+    // for the remaining amount.
+    $payment = Payment::create([
+      'type' => 'payment_default',
+      'payment_gateway' => 'onsite',
+      'order_id' => '1',
+      'amount' => new Price('20', 'USD'),
+      'state' => 'completed',
+    ]);
+    $payment->save();
+    $order = Order::load(1);
+    $this->assertEquals(new Price('20', 'USD'), $order->getTotalPaid());
+    $this->assertEquals(new Price('19.99', 'USD'), $order->getBalance());
+
+    $this->submitForm([
+      'payment_information[payment_method]' => '1',
+    ], 'Continue to review');
+    $this->assertSession()->pageTextContains('Payment information');
+    $this->assertSession()->pageTextContains('Visa ending in 1111');
+    $this->assertSession()->pageTextContains('Expires 3/2028');
+    $this->assertSession()->pageTextContains('Frederick Pabst');
+    $this->assertSession()->pageTextContains('Pabst Blue Ribbon Dr');
+    $this->submitForm([], 'Pay and complete purchase');
+    $this->assertSession()->pageTextContains('Your order number is 1. You can view your order on your account page when logged in.');
+
+    \Drupal::entityTypeManager()->getStorage('commerce_order')->resetCache([1]);
+    $order = Order::load(1);
+    $this->assertEquals('onsite', $order->get('payment_gateway')->target_id);
+    $this->assertEquals('1', $order->get('payment_method')->target_id);
+    $this->assertFalse($order->isLocked());
+    // Verify that a completed payment was made.
+    $payment = Payment::load(2);
+    $this->assertNotNull($payment);
+    $this->assertEquals('completed', $payment->getState()->value);
+    $this->assertEquals(new Price('19.99', 'USD'), $payment->getAmount());
+    $this->assertEquals(new Price('39.99', 'USD'), $order->getTotalPaid());
+    $this->assertEquals(new Price('0', 'USD'), $order->getBalance());
   }
 
   /**
@@ -593,6 +610,7 @@ class PaymentCheckoutTest extends CommerceBrowserTestBase {
     // still unchanged.
     $payment = Payment::load(2);
     $this->assertNotNull($payment);
+    $this->assertEquals('pending', $payment->getState()->value);
     $this->assertEquals(new Price('19.99', 'USD'), $payment->getAmount());
     $this->assertEquals(new Price('20', 'USD'), $order->getTotalPaid());
     $this->assertEquals(new Price('19.99', 'USD'), $order->getBalance());
