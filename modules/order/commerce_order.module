@@ -11,8 +11,10 @@ use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\Element;
+use Drupal\Core\Session\AccountInterface;
 use Drupal\entity\BundleFieldDefinition;
 use Drupal\field\FieldStorageConfigInterface;
+use Drupal\profile\Entity\ProfileTypeInterface;
 
 /**
  * Implements hook_theme().
@@ -207,6 +209,18 @@ function commerce_order_mail($key, &$message, $params) {
  */
 function commerce_order_field_storage_config_access(FieldStorageConfigInterface $field_storage, $operation) {
   if ($field_storage->id() == 'profile.address' && $operation == 'delete') {
+    return AccessResult::forbidden();
+  }
+  return AccessResult::neutral();
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_access().
+ *
+ * Forbids the "customer" profile type from being deletable.
+ */
+function commerce_order_profile_type_access(ProfileTypeInterface $profile_type, $operation, AccountInterface $account) {
+  if ($profile_type->id() === 'customer' && $operation === 'delete') {
     return AccessResult::forbidden();
   }
   return AccessResult::neutral();
