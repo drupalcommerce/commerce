@@ -117,7 +117,7 @@ class ProductVariationFieldRenderer implements ProductVariationFieldRendererInte
    *   An array of base field names.
    */
   protected function getAllowedBaseFields() {
-    return ['title', 'sku', 'price'];
+    return ['title', 'sku', 'list_price', 'price'];
   }
 
 }

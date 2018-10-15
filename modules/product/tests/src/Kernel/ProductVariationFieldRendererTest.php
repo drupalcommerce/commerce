@@ -122,15 +122,11 @@ class ProductVariationFieldRendererTest extends CommerceKernelTestBase {
   public function testGetFieldDefinitions() {
     $field_definitions = $this->variationFieldRenderer->getFieldDefinitions($this->firstVariationType->id());
     $field_names = array_keys($field_definitions);
-    $this->assertEquals(['sku', 'title', 'price'], $field_names, 'The title, sku, price variation fields are renderable.');
+    $this->assertEquals(['sku', 'title', 'list_price', 'price'], $field_names);
 
     $field_definitions = $this->variationFieldRenderer->getFieldDefinitions($this->secondVariationType->id());
     $field_names = array_keys($field_definitions);
-    $this->assertEquals(
-      ['sku', 'title', 'price', 'render_field', 'attribute_color'],
-      $field_names,
-      'The title, sku, price, render_field, attribute_color variation fields are renderable.'
-    );
+    $this->assertEquals(['sku', 'title', 'list_price', 'price', 'render_field', 'attribute_color'], $field_names);
   }
 
   /**
