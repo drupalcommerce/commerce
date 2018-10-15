@@ -553,9 +553,17 @@ class PaymentCheckoutTest extends CommerceBrowserTestBase {
 
     // Make the order partially paid, to confirm that checkout only charges
     // for the remaining amount.
+    $payment = Payment::create([
+      'type' => 'payment_manual',
+      'payment_gateway' => 'manual',
+      'order_id' => '1',
+      'amount' => new Price('20', 'USD'),
+      'state' => 'completed',
+    ]);
+    $payment->save();
     $order = Order::load(1);
-    $order->setTotalPaid(new Price('20', 'USD'));
-    $order->save();
+    $this->assertEquals(new Price('20', 'USD'), $order->getTotalPaid());
+    $this->assertEquals(new Price('19.99', 'USD'), $order->getBalance());
 
     $radio_button = $this->getSession()->getPage()->findField('Cash on delivery');
     $radio_button->click();
@@ -577,13 +585,24 @@ class PaymentCheckoutTest extends CommerceBrowserTestBase {
     $this->assertSession()->pageTextContains('Your order number is 1. You can view your order on your account page when logged in.');
     $this->assertSession()->pageTextContains('Sample payment instructions.');
 
+    \Drupal::entityTypeManager()->getStorage('commerce_order')->resetCache([1]);
     $order = Order::load(1);
     $this->assertEquals('manual', $order->get('payment_gateway')->target_id);
     $this->assertFalse($order->isLocked());
-    // Verify that a payment was created.
-    $payment = Payment::load(1);
+    // Verify that a pending payment was created, and that the totals are
+    // still unchanged.
+    $payment = Payment::load(2);
     $this->assertNotNull($payment);
-    $this->assertEquals($payment->getAmount(), $order->getBalance());
+    $this->assertEquals(new Price('19.99', 'USD'), $payment->getAmount());
+    $this->assertEquals(new Price('20', 'USD'), $order->getTotalPaid());
+    $this->assertEquals(new Price('19.99', 'USD'), $order->getBalance());
+    // Complete the payment and confirm the updated totals.
+    $payment->setState('completed');
+    $payment->save();
+    \Drupal::entityTypeManager()->getStorage('commerce_order')->resetCache([1]);
+    $order = Order::load(1);
+    $this->assertEquals(new Price('39.99', 'USD'), $order->getTotalPaid());
+    $this->assertEquals(new Price('0', 'USD'), $order->getBalance());
   }
 
   /**

@@ -113,7 +113,6 @@ class OrderStorage extends CommerceContentEntityStorage {
         $event = new OrderEvent($entity);
         $this->eventDispatcher->dispatch(OrderEvents::ORDER_PAID, $event);
         $entity->setData('paid_event_dispatched', TRUE);
-        $entity->save();
       }
     }
 
