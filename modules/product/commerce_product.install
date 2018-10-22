@@ -93,3 +93,20 @@ function commerce_product_update_8204() {
 
   $definition_update_manager->installFieldStorageDefinition('list_price', 'commerce_product_variation', 'commerce_product', $storage_definition);
 }
+
+/**
+ * Update entity keys for products and variations.
+ */
+function commerce_product_update_8205() {
+  $definition_update_manager = \Drupal::entityDefinitionUpdateManager();
+  foreach (['commerce_product', 'commerce_product_variation'] as $entity_type_id) {
+    $uid_storage_definition = $definition_update_manager->getFieldStorageDefinition('uid', $entity_type_id);
+    $entity_type = $definition_update_manager->getEntityType($entity_type_id);
+    $keys = $entity_type->getKeys();
+    $keys['owner'] = 'uid';
+    $keys['uid'] = 'uid';
+    $entity_type->set('entity_keys', $keys);
+    $definition_update_manager->updateEntityType($entity_type);
+    $definition_update_manager->updateFieldStorageDefinition($uid_storage_definition);
+  }
+}

@@ -63,6 +63,8 @@ use Drupal\user\UserInterface;
  *     "uuid" = "uuid",
  *     "label" = "title",
  *     "status" = "status",
+ *     "owner" = "uid",
+ *     "uid" = "uid",
  *   },
  *   links = {
  *     "add-form" = "/product/{commerce_product}/variations/add",
@@ -244,7 +246,7 @@ class ProductVariation extends CommerceContentEntityBase implements ProductVaria
    * {@inheritdoc}
    */
   public function getOwnerId() {
-    return $this->get('uid')->target_id;
+    return $this->getEntityKey('owner');
   }
 
   /**

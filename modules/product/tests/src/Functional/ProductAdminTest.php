@@ -121,12 +121,15 @@ class ProductAdminTest extends ProductBrowserTestBase {
     $product_type = $this->createEntity('commerce_product_type', $values);
     commerce_product_add_stores_field($product_type);
     commerce_product_add_variations_field($product_type);
-    $this->createEntity('commerce_product', [
+
+    /** @var \Drupal\commerce_product\Entity\ProductInterface $second_product */
+    $second_product = $this->createEntity('commerce_product', [
       'type' => 'random',
       'title' => 'Second product',
       'status' => FALSE,
     ]);
-    $this->createEntity('commerce_product', [
+    /** @var \Drupal\commerce_product\Entity\ProductInterface $third_product */
+    $third_product = $this->createEntity('commerce_product', [
       'type' => 'random',
       'title' => 'Third product',
       'status' => TRUE,
@@ -197,6 +200,20 @@ class ProductAdminTest extends ProductBrowserTestBase {
     $this->assertEquals(0, count($product_count), 'Unpublished product do not exist in the table.');
     $product_count = $page->findAll('xpath', '//table/tbody/tr/td[starts-with(text(), "Published")]');
     $this->assertEquals(2, count($product_count), 'Published products exist in the table.');
+
+    // Login and confirm access for "view own unpublished commerce_product".
+    $user = $this->drupalCreateUser([
+      'access commerce_product overview',
+      'view own unpublished commerce_product',
+    ]);
+    $second_product->setOwnerId($user->id());
+    $second_product->save();
+    $this->drupalLogin($user);
+    $this->drupalGet('admin/commerce/products');
+    $this->assertSession()->statusCodeEquals(200);
+    $this->assertSession()->pageTextNotContains('You are not authorized to access this page.');
+    $product_count = $page->findAll('xpath', '//table/tbody/tr/td/a[text()="Second product"]');
+    $this->assertEquals(1, count($product_count), 'Second product is displayed.');
   }
 
   /**
