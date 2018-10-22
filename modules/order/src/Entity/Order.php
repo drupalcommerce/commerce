@@ -438,8 +438,19 @@ class Order extends CommerceContentEntityBase implements OrderInterface {
    * {@inheritdoc}
    */
   public function isPaid() {
+    $total_price = $this->getTotalPrice();
+    if (!$total_price) {
+      return FALSE;
+    }
+
     $balance = $this->getBalance();
-    return $balance && ($balance->isNegative() || $balance->isZero());
+    // Free orders are considered fully paid once they have been placed.
+    if ($total_price->isZero()) {
+      return $this->getState()->value != 'draft';
+    }
+    else {
+      return $balance->isNegative() || $balance->isZero();
+    }
   }
 
   /**

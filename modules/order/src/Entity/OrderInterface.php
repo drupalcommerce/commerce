@@ -306,7 +306,11 @@ interface OrderInterface extends ContentEntityInterface, EntityAdjustableInterfa
   /**
    * Gets whether the order has been fully paid.
    *
-   * The order has been fully paid if its balance is zero or negative.
+   * Free orders (total price is zero) are considered fully paid once
+   * they have been placed.
+   *
+   * Non-free orders are considered fully paid once their balance
+   * becomes zero or negative.
    *
    * @return bool
    *   TRUE if the order has been fully paid, FALSE otherwise.

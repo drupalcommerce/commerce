@@ -151,6 +151,7 @@ class OrderTest extends CommerceKernelTestBase {
 
     $order->setOrderNumber(7);
     $this->assertEquals(7, $order->getOrderNumber());
+    $this->assertFalse($order->isPaid());
 
     $order->setStore($this->store);
     $this->assertEquals($this->store, $order->getStore());
@@ -253,6 +254,18 @@ class OrderTest extends CommerceKernelTestBase {
     $this->assertTrue($order->isPaid());
 
     $this->assertEquals('completed', $order->getState()->value);
+
+    // Confirm that free orders are considered paid after placement.
+    $order->addAdjustment(new Adjustment([
+      'type' => 'custom',
+      'label' => '100% off',
+      'amount' => new Price('-17.00', 'USD'),
+    ]));
+    $order->setTotalPaid(new Price('0', 'USD'));
+    $this->assertTrue($order->getTotalPrice()->isZero());
+    $this->assertTrue($order->isPaid());
+    $order->set('state', 'draft');
+    $this->assertFalse($order->isPaid());
 
     $order->setRefreshState(Order::REFRESH_ON_SAVE);
     $this->assertEquals(Order::REFRESH_ON_SAVE, $order->getRefreshState());
