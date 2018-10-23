@@ -84,8 +84,8 @@ class PriceSplitterTest extends CommerceKernelTestBase {
    */
   public function testSplit() {
     // 6 x 3 + 6 x 3 = 36.
-    $amount = new Price('6', 'USD');
-    $order_items = $this->buildOrderItems([$amount, $amount]);
+    $unit_price = new Price('6', 'USD');
+    $order_items = $this->buildOrderItems([$unit_price, $unit_price], 3);
     $this->order->setItems($order_items);
     $this->order->save();
 
@@ -100,9 +100,9 @@ class PriceSplitterTest extends CommerceKernelTestBase {
     $this->assertEquals([$expected_amount, $expected_amount], array_values($amounts));
 
     // 9.99 x 3 + 1.01 x 3 = 33.
-    $first_amount = new Price('9.99', 'USD');
-    $second_amount = new Price('1.01', 'USD');
-    $order_items = $this->buildOrderItems([$first_amount, $second_amount]);
+    $first_unit_price = new Price('9.99', 'USD');
+    $second_unit_price = new Price('1.01', 'USD');
+    $order_items = $this->buildOrderItems([$first_unit_price, $second_unit_price], 3);
     $this->order->setItems($order_items);
     $this->order->save();
 
@@ -114,10 +114,15 @@ class PriceSplitterTest extends CommerceKernelTestBase {
     $this->assertEquals([$first_expected_amount, $second_expected_amount], array_values($amounts));
 
     // Split an amount that has a reminder.
-    $amount = new Price('3.98', 'USD');
-    $amounts = $this->splitter->split($this->order, $amount);
-    $first_expected_amount = new Price('3.62', 'USD');
-    $second_expected_amount = new Price('0.36', 'USD');
+    $unit_price = new Price('69.99', 'USD');
+    $order_items = $this->buildOrderItems([$unit_price, $unit_price]);
+    $this->order->setItems($order_items);
+    $this->order->save();
+
+    $amount = new Price('41.99', 'USD');
+    $amounts = $this->splitter->split($this->order, $amount, '0.3');
+    $first_expected_amount = new Price('21.00', 'USD');
+    $second_expected_amount = new Price('20.99', 'USD');
     $this->assertEquals($amount, $first_expected_amount->add($second_expected_amount));
     $this->assertEquals([$first_expected_amount, $second_expected_amount], array_values($amounts));
   }
@@ -127,17 +132,19 @@ class PriceSplitterTest extends CommerceKernelTestBase {
    *
    * @param \Drupal\commerce_price\Price[] $unit_prices
    *   The unit prices.
+   * @param int $quantity
+   *   The quantity. Same for all items.
    *
    * @return \Drupal\commerce_order\Entity\OrderItemInterface[]
    *   The order items.
    */
-  protected function buildOrderItems(array $unit_prices) {
+  protected function buildOrderItems(array $unit_prices, $quantity = 1) {
     $order_items = [];
     foreach ($unit_prices as $unit_price) {
       $order_item = OrderItem::create([
         'type' => 'test',
         'unit_price' => $unit_price,
-        'quantity' => '3',
+        'quantity' => $quantity,
       ]);
       $order_item->save();
 

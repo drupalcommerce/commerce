@@ -53,6 +53,11 @@ class PriceSplitter implements PriceSplitterInterface {
       if (!$order_item->getTotalPrice()->isZero()) {
         $individual_amount = $order_item->getTotalPrice()->multiply($percentage);
         $individual_amount = $this->rounder->round($individual_amount, PHP_ROUND_HALF_DOWN);
+        // Due to rounding it is possible for the last calculated
+        // per-order-item amount to be larger than the total remaining amount.
+        if ($individual_amount->greaterThan($amount)) {
+          $individual_amount = $amount;
+        }
         $amounts[$order_item->id()] = $individual_amount;
 
         $amount = $amount->subtract($individual_amount);
