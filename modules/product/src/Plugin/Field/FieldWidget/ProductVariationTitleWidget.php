@@ -116,7 +116,8 @@ class ProductVariationTitleWidget extends ProductVariationWidgetBase implements 
     }
     $element['variation'] = [
       '#type' => 'select',
-      '#title' => $this->getSetting('label_text'),
+      // Widget settings can't be translated in D8 yet, t() is a workaround.
+      '#title' => $this->t($this->getSetting('label_text')),
       '#options' => $variation_options,
       '#required' => TRUE,
       '#default_value' => $selected_variation->id(),
