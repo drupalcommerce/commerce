@@ -53,10 +53,12 @@ use Drupal\Core\Field\BaseFieldDefinition;
  *   translatable = TRUE,
  *   entity_keys = {
  *     "id" = "store_id",
+ *     "uuid" = "uuid",
  *     "bundle" = "type",
  *     "label" = "name",
  *     "langcode" = "langcode",
- *     "uuid" = "uuid"
+ *     "owner" = "uid",
+ *     "uid" = "uid",
  *   },
  *   links = {
  *     "canonical" = "/store/{commerce_store}",
@@ -107,7 +109,7 @@ class Store extends ContentEntityBase implements StoreInterface {
    * {@inheritdoc}
    */
   public function getOwnerId() {
-    return $this->get('uid')->target_id;
+    return $this->getEntityKey('owner');
   }
 
   /**

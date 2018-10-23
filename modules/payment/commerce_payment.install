@@ -71,3 +71,18 @@ function commerce_payment_update_8202() {
   $field_definition->setRequired(FALSE);
   $entity_definition_update->updateFieldStorageDefinition($field_definition);
 }
+
+/**
+ * Update entity keys for payment methods.
+ */
+function commerce_payment_update_8203() {
+  $definition_update_manager = \Drupal::entityDefinitionUpdateManager();
+  $uid_storage_definition = $definition_update_manager->getFieldStorageDefinition('uid', 'commerce_payment_method');
+  $entity_type = $definition_update_manager->getEntityType('commerce_payment_method');
+  $keys = $entity_type->getKeys();
+  $keys['owner'] = 'uid';
+  $keys['uid'] = 'uid';
+  $entity_type->set('entity_keys', $keys);
+  $definition_update_manager->updateEntityType($entity_type);
+  $definition_update_manager->updateFieldStorageDefinition($uid_storage_definition);
+}
