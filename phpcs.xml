@@ -24,6 +24,9 @@
   <rule ref="Drupal.Commenting.VariableComment.VarOrder">
     <severity>0</severity>
   </rule>
+  <rule ref="Drupal.Semantics.FunctionT.NotLiteralString">
+    <severity>0</severity>
+  </rule>
   <!-- Complains about example code. -->
   <rule ref="Generic.CodeAnalysis.UselessOverridingMethod.Found">
     <severity>0</severity>
