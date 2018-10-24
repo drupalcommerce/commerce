@@ -76,7 +76,7 @@ class CouponTest extends CommerceBrowserTestBase {
     $this->getSession()->getPage()->fillField('code[0][value]', $code);
     $this->submitForm([], t('Save'));
     $this->assertSession()->pageTextContains("Saved the $code coupon.");
-    $coupon_count = $this->getSession()->getPage()->find('xpath', '//table/tbody/tr/td[text()="' . $code . '"]');
+    $coupon_count = $this->getSession()->getPage()->findAll('xpath', '//table/tbody/tr/td[text()="' . $code . '"]');
     $this->assertEquals(count($coupon_count), 1, 'Coupon exists in the table.');
 
     $coupon = Coupon::load(1);

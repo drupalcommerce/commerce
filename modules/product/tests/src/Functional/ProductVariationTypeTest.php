@@ -31,7 +31,7 @@ class ProductVariationTypeTest extends ProductBrowserTestBase {
     $this->assertNotEmpty(!empty($variation_type), 'The default product variation type is available.');
 
     $this->drupalGet('admin/commerce/config/product-variation-types');
-    $rows = $this->getSession()->getPage()->find('css', 'table tbody tr');
+    $rows = $this->getSession()->getPage()->findAll('css', 'table tbody tr');
     $this->assertEquals(count($rows), 1, '1 product variation type is correctly listed.');
   }
 

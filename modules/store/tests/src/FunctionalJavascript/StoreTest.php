@@ -67,7 +67,7 @@ class StoreTest extends CommerceBrowserTestBase {
     }
     $this->submitForm($edit, t('Save'));
     $this->assertSession()->pageTextContains("Saved the $name store.");
-    $store_count = $this->getSession()->getPage()->find('css', '.view-commerce-stores tr td.views-field-name');
+    $store_count = $this->getSession()->getPage()->findAll('css', '.view-commerce-stores tr td.views-field-name');
     $this->assertEquals(count($store_count), 1, 'Stores exists in the table.');
   }
 
