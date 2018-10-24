@@ -21,7 +21,7 @@ class ProductTypeTest extends ProductBrowserTestBase {
     $this->assertNotEmpty(!empty($product_type), 'The default product type is available.');
 
     $this->drupalGet('admin/commerce/config/product-types');
-    $rows = $this->getSession()->getPage()->find('css', 'table tbody tr');
+    $rows = $this->getSession()->getPage()->findAll('css', 'table tbody tr');
     $this->assertEquals(count($rows), 1, '1 product type is correctly listed.');
   }
 

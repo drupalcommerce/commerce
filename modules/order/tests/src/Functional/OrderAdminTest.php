@@ -116,7 +116,7 @@ class OrderAdminTest extends OrderBrowserTestBase {
     $this->assertSession()->pageTextContains('The order has been successfully saved.');
 
     $this->drupalGet('/admin/commerce/orders');
-    $order_number = $this->getSession()->getPage()->find('css', 'tr td.views-field-order-number');
+    $order_number = $this->getSession()->getPage()->findAll('css', 'tr td.views-field-order-number');
     $this->assertEquals(1, count($order_number), 'Order exists in the table.');
 
     $order = Order::load(1);

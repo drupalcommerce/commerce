@@ -79,7 +79,7 @@ class PromotionTest extends CommerceBrowserTestBase {
 
     $this->submitForm([], t('Save'));
     $this->assertSession()->pageTextContains("Saved the $name promotion.");
-    $promotion_count = $this->getSession()->getPage()->find('xpath', '//table/tbody/tr/td[text()="' . $name . '"]');
+    $promotion_count = $this->getSession()->getPage()->findAll('xpath', '//table/tbody/tr/td[text()="' . $name . '"]');
     $this->assertEquals(count($promotion_count), 1, 'promotions exists in the table.');
 
     $promotion = Promotion::load(1);
@@ -123,7 +123,7 @@ class PromotionTest extends CommerceBrowserTestBase {
 
     $this->submitForm($edit, t('Save'));
     $this->assertSession()->pageTextContains("Saved the $name promotion.");
-    $promotion_count = $this->getSession()->getPage()->find('xpath', '//table/tbody/tr/td[text()="' . $name . '"]');
+    $promotion_count = $this->getSession()->getPage()->findAll('xpath', '//table/tbody/tr/td[text()="' . $name . '"]');
     $this->assertEquals(count($promotion_count), 1, 'promotions exists in the table.');
 
     /** @var \Drupal\commerce\Plugin\Field\FieldType\PluginItem $offer_field */
