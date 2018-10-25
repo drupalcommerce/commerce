@@ -567,12 +567,9 @@ class Order extends CommerceContentEntityBase implements OrderInterface {
   public function preSave(EntityStorageInterface $storage) {
     parent::preSave($storage);
 
-    if ($this->isNew()) {
-      if (!$this->getIpAddress()) {
-        $this->setIpAddress(\Drupal::request()->getClientIp());
-      }
+    if ($this->isNew() && !$this->getIpAddress()) {
+      $this->setIpAddress(\Drupal::request()->getClientIp());
     }
-
     $customer = $this->getCustomer();
     // The customer has been deleted, clear the reference.
     if ($this->getCustomerId() && $customer->isAnonymous()) {
@@ -582,21 +579,13 @@ class Order extends CommerceContentEntityBase implements OrderInterface {
     if (!$this->getEmail() && $customer->isAuthenticated()) {
       $this->setEmail($customer->getEmail());
     }
-    // Maintain the completed timestamp.
-    $state = $this->getState()->value;
-    $original_state = isset($this->original) ? $this->original->getState()->value : '';
-    if ($state == 'completed' && $original_state != 'completed') {
-      if (empty($this->getCompletedTime())) {
-        $this->setCompletedTime(\Drupal::time()->getRequestTime());
-      }
-    }
 
     if ($this->getState()->value == 'draft') {
       // Refresh draft orders on every save.
       if (empty($this->getRefreshState())) {
         $this->setRefreshState(self::REFRESH_ON_SAVE);
       }
-      // Initialize the flag for OrderStorage::preSave().
+      // Initialize the flag for OrderStorage::doOrderPreSave().
       if ($this->getData('paid_event_dispatched') === NULL) {
         $this->setData('paid_event_dispatched', FALSE);
       }
