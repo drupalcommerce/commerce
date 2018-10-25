@@ -327,7 +327,7 @@ abstract class CheckoutFlowBase extends PluginBase implements CheckoutFlowInterf
       $this->order->unlock();
     }
     // Place the order.
-    if ($step_id == 'complete') {
+    if ($step_id == 'complete' && $this->order->getState()->value == 'draft') {
       $transition = $this->order->getState()->getWorkflow()->getTransition('place');
       $this->order->getState()->applyTransition($transition);
     }

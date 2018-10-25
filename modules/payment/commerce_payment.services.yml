@@ -21,6 +21,11 @@ services:
     tags:
       - { name: event_subscriber }
 
+  commerce_payment.order_paid_subscriber:
+    class: Drupal\commerce_payment\EventSubscriber\OrderPaidSubscriber
+    tags:
+    - { name: event_subscriber }
+
   commerce_payment.options_builder:
     class: Drupal\commerce_payment\PaymentOptionsBuilder
     arguments: ['@entity_type.manager', '@string_translation']
