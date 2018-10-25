@@ -210,7 +210,7 @@ class ProductForm extends ContentEntityForm {
   protected function actions(array $form, FormStateInterface $form_state) {
     $actions = parent::actions($form, $form_state);
     $product = $this->entity;
-    if ($product->isNew()) {
+    if ($product->isNew() && empty($form['variations']['widget'])) {
       /** @var \Drupal\commerce_product\Entity\ProductTypeInterface $product_type */
       $product_type = $this->entityTypeManager->getStorage('commerce_product_type')->load($product->bundle());
       if ($product_type->allowsMultipleVariations()) {
