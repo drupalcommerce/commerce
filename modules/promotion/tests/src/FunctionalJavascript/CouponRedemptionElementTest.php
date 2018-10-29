@@ -6,17 +6,14 @@ use Drupal\commerce_order\Entity\OrderItem;
 use Drupal\commerce_order\Entity\OrderItemType;
 use Drupal\commerce_price\Price;
 use Drupal\Core\Url;
-use Drupal\Tests\commerce\Functional\CommerceBrowserTestBase;
-use Drupal\Tests\commerce\FunctionalJavascript\JavascriptTestTrait;
+use Drupal\Tests\commerce\FunctionalJavascript\CommerceWebDriverTestBase;
 
 /**
  * Tests the coupon redemption form element.
  *
  * @group commerce
  */
-class CouponRedemptionElementTest extends CommerceBrowserTestBase {
-
-  use JavascriptTestTrait;
+class CouponRedemptionElementTest extends CommerceWebDriverTestBase {
 
   /**
    * The cart order to test against.

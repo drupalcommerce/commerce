@@ -6,17 +6,13 @@ use Drupal\commerce_price\Entity\Currency;
 use Drupal\Core\Entity\Entity\EntityFormDisplay;
 use Drupal\Core\Entity\Entity\EntityViewDisplay;
 use Drupal\Core\Entity\Entity\EntityViewMode;
-use Drupal\Tests\commerce\FunctionalJavascript\JavascriptTestTrait;
-use Drupal\Tests\commerce_cart\Functional\CartBrowserTestBase;
 
 /**
  * Confirms that changing the product variation keeps the same view mode.
  *
  * @group commerce
  */
-class AddToCartViewModeTest extends CartBrowserTestBase {
-
-  use JavascriptTestTrait;
+class AddToCartViewModeTest extends CartWebDriverTestBase {
 
   /**
    * The first product variation.

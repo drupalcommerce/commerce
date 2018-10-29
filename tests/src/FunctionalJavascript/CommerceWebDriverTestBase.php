@@ -1,15 +1,17 @@
 <?php
 
-namespace Drupal\Tests\commerce\Functional;
+namespace Drupal\Tests\commerce\FunctionalJavascript;
 
 use Drupal\commerce_store\StoreCreationTrait;
+use Drupal\FunctionalJavascriptTests\JSWebAssert;
+use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
 use Drupal\Tests\block\Traits\BlockCreationTrait;
-use Drupal\Tests\BrowserTestBase;
+use Drupal\Tests\commerce\Functional\CommerceBrowserTestTrait;
 
 /**
  * Provides a base class for Commerce functional tests.
  */
-abstract class CommerceBrowserTestBase extends BrowserTestBase {
+abstract class CommerceWebDriverTestBase extends WebDriverTestBase {
 
   use BlockCreationTrait;
   use StoreCreationTrait;
@@ -78,6 +80,43 @@ abstract class CommerceBrowserTestBase extends BrowserTestBase {
       'administer commerce_store',
       'administer commerce_store_type',
     ];
+  }
+
+  /**
+   * Waits for the given time or until the given JS condition becomes TRUE.
+   *
+   * @param string $condition
+   *   JS condition to wait until it becomes TRUE.
+   * @param int $timeout
+   *   (Optional) Timeout in milliseconds, defaults to 1000.
+   * @param string $message
+   *   (optional) A message to display with the assertion. If left blank, a
+   *   default message will be displayed.
+   *
+   * @see \Behat\Mink\Driver\DriverInterface::evaluateScript()
+   */
+  protected function assertJsCondition($condition, $timeout = 1000, $message = '') {
+    $message = $message ?: "Javascript condition met:\n" . $condition;
+    $result = $this->getSession()->getDriver()->wait($timeout, $condition);
+    $this->assertNotEmpty($result, $message);
+  }
+
+  /**
+   * Waits for jQuery to become active and animations to complete.
+   */
+  protected function waitForAjaxToFinish() {
+    $condition = "(0 === jQuery.active && 0 === jQuery(':animated').length)";
+    $this->assertJsCondition($condition, 10000);
+  }
+
+  /**
+   * {@inheritdoc}
+   *
+   * @return \Drupal\FunctionalJavascriptTests\JSWebAssert
+   *   A new web-assert option for asserting the presence of elements with.
+   */
+  public function assertSession($name = NULL) {
+    return new JSWebAssert($this->getSession($name), $this->baseUrl);
   }
 
 }

@@ -6,8 +6,6 @@ use Drupal\commerce_order\Entity\Order;
 use Drupal\commerce_product\Entity\ProductAttribute;
 use Drupal\commerce_product\Entity\ProductType;
 use Drupal\commerce_product\Entity\ProductVariationType;
-use Drupal\Tests\commerce\FunctionalJavascript\JavascriptTestTrait;
-use Drupal\Tests\commerce_cart\Functional\CartBrowserTestBase;
 use Drupal\views\Entity\View;
 
 /**
@@ -17,9 +15,7 @@ use Drupal\views\Entity\View;
  *
  * @group commerce
  */
-class MultipleCartMultipleVariationTypesTest extends CartBrowserTestBase {
-
-  use JavascriptTestTrait;
+class MultipleCartMultipleVariationTypesTest extends CartWebDriverTestBase {
 
   /**
    * Modules to enable.

@@ -4,7 +4,6 @@ namespace Drupal\Tests\commerce\FunctionalJavascript;
 
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
-use Drupal\Tests\commerce\Functional\CommerceBrowserTestBase;
 use Drupal\user\Entity\Role;
 
 /**
@@ -12,9 +11,7 @@ use Drupal\user\Entity\Role;
  *
  * @group commerce
  */
-class PluginSelectTest extends CommerceBrowserTestBase {
-
-  use JavascriptTestTrait;
+class PluginSelectTest extends CommerceWebDriverTestBase {
 
   /**
    * The entity_test storage.

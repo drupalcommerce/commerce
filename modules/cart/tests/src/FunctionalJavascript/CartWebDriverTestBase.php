@@ -1,13 +1,14 @@
 <?php
 
-namespace Drupal\Tests\commerce_cart\Functional;
+namespace Drupal\Tests\commerce_cart\FunctionalJavascript;
 
-use Drupal\Tests\commerce_order\Functional\OrderBrowserTestBase;
+use Drupal\Tests\commerce_cart\Functional\CartBrowserTestTrait;
+use Drupal\Tests\commerce_order\FunctionalJavascript\OrderWebDriverTestBase;
 
 /**
  * Defines base class for commerce_cart test cases.
  */
-abstract class CartBrowserTestBase extends OrderBrowserTestBase {
+abstract class CartWebDriverTestBase extends OrderWebDriverTestBase {
 
   use CartBrowserTestTrait;
 

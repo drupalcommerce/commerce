@@ -3,17 +3,14 @@
 namespace Drupal\Tests\commerce_store\FunctionalJavascript;
 
 use Drupal\commerce_store\Entity\Store;
-use Drupal\Tests\commerce\Functional\CommerceBrowserTestBase;
-use Drupal\Tests\commerce\FunctionalJavascript\JavascriptTestTrait;
+use Drupal\Tests\commerce\FunctionalJavascript\CommerceWebDriverTestBase;
 
 /**
  * Create, view, edit, delete, and change store entities.
  *
  * @group commerce
  */
-class StoreTest extends CommerceBrowserTestBase {
-
-  use JavascriptTestTrait;
+class StoreTest extends CommerceWebDriverTestBase {
 
   /**
    * A store type entity to use in the tests.
@@ -95,7 +92,6 @@ class StoreTest extends CommerceBrowserTestBase {
   public function testDeleteStore() {
     $store = $this->createStore();
     $this->drupalGet($store->toUrl('delete-form'));
-    $this->assertSession()->statusCodeEquals(200);
     $this->assertSession()->pageTextContains('This action cannot be undone.');
     $this->submitForm([], t('Delete'));
 

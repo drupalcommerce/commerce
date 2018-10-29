@@ -8,17 +8,13 @@ use Drupal\commerce_product\Entity\ProductVariation;
 use Drupal\commerce_product\Entity\ProductVariationType;
 use Drupal\Core\Entity\Entity\EntityFormDisplay;
 use Drupal\language\Entity\ConfigurableLanguage;
-use Drupal\Tests\commerce\FunctionalJavascript\JavascriptTestTrait;
-use Drupal\Tests\commerce_cart\Functional\CartBrowserTestBase;
 
 /**
  * Tests the add to cart form for multilingual.
  *
  * @group commerce
  */
-class AddToCartMultilingualTest extends CartBrowserTestBase {
-
-  use JavascriptTestTrait;
+class AddToCartMultilingualTest extends CartWebDriverTestBase {
 
   /**
    * The variations to test with.

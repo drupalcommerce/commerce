@@ -1,19 +1,16 @@
 <?php
 
-namespace Drupal\Tests\commerce_tax\FunctionalJavascript\Plugin\Commerce\TaxType;
+namespace Drupal\Tests\commerce_tax\FunctionalJavascript;
 
 use Drupal\commerce_tax\Entity\TaxType;
-use Drupal\Tests\commerce\Functional\CommerceBrowserTestBase;
-use Drupal\Tests\commerce\FunctionalJavascript\JavascriptTestTrait;
+use Drupal\Tests\commerce\FunctionalJavascript\CommerceWebDriverTestBase;
 
 /**
  * Tests the commerce_tax custom plugin.
  *
  * @group commerce
  */
-class CustomTest extends CommerceBrowserTestBase {
-
-  use JavascriptTestTrait;
+class CustomTest extends CommerceWebDriverTestBase {
 
   /**
    * Modules to enable.
