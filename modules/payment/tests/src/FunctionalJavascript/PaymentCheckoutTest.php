@@ -561,6 +561,67 @@ class PaymentCheckoutTest extends CommerceBrowserTestBase {
   }
 
   /**
+   * Tests checkout with an off-site gateway that supports notifications.
+   *
+   * We simulate onNotify() being called before onReturn(), resulting in the
+   * order being fully paid and placed before the customer returns to the site.
+   */
+  public function testCheckoutWithOffsitePaymentNotify() {
+    $payment_gateway = PaymentGateway::load('offsite');
+    $payment_gateway->getPlugin()->setConfiguration([
+      'redirect_method' => 'post_manual',
+      'payment_method_types' => ['credit_card'],
+    ]);
+    $payment_gateway->save();
+
+    $this->drupalGet($this->product->toUrl()->toString());
+    $this->submitForm([], 'Add to cart');
+    $this->drupalGet('checkout/1');
+    $radio_button = $this->getSession()->getPage()->findField('Example');
+    $radio_button->click();
+    $this->waitForAjaxToFinish();
+
+    $this->submitForm([
+      'payment_information[billing_information][address][0][address][given_name]' => 'Johnny',
+      'payment_information[billing_information][address][0][address][family_name]' => 'Appleseed',
+      'payment_information[billing_information][address][0][address][address_line1]' => '123 New York Drive',
+      'payment_information[billing_information][address][0][address][locality]' => 'New York City',
+      'payment_information[billing_information][address][0][address][administrative_area]' => 'NY',
+      'payment_information[billing_information][address][0][address][postal_code]' => '10001',
+    ], 'Continue to review');
+    $this->assertSession()->pageTextContains('Payment information');
+    $this->assertSession()->pageTextContains('Example');
+    $this->assertSession()->pageTextContains('Johnny Appleseed');
+    $this->assertSession()->pageTextContains('123 New York Drive');
+    $this->submitForm([], 'Pay and complete purchase');
+
+    $this->assertSession()->addressEquals('checkout/1/payment');
+    // Simulate the order being paid in full.
+    $payment = Payment::create([
+      'type' => 'payment_default',
+      'payment_gateway' => 'offsite',
+      'order_id' => '1',
+      'amount' => new Price('39.99', 'USD'),
+      'state' => 'completed',
+    ]);
+    $payment->save();
+    $order = Order::load(1);
+    $this->assertTrue($order->isPaid());
+    $this->assertFalse($order->isLocked());
+
+    // Go to the return url and confirm that it works.
+    $this->drupalGet('checkout/1/payment/return');
+    $this->assertSession()->addressEquals('checkout/1/complete');
+    $this->assertSession()->pageTextContains('Your order number is 1. You can view your order on your account page when logged in.');
+
+    /** @var \Drupal\commerce_payment\PaymentStorageInterface $payment_storage */
+    $payment_storage = \Drupal::entityTypeManager()->getStorage('commerce_payment');
+    // Confirm that only one payment was made.
+    $payments = $payment_storage->loadMultipleByOrder($order);
+    $this->assertCount(1, $payments);
+  }
+
+  /**
    * Tests checkout with a manual gateway.
    */
   public function testCheckoutWithManual() {

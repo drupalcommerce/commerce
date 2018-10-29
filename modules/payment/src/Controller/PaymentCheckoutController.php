@@ -2,6 +2,7 @@
 
 namespace Drupal\commerce_payment\Controller;
 
+use Drupal\commerce\Response\NeedsRedirectException;
 use Drupal\commerce_checkout\CheckoutOrderManagerInterface;
 use Drupal\commerce_order\Entity\OrderInterface;
 use Drupal\commerce_payment\Exception\PaymentGatewayException;
@@ -9,6 +10,8 @@ use Drupal\commerce_payment\Plugin\Commerce\PaymentGateway\OffsitePaymentGateway
 use Drupal\Core\Access\AccessException;
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 use Drupal\Core\Messenger\MessengerInterface;
+use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\Core\Url;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -59,25 +62,28 @@ class PaymentCheckoutController implements ContainerInjectionInterface {
    *
    * Redirects to the next checkout page, completing checkout.
    *
-   * @param \Drupal\commerce_order\Entity\OrderInterface $commerce_order
-   *   The order.
    * @param \Symfony\Component\HttpFoundation\Request $request
    *   The request.
+   * @param \Drupal\Core\Routing\RouteMatchInterface $route_match
+   *   The route match.
    */
-  public function returnPage(OrderInterface $commerce_order, Request $request) {
+  public function returnPage(Request $request, RouteMatchInterface $route_match) {
+    /** @var \Drupal\commerce_order\Entity\OrderInterface $order */
+    $order = $route_match->getParameter('commerce_order');
+    $step_id = $route_match->getParameter('step');
+    $this->validateStepId($step_id, $order);
     /** @var \Drupal\commerce_payment\Entity\PaymentGatewayInterface $payment_gateway */
-    $payment_gateway = $commerce_order->get('payment_gateway')->entity;
+    $payment_gateway = $order->get('payment_gateway')->entity;
     $payment_gateway_plugin = $payment_gateway->getPlugin();
     if (!$payment_gateway_plugin instanceof OffsitePaymentGatewayInterface) {
       throw new AccessException('The payment gateway for the order does not implement ' . OffsitePaymentGatewayInterface::class);
     }
     /** @var \Drupal\commerce_checkout\Entity\CheckoutFlowInterface $checkout_flow */
-    $checkout_flow = $commerce_order->get('checkout_flow')->entity;
+    $checkout_flow = $order->get('checkout_flow')->entity;
     $checkout_flow_plugin = $checkout_flow->getPlugin();
-    $step_id = $this->checkoutOrderManager->getCheckoutStepId($commerce_order);
 
     try {
-      $payment_gateway_plugin->onReturn($commerce_order, $request);
+      $payment_gateway_plugin->onReturn($order, $request);
       $redirect_step_id = $checkout_flow_plugin->getNextStepId($step_id);
     }
     catch (PaymentGatewayException $e) {
@@ -93,26 +99,54 @@ class PaymentCheckoutController implements ContainerInjectionInterface {
    *
    * Redirects to the previous checkout page.
    *
-   * @param \Drupal\commerce_order\Entity\OrderInterface $commerce_order
-   *   The order.
    * @param \Symfony\Component\HttpFoundation\Request $request
    *   The request.
+   * @param \Drupal\Core\Routing\RouteMatchInterface $route_match
+   *   The route match.
    */
-  public function cancelPage(OrderInterface $commerce_order, Request $request) {
+  public function cancelPage(Request $request, RouteMatchInterface $route_match) {
+    /** @var \Drupal\commerce_order\Entity\OrderInterface $order */
+    $order = $route_match->getParameter('commerce_order');
+    $step_id = $route_match->getParameter('step');
+    $this->validateStepId($step_id, $order);
     /** @var \Drupal\commerce_payment\Entity\PaymentGatewayInterface $payment_gateway */
-    $payment_gateway = $commerce_order->get('payment_gateway')->entity;
+    $payment_gateway = $order->get('payment_gateway')->entity;
     $payment_gateway_plugin = $payment_gateway->getPlugin();
     if (!$payment_gateway_plugin instanceof OffsitePaymentGatewayInterface) {
       throw new AccessException('The payment gateway for the order does not implement ' . OffsitePaymentGatewayInterface::class);
     }
-
-    $payment_gateway_plugin->onCancel($commerce_order, $request);
     /** @var \Drupal\commerce_checkout\Entity\CheckoutFlowInterface $checkout_flow */
-    $checkout_flow = $commerce_order->get('checkout_flow')->entity;
+    $checkout_flow = $order->get('checkout_flow')->entity;
     $checkout_flow_plugin = $checkout_flow->getPlugin();
-    $step_id = $this->checkoutOrderManager->getCheckoutStepId($commerce_order);
+
+    $payment_gateway_plugin->onCancel($order, $request);
     $previous_step_id = $checkout_flow_plugin->getPreviousStepId($step_id);
     $checkout_flow_plugin->redirectToStep($previous_step_id);
+  }
+
+  /**
+   * Validates the requested step ID.
+   *
+   * Redirects to the actual step ID if the requested one is no longer
+   * available. This can happen if payment was already cancelled, or if the
+   * payment "notify" endpoint created the payment and placed the order
+   * before the customer returned to the site.
+   *
+   * @param string $requested_step_id
+   *   The requested step ID, usually "payment".
+   * @param \Drupal\commerce_order\Entity\OrderInterface $order
+   *   The order.
+   *
+   * @throws \Drupal\commerce\Response\NeedsRedirectException
+   */
+  protected function validateStepId($requested_step_id, OrderInterface $order) {
+    $step_id = $this->checkoutOrderManager->getCheckoutStepId($order);
+    if ($requested_step_id != $step_id) {
+      throw new NeedsRedirectException(Url::fromRoute('commerce_checkout.form', [
+        'commerce_order' => $order->id(),
+        'step' => $step_id,
+      ])->toString());
+    }
   }
 
 }
