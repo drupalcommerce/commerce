@@ -12,6 +12,9 @@ sudo: false
 
 dist: precise
 
+addons:
+  chrome: stable
+
 php:
   - 7.2
   - 7.1
@@ -26,7 +29,7 @@ matrix:
 
 env:
   global:
-    - PHANTOMJS2_VERSION="2.0.0"
+    - CHROME_DRIVER_VERSION=2.32
     # add composer's global bin directory to the path
     # see: https://github.com/drush-ops/drush#install---composer
     - PATH="$PATH:$HOME/.composer/vendor/bin"
@@ -88,6 +91,9 @@ env:
     # etc. to only output those channels.
     #- DRUPAL_TI_DEBUG_FILE_OUTPUT="selenium xvfb webserver"
 
+    # Set mink for webdriver.
+    - MINK_DRIVER_ARGS_WEBDRIVER='["chrome", {"browserName":"chrome","chromeOptions":{"args":["--disable-gpu","--headless", "--no-sandbox"]}}, "http://localhost:9515"]'
+
   matrix:
     # [[[ SELECT ANY OR MORE OPTIONS ]]]
     #- DRUPAL_TI_RUNNERS="phpunit"
@@ -112,11 +118,13 @@ before_install:
 
 install:
   - drupal-ti install
-  - mkdir travis-phantomjs
-  - wget https://s3.amazonaws.com/travis-phantomjs/phantomjs-2.0.0-ubuntu-12.04.tar.bz2 -O $PWD/travis-phantomjs/phantomjs-2.0.0-ubuntu-12.04.tar.bz2
-  - tar -xvf $PWD/travis-phantomjs/phantomjs-2.0.0-ubuntu-12.04.tar.bz2 -C $PWD/travis-phantomjs
-  - export PATH=$PWD/travis-phantomjs:$PATH
-  - phantomjs --version
+  - mkdir chromedriver
+  - wget --no-verbose -O chromedriver_linux64.zip https://chromedriver.storage.googleapis.com/$CHROME_DRIVER_VERSION/chromedriver_linux64.zip
+  - unzip chromedriver_linux64.zip -d chromedriver
+  - rm chromedriver_linux64.zip
+  - chmod 755 chromedriver/chromedriver
+  - export PATH=$PWD/chromedriver/chromedriver:$PATH
+  - chromedriver --version
   # Installed after Drush to prevent Composer conflicts around symfony/yaml.
   - composer global require "drupal/coder:8.2.*"
   - phpcs --config-set installed_paths $HOME/.composer/vendor/drupal/coder/coder_sniffer
