@@ -7,4 +7,4 @@ set -e $DRUPAL_TI_DEBUG
 drupal_ti_ensure_drupal
 
 # Turn on chromedriver for functional Javascript tests
-chromedriver 2>&1 >> /dev/null &
+chromedriver --whitelisted-ips --log-path=/tmp/chromedriver.log --verbose &
