@@ -21,7 +21,7 @@ services:
 
   commerce_product.variation_field_renderer:
     class: Drupal\commerce_product\ProductVariationFieldRenderer
-    arguments: ['@entity_type.manager', '@entity_field.manager']
+    arguments: ['@entity_type.manager']
 
   commerce_product.product_route_context:
     class: Drupal\commerce_product\ContextProvider\ProductRouteContext
