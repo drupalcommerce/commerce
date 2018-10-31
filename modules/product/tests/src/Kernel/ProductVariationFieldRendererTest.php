@@ -2,6 +2,7 @@
 
 namespace Drupal\Tests\commerce_product\Kernel;
 
+use Drupal\commerce_price\Price;
 use Drupal\commerce_product\Entity\Product;
 use Drupal\commerce_product\Entity\ProductAttribute;
 use Drupal\commerce_product\Entity\ProductAttributeValue;
@@ -115,25 +116,9 @@ class ProductVariationFieldRendererTest extends CommerceKernelTestBase {
   }
 
   /**
-   * Tests the getFieldDefinitions method.
-   *
-   * @covers ::getFieldDefinitions
-   */
-  public function testGetFieldDefinitions() {
-    $field_definitions = $this->variationFieldRenderer->getFieldDefinitions($this->firstVariationType->id());
-    $field_names = array_keys($field_definitions);
-    $this->assertEquals(['sku', 'title', 'list_price', 'price'], $field_names);
-
-    $field_definitions = $this->variationFieldRenderer->getFieldDefinitions($this->secondVariationType->id());
-    $field_names = array_keys($field_definitions);
-    $this->assertEquals(['sku', 'title', 'list_price', 'price', 'render_field', 'attribute_color'], $field_names);
-  }
-
-  /**
    * Tests renderFields.
    *
    * @covers ::renderFields
-   * @covers ::renderField
    */
   public function testRenderFields() {
     $attribute_value = ProductAttributeValue::create([
@@ -155,21 +140,30 @@ class ProductVariationFieldRendererTest extends CommerceKernelTestBase {
     ]);
     $product->save();
 
-    $product_display = commerce_get_entity_display('commerce_product_variation', $variation->bundle(), 'view');
-    $product_display->setComponent('attribute_color', [
-      'label' => 'above',
-      'type' => 'entity_reference_label',
-    ]);
-    $product_display->setComponent('title', [
+    $entity_display = commerce_get_entity_display('commerce_product_variation', $variation->bundle(), 'view');
+    $entity_display->setComponent('sku', [
       'label' => 'above',
       'type' => 'string',
     ]);
-    $product_display->save();
+    $entity_display->setComponent('attribute_color', [
+      'label' => 'above',
+      'type' => 'entity_reference_label',
+    ]);
+    $entity_display->setComponent('product_id', [
+      'label' => 'above',
+      'type' => 'entity_reference_entity_view',
+    ]);
+    $entity_display->removeComponent('price');
+    $entity_display->save();
 
     $rendered_fields = $this->variationFieldRenderer->renderFields($variation);
-    $this->assertEmpty(isset($rendered_fields['status']), 'Variation status field was not rendered');
-    $this->assertNotEmpty(isset($rendered_fields['sku']), 'Variation SKU field was rendered');
-    $this->assertNotEmpty(isset($rendered_fields['attribute_color']), 'Variation atrribute color field was rendered');
+    // The product_id field should be skipped to avoid a render loop.
+    $this->assertArrayNotHasKey('product_id', $rendered_fields);
+    $this->assertArrayNotHasKey('price', $rendered_fields);
+    $this->assertArrayHasKey('sku', $rendered_fields);
+    $this->assertArrayHasKey('attribute_color', $rendered_fields);
+    $this->assertNotEmpty($rendered_fields['sku'][0]);
+    $this->assertNotEmpty($rendered_fields['attribute_color'][0]);
     $this->assertEquals('product--variation-field--variation_sku__' . $variation->getProductId(), $rendered_fields['sku']['#ajax_replace_class']);
     $this->assertEquals('product--variation-field--variation_attribute_color__' . $variation->getProductId(), $rendered_fields['attribute_color']['#ajax_replace_class']);
 
@@ -177,18 +171,16 @@ class ProductVariationFieldRendererTest extends CommerceKernelTestBase {
     $product_build = $product_view_builder->view($product);
     $this->render($product_build);
 
-    // Attributes are excluded by default in twig template, verify.
+    // Attributes are excluded by default in the twig template.
     $this->assertEmpty($this->cssSelect('.product--variation-field--variation_attribute_color__' . $variation->getProductId()));
-    $this->assertEmpty($this->cssSelect('.product--variation-field--variation_sku__' . $variation->getProductId()));
-    // Verify that the title was displayed.
-    $this->assertEscaped($variation->label(), 'Variation title was injected and displayed.');
+    // Verify that the SKU was displayed.
+    $this->assertEscaped($variation->getSku());
   }
 
   /**
    * Tests renderFields in multilingual context.
    *
    * @covers ::renderFields
-   * @covers ::renderField
    */
   public function testRenderFieldsMultilingual() {
     $this->secondVariationType->setGenerateTitle(TRUE);
@@ -248,16 +240,16 @@ class ProductVariationFieldRendererTest extends CommerceKernelTestBase {
     $this->assertEquals('Mon super produit - Bleu', $variation1->getTranslation('fr')->label());
     $this->assertEquals('Mon super produit - Noir', $variation2->getTranslation('fr')->label());
 
-    $product_display = commerce_get_entity_display('commerce_product_variation', $this->secondVariationType->id(), 'view');
-    $product_display->setComponent('attribute_color', [
+    $entity_display = commerce_get_entity_display('commerce_product_variation', $this->secondVariationType->id(), 'view');
+    $entity_display->setComponent('attribute_color', [
       'label' => 'above',
       'type' => 'entity_reference_label',
     ]);
-    $product_display->setComponent('title', [
+    $entity_display->setComponent('title', [
       'label' => 'above',
       'type' => 'string',
     ]);
-    $product_display->save();
+    $entity_display->save();
 
     // Make sure loadFromContext does not return the default variation, which is
     // always translated via ::getDefaultVariation on the product entity.
@@ -280,11 +272,55 @@ class ProductVariationFieldRendererTest extends CommerceKernelTestBase {
   }
 
   /**
+   * Tests rendering a single field.
+   *
+   * @covers ::renderField
+   */
+  public function testRenderField() {
+    $variation = ProductVariation::create([
+      'type' => $this->secondVariationType->id(),
+      'sku' => strtolower($this->randomMachineName()),
+      'title' => $this->randomString(),
+      'price' => new Price('10', 'USD'),
+      'status' => 1,
+    ]);
+    $variation->save();
+    $product = Product::create([
+      'type' => 'default',
+      'variations' => [$variation],
+    ]);
+    $product->save();
+
+    $entity_display = commerce_get_entity_display('commerce_product_variation', $variation->bundle(), 'view');
+    $entity_display->setComponent('sku', [
+      'label' => 'above',
+      'type' => 'string',
+    ]);
+    $entity_display->removeComponent('price');
+    $entity_display->save();
+
+    $rendered_field = $this->variationFieldRenderer->renderField('sku', $variation, 'default');
+    $this->assertNotEmpty($rendered_field[0]);
+    $this->assertEquals('product--variation-field--variation_sku__' . $variation->getProductId(), $rendered_field['#ajax_replace_class']);
+
+    // Confirm that hidden fields don't get AJAX classes.
+    $rendered_field = $this->variationFieldRenderer->renderField('price', $variation, 'default');
+    $this->assertEmpty($rendered_field);
+
+    // Confirm that passing a custom formatter works.
+    $rendered_field = $this->variationFieldRenderer->renderField('price', $variation, [
+      'type' => 'commerce_price_default',
+    ]);
+    $this->assertNotEmpty($rendered_field[0]);
+    $this->assertEquals('product--variation-field--variation_price__' . $variation->getProductId(), $rendered_field['#ajax_replace_class']);
+  }
+
+  /**
    * Tests that viewing a product without variations does not throw fatal error.
    *
    * @see commerce_product_commerce_product_view()
    */
-  public function testRenderFieldsNoVariations() {
+  public function testNoVariations() {
     $product = Product::create([
       'type' => 'default',
       'variations' => [],

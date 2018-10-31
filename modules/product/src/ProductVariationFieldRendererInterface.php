@@ -15,17 +15,6 @@ use Drupal\Core\Ajax\AjaxResponse;
 interface ProductVariationFieldRendererInterface {
 
   /**
-   * Gets the renderable field definitions for the given variation type.
-   *
-   * @param string $variation_type_id
-   *   The product variation type ID.
-   *
-   * @return \Drupal\Core\Field\FieldDefinitionInterface[]
-   *   The renderable field definitions, keyed by field name.
-   */
-  public function getFieldDefinitions($variation_type_id);
-
-  /**
    * Renders all renderable variation fields.
    *
    * @param \Drupal\commerce_product\Entity\ProductVariationInterface $variation

@@ -5,9 +5,9 @@ namespace Drupal\commerce_product;
 use Drupal\commerce_product\Entity\ProductVariationInterface;
 use Drupal\Core\Ajax\AjaxResponse;
 use Drupal\Core\Ajax\ReplaceCommand;
+use Drupal\Core\Render\Element;
 use Drupal\Core\Entity\EntityFieldManagerInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
-use Drupal\Core\Field\BaseFieldDefinition;
 
 class ProductVariationFieldRenderer implements ProductVariationFieldRendererInterface {
 
@@ -49,40 +49,44 @@ class ProductVariationFieldRenderer implements ProductVariationFieldRendererInte
   /**
    * {@inheritdoc}
    */
-  public function getFieldDefinitions($variation_type_id) {
-    $definitions = $this->entityFieldManager->getFieldDefinitions('commerce_product_variation', $variation_type_id);
-    $allowed_base_fields = $this->getAllowedBaseFields();
-    foreach ($definitions as $field_name => $definition) {
-      if ($definition instanceof BaseFieldDefinition && !in_array($field_name, $allowed_base_fields)) {
-        unset($definitions[$field_name]);
+  public function renderFields(ProductVariationInterface $variation, $view_mode = 'default') {
+    $build = $this->variationViewBuilder->view($variation, $view_mode);
+    // Formatters aren't called until #pre_render.
+    foreach ($build['#pre_render'] as $callable) {
+      $build = call_user_func($callable, $build);
+    }
+    unset($build['#pre_render']);
+    // Rendering the product can cause an infinite loop.
+    unset($build['product_id']);
+    // Fields are rendered individually, top-level properties are not needed.
+    foreach ($build as $key => $value) {
+      if (Element::property($key)) {
+        unset($build[$key]);
       }
     }
-
-    return $definitions;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function renderFields(ProductVariationInterface $variation, $view_mode = 'default') {
-    $rendered_fields = [];
-    foreach ($this->getFieldDefinitions($variation->bundle()) as $field_name => $field_definition) {
-      $rendered_fields[$field_name] = $this->renderField($field_name, $variation, $view_mode);
+    // Prepare the fields for AJAX replacement.
+    foreach ($build as $field_name => &$elements) {
+      $ajax_class = $this->buildAjaxReplacementClass($field_name, $variation);
+      $elements['#attributes']['class'][] = $ajax_class;
+      $elements['#ajax_replace_class'] = $ajax_class;
     }
 
-    return $rendered_fields;
+    return $build;
   }
 
   /**
    * {@inheritdoc}
    */
   public function renderField($field_name, ProductVariationInterface $variation, $display_options = []) {
-    $ajax_class = $this->buildAjaxReplacementClass($field_name, $variation);
-    $content = $this->variationViewBuilder->viewField($variation->get($field_name), $display_options);
-    $content['#attributes']['class'][] = $ajax_class;
-    $content['#ajax_replace_class'] = $ajax_class;
+    $build = $this->variationViewBuilder->viewField($variation->get($field_name), $display_options);
+    if (!empty($build)) {
+      // Prepare the fields for AJAX replacement.
+      $ajax_class = $this->buildAjaxReplacementClass($field_name, $variation);
+      $build['#attributes']['class'][] = $ajax_class;
+      $build['#ajax_replace_class'] = $ajax_class;
+    }
 
-    return $content;
+    return $build;
   }
 
   /**
@@ -108,16 +112,6 @@ class ProductVariationFieldRenderer implements ProductVariationFieldRendererInte
    */
   protected function buildAjaxReplacementClass($field_name, ProductVariationInterface $variation) {
     return 'product--variation-field--variation_' . $field_name . '__' . $variation->getProductId();
-  }
-
-  /**
-   * Gets the allowed base field definitions for injection.
-   *
-   * @return array
-   *   An array of base field names.
-   */
-  protected function getAllowedBaseFields() {
-    return ['title', 'sku', 'list_price', 'price'];
   }
 
 }
