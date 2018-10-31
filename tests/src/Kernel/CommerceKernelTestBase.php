@@ -46,7 +46,6 @@ abstract class CommerceKernelTestBase extends EntityKernelTestBase {
   protected function setUp() {
     parent::setUp();
 
-    $this->installSchema('system', 'router');
     $this->installEntitySchema('commerce_currency');
     $this->installEntitySchema('commerce_store');
     $this->installConfig(['commerce_store']);
