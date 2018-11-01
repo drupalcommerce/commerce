@@ -33,6 +33,7 @@ class CommerceCondition extends Plugin {
    * The condition display label.
    *
    * Shown in the condition UI when enabling/disabling a condition.
+   * Defaults to the main label.
    *
    * @ingroup plugin_translatable
    *
@@ -60,12 +61,36 @@ class CommerceCondition extends Plugin {
   public $entity_type;
 
   /**
+   * The parent entity type ID.
+   *
+   * This is the entity type ID of the entity that embeds the conditions.
+   * For example: 'commerce_promotion'.
+   *
+   * When specified, a condition will only be available on that entity type.
+   *
+   * @var string
+   */
+  public $parent_entity_type;
+
+  /**
+   * The condition weight.
+   *
+   * Used when sorting the condition list in the UI.
+   *
+   * @var int
+   */
+  public $weight = 0;
+
+  /**
    * Constructs a new CommerceCondition object.
    *
    * @param array $values
    *   The annotation values.
    */
   public function __construct(array $values) {
+    if (empty($values['display_label'])) {
+      $values['display_label'] = $values['label'];
+    }
     if (empty($values['category'])) {
       $values['category'] = t('Other');
     }

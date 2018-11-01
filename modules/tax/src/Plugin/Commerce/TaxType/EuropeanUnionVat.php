@@ -1114,6 +1114,7 @@ class EuropeanUnionVat extends LocalTaxTypeBase {
     return new TaxZone([
       'id' => 'ic',
       'label' => $this->t('Intra-Community Supply'),
+      'display_label' => $this->t('Intra-Community Supply'),
       'territories' => [
         // This territory won't match, but it doesn't need to.
         ['country_code' => 'EU'],

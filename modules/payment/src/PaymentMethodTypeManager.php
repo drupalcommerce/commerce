@@ -39,7 +39,7 @@ class PaymentMethodTypeManager extends DefaultPluginManager {
   public function processDefinition(&$definition, $plugin_id) {
     parent::processDefinition($definition, $plugin_id);
 
-    foreach (['id', 'label', 'create_label'] as $required_property) {
+    foreach (['id', 'label'] as $required_property) {
       if (empty($definition[$required_property])) {
         throw new PluginException(sprintf('The payment method type %s must define the %s property.', $plugin_id, $required_property));
       }

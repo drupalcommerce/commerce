@@ -11,8 +11,7 @@ use Drupal\Core\Form\FormStateInterface;
  *
  * @CommerceCondition(
  *   id = "order_currency",
- *   label = @Translation("Currency"),
- *   display_label = @Translation("Limit by currency"),
+ *   label = @Translation("Order currency"),
  *   category = @Translation("Order"),
  *   entity_type = "commerce_order",
  * )

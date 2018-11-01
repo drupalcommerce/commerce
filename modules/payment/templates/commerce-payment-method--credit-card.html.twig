@@ -23,7 +23,7 @@
     {{ payment_method.label }}
     <span class="payment-method-icon payment-method-icon--{{ payment_method_entity.card_type.value }}"></span>
   </div>
-  {% if payment_method_entity.expiresTime %}
+  {% if payment_method_entity.isReusable and payment_method_entity.expiresTime %}
     <div class="field field--name-expires">
       {{ 'Expires'|t }} {{ payment_method_entity.expiresTime|format_date('custom', 'n/Y') }}
     </div>

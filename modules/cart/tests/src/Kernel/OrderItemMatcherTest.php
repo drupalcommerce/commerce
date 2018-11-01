@@ -46,7 +46,6 @@ class OrderItemMatcherTest extends CommerceKernelTestBase {
    */
   public static $modules = [
     'entity_reference_revisions',
-    'path',
     'profile',
     'state_machine',
     'commerce_product',
@@ -226,6 +225,14 @@ class OrderItemMatcherTest extends CommerceKernelTestBase {
       'field_custom_text' => 'Blue',
     ]);
     $order_item3->save();
+    $order_item4 = OrderItem::create([
+      'type' => 'default',
+      'quantity' => 4,
+      'unit_price' => new Price('12.00', 'USD'),
+      'purchased_entity' => $this->variation1,
+      'field_custom_text' => '',
+    ]);
+    $order_item4->save();
 
     // Same purchased entity, different custom text, no match.
     $matches = $this->orderItemMatcher->matchAll($order_item1, [$order_item2]);
@@ -239,21 +246,31 @@ class OrderItemMatcherTest extends CommerceKernelTestBase {
     $this->assertNotEmpty($match);
     $this->assertEquals($match, $order_item3);
 
-    // Item with missing custom text does not match.
-    $order_item4 = OrderItem::create([
+    // Item with missing custom text, no match.
+    $order_item5 = OrderItem::create([
       'type' => 'default',
       'quantity' => 5,
       'unit_price' => new Price('12.00', 'USD'),
       'purchased_entity' => $this->variation1,
     ]);
-    $order_item4->save();
-
-    $matches = $this->orderItemMatcher->matchAll($order_item4, [
+    $matches = $this->orderItemMatcher->matchAll($order_item5, [
       $order_item1,
       $order_item2,
       $order_item3,
     ]);
     $this->assertEmpty($matches);
+
+    // Empty custom text on both sides, match.
+    $order_item6 = OrderItem::create([
+      'type' => 'default',
+      'quantity' => 5,
+      'unit_price' => new Price('12.00', 'USD'),
+      'purchased_entity' => $this->variation1,
+      'field_custom_text' => '',
+    ]);
+    $match = $this->orderItemMatcher->match($order_item6, [$order_item4]);
+    $this->assertNotEmpty($match);
+    $this->assertEquals($match, $order_item4);
   }
 
 }

@@ -7,8 +7,9 @@ use Drupal\commerce_product\Entity\Product;
 use Drupal\Tests\commerce\Kernel\CommerceKernelTestBase;
 
 /**
- * Tests the Product variation entity.
+ * Tests the product variation access control.
  *
+ * @coversDefaultClass \Drupal\commerce_product\ProductVariationAccessControlHandler
  * @group commerce
  */
 class ProductVariationAccessTest extends CommerceKernelTestBase {
@@ -41,14 +42,86 @@ class ProductVariationAccessTest extends CommerceKernelTestBase {
     $this->installEntitySchema('commerce_product');
     $this->installConfig(['commerce_product']);
 
-    $user = $this->createUser();
-    $this->user = $this->reloadEntity($user);
+    // Create uid: 1 here so that it's skipped in test cases.
+    $admin_user = $this->createUser();
   }
 
   /**
-   * Tests that variations without access are not available.
+   * @covers ::checkAccess
    */
-  public function testProductVariation() {
+  public function testAccess() {
+    /** @var \Drupal\commerce_product\Entity\ProductVariationInterface $variation */
+    $variation = ProductVariation::create([
+      'type' => 'default',
+      'sku' => $this->randomMachineName(),
+      'title' => $this->randomString(),
+      'status' => 1,
+    ]);
+    $variation->save();
+    /** @var \Drupal\commerce_product\Entity\ProductInterface $product */
+    $product = Product::create([
+      'type' => 'default',
+      'title' => 'My Product Title',
+      'variations' => [$variation],
+    ]);
+    $product->save();
+    $variation = $this->reloadEntity($variation);
+
+    $account = $this->createUser([], ['access administration pages']);
+    $this->assertFalse($variation->access('view', $account));
+    $this->assertFalse($variation->access('update', $account));
+    $this->assertFalse($variation->access('delete', $account));
+
+    $account = $this->createUser([], ['view commerce_product']);
+    $this->assertTrue($variation->access('view', $account));
+    $this->assertFalse($variation->access('update', $account));
+    $this->assertFalse($variation->access('delete', $account));
+
+    $account = $this->createUser([], ['update commerce_product']);
+    $this->assertFalse($variation->access('view', $account));
+    $this->assertFalse($variation->access('update', $account));
+    $this->assertFalse($variation->access('delete', $account));
+
+    $account = $this->createUser([], [
+      'manage default commerce_product_variation',
+    ]);
+    $this->assertFalse($variation->access('view', $account));
+    $this->assertTrue($variation->access('update', $account));
+    $this->assertTrue($variation->access('delete', $account));
+
+    $account = $this->createUser([], ['administer commerce_product']);
+    $this->assertTrue($variation->access('view', $account));
+    $this->assertTrue($variation->access('update', $account));
+    $this->assertTrue($variation->access('delete', $account));
+
+    // Broken product reference.
+    $variation->set('product_id', '999');
+    $account = $this->createUser([], ['manage default commerce_product_variation']);
+    $this->assertFalse($variation->access('view', $account));
+    $this->assertFalse($variation->access('update', $account));
+    $this->assertFalse($variation->access('delete', $account));
+  }
+
+  /**
+   * @covers ::checkCreateAccess
+   */
+  public function testCreateAccess() {
+    $access_control_handler = \Drupal::entityTypeManager()->getAccessControlHandler('commerce_product_variation');
+
+    $account = $this->createUser([], ['access content']);
+    $this->assertFalse($access_control_handler->createAccess('test', $account));
+
+    $account = $this->createUser([], ['administer commerce_product']);
+    $this->assertTrue($access_control_handler->createAccess('default', $account));
+
+    $account = $this->createUser([], ['manage default commerce_product_variation']);
+    $this->assertTrue($access_control_handler->createAccess('default', $account));
+  }
+
+  /**
+   * Tests that variations without access are not available on the frontend.
+   */
+  public function testFrontendFiltering() {
     /** @var \Drupal\commerce_product\Entity\ProductVariationInterface $variation */
     $variation = ProductVariation::create([
       'type' => 'default',
@@ -65,26 +138,17 @@ class ProductVariationAccessTest extends CommerceKernelTestBase {
       'status' => 1,
     ]);
     $variation_denied->save();
-    $variation2 = ProductVariation::create([
-      'type' => 'default',
-      'sku' => $this->randomMachineName(),
-      'title' => $this->randomString(),
-      'status' => 1,
-    ]);
-    $variation2->save();
-
-    $this->assertTrue($variation->access('view'));
-    $this->assertFalse($variation_denied->access('view'));
-    $this->assertTrue($variation2->access('view'));
-
     /** @var \Drupal\commerce_product\Entity\ProductInterface $product */
     $product = Product::create([
       'type' => 'default',
       'title' => 'My Product Title',
-      'variations' => [$variation, $variation_denied, $variation2],
+      'variations' => [$variation, $variation_denied],
     ]);
     $product->save();
     $product = $this->reloadEntity($product);
+
+    $user = $this->createUser([], ['view commerce_product']);
+    $this->container->get('current_user')->setAccount($user);
 
     /** @var \Drupal\commerce_product\ProductVariationStorageInterface $variation_storage */
     $variation_storage = $this->container->get('entity_type.manager')->getStorage('commerce_product_variation');
@@ -94,7 +158,47 @@ class ProductVariationAccessTest extends CommerceKernelTestBase {
     $this->assertEquals($variation->id(), $context->id());
 
     $enabled = $variation_storage->loadEnabled($product);
-    $this->assertEquals(2, count($enabled));
+    $this->assertEquals(1, count($enabled));
+  }
+
+  /**
+   * Tests route access for variations.
+   */
+  public function testRouteAccess() {
+    /** @var \Drupal\commerce_product\Entity\ProductVariationInterface $variation */
+    $variation = ProductVariation::create([
+      'type' => 'default',
+      'sku' => $this->randomMachineName(),
+      'title' => $this->randomString(),
+      'status' => 1,
+    ]);
+    $variation->save();
+    /** @var \Drupal\commerce_product\Entity\ProductInterface $product */
+    $product = Product::create([
+      'type' => 'default',
+      'title' => 'My Product Title',
+      'variations' => [$variation],
+    ]);
+    $product->save();
+    $variation = $this->reloadEntity($variation);
+
+    $account = $this->createUser([], ['administer commerce_product']);
+    $this->assertTrue($variation->toUrl('collection')->access($account));
+    $this->assertTrue($variation->toUrl('add-form')->access($account));
+    $this->assertTrue($variation->toUrl('edit-form')->access($account));
+    $this->assertTrue($variation->toUrl('delete-form')->access($account));
+
+    $account = $this->createUser([], ['manage default commerce_product_variation']);
+    $this->assertTrue($variation->toUrl('collection')->access($account));
+    $this->assertTrue($variation->toUrl('add-form')->access($account));
+    $this->assertTrue($variation->toUrl('edit-form')->access($account));
+    $this->assertTrue($variation->toUrl('delete-form')->access($account));
+
+    $account = $this->createUser([], ['access commerce_product overview']);
+    $this->assertTrue($variation->toUrl('collection')->access($account));
+    $this->assertFalse($variation->toUrl('add-form')->access($account));
+    $this->assertFalse($variation->toUrl('edit-form')->access($account));
+    $this->assertFalse($variation->toUrl('delete-form')->access($account));
   }
 
 }

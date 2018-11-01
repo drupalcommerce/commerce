@@ -42,6 +42,7 @@ use Drupal\commerce\Entity\CommerceBundleEntityBase;
  *     "label",
  *     "description",
  *     "variationType",
+ *     "multipleVariations",
  *     "injectVariationFields",
  *     "traits",
  *     "locked",
@@ -71,7 +72,14 @@ class ProductType extends CommerceBundleEntityBase implements ProductTypeInterfa
   protected $variationType;
 
   /**
-   * Indicates if variation fields should be injected.
+   * Whether products of this type can have multiple variations.
+   *
+   * @var bool
+   */
+  protected $multipleVariations = TRUE;
+
+  /**
+   * Whether variation fields should be injected.
    *
    * @var bool
    */
@@ -105,6 +113,20 @@ class ProductType extends CommerceBundleEntityBase implements ProductTypeInterfa
   public function setVariationTypeId($variation_type_id) {
     $this->variationType = $variation_type_id;
     return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function allowsMultipleVariations() {
+    return $this->multipleVariations;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setMultipleVariations($multiple_variations) {
+    $this->multipleVariations = $multiple_variations;
   }
 
   /**

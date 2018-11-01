@@ -162,7 +162,9 @@ class PriceCalculatedFormatter extends PriceDefaultFormatter implements Containe
   public function viewElements(FieldItemListInterface $items, $langcode) {
     $elements = [];
     if (!$items->isEmpty()) {
-      $context = new Context($this->currentUser, $this->currentStore->getStore());
+      $context = new Context($this->currentUser, $this->currentStore->getStore(), NULL, [
+        'field_name' => $items->getName(),
+      ]);
       /** @var \Drupal\commerce\PurchasableEntityInterface $purchasable_entity */
       $purchasable_entity = $items->getEntity();
       $adjustment_types = array_filter($this->getSetting('adjustment_types'));

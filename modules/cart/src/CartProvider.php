@@ -213,7 +213,8 @@ class CartProvider implements CartProviderInterface {
         ->condition('state', 'draft')
         ->condition('cart', TRUE)
         ->condition('uid', $account->id())
-        ->sort('order_id', 'DESC');
+        ->sort('order_id', 'DESC')
+        ->accessCheck(FALSE);
       $cart_ids = $query->execute();
     }
     else {

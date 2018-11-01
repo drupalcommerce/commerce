@@ -30,6 +30,7 @@ abstract class CommerceKernelTestBase extends EntityKernelTestBase {
     'commerce',
     'commerce_price',
     'commerce_store',
+    'path',
   ];
 
   /**
@@ -45,7 +46,6 @@ abstract class CommerceKernelTestBase extends EntityKernelTestBase {
   protected function setUp() {
     parent::setUp();
 
-    $this->installSchema('system', 'router');
     $this->installEntitySchema('commerce_currency');
     $this->installEntitySchema('commerce_store');
     $this->installConfig(['commerce_store']);

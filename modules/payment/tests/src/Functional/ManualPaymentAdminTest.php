@@ -110,6 +110,8 @@ class ManualPaymentAdminTest extends CommerceBrowserTestBase {
     $this->submitForm(['payment[amount][number]' => '100'], 'Add payment');
     $this->assertSession()->addressEquals($this->paymentUri);
     $this->assertSession()->pageTextContains('Pending');
+
+    \Drupal::entityTypeManager()->getStorage('commerce_payment')->resetCache([1]);
     /** @var \Drupal\commerce_payment\Entity\PaymentInterface $payment */
     $payment = Payment::load(1);
     $this->assertEquals($payment->getOrderId(), $this->order->id());
@@ -122,6 +124,8 @@ class ManualPaymentAdminTest extends CommerceBrowserTestBase {
     $this->submitForm(['payment[amount][number]' => '100', 'payment[received]' => TRUE], 'Add payment');
     $this->assertSession()->addressEquals($this->paymentUri);
     $this->assertSession()->pageTextContains('Completed');
+
+    \Drupal::entityTypeManager()->getStorage('commerce_payment')->resetCache([2]);
     /** @var \Drupal\commerce_payment\Entity\PaymentInterface $payment */
     $payment = Payment::load(2);
     $this->assertEquals($payment->getOrderId(), $this->order->id());
@@ -147,6 +151,7 @@ class ManualPaymentAdminTest extends CommerceBrowserTestBase {
     $this->assertSession()->pageTextNotContains('Pending');
     $this->assertSession()->pageTextContains('Completed');
 
+    \Drupal::entityTypeManager()->getStorage('commerce_payment')->resetCache([$payment->id()]);
     $payment = Payment::load($payment->id());
     $this->assertEquals($payment->getState()->getLabel(), 'Completed');
   }
@@ -168,8 +173,9 @@ class ManualPaymentAdminTest extends CommerceBrowserTestBase {
     $this->assertSession()->pageTextNotContains('Completed');
     $this->assertSession()->pageTextContains('Refunded');
 
+    \Drupal::entityTypeManager()->getStorage('commerce_payment')->resetCache([$payment->id()]);
     $payment = Payment::load($payment->id());
-    $this->assertEquals($payment->getState()->getLabel(), 'Refunded');
+    $this->assertEquals('Refunded', $payment->getState()->getLabel());
   }
 
   /**
@@ -188,6 +194,7 @@ class ManualPaymentAdminTest extends CommerceBrowserTestBase {
     $this->assertSession()->addressEquals($this->paymentUri);
     $this->assertSession()->pageTextContains('Voided');
 
+    \Drupal::entityTypeManager()->getStorage('commerce_payment')->resetCache([$payment->id()]);
     $payment = Payment::load($payment->id());
     $this->assertEquals($payment->getState()->getLabel(), 'Voided');
   }

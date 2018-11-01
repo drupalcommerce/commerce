@@ -75,13 +75,13 @@ class BillingProfileWidget extends WidgetBase implements ContainerFactoryPluginI
     $order = $items[$delta]->getEntity();
     $store = $order->getStore();
 
-    if (!$items[$delta]->isEmpty()) {
+    if (!$items[$delta]->isEmpty() && $items[$delta]->entity) {
       $profile = $items[$delta]->entity;
     }
     else {
       $profile = $this->entityTypeManager->getStorage('profile')->create([
         'type' => 'customer',
-        'uid' => $order->getCustomerId(),
+        'uid' => $order->getCustomer(),
       ]);
     }
 

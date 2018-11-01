@@ -13,6 +13,7 @@ sudo: false
 dist: precise
 
 php:
+  - 7.2
   - 7.1
   - 7.0
 
@@ -41,7 +42,7 @@ env:
 
     # The environment to use, supported are: drupal-7, drupal-8
     - DRUPAL_TI_ENVIRONMENT="drupal-8"
-    - DRUPAL_TI_CORE_BRANCH="8.5.x"
+    - DRUPAL_TI_CORE_BRANCH="8.6.x"
 
     # Drupal specific variables.
     - DRUPAL_TI_DB="drupal_travis_db"
@@ -105,7 +106,7 @@ before_install:
   # Add the oauth token to prevent GitHub timeouts.
   - git config --global github.accesstoken $GITHUB_OAUTH_TOKEN
   - composer global require "hirak/prestissimo:^0.3"
-  - composer global require "lionsad/drupal_ti:dev-master#396d11d200005eb68491d24170da0a98ae7f51b3"
+  - composer global require "lionsad/drupal_ti:dev-master#0d7c41abd1efa11726d7c908ae7a39bbeea905df"
   - composer global require "squizlabs/php_codesniffer:2.*"
   - drupal-ti before_install
 

@@ -125,6 +125,11 @@ abstract class CheckoutFlowBase extends PluginBase implements CheckoutFlowInterf
    * {@inheritdoc}
    */
   public function redirectToStep($step_id) {
+    $available_step_ids = array_keys($this->getVisibleSteps());
+    if (!in_array($step_id, $available_step_ids)) {
+      throw new \InvalidArgumentException(sprintf('Invalid step ID "%s" passed to redirectToStep().', $step_id));
+    }
+
     $this->order->set('checkout_step', $step_id);
     $this->onStepChange($step_id);
     $this->order->save();
@@ -322,7 +327,7 @@ abstract class CheckoutFlowBase extends PluginBase implements CheckoutFlowInterf
       $this->order->unlock();
     }
     // Place the order.
-    if ($step_id == 'complete') {
+    if ($step_id == 'complete' && $this->order->getState()->value == 'draft') {
       $transition = $this->order->getState()->getWorkflow()->getTransition('place');
       $this->order->getState()->applyTransition($transition);
     }

@@ -46,7 +46,8 @@ class AddToCartFormTest extends CartBrowserTestBase {
     // Find the newly created anonymous cart.
     $query = \Drupal::entityQuery('commerce_order')
       ->condition('cart', TRUE)
-      ->condition('uid', 0);
+      ->condition('uid', 0)
+      ->accessCheck(FALSE);
     $result = $query->execute();
     $cart_id = reset($result);
     $cart = Order::load($cart_id);

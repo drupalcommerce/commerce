@@ -112,16 +112,31 @@ class Conditions extends FormElement {
 
     $element['#attached']['library'][] = 'commerce/conditions';
     $element['#categories'] = [];
-    $element['conditions'] = [
-      '#type' => 'vertical_tabs',
-      '#title' => $element['#title'],
-    ];
+
+    // Render vertical tabs only if there is more than a single category.
+    $render_vertical_tabs = count($grouped_definitions) > 1;
+    if ($render_vertical_tabs) {
+      $element['conditions'] = [
+        '#type' => 'vertical_tabs',
+        '#title' => $element['#title'],
+      ];
+    }
+    else {
+      $element['conditions_title'] = [
+        '#type' => 'item',
+        '#title' => $element['#title'],
+      ];
+      $element['conditions'] = [
+        '#type' => 'container',
+      ];
+    }
+
     foreach ($grouped_definitions as $category => $definitions) {
       $category_id = preg_replace('/[^a-zA-Z\-]/', '_', strtolower($category));
       $element['#categories'][] = $category_id;
 
       $element[$category_id] = [
-        '#type' => 'details',
+        '#type' => $render_vertical_tabs ? 'details' : 'container',
         '#title' => $category,
         '#group' => $tab_group,
       ];

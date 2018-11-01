@@ -45,11 +45,11 @@
           {% endif %}
         {% endfor %}
       </div>
-      <details open>
-        <summary role="button">
+      <details open class="seven-details">
+        <summary role="button" class="seven-details__summary">
           {{ 'Customer Information'|t }}
         </summary>
-        <div class="details-wrapper">
+        <div class="details-wrapper seven-details__wrapper">
           {% for key in ['uid', 'mail', 'ip_address'] %}
             {% if order[key] %}
               <div class="form-item">
@@ -60,21 +60,21 @@
         </div>
       </details>
       {% if order.billing_information %}
-        <details open>
-          <summary role="button">
+        <details open class="seven-details">
+          <summary role="button" class="seven-details__summary">
             {{ 'Billing information'|t }}
           </summary>
-          <div class="details-wrapper">
+          <div class="details-wrapper seven-details__wrapper">
             {{ order.billing_information }}
           </div>
         </details>
       {% endif %}
       {% if order.shipping_information %}
-        <details open>
-          <summary role="button">
+        <details open class="seven-details">
+          <summary role="button" class="seven-details__summary">
             {{ 'Shipping information'|t }}
           </summary>
-          <div class="details-wrapper">
+          <div class="details-wrapper seven-details__wrapper">
             {{ order.shipping_information }}
           </div>
         </details>

@@ -44,7 +44,9 @@ use Drupal\profile\Entity\ProfileInterface;
  *   entity_keys = {
  *     "id" = "method_id",
  *     "uuid" = "uuid",
- *     "bundle" = "type"
+ *     "bundle" = "type",
+ *     "owner" = "uid",
+ *     "uid" = "uid",
  *   },
  *   links = {
  *     "collection" = "/user/{user}/payment-methods",
@@ -113,7 +115,7 @@ class PaymentMethod extends ContentEntityBase implements PaymentMethodInterface 
    * {@inheritdoc}
    */
   public function getOwnerId() {
-    return $this->get('uid')->target_id;
+    return $this->getEntityKey('owner');
   }
 
   /**

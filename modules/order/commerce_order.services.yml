@@ -67,6 +67,10 @@ services:
     tags:
       - { name: commerce_store.store_resolver, priority: 100 }
 
+  commerce_order.price_splitter:
+    class: Drupal\commerce_order\PriceSplitter
+    arguments: ['@entity_type.manager', '@commerce_price.rounder']
+
   commerce_order.price_calculator:
     class: Drupal\commerce_order\PriceCalculator
     arguments: ['@commerce_order.adjustment_transformer', '@commerce_order.chain_order_type_resolver', '@commerce_price.chain_price_resolver', '@entity_type.manager', '@request_stack']

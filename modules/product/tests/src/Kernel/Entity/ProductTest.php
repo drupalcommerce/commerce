@@ -42,8 +42,9 @@ class ProductTest extends CommerceKernelTestBase {
     $this->installEntitySchema('commerce_product');
     $this->installConfig(['commerce_product']);
 
-    $user = $this->createUser();
+    $user = $this->createUser([], ['administer commerce_product']);
     $this->user = $this->reloadEntity($user);
+    $this->container->get('current_user')->setAccount($user);
   }
 
   /**
@@ -124,8 +125,8 @@ class ProductTest extends CommerceKernelTestBase {
     $product->save();
 
     // An initially saved variation won't be the same as the loaded one.
-    $variation1 = ProductVariation::load($variation1->id());
-    $variation2 = ProductVariation::load($variation2->id());
+    $variation1 = $this->reloadEntity($variation1);
+    $variation2 = $this->reloadEntity($variation2);
 
     $variations = [$variation1, $variation2];
     $this->assertEmpty($product->hasVariations());
@@ -145,6 +146,23 @@ class ProductTest extends CommerceKernelTestBase {
 
     $this->assertEquals($product->getDefaultVariation(), $variation2);
     $this->assertNotEquals($product->getDefaultVariation(), $variation1);
+
+    // Confirm that postSave() sets the product_id on each variation.
+    $product->save();
+    /** @var \Drupal\commerce_product\Entity\ProductVariationInterface $variation1 */
+    $variation1 = $this->reloadEntity($variation1);
+    /** @var \Drupal\commerce_product\Entity\ProductVariationInterface $variation2 */
+    $variation2 = $this->reloadEntity($variation2);
+    $this->assertEquals($product->id(), $variation1->getProductId());
+    $this->assertEquals($product->id(), $variation2->getProductId());
+
+    // Confirm that postDelete() deletes the variations.
+    $product->delete();
+    $variation1 = $this->reloadEntity($variation1);
+    /** @var \Drupal\commerce_product\Entity\ProductVariationInterface $variation2 */
+    $variation2 = $this->reloadEntity($variation2);
+    $this->assertNull($variation1);
+    $this->assertNull($variation2);
   }
 
   /**

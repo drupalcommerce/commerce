@@ -5,9 +5,9 @@ package: Commerce
 core: 8.x
 configure: commerce.admin_commerce
 dependencies:
-  - address
+  - address:address
   - entity:entity
-  - datetime
-  - inline_entity_form
-  - views
-  - system (>=8.5.0)
+  - inline_entity_form:inline_entity_form
+  - drupal:datetime
+  - drupal:views
+  - drupal:system (>=8.6.0)

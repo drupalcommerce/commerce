@@ -34,10 +34,25 @@ class CommercePaymentMethodType extends Plugin {
   /**
    * The payment method type create label.
    *
+   * Defaults to the main label.
+   *
    * @ingroup plugin_translatable
    *
    * @var \Drupal\Core\Annotation\Translation
    */
   public $create_label;
+
+  /**
+   * Constructs a new CommercePaymentMethodType object.
+   *
+   * @param array $values
+   *   The annotation values.
+   */
+  public function __construct(array $values) {
+    if (empty($values['create_label'])) {
+      $values['create_label'] = $values['label'];
+    }
+    parent::__construct($values);
+  }
 
 }

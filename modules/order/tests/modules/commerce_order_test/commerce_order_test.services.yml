@@ -1,4 +1,9 @@
 services:
+  commerce_order_test.order_paid_subscriber:
+    class: Drupal\commerce_order_test\EventSubscriber\OrderPaidSubscriber
+    tags:
+      - { name: event_subscriber }
+
   commerce_order_test.test_adjustment_processor:
     class: Drupal\commerce_order_test\TestAdjustmentProcessor
     tags:

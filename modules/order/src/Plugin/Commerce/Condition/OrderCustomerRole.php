@@ -11,10 +11,10 @@ use Drupal\Core\Form\FormStateInterface;
  *
  * @CommerceCondition(
  *   id = "order_customer_role",
- *   label = @Translation("Role"),
- *   display_label = @Translation("Limit by role"),
+ *   label = @Translation("Customer role"),
  *   category = @Translation("Customer"),
  *   entity_type = "commerce_order",
+ *   weight = -1,
  * )
  */
 class OrderCustomerRole extends ConditionBase {
@@ -63,9 +63,8 @@ class OrderCustomerRole extends ConditionBase {
     /** @var \Drupal\commerce_order\Entity\OrderInterface $order */
     $order = $entity;
     $customer = $order->getCustomer();
-    $roles = $customer ? $customer->getRoles() : ['anonymous'];
 
-    return (bool) array_intersect($this->configuration['roles'], $roles);
+    return (bool) array_intersect($this->configuration['roles'], $customer->getRoles());
   }
 
 }

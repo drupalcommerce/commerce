@@ -69,21 +69,23 @@ class ProductVariationTest extends CommerceKernelTestBase {
    * @covers ::getStores
    */
   public function testProductVariation() {
-    /** @var \Drupal\commerce_product\Entity\ProductVariationInterface $variation */
-    $variation = ProductVariation::create([
-      'type' => 'default',
-    ]);
-    $variation->save();
-
     /** @var \Drupal\commerce_product\Entity\ProductInterface $product */
     $product = Product::create([
       'type' => 'default',
       'title' => 'My Product Title',
-      'variations' => [$variation],
     ]);
     $product->save();
+    /** @var \Drupal\commerce_product\Entity\ProductVariationInterface $variation */
+    $variation = ProductVariation::create([
+      'type' => 'default',
+      'product_id' => $product->id(),
+    ]);
+    $variation->save();
     $product = $this->reloadEntity($product);
     $variation = $this->reloadEntity($variation);
+
+    // Confirm that postSave() added the reference on the parent product.
+    $this->assertTrue($product->hasVariation($variation));
 
     $this->assertEquals('default', $variation->getOrderItemTypeId());
     $this->assertEquals('My Product Title', $variation->getOrderItemTitle());
@@ -117,6 +119,11 @@ class ProductVariationTest extends CommerceKernelTestBase {
     $this->assertEquals($this->user->id(), $variation->getOwnerId());
 
     $this->assertEquals($product->getStores(), $variation->getStores());
+
+    // Confirm that deleting the variation deletes the reference.
+    $variation->delete();
+    $product = $this->reloadEntity($product);
+    $this->assertFalse($product->hasVariation($variation));
   }
 
 }

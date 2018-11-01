@@ -97,7 +97,7 @@ class PromotionCartTest extends CommerceKernelTestBase {
       'offer' => [
         'target_plugin_id' => 'order_percentage_off',
         'target_plugin_configuration' => [
-          'amount' => '0.10',
+          'percentage' => '0.10',
         ],
       ],
       'start_date' => '2017-01-01',
@@ -110,7 +110,7 @@ class PromotionCartTest extends CommerceKernelTestBase {
     $cart = $this->cartProvider->createCart('default', $this->store, $user);
     $this->cartManager->addEntity($cart, $variation);
 
-    $this->assertEquals(1, count($cart->getAdjustments()));
+    $this->assertEquals(1, count($cart->collectAdjustments()));
     $this->assertEquals(new Price('9.00', 'USD'), $cart->getTotalPrice());
 
     // Disable the promotion.

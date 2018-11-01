@@ -321,7 +321,7 @@ class Custom extends LocalTaxTypeBase {
         $this->configuration['rates'][] = [
           'id' => $rate['rate']['id'],
           'label' => $rate['rate']['label'],
-          'percentage' => $rate['percentage'] / 100,
+          'percentage' => (string) ($rate['percentage'] / 100),
         ];
       }
       $this->configuration['territories'] = [];
@@ -382,7 +382,7 @@ class Custom extends LocalTaxTypeBase {
     // start/end dates for UX reasons, so a start date is invented here.
     foreach ($rates as &$rate) {
       $rate['percentages'][] = [
-        'number' => $rate['percentage'],
+        'number' => (string) $rate['percentage'],
         'start_date' => '2000-01-01',
       ];
       unset($rate['percentage']);

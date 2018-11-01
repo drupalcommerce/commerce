@@ -58,14 +58,14 @@ class PromotionTest extends CommerceBrowserTestBase {
     $this->getSession()->getPage()->fillField('offer[0][target_plugin_configuration][order_percentage_off][percentage]', '10.0');
 
     // Confirm the integrity of the conditions UI.
-    foreach (['order', 'product', 'customer'] as $condition_group) {
+    foreach (['order', 'products', 'customer'] as $condition_group) {
       $tab_matches = $this->xpath('//a[@href="#edit-conditions-form-' . $condition_group . '"]');
       $this->assertNotEmpty($tab_matches);
     }
     $vertical_tab_elements = $this->xpath('//a[@href="#edit-conditions-form-order"]');
     $vertical_tab_element = reset($vertical_tab_elements);
     $vertical_tab_element->click();
-    $this->getSession()->getPage()->checkField('Limit by total price');
+    $this->getSession()->getPage()->checkField('Current order total');
     $this->waitForAjaxToFinish();
     $this->getSession()->getPage()->fillField('conditions[form][order][order_total_price][configuration][form][amount][number]', '50.00');
 
@@ -79,7 +79,7 @@ class PromotionTest extends CommerceBrowserTestBase {
 
     $this->submitForm([], t('Save'));
     $this->assertSession()->pageTextContains("Saved the $name promotion.");
-    $promotion_count = $this->getSession()->getPage()->find('xpath', '//table/tbody/tr/td[text()="' . $name . '"]');
+    $promotion_count = $this->getSession()->getPage()->findAll('xpath', '//table/tbody/tr/td[text()="' . $name . '"]');
     $this->assertEquals(count($promotion_count), 1, 'promotions exists in the table.');
 
     $promotion = Promotion::load(1);
@@ -123,7 +123,7 @@ class PromotionTest extends CommerceBrowserTestBase {
 
     $this->submitForm($edit, t('Save'));
     $this->assertSession()->pageTextContains("Saved the $name promotion.");
-    $promotion_count = $this->getSession()->getPage()->find('xpath', '//table/tbody/tr/td[text()="' . $name . '"]');
+    $promotion_count = $this->getSession()->getPage()->findAll('xpath', '//table/tbody/tr/td[text()="' . $name . '"]');
     $this->assertEquals(count($promotion_count), 1, 'promotions exists in the table.');
 
     /** @var \Drupal\commerce\Plugin\Field\FieldType\PluginItem $offer_field */
@@ -163,7 +163,7 @@ class PromotionTest extends CommerceBrowserTestBase {
 
     $this->drupalGet($promotion->toUrl('edit-form'));
     $this->assertSession()->pageTextContains('Restricted');
-    $this->assertSession()->checkboxChecked('Limit by total price');
+    $this->assertSession()->checkboxChecked('Current order total');
     $this->assertSession()->fieldValueEquals('conditions[form][order][order_total_price][configuration][form][amount][number]', '9.10');
 
     $new_promotion_name = $this->randomMachineName(8);

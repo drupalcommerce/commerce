@@ -29,6 +29,25 @@ interface ProductTypeInterface extends CommerceBundleEntityInterface, EntityDesc
   public function setVariationTypeId($variation_type_id);
 
   /**
+   * Gets whether products of this type can have multiple variations.
+   *
+   * @return bool
+   *   TRUE if products of this type can have multiple variations,
+   *   FALSE otherwise.
+   */
+  public function allowsMultipleVariations();
+
+  /**
+   * Sets whether products of this type can have multiple variations.
+   *
+   * @param bool $multiple_variations
+   *   Whether products of this type can have multiple variations.
+   *
+   * @return $this
+   */
+  public function setMultipleVariations($multiple_variations);
+
+  /**
    * Gets whether variation fields should be injected into the rendered product.
    *
    * @return bool

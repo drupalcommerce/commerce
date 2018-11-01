@@ -101,7 +101,7 @@ class PaymentAddForm extends FormBase implements ContainerInjectionInterface {
     // @todo
     // Support adding payments to anonymous orders, by adding support for
     // creating payment methods directly on this form.
-    if (!$this->order->getCustomerId()) {
+    if ($this->order->getCustomer()->isAnonymous()) {
       throw new AccessDeniedHttpException();
     }
 

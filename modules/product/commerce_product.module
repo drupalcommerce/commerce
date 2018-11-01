@@ -260,20 +260,16 @@ function commerce_product_add_variations_field(ProductTypeInterface $product_typ
         $product_type->getVariationTypeId(),
       ],
     ])
-    ->setDisplayOptions('form', [
-      'type' => 'inline_entity_form_complex',
-      'weight' => 10,
-      'settings' => [
-        'allow_duplicate' => TRUE,
-        'override_labels' => TRUE,
-        'label_singular' => 'variation',
-        'label_plural' => 'variations',
-      ],
-    ])
     ->setDisplayOptions('view', [
       'type' => 'commerce_add_to_cart',
       'weight' => 10,
     ]);
+  if (!$product_type->allowsMultipleVariations()) {
+    $field_definition->setDisplayOptions('form', [
+      'type' => 'commerce_product_single_variation',
+      'weight' => 2,
+    ]);
+  }
 
   $configurable_field_manager = \Drupal::service('commerce.configurable_field_manager');
   $configurable_field_manager->createField($field_definition);

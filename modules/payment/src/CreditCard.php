@@ -247,7 +247,7 @@ final class CreditCard {
     // Credit cards expire on the last day of the month.
     $month_start = strtotime($year . '-' . $month . '-01');
     $last_day = date('t', $month_start);
-    return strtotime($year . '-' . $month . '-' . $last_day);
+    return mktime(23, 59, 59, $month, $last_day, $year);
   }
 
   /**

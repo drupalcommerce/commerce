@@ -12,7 +12,6 @@ use Drupal\commerce_payment\Entity\PaymentMethodInterface;
  * @CommercePaymentMethodType(
  *   id = "credit_card",
  *   label = @Translation("Credit card"),
- *   create_label = @Translation("New credit card"),
  * )
  */
 class CreditCard extends PaymentMethodTypeBase {

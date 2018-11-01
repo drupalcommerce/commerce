@@ -5,9 +5,9 @@
     "homepage": "http://drupal.org/project/commerce",
     "license": "GPL-2.0+",
     "require": {
-        "drupal/core": "~8.5",
+        "drupal/core": "^8.6",
         "drupal/address": "^1.4",
-        "drupal/entity": "^1.0-beta3",
+        "drupal/entity": "^1.0-rc1",
         "drupal/entity_reference_revisions": "~1.0",
         "drupal/inline_entity_form": "^1.0-rc1",
         "drupal/profile": "~1.0",

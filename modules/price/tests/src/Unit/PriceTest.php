@@ -30,6 +30,29 @@ class PriceTest extends UnitTestCase {
   }
 
   /**
+   * Tests creating a price from an invalid array.
+   *
+   * ::covers __construct.
+   */
+  public function testCreateFromInvalidArray() {
+    $this->setExpectedException(\InvalidArgumentException::class);
+    $price = Price::fromArray([]);
+  }
+
+  /**
+   * Tests creating a price from a valid array.
+   *
+   * ::covers __construct.
+   */
+  public function testCreateFromValidArray() {
+    $price = Price::fromArray(['number' => '10', 'currency_code' => 'USD']);
+    $this->assertEquals('10', $price->getNumber());
+    $this->assertEquals('USD', $price->getCurrencyCode());
+    $this->assertEquals('10 USD', $price->__toString());
+    $this->assertEquals(['number' => '10', 'currency_code' => 'USD'], $price->toArray());
+  }
+
+  /**
    * Tests creating a price with an invalid number.
    *
    * ::covers __construct.
@@ -89,6 +112,8 @@ class PriceTest extends UnitTestCase {
   /**
    * Tests the comparison methods.
    *
+   * ::covers isPositive
+   * ::covers isNegative
    * ::covers isZero
    * ::covers equals
    * ::covers greaterThan
@@ -98,9 +123,19 @@ class PriceTest extends UnitTestCase {
    * ::covers compareTo.
    */
   public function testComparison() {
-    $this->assertEmpty($this->price->isZero());
+    $this->assertTrue($this->price->isPositive());
+    $this->assertFalse($this->price->isNegative());
+    $this->assertFalse($this->price->isZero());
+
+    $negative_price = new Price('-10', 'USD');
+    $this->assertFalse($negative_price->isPositive());
+    $this->assertTrue($negative_price->isNegative());
+    $this->assertFalse($negative_price->isZero());
+
     $zero_price = new Price('0', 'USD');
-    $this->assertNotEmpty($zero_price->isZero());
+    $this->assertFalse($zero_price->isPositive());
+    $this->assertFalse($zero_price->isNegative());
+    $this->assertTrue($zero_price->isZero());
 
     $this->assertNotEmpty($this->price->equals(new Price('10', 'USD')));
     $this->assertEmpty($this->price->equals(new Price('15', 'USD')));

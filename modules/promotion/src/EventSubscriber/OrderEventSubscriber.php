@@ -79,7 +79,11 @@ class OrderEventSubscriber implements EventSubscriberInterface {
       $promotion_id = $adjustment->getSourceId();
       if ($promotion_id && !in_array($promotion_id, $coupon_promotion_ids)) {
         $promotion = $this->promotionStorage->load($promotion_id);
-        $this->usage->register($order, $promotion);
+        // Not every adjustment can be mapped to a promotion (because the
+        // the promotion was deleted, or because the adjustment is custom).
+        if ($promotion) {
+          $this->usage->register($order, $promotion);
+        }
       }
     }
   }

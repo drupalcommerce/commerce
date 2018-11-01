@@ -42,7 +42,7 @@ class OrderAssignment implements OrderAssignmentInterface {
    * {@inheritdoc}
    */
   public function assign(OrderInterface $order, UserInterface $account) {
-    if (!empty($order->getCustomerId())) {
+    if ($order->getCustomer()->isAuthenticated()) {
       // Skip orders which already have a customer.
       return;
     }

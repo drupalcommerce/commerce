@@ -20,6 +20,10 @@ use Symfony\Component\HttpFoundation\Request;
  * creating the payment in onNotify() is preferred, since it is guaranteed to
  * be called even if the customer does not return to the site.
  *
+ * Note that onReturn() will be skipped if onNotify() was called before the
+ * customer returned to the site, completing the payment process and
+ * placing the order.
+ *
  * If the customer declines to provide their payment details, and cancels
  * the payment at the payment provider, they will be redirected back to the
  * cancel url.
@@ -39,6 +43,11 @@ interface OffsitePaymentGatewayInterface extends PaymentGatewayInterface, Suppor
 
   /**
    * Processes the "return" request.
+   *
+   * This method should only be concerned with creating/completing payments,
+   * the parent order does not need to be touched. The order state is updated
+   * automatically when the order is paid in full, or manually by the
+   * merchant (via the admin UI).
    *
    * @param \Drupal\commerce_order\Entity\OrderInterface $order
    *   The order.

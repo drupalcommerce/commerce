@@ -13,7 +13,7 @@ use Drupal\commerce_price\Price;
  * @CommerceCondition(
  *   id = "order_total_price",
  *   label = @Translation("Total price"),
- *   display_label = @Translation("Limit by total price"),
+ *   display_label = @Translation("Current order total"),
  *   category = @Translation("Order"),
  *   entity_type = "commerce_order",
  * )
@@ -78,7 +78,7 @@ class OrderTotalPrice extends ConditionBase {
     /** @var \Drupal\commerce_order\Entity\OrderInterface $order */
     $order = $entity;
     $total_price = $order->getTotalPrice();
-    $condition_price = new Price($this->configuration['amount']['number'], $this->configuration['amount']['currency_code']);
+    $condition_price = Price::fromArray($this->configuration['amount']);
     if ($total_price->getCurrencyCode() != $condition_price->getCurrencyCode()) {
       return FALSE;
     }

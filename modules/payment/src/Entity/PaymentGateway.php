@@ -4,6 +4,7 @@ namespace Drupal\commerce_payment\Entity;
 
 use Drupal\commerce\CommerceSinglePluginCollection;
 use Drupal\commerce\ConditionGroup;
+use Drupal\commerce\Plugin\Commerce\Condition\ParentEntityAwareInterface;
 use Drupal\commerce_order\Entity\OrderInterface;
 use Drupal\Core\Config\Entity\ConfigEntityBase;
 
@@ -188,7 +189,11 @@ class PaymentGateway extends ConfigEntityBase implements PaymentGatewayInterface
     $plugin_manager = \Drupal::service('plugin.manager.commerce_condition');
     $conditions = [];
     foreach ($this->conditions as $condition) {
-      $conditions[] = $plugin_manager->createInstance($condition['plugin'], $condition['configuration']);
+      $condition = $plugin_manager->createInstance($condition['plugin'], $condition['configuration']);
+      if ($condition instanceof ParentEntityAwareInterface) {
+        $condition->setParentEntity($this);
+      }
+      $conditions[] = $condition;
     }
     return $conditions;
   }

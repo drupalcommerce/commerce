@@ -177,7 +177,7 @@ class UsageTest extends CommerceKernelTestBase {
       'offer' => [
         'target_plugin_id' => 'order_percentage_off',
         'target_plugin_configuration' => [
-          'amount' => '0.10',
+          'percentage' => '0.10',
         ],
       ],
       'start_date' => '2017-01-01',
@@ -196,7 +196,7 @@ class UsageTest extends CommerceKernelTestBase {
     $this->order->get('coupons')->appendItem($coupon);
     $this->order->save();
     $this->container->get('commerce_order.order_refresh')->refresh($this->order);
-    $this->assertEquals(2, count($this->order->getAdjustments()));
+    $this->assertEquals(2, count($this->order->collectAdjustments()));
     $this->order->save();
 
     $this->order->getState()->applyTransition($this->order->getState()->getTransitions()['place']);
@@ -226,7 +226,7 @@ class UsageTest extends CommerceKernelTestBase {
       'offer' => [
         'target_plugin_id' => 'order_percentage_off',
         'target_plugin_configuration' => [
-          'amount' => '0.10',
+          'percentage' => '0.10',
         ],
       ],
       'usage_limit' => 1,
@@ -237,7 +237,7 @@ class UsageTest extends CommerceKernelTestBase {
 
     $this->assertTrue($promotion->applies($this->order));
     $this->container->get('commerce_order.order_refresh')->refresh($this->order);
-    $this->assertEquals(1, count($this->order->getAdjustments()));
+    $this->assertEquals(1, count($this->order->collectAdjustments()));
     $this->order->save();
 
     $this->order->getState()->applyTransition($this->order->getState()->getTransitions()['place']);

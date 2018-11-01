@@ -7,6 +7,19 @@ use Drupal\Core\Entity\EntityInterface;
 /**
  * Defines an interface for objects that contain adjustments.
  *
+ * Adjustments store promotions, taxes, fees, shipping costs.
+ * They can be calculated on the order level (based on the order subtotal),
+ * or on the order item level (based on the order item total).
+ *
+ * if $order_item->usesLegacyAdjustments() is true, the order item adjustments
+ * were calculated based on the order item unit price, which was the default
+ * logic prior to Commerce 2.8, changed in #2980713.
+ *
+ * Adjustments are always displayed in the order total summary, below
+ * the subtotal. They are not shown as a part of the order item prices.
+ * To get the order item total price with adjustments included, use
+ * $order_item->getAdjustedTotalPrice().
+ *
  * @see \Drupal\commerce_order\Entity\OrderInterfaceEntity
  * @see \Drupal\commerce_order\Entity\OrderItemInterfaceEntity
  */

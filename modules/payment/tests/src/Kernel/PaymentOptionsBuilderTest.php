@@ -237,7 +237,7 @@ class PaymentOptionsBuilderTest extends CommerceKernelTestBase {
 
     // Add new payment method.
     $this->assertEquals('new--credit_card--onsite', $options[2]->getId());
-    $this->assertEquals('New credit card', $options[2]->getLabel());
+    $this->assertEquals('Credit card', $options[2]->getLabel());
     $this->assertEquals('onsite', $options[2]->getPaymentGatewayId());
     $this->assertNull($options[2]->getPaymentMethodId());
     $this->assertEquals('credit_card', $options[2]->getPaymentMethodTypeId());
@@ -284,13 +284,13 @@ class PaymentOptionsBuilderTest extends CommerceKernelTestBase {
     $this->assertCount(2, $options);
 
     $this->assertEquals('new--credit_card--first_onsite', $options[0]->getId());
-    $this->assertEquals('New credit card (Example)', $options[0]->getLabel());
+    $this->assertEquals('Credit card (Example)', $options[0]->getLabel());
     $this->assertEquals('first_onsite', $options[0]->getPaymentGatewayId());
     $this->assertNull($options[0]->getPaymentMethodId());
     $this->assertEquals('credit_card', $options[0]->getPaymentMethodTypeId());
 
     $this->assertEquals('new--credit_card--second_onsite', $options[1]->getId());
-    $this->assertEquals('New credit card (Test)', $options[1]->getLabel());
+    $this->assertEquals('Credit card (Test)', $options[1]->getLabel());
     $this->assertEquals('second_onsite', $options[1]->getPaymentGatewayId());
     $this->assertNull($options[1]->getPaymentMethodId());
     $this->assertEquals('credit_card', $options[1]->getPaymentMethodTypeId());

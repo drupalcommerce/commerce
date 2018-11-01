@@ -9,13 +9,17 @@ use Drupal\Core\Entity\EntityInterface;
 /**
  * Provides the fixed amount off offer for orders.
  *
+ * The discount is split between order items, to simplify VAT taxes and refunds.
+ *
  * @CommercePromotionOffer(
  *   id = "order_fixed_amount_off",
  *   label = @Translation("Fixed amount off the order subtotal"),
  *   entity_type = "commerce_order",
  * )
  */
-class OrderFixedAmountOff extends FixedAmountOffBase {
+class OrderFixedAmountOff extends OrderPromotionOfferBase {
+
+  use FixedAmountOffTrait;
 
   /**
    * {@inheritdoc}
@@ -25,23 +29,29 @@ class OrderFixedAmountOff extends FixedAmountOffBase {
     /** @var \Drupal\commerce_order\Entity\OrderInterface $order */
     $order = $entity;
     $subtotal_price = $order->getSubTotalPrice();
-    $adjustment_amount = $this->getAmount();
-    if ($subtotal_price->getCurrencyCode() != $adjustment_amount->getCurrencyCode()) {
+    $amount = $this->getAmount();
+    if ($subtotal_price->getCurrencyCode() != $amount->getCurrencyCode()) {
       return;
     }
     // The promotion amount can't be larger than the subtotal, to avoid
     // potentially having a negative order total.
-    if ($adjustment_amount->greaterThan($subtotal_price)) {
-      $adjustment_amount = $subtotal_price;
+    if ($amount->greaterThan($subtotal_price)) {
+      $amount = $subtotal_price;
     }
+    // Split the amount between order items.
+    $amounts = $this->splitter->split($order, $amount);
 
-    $order->addAdjustment(new Adjustment([
-      'type' => 'promotion',
-      // @todo Change to label from UI when added in #2770731.
-      'label' => t('Discount'),
-      'amount' => $adjustment_amount->multiply('-1'),
-      'source_id' => $promotion->id(),
-    ]));
+    foreach ($order->getItems() as $order_item) {
+      if (isset($amounts[$order_item->id()])) {
+        $order_item->addAdjustment(new Adjustment([
+          'type' => 'promotion',
+          // @todo Change to label from UI when added in #2770731.
+          'label' => t('Discount'),
+          'amount' => $amounts[$order_item->id()]->multiply('-1'),
+          'source_id' => $promotion->id(),
+        ]));
+      }
+    }
   }
 
 }

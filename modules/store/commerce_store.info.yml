@@ -7,6 +7,7 @@ dependencies:
   - commerce:commerce
   - commerce:commerce_price
   - drupal:options
+  - drupal:path
 config_devel:
   install:
     - commerce_store.commerce_store_type.online

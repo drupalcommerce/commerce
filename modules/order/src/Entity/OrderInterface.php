@@ -3,6 +3,7 @@
 namespace Drupal\commerce_order\Entity;
 
 use Drupal\commerce_order\EntityAdjustableInterface;
+use Drupal\commerce_price\Price;
 use Drupal\commerce_store\Entity\StoreInterface;
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\EntityChangedInterface;
@@ -76,8 +77,10 @@ interface OrderInterface extends ContentEntityInterface, EntityAdjustableInterfa
   /**
    * Gets the customer user.
    *
-   * @return \Drupal\user\UserInterface|null
-   *   The customer user entity, or NULL in case the order is anonymous,
+   * @return \Drupal\user\UserInterface
+   *   The customer user entity. If the order is anonymous (customer
+   *   unspecified or deleted), an anonymous user will be returned. Use
+   *   $customer->isAnonymous() to check.
    */
   public function getCustomer();
 
@@ -94,8 +97,8 @@ interface OrderInterface extends ContentEntityInterface, EntityAdjustableInterfa
   /**
    * Gets the customer user ID.
    *
-   * @return int|null
-   *   The customer user ID, or NULL in case the order is anonymous.
+   * @return int
+   *   The customer user ID ('0' if anonymous).
    */
   public function getCustomerId();
 
@@ -234,8 +237,7 @@ interface OrderInterface extends ContentEntityInterface, EntityAdjustableInterfa
    * Collects all adjustments that belong to the order.
    *
    * Unlike getAdjustments() which returns only order adjustments, this
-   * method returns both order and order item adjustments (multiplied
-   * by quantity).
+   * method returns both order and order item adjustments.
    *
    * Important:
    * The returned adjustments are unprocessed, and must be processed before use.
@@ -273,6 +275,47 @@ interface OrderInterface extends ContentEntityInterface, EntityAdjustableInterfa
    *   The order total price, or NULL.
    */
   public function getTotalPrice();
+
+  /**
+   * Gets the total paid price.
+   *
+   * @return \Drupal\commerce_price\Price|null
+   *   The total paid price, or NULL.
+   */
+  public function getTotalPaid();
+
+  /**
+   * Sets the total paid price.
+   *
+   * @param \Drupal\commerce_price\Price $total_paid
+   *   The total paid price.
+   */
+  public function setTotalPaid(Price $total_paid);
+
+  /**
+   * Gets the order balance.
+   *
+   * Calculated by subtracting the total paid price from the total price.
+   * Can be negative in case the order was overpaid.
+   *
+   * @return \Drupal\commerce_price\Price|null
+   *   The order balance, or NULL.
+   */
+  public function getBalance();
+
+  /**
+   * Gets whether the order has been fully paid.
+   *
+   * Free orders (total price is zero) are considered fully paid once
+   * they have been placed.
+   *
+   * Non-free orders are considered fully paid once their balance
+   * becomes zero or negative.
+   *
+   * @return bool
+   *   TRUE if the order has been fully paid, FALSE otherwise.
+   */
+  public function isPaid();
 
   /**
    * Gets the order state.

@@ -19,6 +19,11 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 /**
  * Provides the payment information pane.
  *
+ * Disabling this pane will automatically disable the payment process pane,
+ * since they are always used together. Developers subclassing this pane
+ * should use hook_commerce_checkout_pane_info_alter(array &$panes) to
+ * point $panes['payment_information']['class'] to the new child class.
+ *
  * @CommerceCheckoutPane(
  *   id = "payment_information",
  *   label = @Translation("Payment information"),
@@ -98,14 +103,16 @@ class PaymentInformation extends CheckoutPaneBase {
    */
   public function buildPaneSummary() {
     $billing_profile = $this->order->getBillingProfile();
-    if ($this->order->getTotalPrice()->isZero() && $billing_profile) {
-      // Only the billing information was collected.
-      $view_builder = $this->entityTypeManager->getViewBuilder('profile');
-      $summary = [
-        '#title' => $this->t('Billing information'),
-        'profile' => $view_builder->view($billing_profile, 'default'),
-      ];
-      return $summary;
+    if ($this->order->isPaid() || $this->order->getTotalPrice()->isZero()) {
+      if ($billing_profile) {
+        // Only the billing information was collected.
+        $view_builder = $this->entityTypeManager->getViewBuilder('profile');
+        $summary = [
+          '#title' => $this->t('Billing information'),
+          'profile' => $view_builder->view($billing_profile, 'default'),
+        ];
+        return $summary;
+      }
     }
 
     $summary = [];
@@ -136,8 +143,9 @@ class PaymentInformation extends CheckoutPaneBase {
    * {@inheritdoc}
    */
   public function buildPaneForm(array $pane_form, FormStateInterface $form_state, array &$complete_form) {
-    if ($this->order->getTotalPrice()->isZero()) {
-      // Free orders don't need payment, collect just the billing information.
+    if ($this->order->isPaid() || $this->order->getTotalPrice()->isZero()) {
+      // No payment is needed if the order is free or has already been paid.
+      // In that case, collect just the billing information.
       $pane_form['#title'] = $this->t('Billing information');
       $pane_form = $this->buildBillingProfileForm($pane_form, $form_state);
       return $pane_form;
@@ -291,7 +299,7 @@ class PaymentInformation extends CheckoutPaneBase {
    * {@inheritdoc}
    */
   public function validatePaneForm(array &$pane_form, FormStateInterface $form_state, array &$complete_form) {
-    if ($this->order->getTotalPrice()->isZero()) {
+    if ($this->order->isPaid() || $this->order->getTotalPrice()->isZero()) {
       return;
     }
 
@@ -305,7 +313,7 @@ class PaymentInformation extends CheckoutPaneBase {
    * {@inheritdoc}
    */
   public function submitPaneForm(array &$pane_form, FormStateInterface $form_state, array &$complete_form) {
-    if ($this->order->getTotalPrice()->isZero()) {
+    if ($this->order->isPaid() || $this->order->getTotalPrice()->isZero()) {
       $this->order->setBillingProfile($pane_form['billing_information']['#profile']);
       return;
     }

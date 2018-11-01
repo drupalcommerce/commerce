@@ -2,10 +2,10 @@
 
 namespace Drupal\commerce_product\Plugin\Commerce\Condition;
 
+use Drupal\commerce\EntityUuidMapperInterface;
 use Drupal\commerce\Plugin\Commerce\Condition\ConditionBase;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
-use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -15,19 +15,15 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * @CommerceCondition(
  *   id = "order_item_product",
  *   label = @Translation("Product"),
- *   display_label = @Translation("Limit by product"),
- *   category = @Translation("Product"),
+ *   display_label = @Translation("Specific products"),
+ *   category = @Translation("Products"),
  *   entity_type = "commerce_order_item",
+ *   weight = -1,
  * )
  */
 class OrderItemProduct extends ConditionBase implements ContainerFactoryPluginInterface {
 
-  /**
-   * The product storage.
-   *
-   * @var \Drupal\Core\Entity\EntityStorageInterface
-   */
-  protected $productStorage;
+  use ProductTrait;
 
   /**
    * Constructs a new OrderItemProduct object.
@@ -41,11 +37,14 @@ class OrderItemProduct extends ConditionBase implements ContainerFactoryPluginIn
    *   The plugin implementation definition.
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
+   * @param \Drupal\commerce\EntityUuidMapperInterface $entity_uuid_mapper
+   *   The entity UUID mapper.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityTypeManagerInterface $entity_type_manager) {
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityTypeManagerInterface $entity_type_manager, EntityUuidMapperInterface $entity_uuid_mapper) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
 
     $this->productStorage = $entity_type_manager->getStorage('commerce_product');
+    $this->entityUuidMapper = $entity_uuid_mapper;
   }
 
   /**
@@ -56,55 +55,9 @@ class OrderItemProduct extends ConditionBase implements ContainerFactoryPluginIn
       $configuration,
       $plugin_id,
       $plugin_definition,
-      $container->get('entity_type.manager')
+      $container->get('entity_type.manager'),
+      $container->get('commerce.entity_uuid_mapper')
     );
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function defaultConfiguration() {
-    return [
-      'products' => [],
-    ] + parent::defaultConfiguration();
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function buildConfigurationForm(array $form, FormStateInterface $form_state) {
-    $form = parent::buildConfigurationForm($form, $form_state);
-
-    $products = NULL;
-    $product_ids = array_column($this->configuration['products'], 'product_id');
-    if (!empty($product_ids)) {
-      $products = $this->productStorage->loadMultiple($product_ids);
-    }
-    $form['products'] = [
-      '#type' => 'entity_autocomplete',
-      '#title' => $this->t('Products'),
-      '#default_value' => $products,
-      '#target_type' => 'commerce_product',
-      '#tags' => TRUE,
-      '#required' => TRUE,
-    ];
-
-    return $form;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function submitConfigurationForm(array &$form, FormStateInterface $form_state) {
-    parent::submitConfigurationForm($form, $form_state);
-
-    $values = $form_state->getValue($form['#parents']);
-    $this->configuration['products'] = [];
-    foreach ($values['products'] as $value) {
-      $this->configuration['products'][] = [
-        'product_id' => $value['target_id'],
-      ];
-    }
   }
 
   /**
@@ -114,14 +67,14 @@ class OrderItemProduct extends ConditionBase implements ContainerFactoryPluginIn
     $this->assertEntity($entity);
     /** @var \Drupal\commerce_order\Entity\OrderItemInterface $order_item */
     $order_item = $entity;
-    /** @var \Drupal\commerce_product\Entity\ProductVariationInterface $purchasable_entity */
-    $purchasable_entity = $order_item->getPurchasedEntity();
-    if (!$purchasable_entity || $purchasable_entity->getEntityTypeId() != 'commerce_product_variation') {
+    /** @var \Drupal\commerce_product\Entity\ProductVariationInterface $purchased_entity */
+    $purchased_entity = $order_item->getPurchasedEntity();
+    if (!$purchased_entity || $purchased_entity->getEntityTypeId() != 'commerce_product_variation') {
       return FALSE;
     }
-    $product_ids = array_column($this->configuration['products'], 'product_id');
+    $product_ids = $this->getProductIds();
 
-    return in_array($purchasable_entity->getProductId(), $product_ids);
+    return in_array($purchased_entity->getProductId(), $product_ids);
   }
 
 }

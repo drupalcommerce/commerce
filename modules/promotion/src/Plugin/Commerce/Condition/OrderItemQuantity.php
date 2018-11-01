@@ -1,23 +1,34 @@
 <?php
 
-namespace Drupal\commerce_order\Plugin\Commerce\Condition;
+namespace Drupal\commerce_promotion\Plugin\Commerce\Condition;
 
+use Drupal\commerce\ConditionGroup;
 use Drupal\commerce\Plugin\Commerce\Condition\ConditionBase;
+use Drupal\commerce\Plugin\Commerce\Condition\ParentEntityAwareInterface;
+use Drupal\commerce\Plugin\Commerce\Condition\ParentEntityAwareTrait;
+use Drupal\commerce_price\Calculator;
+use Drupal\commerce_promotion\Plugin\Commerce\PromotionOffer\OrderItemPromotionOfferInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Form\FormStateInterface;
 
 /**
- * Provides the quantity condition for order items.
+ * Provides the total discounted product quantity condition.
+ *
+ * Implemented as an order condition to be able to count products across
+ * non-combined order items.
  *
  * @CommerceCondition(
  *   id = "order_item_quantity",
- *   label = @Translation("Quantity"),
- *   display_label = @Translation("Limit by quantity"),
- *   category = @Translation("Product"),
- *   entity_type = "commerce_order_item",
+ *   label = @Translation("Total discounted product quantity"),
+ *   category = @Translation("Products"),
+ *   entity_type = "commerce_order",
+ *   parent_entity_type = "commerce_promotion",
+ *   weight = 10,
  * )
  */
-class OrderItemQuantity extends ConditionBase {
+class OrderItemQuantity extends ConditionBase implements ParentEntityAwareInterface {
+
+  use ParentEntityAwareTrait;
 
   /**
    * {@inheritdoc}
@@ -69,9 +80,24 @@ class OrderItemQuantity extends ConditionBase {
    */
   public function evaluate(EntityInterface $entity) {
     $this->assertEntity($entity);
-    /** @var \Drupal\commerce_order\Entity\OrderItemInterface $order_item */
-    $order_item = $entity;
-    $quantity = $order_item->getQuantity();
+    /** @var \Drupal\commerce_order\Entity\OrderInterface $order */
+    $order = $entity;
+    /** @var \Drupal\commerce_promotion\Entity\PromotionInterface $promotion */
+    $promotion = $this->parentEntity;
+    $offer = $promotion->getOffer();
+
+    $quantity = '0';
+    foreach ($order->getItems() as $order_item) {
+      // If the offer has conditions, skip order items that don't match.
+      if ($offer instanceof OrderItemPromotionOfferInterface) {
+        $conditions = $offer->getConditions();
+        $condition_group = new ConditionGroup($conditions, 'OR');
+        if (!$condition_group->evaluate($order_item)) {
+          continue;
+        }
+      }
+      $quantity = Calculator::add($quantity, $order_item->getQuantity());
+    }
 
     switch ($this->configuration['operator']) {
       case '>=':

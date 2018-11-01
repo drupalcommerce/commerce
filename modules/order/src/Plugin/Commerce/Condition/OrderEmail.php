@@ -11,8 +11,7 @@ use Drupal\Core\Form\FormStateInterface;
  *
  * @CommerceCondition(
  *   id = "order_email",
- *   label = @Translation("Email"),
- *   display_label = @Translation("Limit by email"),
+ *   label = @Translation("Customer email"),
  *   category = @Translation("Customer"),
  *   entity_type = "commerce_order",
  * )

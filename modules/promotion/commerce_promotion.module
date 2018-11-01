@@ -11,6 +11,20 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\Element;
 
 /**
+ * Implements hook_commerce_condition_info_alter().
+ */
+function commerce_promotion_commerce_condition_info_alter(&$definitions) {
+  foreach ($definitions as &$definition) {
+    // Force all order item conditions to have the same category.
+    // This prevents them from accidentally showing in vertical tabs
+    // in the promotion offer UI.
+    if ($definition['entity_type'] == 'commerce_order_item') {
+      $definition['category'] = t('Products');
+    }
+  }
+}
+
+/**
  * Implements hook_theme().
  */
 function commerce_promotion_theme() {

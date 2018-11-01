@@ -7,7 +7,7 @@ use Drupal\commerce_order\Entity\OrderType;
 use Drupal\commerce_price\RounderInterface;
 use Drupal\commerce_promotion\Entity\Coupon;
 use Drupal\commerce_promotion\Entity\Promotion;
-use Drupal\commerce_promotion\Plugin\Commerce\PromotionOffer\OrderPercentageOff;
+use Drupal\commerce_promotion\Plugin\Commerce\PromotionOffer\OrderItemPercentageOff;
 use Drupal\Core\Datetime\DrupalDateTime;
 use Drupal\Tests\commerce\Kernel\CommerceKernelTestBase;
 
@@ -118,7 +118,7 @@ class PromotionTest extends CommerceKernelTestBase {
     $this->assertEquals([$this->store->id()], $promotion->getStoreIds());
 
     $rounder = $this->prophesize(RounderInterface::class)->reveal();
-    $offer = new OrderPercentageOff(['percentage' => '0.5'], 'order_percentage_off', [], $rounder);
+    $offer = new OrderItemPercentageOff(['percentage' => '0.5'], 'order_percentage_off', [], $rounder);
     $promotion->setOffer($offer);
     $this->assertEquals($offer->getPluginId(), $promotion->getOffer()->getPluginId());
     $this->assertEquals($offer->getConfiguration(), $promotion->getOffer()->getConfiguration());

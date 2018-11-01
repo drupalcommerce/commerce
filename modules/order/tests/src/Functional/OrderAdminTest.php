@@ -4,6 +4,7 @@ namespace Drupal\Tests\commerce_order\Functional;
 
 use Drupal\commerce_order\Adjustment;
 use Drupal\commerce_order\Entity\Order;
+use Drupal\commerce_order\Entity\OrderItem;
 use Drupal\commerce_price\Price;
 use Drupal\profile\Entity\Profile;
 
@@ -39,8 +40,6 @@ class OrderAdminTest extends OrderBrowserTestBase {
 
   /**
    * Tests creating/editing an Order.
-   *
-   * @group failing
    */
   public function testCreateOrder() {
     // Create an order through the add form.
@@ -117,7 +116,7 @@ class OrderAdminTest extends OrderBrowserTestBase {
     $this->assertSession()->pageTextContains('The order has been successfully saved.');
 
     $this->drupalGet('/admin/commerce/orders');
-    $order_number = $this->getSession()->getPage()->find('css', 'tr td.views-field-order-number');
+    $order_number = $this->getSession()->getPage()->findAll('css', 'tr td.views-field-order-number');
     $this->assertEquals(1, count($order_number), 'Order exists in the table.');
 
     $order = Order::load(1);
@@ -159,6 +158,50 @@ class OrderAdminTest extends OrderBrowserTestBase {
     $this->assertSession()->fieldValueEquals('adjustments[1][definition][label]', 'Handling fee');
     $this->assertSession()->optionExists('adjustments[2][type]', 'Custom');
     $this->assertSession()->optionNotExists('adjustments[2][type]', 'Test order adjustment type');
+  }
+
+  /**
+   * Tests editing an order after the customer was deleted.
+   */
+  public function testEditOrderWithDeletedCustomer() {
+    $customer = $this->drupalCreateUser();
+    // The profile is not associated with the customer to avoid #2995300.
+    $profile = Profile::create([
+      'type' => 'customer',
+      'address' => [
+        'country_code' => 'US',
+        'postal_code' => '53177',
+        'locality' => 'Milwaukee',
+        'address_line1' => 'Pabst Blue Ribbon Dr',
+        'administrative_area' => 'WI',
+        'given_name' => 'Frederick',
+        'family_name' => 'Pabst',
+      ],
+    ]);
+    $profile->save();
+    $order_item = OrderItem::create([
+      'type' => 'default',
+      'unit_price' => [
+        'number' => '999',
+        'currency_code' => 'USD',
+      ],
+    ]);
+    $order_item->save();
+    $order = Order::create([
+      'type' => 'default',
+      'state' => 'completed',
+      'uid' => $customer->id(),
+      'store_id' => $this->store,
+      'billing_profile' => $profile,
+      'order_items' => [$order_item],
+    ]);
+    $order->save();
+    $customer->delete();
+
+    $this->drupalGet($order->toUrl('edit-form'));
+    $this->assertSession()->statusCodeEquals(200);
+    $this->submitForm([], 'Save');
+    $this->assertSession()->pageTextContains('The order has been successfully saved.');
   }
 
   /**

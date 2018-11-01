@@ -36,7 +36,6 @@ class CheckoutOrderManagerTest extends CommerceKernelTestBase {
    * @var array
    */
   public static $modules = [
-    'path',
     'entity_reference_revisions',
     'profile',
     'state_machine',
@@ -87,6 +86,11 @@ class CheckoutOrderManagerTest extends CommerceKernelTestBase {
    * Tests getting the order's checkout flow.
    */
   public function testGetCheckoutFlow() {
+    $checkout_flow = $this->checkoutOrderManager->getCheckoutFlow($this->order);
+    $this->assertInstanceOf(CheckoutFlow::class, $checkout_flow);
+    $this->assertEquals('default', $checkout_flow->id());
+
+    $this->order->checkout_flow->target_id = 'deleted';
     $checkout_flow = $this->checkoutOrderManager->getCheckoutFlow($this->order);
     $this->assertInstanceOf(CheckoutFlow::class, $checkout_flow);
     $this->assertEquals('default', $checkout_flow->id());

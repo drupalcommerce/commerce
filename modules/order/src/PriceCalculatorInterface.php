@@ -45,7 +45,7 @@ interface PriceCalculatorInterface {
    *   The quantity.
    * @param \Drupal\commerce\Context $context
    *   The context.
-   * @param array $adjustment_types
+   * @param string[] $adjustment_types
    *   The adjustment types to include in the calculated price.
    *   Examples: fee, promotion, tax.
    *

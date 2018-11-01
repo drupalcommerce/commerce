@@ -119,21 +119,6 @@ interface OrderItemInterface extends ContentEntityInterface, EntityAdjustableInt
   public function isUnitPriceOverridden();
 
   /**
-   * Gets the adjusted order item unit price.
-   *
-   * The adjusted unit price is calculated by applying the order item's
-   * adjustments to the unit price. This includes promotions, taxes, fees, etc.
-   *
-   * Adjustments are usually included only in the order total price, but
-   * knowing the adjusted unit prices for each order item can be useful for
-   * refunds and other purposes.
-   *
-   * @return \Drupal\commerce_price\Price|null
-   *   The adjusted order item unit price, or NULL.
-   */
-  public function getAdjustedUnitPrice();
-
-  /**
    * Gets the order item total price.
    *
    * @return \Drupal\commerce_price\Price|null
@@ -142,14 +127,47 @@ interface OrderItemInterface extends ContentEntityInterface, EntityAdjustableInt
   public function getTotalPrice();
 
   /**
+   * Gets whether the order item uses legacy adjustments.
+   *
+   * Indicates that the adjustments were calculated based on the unit price,
+   * which was the default logic prior to Commerce 2.8, changed in #2980713.
+   *
+   * @return bool
+   *   TRUE if the order item uses legacy adjustments, FALSE otherwise.
+   */
+  public function usesLegacyAdjustments();
+
+  /**
    * Gets the adjusted order item total price.
    *
-   * Calculated by multiplying the adjusted unit price by quantity.
+   * The adjusted total price is calculated by applying the order item's
+   * adjustments to the total price. This can include promotions, taxes, etc.
+   *
+   * @param string[] $adjustment_types
+   *   The adjustment types to include in the adjusted price.
+   *   Examples: fee, promotion, tax. Defaults to all adjustment types.
    *
    * @return \Drupal\commerce_price\Price|null
    *   The adjusted order item total price, or NULL.
    */
-  public function getAdjustedTotalPrice();
+  public function getAdjustedTotalPrice(array $adjustment_types = []);
+
+  /**
+   * Gets the adjusted order item unit price.
+   *
+   * Calculated by dividing the adjusted total price by quantity.
+   *
+   * Useful for refunds and other purposes where there's a need to know
+   * how much a single unit contributed to the order total.
+   *
+   * @param string[] $adjustment_types
+   *   The adjustment types to include in the adjusted price.
+   *   Examples: fee, promotion, tax. Defaults to all adjustment types.
+   *
+   * @return \Drupal\commerce_price\Price|null
+   *   The adjusted order item unit price, or NULL.
+   */
+  public function getAdjustedUnitPrice(array $adjustment_types = []);
 
   /**
    * Gets an order item data value with the given key.

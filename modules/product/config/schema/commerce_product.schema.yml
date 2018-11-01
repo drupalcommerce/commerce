@@ -1,4 +1,4 @@
-commerce.commerce_condition.plugin.order_item_product:
+commerce.commerce_condition.plugin.order_product:
   type: commerce_condition_configuration
   mapping:
     products:
@@ -7,10 +7,28 @@ commerce.commerce_condition.plugin.order_item_product:
       sequence:
         type: mapping
         mapping:
-          product_id:
-            type: integer
+          product:
+            type: uuid
+            label: 'Product'
 
-commerce.commerce_condition.plugin.order_item_product_type:
+commerce.commerce_condition.plugin.order_item_product:
+  type: commerce.commerce_condition.plugin.order_product
+
+commerce.commerce_condition.plugin.order_product_category:
+  type: commerce_condition_configuration
+  mapping:
+    terms:
+      type: sequence
+      label: 'Categories'
+      orderby: value
+      sequence:
+        type: uuid
+        label: 'Category'
+
+commerce.commerce_condition.plugin.order_item_product_category:
+  type: commerce.commerce_condition.plugin.order_product_category
+
+commerce.commerce_condition.plugin.order_product_type:
   type: commerce_condition_configuration
   mapping:
     product_types:
@@ -21,7 +39,10 @@ commerce.commerce_condition.plugin.order_item_product_type:
         type: string
         label: 'Product type'
 
-commerce.commerce_condition.plugin.order_item_variation_type:
+commerce.commerce_condition.plugin.order_item_product_type:
+  type: commerce.commerce_condition.plugin.order_product_type
+
+commerce.commerce_condition.plugin.order_variation_type:
   type: commerce_condition_configuration
   mapping:
     variation_types:
@@ -31,6 +52,9 @@ commerce.commerce_condition.plugin.order_item_variation_type:
       sequence:
         type: string
         label: 'Product variation type'
+
+commerce.commerce_condition.plugin.order_item_variation_type:
+  type: commerce.commerce_condition.plugin.order_variation_type
 
 commerce_product.commerce_product_type.*:
   type: commerce_config_entity_bundle
@@ -42,6 +66,9 @@ commerce_product.commerce_product_type.*:
     variationType:
       type: string
       label: 'Variation type'
+    multipleVariations:
+      type: boolean
+      label: 'Allow each product to have multiple variations'
     injectVariationFields:
       type: boolean
       label: 'Inject product variation fields into the rendered product'

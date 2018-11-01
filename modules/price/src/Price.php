@@ -42,6 +42,21 @@ final class Price {
   }
 
   /**
+   * Creates a new price from the given array.
+   *
+   * @param array $price
+   *   The price array, with the "number" and "currency_code" keys.
+   *
+   * @return static
+   */
+  public static function fromArray(array $price) {
+    if (!isset($price['number'], $price['currency_code'])) {
+      throw new \InvalidArgumentException('Price::fromArray() called with a malformed array.');
+    }
+    return new static($price['number'], $price['currency_code']);
+  }
+
+  /**
    * Gets the number.
    *
    * @return string
@@ -167,6 +182,26 @@ final class Price {
   public function compareTo(Price $price) {
     $this->assertSameCurrency($this, $price);
     return Calculator::compare($this->number, $price->getNumber());
+  }
+
+  /**
+   * Gets whether the current price is positive.
+   *
+   * @return bool
+   *   TRUE if the price is positive, FALSE otherwise.
+   */
+  public function isPositive() {
+    return Calculator::compare($this->number, '0') == 1;
+  }
+
+  /**
+   * Gets whether the current price is negative.
+   *
+   * @return bool
+   *   TRUE if the price is negative, FALSE otherwise.
+   */
+  public function isNegative() {
+    return Calculator::compare($this->number, '0') == -1;
   }
 
   /**

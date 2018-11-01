@@ -15,6 +15,6 @@ services:
 
   commerce_tax.tax_order_processor:
     class: Drupal\commerce_tax\TaxOrderProcessor
-    arguments: ['@entity_type.manager']
+    arguments: ['@entity_type.manager', '@commerce_price.rounder', '@commerce_tax.chain_tax_rate_resolver']
     tags:
-      - { name: commerce_order.order_processor, priority: 100, adjustment_type: tax }
+      - { name: commerce_order.order_processor, priority: 50, adjustment_type: tax }

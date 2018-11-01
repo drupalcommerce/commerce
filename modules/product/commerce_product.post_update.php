@@ -138,3 +138,41 @@ function commerce_product_post_update_5() {
     }
   }
 }
+
+/**
+ * Grants the "manage variations" permission to roles that can update products.
+ */
+function commerce_product_post_update_6() {
+  $entity_type_manager = \Drupal::entityTypeManager();
+  /** @var \Drupal\commerce_product\Entity\ProductTypeInterface[] $product_types */
+  $product_types = $entity_type_manager->getStorage('commerce_product_type')->loadMultiple();
+  /** @var \Drupal\user\RoleInterface[] $roles */
+  $roles = $entity_type_manager->getStorage('user_role')->loadMultiple();
+
+  foreach ($roles as $role) {
+    foreach ($product_types as $product_type) {
+      // If the role had any update permission, grant the manage permission.
+      if (
+        $role->hasPermission("update any {$product_type->id()} commerce_product") ||
+        $role->hasPermission("update own {$product_type->id()} commerce_product")
+      ) {
+        $role->grantPermission("manage {$product_type->getVariationTypeId()} commerce_product_variation");
+      }
+    }
+    $role->save();
+  }
+}
+
+/**
+ * Move the variations form to its own tab.
+ */
+function commerce_product_post_update_7() {
+  $entity_type_manager = \Drupal::entityTypeManager();
+  /** @var \Drupal\commerce_product\Entity\ProductTypeInterface[] $product_types */
+  $product_types = $entity_type_manager->getStorage('commerce_product_type')->loadMultiple();
+  foreach ($product_types as $product_type) {
+    $form_display = commerce_get_entity_display('commerce_product', $product_type->id(), 'form');
+    $form_display->removeComponent('variations');
+    $form_display->save();
+  }
+}

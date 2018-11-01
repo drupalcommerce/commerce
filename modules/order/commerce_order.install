@@ -6,6 +6,15 @@
  */
 
 use Drupal\Core\Field\BaseFieldDefinition;
+use Drupal\Core\Session\AccountInterface;
+
+/**
+ * Implements hook_install().
+ */
+function commerce_order_install() {
+  // Allow authenticated users to view own orders.
+  user_role_grant_permissions(AccountInterface::AUTHENTICATED_ROLE, ['view own commerce_order']);
+}
 
 /**
  * Add the 'data' field to 'commerce_order_item' entities.
@@ -46,4 +55,35 @@ function commerce_order_update_8203() {
 
   $update_manager = \Drupal::entityDefinitionUpdateManager();
   $update_manager->installFieldStorageDefinition('locked', 'commerce_order', 'commerce_order', $storage_definition);
+}
+
+/**
+ * Add the 'uses_legacy_adjustments' field to 'commerce_order_item' entities.
+ */
+function commerce_order_update_8204() {
+  $storage_definition = BaseFieldDefinition::create('boolean')
+    ->setLabel(t('Uses legacy adjustments'))
+    ->setSettings([
+      'on_label' => t('Yes'),
+      'off_label' => t('No'),
+    ])
+    ->setDefaultValue(FALSE)
+    ->setInitialValue(TRUE);
+
+  $update_manager = \Drupal::entityDefinitionUpdateManager();
+  $update_manager->installFieldStorageDefinition('uses_legacy_adjustments', 'commerce_order_item', 'commerce_order', $storage_definition);
+}
+
+/**
+ * Add the 'total_paid' field to 'commerce_order' entities.
+ */
+function commerce_order_update_8205() {
+  $storage_definition = BaseFieldDefinition::create('commerce_price')
+    ->setLabel(t('Total paid'))
+    ->setDescription(t('The total paid price of the order.'))
+    ->setDisplayConfigurable('form', FALSE)
+    ->setDisplayConfigurable('view', TRUE);
+
+  $update_manager = \Drupal::entityDefinitionUpdateManager();
+  $update_manager->installFieldStorageDefinition('total_paid', 'commerce_order', 'commerce_order', $storage_definition);
 }

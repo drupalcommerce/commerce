@@ -124,6 +124,9 @@ class ProductVariationAttributeMapperTest extends CommerceKernelTestBase {
       '2tb' => '2TB',
       '3tb' => '3TB',
     ], FALSE);
+
+    $user = $this->createUser([], ['administer commerce_product']);
+    $this->container->get('current_user')->setAccount($user);
   }
 
   /**

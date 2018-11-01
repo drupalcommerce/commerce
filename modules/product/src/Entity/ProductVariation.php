@@ -30,18 +30,30 @@ use Drupal\user\UserInterface;
  *   handlers = {
  *     "event" = "Drupal\commerce_product\Event\ProductVariationEvent",
  *     "storage" = "Drupal\commerce_product\ProductVariationStorage",
- *     "access" = "Drupal\commerce\EmbeddedEntityAccessControlHandler",
+ *     "access" = "Drupal\commerce_product\ProductVariationAccessControlHandler",
+ *     "permission_provider" = "Drupal\commerce_product\ProductVariationPermissionProvider",
  *     "view_builder" = "Drupal\Core\Entity\EntityViewBuilder",
+ *     "list_builder" = "Drupal\commerce_product\ProductVariationListBuilder",
  *     "views_data" = "Drupal\commerce\CommerceEntityViewsData",
  *     "form" = {
- *       "default" = "Drupal\Core\Entity\ContentEntityForm",
+ *       "add" = "Drupal\commerce_product\Form\ProductVariationForm",
+ *       "edit" = "Drupal\commerce_product\Form\ProductVariationForm",
+ *       "duplicate" = "Drupal\commerce_product\Form\ProductVariationForm",
+ *       "delete" = "Drupal\commerce_product\Form\ProductVariationDeleteForm",
+ *     },
+ *     "route_provider" = {
+ *       "default" = "Drupal\commerce_product\ProductVariationRouteProvider",
  *     },
  *     "inline_form" = "Drupal\commerce_product\Form\ProductVariationInlineForm",
  *     "translation" = "Drupal\content_translation\ContentTranslationHandler"
  *   },
  *   admin_permission = "administer commerce_product",
  *   translatable = TRUE,
- *   content_translation_ui_skip = TRUE,
+ *   translation = {
+ *     "content_translation" = {
+ *       "access_callback" = "content_translation_translate_access"
+ *     },
+ *   },
  *   base_table = "commerce_product_variation",
  *   data_table = "commerce_product_variation_field_data",
  *   entity_keys = {
@@ -51,6 +63,19 @@ use Drupal\user\UserInterface;
  *     "uuid" = "uuid",
  *     "label" = "title",
  *     "status" = "status",
+ *     "owner" = "uid",
+ *     "uid" = "uid",
+ *   },
+ *   links = {
+ *     "add-form" = "/product/{commerce_product}/variations/add",
+ *     "edit-form" = "/product/{commerce_product}/variations/{commerce_product_variation}/edit",
+ *     "duplicate-form" = "/product/{commerce_product}/variations/{commerce_product_variation}/duplicate",
+ *     "delete-form" = "/product/{commerce_product}/variations/{commerce_product_variation}/delete",
+ *     "collection" = "/product/{commerce_product}/variations",
+ *     "drupal:content-translation-overview" = "/product/{commerce_product}/variations/{commerce_product_variation}/translations",
+ *     "drupal:content-translation-add" = "/product/{commerce_product}/variations/{commerce_product_variation}/translations/add/{source}/{target}",
+ *     "drupal:content-translation-edit" = "/product/{commerce_product}/variations/{commerce_product_variation}/translations/edit/{language}",
+ *     "drupal:content-translation-delete" = "/product/{commerce_product}/variations/{commerce_product_variation}/translations/delete/{language}",
  *   },
  *   bundle_entity_type = "commerce_product_variation_type",
  *   field_ui_base_route = "entity.commerce_product_variation_type.edit_form",
@@ -59,6 +84,15 @@ use Drupal\user\UserInterface;
 class ProductVariation extends CommerceContentEntityBase implements ProductVariationInterface {
 
   use EntityChangedTrait;
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function urlRouteParameters($rel) {
+    $uri_route_parameters = parent::urlRouteParameters($rel);
+    $uri_route_parameters['commerce_product'] = $this->getProductId();
+    return $uri_route_parameters;
+  }
 
   /**
    * {@inheritdoc}
@@ -133,6 +167,22 @@ class ProductVariation extends CommerceContentEntityBase implements ProductVaria
   /**
    * {@inheritdoc}
    */
+  public function getListPrice() {
+    if (!$this->get('list_price')->isEmpty()) {
+      return $this->get('list_price')->first()->toPrice();
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setListPrice(Price $list_price) {
+    return $this->set('list_price', $list_price);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function getPrice() {
     if (!$this->get('price')->isEmpty()) {
       return $this->get('price')->first()->toPrice();
@@ -196,7 +246,7 @@ class ProductVariation extends CommerceContentEntityBase implements ProductVaria
    * {@inheritdoc}
    */
   public function getOwnerId() {
-    return $this->get('uid')->target_id;
+    return $this->getEntityKey('owner');
   }
 
   /**
@@ -336,6 +386,37 @@ class ProductVariation extends CommerceContentEntityBase implements ProductVaria
   }
 
   /**
+   * {@inheritdoc}
+   */
+  public function postSave(EntityStorageInterface $storage, $update = TRUE) {
+    parent::postSave($storage, $update);
+
+    // Ensure there's a reference on the parent product.
+    $product = $this->getProduct();
+    if ($product && !$product->hasVariation($this)) {
+      $product->addVariation($this);
+      $product->save();
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function postDelete(EntityStorageInterface $storage, array $entities) {
+    parent::postDelete($storage, $entities);
+
+    /** @var \Drupal\commerce_product\Entity\ProductVariationInterface[] $entities */
+    foreach ($entities as $variation) {
+      // Remove the reference from the parent product.
+      $product = $variation->getProduct();
+      if ($product && $product->hasVariation($variation)) {
+        $product->removeVariation($variation);
+        $product->save();
+      }
+    }
+  }
+
+  /**
    * Generates the variation title based on attribute values.
    *
    * @return string
@@ -412,9 +493,24 @@ class ProductVariation extends CommerceContentEntityBase implements ProductVaria
       ->setDisplayConfigurable('form', TRUE)
       ->setDisplayConfigurable('view', TRUE);
 
+    $fields['list_price'] = BaseFieldDefinition::create('commerce_price')
+      ->setLabel(t('List price'))
+      ->setDescription(t('The list price.'))
+      ->setDisplayOptions('view', [
+        'label' => 'above',
+        'type' => 'commerce_price_default',
+        'weight' => -1,
+      ])
+      ->setDisplayOptions('form', [
+        'type' => 'commerce_list_price',
+        'weight' => -1,
+      ])
+      ->setDisplayConfigurable('form', TRUE)
+      ->setDisplayConfigurable('view', TRUE);
+
     $fields['price'] = BaseFieldDefinition::create('commerce_price')
       ->setLabel(t('Price'))
-      ->setDescription(t('The variation price'))
+      ->setDescription(t('The price'))
       ->setRequired(TRUE)
       ->setDisplayOptions('view', [
         'label' => 'above',

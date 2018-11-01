@@ -49,13 +49,13 @@ class OrderReassignForm extends FormBase {
    * {@inheritdoc}
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
-    if (!$this->order->getCustomerId()) {
+    $customer = $this->order->getCustomer();
+    if ($customer->isAnonymous()) {
       $current_customer = $this->t('anonymous user with the email %email', [
         '%email' => $this->order->getEmail(),
       ]);
     }
     else {
-      $customer = $this->order->getCustomer();
       // If the display name has been altered to not be the email address,
       // show the email as well.
       if ($customer->getDisplayName() != $customer->getEmail()) {

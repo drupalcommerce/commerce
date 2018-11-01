@@ -4,6 +4,7 @@ namespace Drupal\commerce_promotion\Form;
 
 use Drupal\commerce_promotion\CouponCodePattern;
 use Drupal\commerce_promotion\CouponCodeGeneratorInterface;
+use Drupal\Core\Batch\BatchBuilder;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Routing\CurrentRouteMatch;
@@ -185,18 +186,13 @@ class CouponGenerateForm extends FormBase {
     ];
     $pattern = new CouponCodePattern($values['format'], $values['prefix'], $values['suffix'], $values['length']);
 
-    $batch = [
-      'title' => $this->t('Generating coupons'),
-      'progress_message' => '',
-      'operations' => [
-        [
-          [get_class($this), 'processBatch'],
-          [$quantity, $coupon_values, $pattern],
-        ],
-      ],
-      'finished' => [$this, 'finishBatch'],
-    ];
-    batch_set($batch);
+    $batch_builder = (new BatchBuilder())
+      ->setTitle($this->t('Generating coupons'))
+      ->setProgressMessage('')
+      ->setFinishCallback([$this, 'finishBatch'])
+      ->addOperation([get_class($this), 'processBatch'], [$quantity, $coupon_values, $pattern]);
+    batch_set($batch_builder->toArray());
+
     $form_state->setRedirect('entity.commerce_promotion_coupon.collection', [
       'commerce_promotion' => $this->promotion->id(),
     ]);

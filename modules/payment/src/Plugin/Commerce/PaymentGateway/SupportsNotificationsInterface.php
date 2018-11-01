@@ -17,6 +17,11 @@ interface SupportsNotificationsInterface {
   /**
    * Processes the notification request.
    *
+   * This method should only be concerned with creating/completing payments,
+   * the parent order does not need to be touched. The order state is updated
+   * automatically when the order is paid in full, or manually by the
+   * merchant (via the admin UI).
+   *
    * Note:
    * This method can't throw exceptions on failure because some payment
    * providers expect an error response to be returned in that case.

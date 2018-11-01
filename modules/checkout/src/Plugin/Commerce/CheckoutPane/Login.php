@@ -9,7 +9,6 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Url;
-use Drupal\Core\Link;
 use Drupal\user\UserAuthInterface;
 use Drupal\user\UserInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -215,8 +214,9 @@ class Login extends CheckoutPaneBase implements CheckoutPaneInterface, Container
       '#op' => 'login',
     ];
     $pane_form['returning_customer']['forgot_password'] = [
-      '#type' => 'markup',
-      '#markup' => Link::createFromRoute($this->t('Forgot password?'), 'user.pass')->toString(),
+      '#type' => 'link',
+      '#title' => $this->t('Forgot password?'),
+      '#url' => Url::fromRoute('user.pass'),
     ];
 
     $pane_form['guest'] = [
@@ -313,12 +313,12 @@ class Login extends CheckoutPaneBase implements CheckoutPaneInterface, Container
           return;
         }
         if (!$this->credentialsCheckFlood->isAllowedHost($this->clientIp)) {
-          $form_state->setErrorByName($name_element, $this->t('Too many failed login attempts from your IP address. This IP address is temporarily blocked. Try again later or <a href=":url">request a new password</a>.', [':url' => Url::fromRoute('user.pass')]));
+          $form_state->setError($name_element, $this->t('Too many failed login attempts from your IP address. This IP address is temporarily blocked. Try again later or <a href=":url">request a new password</a>.', [':url' => $password_url]));
           $this->credentialsCheckFlood->register($this->clientIp, $username);
           return;
         }
         elseif (!$this->credentialsCheckFlood->isAllowedAccount($this->clientIp, $username)) {
-          $form_state->setErrorByName($name_element, $this->t('Too many failed login attempts for this account. It is temporarily blocked. Try again later or <a href=":url">request a new password</a>.', [':url' => Url::fromRoute('user.pass')]));
+          $form_state->setError($name_element, $this->t('Too many failed login attempts for this account. It is temporarily blocked. Try again later or <a href=":url">request a new password</a>.', [':url' => $password_url]));
           $this->credentialsCheckFlood->register($this->clientIp, $username);
           return;
         }
