@@ -425,6 +425,10 @@ class ProductAdminTest extends ProductBrowserTestBase {
     $this->assertEquals(1, $variation->id());
     $this->assertEquals($sku, $variation->getSku());
     $this->assertEquals(new Price('199.99', 'USD'), $variation->getPrice());
+
+    // The variation collection page should be inaccessible.
+    $this->drupalGet($variation->toUrl('collection'));
+    $this->assertSession()->statusCodeEquals('403');
   }
 
 }
