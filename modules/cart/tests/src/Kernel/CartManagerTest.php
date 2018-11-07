@@ -77,6 +77,7 @@ class CartManagerTest extends CommerceKernelTestBase {
     $this->installConfig(['commerce_order']);
     $this->installConfig(['commerce_product']);
     $this->installConfig(['extra_order_item_field']);
+    $this->installCommerceCart();
 
     $this->variation1 = ProductVariation::create([
       'type' => 'default',
@@ -109,8 +110,6 @@ class CartManagerTest extends CommerceKernelTestBase {
    * @covers ::emptyCart
    */
   public function testCartManager() {
-    $this->installCommerceCart();
-
     $cart = $this->cartProvider->createCart('default', $this->store, $this->user);
     $this->assertInstanceOf(OrderInterface::class, $cart);
     $this->assertEmpty($cart->getItems());

@@ -55,6 +55,8 @@ class CartOrderPlacedTest extends CommerceKernelTestBase {
     $this->installEntitySchema('commerce_order_item');
     $this->installConfig('commerce_order');
     $this->installConfig('commerce_product');
+    $this->installCommerceCart();
+
     $this->createUser();
 
     // Create a product variation.
@@ -86,8 +88,6 @@ class CartOrderPlacedTest extends CommerceKernelTestBase {
    * Tests that a draft order is no longer a cart once placed.
    */
   public function testCartOrderPlaced() {
-    $this->installCommerceCart();
-
     $this->store = $this->createStore();
     $cart_order = $this->container->get('commerce_cart.cart_provider')->createCart('default', $this->store, $this->user);
     $this->cartManager = $this->container->get('commerce_cart.cart_manager');
