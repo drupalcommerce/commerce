@@ -46,18 +46,18 @@ final class CreditCard {
         'id' => 'visa',
         'label' => new TranslatableMarkup('Visa'),
         'number_prefixes' => ['4'],
+        'number_lengths' => [16, 18, 19],
       ],
       'mastercard' => [
         'id' => 'mastercard',
-        'label' => new TranslatableMarkup('MasterCard'),
+        'label' => new TranslatableMarkup('Mastercard'),
         'number_prefixes' => ['51-55', '222100-272099'],
       ],
       'maestro' => [
         'id' => 'maestro',
         'label' => new TranslatableMarkup('Maestro'),
         'number_prefixes' => [
-          '5018', '5020', '5038', '5612', '5893', '6304',
-          '6759', '6761', '6762', '6763', '0604', '6390',
+          '5018', '502', '503', '506', '56', '58', '639', '6220', '67',
         ],
         'number_lengths' => [12, 13, 14, 15, 16, 17, 18, 19],
       ],
@@ -72,7 +72,7 @@ final class CreditCard {
         'id' => 'dinersclub',
         'label' => new TranslatableMarkup('Diners Club'),
         'number_prefixes' => ['300-305', '309', '36', '38', '39'],
-        'number_lengths' => [14],
+        'number_lengths' => [14, 16, 19],
       ],
       'discover' => [
         'id' => 'discover',
@@ -84,6 +84,7 @@ final class CreditCard {
         'id' => 'jcb',
         'label' => new TranslatableMarkup('JCB'),
         'number_prefixes' => ['3528-3589'],
+        'number_lengths' => [16, 17, 18, 19],
       ],
       'unionpay' => [
         'id' => 'unionpay',
