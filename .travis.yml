@@ -107,7 +107,7 @@ before_install:
   - git config --global github.accesstoken $GITHUB_OAUTH_TOKEN
   - composer global require "hirak/prestissimo:^0.3"
   - composer global require "lionsad/drupal_ti:dev-master#0d7c41abd1efa11726d7c908ae7a39bbeea905df"
-  - composer global require "squizlabs/php_codesniffer:2.*"
+  - composer global require "squizlabs/php_codesniffer:3.*"
   - drupal-ti before_install
 
 install:
@@ -118,7 +118,7 @@ install:
   - export PATH=$PWD/travis-phantomjs:$PATH
   - phantomjs --version
   # Installed after Drush to prevent Composer conflicts around symfony/yaml.
-  - composer global require "drupal/coder:8.2.*"
+  - composer global require "drupal/coder:8.3.*"
   - phpcs --config-set installed_paths $HOME/.composer/vendor/drupal/coder/coder_sniffer
 
 before_script:
