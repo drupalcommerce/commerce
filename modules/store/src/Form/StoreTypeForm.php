@@ -31,6 +31,8 @@ class StoreTypeForm extends CommerceBundleEntityFormBase {
         'exists' => '\Drupal\commerce_store\Entity\StoreType::load',
       ],
       '#maxlength' => EntityTypeInterface::BUNDLE_MAX_LENGTH,
+      '#disabled' => !$store_type->isNew(),
+
     ];
     $form['description'] = [
       '#type' => 'textfield',
@@ -56,7 +58,7 @@ class StoreTypeForm extends CommerceBundleEntityFormBase {
       $form['#submit'][] = 'language_configuration_element_submit';
     }
 
-    return $this->protectBundleIdElement($form);
+    return $form;
   }
 
   /**

@@ -62,6 +62,7 @@ class ProductAttributeForm extends BundleEntityFormBase {
       // Attribute field names are constructed as 'attribute_' + id, and must
       // not be longer than 32 characters. Account for that prefix length here.
       '#maxlength' => EntityTypeInterface::BUNDLE_MAX_LENGTH - 10,
+      '#disabled' => !$attribute->isNew(),
     ];
     $form['elementType'] = [
       '#type' => 'select',
@@ -129,7 +130,7 @@ class ProductAttributeForm extends BundleEntityFormBase {
       $form = $this->buildValuesForm($form, $form_state);
     }
 
-    return $this->protectBundleIdElement($form);
+    return $form;
   }
 
   /**

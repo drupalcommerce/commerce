@@ -71,6 +71,7 @@ class OrderTypeForm extends CommerceBundleEntityFormBase {
         'source' => ['label'],
       ],
       '#maxlength' => EntityTypeInterface::BUNDLE_MAX_LENGTH,
+      '#disabled' => !$order_type->isNew(),
     ];
     $form['workflow'] = [
       '#type' => 'select',
@@ -139,7 +140,7 @@ class OrderTypeForm extends CommerceBundleEntityFormBase {
       ],
     ];
 
-    return $this->protectBundleIdElement($form);
+    return $form;
   }
 
   /**

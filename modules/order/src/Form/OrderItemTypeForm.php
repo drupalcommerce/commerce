@@ -42,6 +42,7 @@ class OrderItemTypeForm extends CommerceBundleEntityFormBase {
         'source' => ['label'],
       ],
       '#maxlength' => EntityTypeInterface::BUNDLE_MAX_LENGTH,
+      '#disabled' => !$order_item_type->isNew(),
     ];
     $form['purchasableEntityType'] = [
       '#type' => 'select',
@@ -60,7 +61,7 @@ class OrderItemTypeForm extends CommerceBundleEntityFormBase {
     ];
     $form = $this->buildTraitForm($form, $form_state);
 
-    return $this->protectBundleIdElement($form);
+    return $form;
   }
 
   /**

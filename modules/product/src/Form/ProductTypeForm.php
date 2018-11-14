@@ -89,6 +89,7 @@ class ProductTypeForm extends CommerceBundleEntityFormBase {
         'exists' => '\Drupal\commerce_product\Entity\ProductType::load',
       ],
       '#maxlength' => EntityTypeInterface::BUNDLE_MAX_LENGTH,
+      '#disabled' => !$product_type->isNew(),
     ];
     $form['description'] = [
       '#type' => 'textarea',
@@ -141,7 +142,7 @@ class ProductTypeForm extends CommerceBundleEntityFormBase {
       $form['#submit'][] = 'language_configuration_element_submit';
     }
 
-    return $this->protectBundleIdElement($form);
+    return $form;
   }
 
   /**

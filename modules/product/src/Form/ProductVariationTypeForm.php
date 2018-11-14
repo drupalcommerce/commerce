@@ -66,6 +66,7 @@ class ProductVariationTypeForm extends CommerceBundleEntityFormBase {
         'exists' => '\Drupal\commerce_product\Entity\ProductVariationType::load',
       ],
       '#maxlength' => EntityTypeInterface::BUNDLE_MAX_LENGTH,
+      '#disabled' => !$variation_type->isNew(),
     ];
     $form['generateTitle'] = [
       '#type' => 'checkbox',
@@ -144,7 +145,7 @@ class ProductVariationTypeForm extends CommerceBundleEntityFormBase {
       $form['#submit'][] = 'language_configuration_element_submit';
     }
 
-    return $this->protectBundleIdElement($form);
+    return $form;
   }
 
   /**
