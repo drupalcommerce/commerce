@@ -40,7 +40,7 @@ class OrderPaidSubscriber implements EventSubscriberInterface {
    */
   public function onPaid(OrderEvent $event) {
     $order = $event->getOrder();
-    if ($order->getState()->value != 'draft') {
+    if ($order->getState()->getId() != 'draft') {
       // The order has already been placed.
       return;
     }
@@ -52,8 +52,7 @@ class OrderPaidSubscriber implements EventSubscriberInterface {
     }
 
     if ($payment_gateway->getPlugin() instanceof OffsitePaymentGatewayInterface) {
-      $workflow = $order->getState()->getWorkflow();
-      $order->getState()->applyTransition($workflow->getTransition('place'));
+      $order->getState()->applyTransitionById('place');
       // A placed order should never be locked.
       $order->unlock();
     }

@@ -158,7 +158,7 @@ function commerce_cart_form_commerce_order_form_alter(array &$form, FormStateInt
   if (isset($form['cart'])) {
     /** @var \Drupal\commerce_order\Entity\OrderInterface $order */
     $order = $form_state->getFormObject()->getEntity();
-    if ($order->getState()->value == 'draft') {
+    if ($order->getState()->getId() == 'draft') {
       // Move the cart element to the bottom of the meta sidebar container.
       $form['cart']['#group'] = 'meta';
       $form['cart']['#weight'] = 100;

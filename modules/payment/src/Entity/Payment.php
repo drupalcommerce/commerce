@@ -297,8 +297,8 @@ class Payment extends ContentEntityBase implements PaymentInterface {
       $this->setRefundedAmount($refunded_amount);
     }
     // Maintain the authorized and completed timestamps.
-    $state = $this->getState()->value;
-    $original_state = isset($this->original) ? $this->original->getState()->value : '';
+    $state = $this->getState()->getId();
+    $original_state = isset($this->original) ? $this->original->getState()->getId() : '';
     if ($state == 'authorization' && $original_state != 'authorization') {
       if (empty($this->getAuthorizedTime())) {
         $this->setAuthorizedTime(\Drupal::time()->getRequestTime());

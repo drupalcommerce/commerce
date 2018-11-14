@@ -159,9 +159,9 @@ class PaymentTest extends CommerceKernelTestBase {
     $payment->setRefundedAmount(new Price('15', 'USD'));
     $this->assertEquals(new Price('15', 'USD'), $payment->getRefundedAmount());
 
-    $this->assertEquals('refunded', $payment->getState()->value);
+    $this->assertEquals('refunded', $payment->getState()->getId());
     $payment->setState('completed');
-    $this->assertEquals('completed', $payment->getState()->value);
+    $this->assertEquals('completed', $payment->getState()->getId());
 
     $this->assertEmpty($payment->getAuthorizedTime());
     $payment->setAuthorizedTime(635879600);

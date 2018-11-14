@@ -136,17 +136,6 @@ class OrderStorage extends CommerceContentEntityStorage {
         $order->setData('paid_event_dispatched', TRUE);
       }
     }
-
-    // Calculate the completion timestamp.
-    // @todo Move to the TimestampEventSubscriber.
-    $state_id = $order->getState()->value;
-    $original_state_id = isset($order->original) ? $order->original->getState()->value : '';
-    // Maintain the completed timestamp.
-    if ($state_id == 'completed' && $original_state_id != 'completed') {
-      if (empty($order->getCompletedTime())) {
-        $order->setCompletedTime(\Drupal::time()->getRequestTime());
-      }
-    }
   }
 
   /**

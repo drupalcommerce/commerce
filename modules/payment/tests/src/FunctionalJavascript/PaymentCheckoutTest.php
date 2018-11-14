@@ -291,7 +291,7 @@ class PaymentCheckoutTest extends CommerceBrowserTestBase {
     $payment = Payment::load(1);
     $this->assertNotNull($payment);
     $this->assertEquals($payment->getAmount(), $order->getTotalPrice());
-    $this->assertEquals('authorization', $payment->getState()->value);
+    $this->assertEquals('authorization', $payment->getState()->getId());
   }
 
   /**
@@ -335,7 +335,7 @@ class PaymentCheckoutTest extends CommerceBrowserTestBase {
     // Verify that a completed payment was made.
     $payment = Payment::load(2);
     $this->assertNotNull($payment);
-    $this->assertEquals('completed', $payment->getState()->value);
+    $this->assertEquals('completed', $payment->getState()->getId());
     $this->assertEquals(new Price('19.99', 'USD'), $payment->getAmount());
     $this->assertEquals(new Price('39.99', 'USD'), $order->getTotalPaid());
     $this->assertEquals(new Price('0', 'USD'), $order->getBalance());
@@ -671,7 +671,7 @@ class PaymentCheckoutTest extends CommerceBrowserTestBase {
     // still unchanged.
     $payment = Payment::load(2);
     $this->assertNotNull($payment);
-    $this->assertEquals('pending', $payment->getState()->value);
+    $this->assertEquals('pending', $payment->getState()->getId());
     $this->assertEquals(new Price('19.99', 'USD'), $payment->getAmount());
     $this->assertEquals(new Price('20', 'USD'), $order->getTotalPaid());
     $this->assertEquals(new Price('19.99', 'USD'), $order->getBalance());

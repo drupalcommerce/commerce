@@ -95,8 +95,7 @@ class CartOrderPlacedTest extends CommerceKernelTestBase {
 
     $this->assertNotEmpty($cart_order->cart->value);
 
-    $workflow = $cart_order->getState()->getWorkflow();
-    $cart_order->getState()->applyTransition($workflow->getTransition('place'));
+    $cart_order->getState()->applyTransitionById('place');
     $cart_order->save();
 
     $cart_order = $this->reloadEntity($cart_order);

@@ -105,9 +105,8 @@ class OrderReceiptTest extends CommerceKernelTestBase {
    * Tests the order receipt.
    */
   public function testOrderReceipt() {
-    $transition = $this->order->getState()->getTransitions();
     $this->order->setOrderNumber('2017/01');
-    $this->order->getState()->applyTransition($transition['place']);
+    $this->order->getState()->applyTransitionById('place');
     $this->order->save();
 
     $mails = $this->getMails();
@@ -128,8 +127,7 @@ class OrderReceiptTest extends CommerceKernelTestBase {
     $order_type->setSendReceipt(FALSE);
     $order_type->save();
 
-    $transition = $this->order->getState()->getTransitions();
-    $this->order->getState()->applyTransition($transition['place']);
+    $this->order->getState()->applyTransitionById('place');
     $this->order->save();
 
     $mails = $this->getMails();
@@ -144,8 +142,7 @@ class OrderReceiptTest extends CommerceKernelTestBase {
     $order_type->setReceiptBcc('bcc@example.com');
     $order_type->save();
 
-    $transition = $this->order->getState()->getTransitions();
-    $this->order->getState()->applyTransition($transition['place']);
+    $this->order->getState()->applyTransitionById('place');
     $this->order->save();
 
     $mails = $this->getMails();

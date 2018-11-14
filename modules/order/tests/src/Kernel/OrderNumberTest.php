@@ -61,6 +61,7 @@ class OrderNumberTest extends CommerceKernelTestBase {
       'unit_price' => new Price('12.00', 'USD'),
     ]);
     $order_item1->save();
+    /** @var \Drupal\commerce_order\Entity\OrderInterface $order1 */
     $order1 = Order::create([
       'type' => 'default',
       'store_id' => $this->store->id(),
@@ -72,8 +73,7 @@ class OrderNumberTest extends CommerceKernelTestBase {
     ]);
     $order1->save();
 
-    $transition = $order1->getState()->getTransitions();
-    $order1->getState()->applyTransition($transition['place']);
+    $order1->getState()->applyTransitionById('place');
     $order1->save();
     $this->assertEquals($order1->id(), $order1->getOrderNumber(), 'During placement transition, the order number is set to the order ID.');
 
@@ -83,6 +83,7 @@ class OrderNumberTest extends CommerceKernelTestBase {
       'unit_price' => new Price('14.00', 'USD'),
     ]);
     $order_item2->save();
+    /** @var \Drupal\commerce_order\Entity\OrderInterface $order2 */
     $order2 = Order::create([
       'type' => 'default',
       'store_id' => $this->store->id(),
@@ -95,8 +96,7 @@ class OrderNumberTest extends CommerceKernelTestBase {
     ]);
     $order2->save();
 
-    $transition = $order2->getState()->getTransitions();
-    $order2->getState()->applyTransition($transition['place']);
+    $order2->getState()->applyTransitionById('place');
     $order2->save();
     $this->assertEquals('9999', $order2->getOrderNumber(), 'Explicitly set order number should not get overridden.');
   }

@@ -108,7 +108,7 @@ class CheckoutController implements ContainerInjectionInterface {
   public function checkAccess(RouteMatchInterface $route_match, AccountInterface $account) {
     /** @var \Drupal\commerce_order\Entity\OrderInterface $order */
     $order = $route_match->getParameter('commerce_order');
-    if ($order->getState()->value == 'canceled') {
+    if ($order->getState()->getId() == 'canceled') {
       return AccessResult::forbidden()->addCacheableDependency($order);
     }
 

@@ -45,7 +45,7 @@ class CheckoutOrderManager implements CheckoutOrderManagerInterface {
    */
   public function getCheckoutStepId(OrderInterface $order, $requested_step_id = NULL) {
     // Customers can't edit orders that have already been placed.
-    if ($order->getState()->value != 'draft') {
+    if ($order->getState()->getId() != 'draft') {
       return 'complete';
     }
     $checkout_flow = $this->getCheckoutFlow($order);

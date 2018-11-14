@@ -36,8 +36,7 @@ class CartBlockTest extends CartBrowserTestBase {
     $this->assertSession()->pageTextContains('3 x');
 
     // If the order is no longer a draft, the block should not render.
-    $workflow = $this->cart->getState()->getWorkflow();
-    $this->cart->getState()->applyTransition($workflow->getTransition('place'));
+    $this->cart->getState()->applyTransitionById('place');
     $this->cart->save();
 
     $this->drupalGet('<front>');

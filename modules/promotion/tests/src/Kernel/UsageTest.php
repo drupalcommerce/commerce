@@ -199,7 +199,7 @@ class UsageTest extends CommerceKernelTestBase {
     $this->assertEquals(2, count($this->order->collectAdjustments()));
     $this->order->save();
 
-    $this->order->getState()->applyTransition($this->order->getState()->getTransitions()['place']);
+    $this->order->getState()->applyTransitionById('place');
     $this->order->save();
     $this->assertEquals(1, $this->usage->load($first_promotion));
     $this->assertEquals(1, $this->usage->load($second_promotion));
@@ -240,7 +240,7 @@ class UsageTest extends CommerceKernelTestBase {
     $this->assertEquals(1, count($this->order->collectAdjustments()));
     $this->order->save();
 
-    $this->order->getState()->applyTransition($this->order->getState()->getTransitions()['place']);
+    $this->order->getState()->applyTransitionById('place');
     $this->order->save();
     $usage = $this->usage->load($promotion);
     $this->assertEquals(1, $usage);

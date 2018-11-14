@@ -31,6 +31,7 @@ class TimestampEventSubscriber implements EventSubscriberInterface {
   public static function getSubscribedEvents() {
     $events = [
       'commerce_order.place.pre_transition' => 'onPlaceTransition',
+      'commerce_order.pre_transition' => 'onAnyTransition',
     ];
     return $events;
   }
@@ -46,6 +47,21 @@ class TimestampEventSubscriber implements EventSubscriberInterface {
     $order = $event->getEntity();
     if (empty($order->getPlacedTime())) {
       $order->setPlacedTime($this->time->getRequestTime());
+    }
+  }
+
+  /**
+   * Sets the order's completed timestamp.
+   *
+   * @param \Drupal\state_machine\Event\WorkflowTransitionEvent $event
+   *   The transition event.
+   */
+  public function onAnyTransition(WorkflowTransitionEvent $event) {
+    /** @var \Drupal\commerce_order\Entity\OrderInterface $order */
+    $order = $event->getEntity();
+    $to_state_id = $event->getTransition()->getToState()->getId();
+    if ($to_state_id == 'completed' && empty($order->getCompletedTime())) {
+      $order->setCompletedTime($this->time->getRequestTime());
     }
   }
 

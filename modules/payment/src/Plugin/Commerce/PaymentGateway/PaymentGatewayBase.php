@@ -331,7 +331,7 @@ abstract class PaymentGatewayBase extends PluginBase implements PaymentGatewayIn
    * {@inheritdoc}
    */
   public function buildPaymentOperations(PaymentInterface $payment) {
-    $payment_state = $payment->getState()->value;
+    $payment_state = $payment->getState()->getId();
     $operations = [];
     if ($this instanceof SupportsAuthorizationsInterface) {
       $operations['capture'] = [
@@ -446,7 +446,7 @@ abstract class PaymentGatewayBase extends PluginBase implements PaymentGatewayIn
    *   Thrown if the payment state does not match the allowed states.
    */
   protected function assertPaymentState(PaymentInterface $payment, array $states) {
-    $state = $payment->getState()->value;
+    $state = $payment->getState()->getId();
     if (!in_array($state, $states)) {
       throw new \InvalidArgumentException(sprintf('The provided payment is in an invalid state ("%s").', $state));
     }

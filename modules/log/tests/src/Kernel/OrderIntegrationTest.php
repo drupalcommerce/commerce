@@ -129,8 +129,7 @@ class OrderIntegrationTest extends CommerceKernelTestBase {
    */
   public function testCancelLog() {
     // Draft -> Canceled.
-    $transition = $this->order->getState()->getTransitions();
-    $this->order->getState()->applyTransition($transition['cancel']);
+    $this->order->getState()->applyTransitionById('cancel');
     $this->order->save();
 
     $logs = $this->logStorage->loadMultipleByEntity($this->order);
@@ -147,8 +146,7 @@ class OrderIntegrationTest extends CommerceKernelTestBase {
    */
   public function testPlaceValidateFulfillLogs() {
     // Draft -> Placed.
-    $transition = $this->order->getState()->getTransitions();
-    $this->order->getState()->applyTransition($transition['place']);
+    $this->order->getState()->applyTransitionById('place');
     $this->order->save();
 
     $logs = $this->logStorage->loadMultipleByEntity($this->order);
@@ -160,8 +158,7 @@ class OrderIntegrationTest extends CommerceKernelTestBase {
     $this->assertText('The order was placed.');
 
     // Placed -> Validated.
-    $transition = $this->order->getState()->getTransitions();
-    $this->order->getState()->applyTransition($transition['validate']);
+    $this->order->getState()->applyTransitionById('validate');
     $this->order->save();
 
     $logs = $this->logStorage->loadMultipleByEntity($this->order);
@@ -173,8 +170,7 @@ class OrderIntegrationTest extends CommerceKernelTestBase {
     $this->assertText('The order was validated.');
 
     // Validated -> Fulfilled.
-    $transition = $this->order->getState()->getTransitions();
-    $this->order->getState()->applyTransition($transition['fulfill']);
+    $this->order->getState()->applyTransitionById('fulfill');
     $this->order->save();
 
     $logs = $this->logStorage->loadMultipleByEntity($this->order);

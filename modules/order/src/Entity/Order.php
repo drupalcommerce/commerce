@@ -446,7 +446,7 @@ class Order extends CommerceContentEntityBase implements OrderInterface {
     $balance = $this->getBalance();
     // Free orders are considered fully paid once they have been placed.
     if ($total_price->isZero()) {
-      return $this->getState()->value != 'draft';
+      return $this->getState()->getId() != 'draft';
     }
     else {
       return $balance->isNegative() || $balance->isZero();
@@ -580,7 +580,7 @@ class Order extends CommerceContentEntityBase implements OrderInterface {
       $this->setEmail($customer->getEmail());
     }
 
-    if ($this->getState()->value == 'draft') {
+    if ($this->getState()->getId() == 'draft') {
       // Refresh draft orders on every save.
       if (empty($this->getRefreshState())) {
         $this->setRefreshState(self::REFRESH_ON_SAVE);

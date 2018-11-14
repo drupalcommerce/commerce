@@ -275,7 +275,7 @@ class OrderAdminTest extends OrderBrowserTestBase {
 
     // Confirm that the transition buttons are visible and functional.
     $workflow = $order->getState()->getWorkflow();
-    $transitions = $workflow->getAllowedTransitions($order->getState()->value, $order);
+    $transitions = $workflow->getAllowedTransitions($order->getState()->getId(), $order);
     foreach ($transitions as $transition) {
       $this->assertSession()->buttonExists($transition->getLabel());
     }

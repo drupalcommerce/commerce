@@ -86,7 +86,7 @@ class Manual extends PaymentGatewayBase implements ManualPaymentGatewayInterface
    * {@inheritdoc}
    */
   public function buildPaymentOperations(PaymentInterface $payment) {
-    $payment_state = $payment->getState()->value;
+    $payment_state = $payment->getState()->getId();
     $operations = [];
     $operations['receive'] = [
       'title' => $this->t('Receive'),

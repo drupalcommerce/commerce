@@ -100,7 +100,7 @@ class OrderRefresh implements OrderRefreshInterface {
    */
   public function needsRefresh(OrderInterface $order) {
     // Only draft orders should be automatically refreshed.
-    if ($order->getState()->value != 'draft') {
+    if ($order->getState()->getId() != 'draft') {
       return FALSE;
     }
 

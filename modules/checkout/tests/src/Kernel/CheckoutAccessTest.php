@@ -141,7 +141,7 @@ class CheckoutAccessTest extends CommerceKernelTestBase {
   public function testCanceledOrderCheckout() {
     $user1 = $this->createUser([], ['access checkout']);
     $order = $this->createOrder($user1);
-    $order->getState()->applyTransition($order->getState()->getTransitions()['cancel']);
+    $order->getState()->applyTransitionById('cancel');
     $request = $this->createRequest($order);
     $this->assertFalse($this->accessManager->checkRequest($request, $user1));
   }

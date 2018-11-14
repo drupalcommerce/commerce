@@ -11,7 +11,7 @@
         "drupal/entity_reference_revisions": "~1.0",
         "drupal/inline_entity_form": "^1.0-rc1",
         "drupal/profile": "~1.0",
-        "drupal/state_machine": "~1.0",
+        "drupal/state_machine": "^1.0-rc1",
         "commerceguys/intl": "^1.0.0"
     },
     "minimum-stability": "dev"
