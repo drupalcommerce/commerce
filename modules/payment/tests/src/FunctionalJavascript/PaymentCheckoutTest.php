@@ -8,17 +8,14 @@ use Drupal\commerce_order\Entity\Order;
 use Drupal\commerce_payment\Entity\Payment;
 use Drupal\commerce_payment\Entity\PaymentGateway;
 use Drupal\commerce_price\Price;
-use Drupal\Tests\commerce\Functional\CommerceBrowserTestBase;
-use Drupal\Tests\commerce\FunctionalJavascript\JavascriptTestTrait;
+use Drupal\Tests\commerce\FunctionalJavascript\CommerceWebDriverTestBase;
 
 /**
  * Tests the integration between payments and checkout.
  *
  * @group commerce
  */
-class PaymentCheckoutTest extends CommerceBrowserTestBase {
-
-  use JavascriptTestTrait;
+class PaymentCheckoutTest extends CommerceWebDriverTestBase {
 
   /**
    * The current user.

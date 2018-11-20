@@ -2,20 +2,16 @@
 
 namespace Drupal\Tests\commerce_cart\FunctionalJavascript;
 
-use Drupal\Tests\commerce\FunctionalJavascript\JavascriptTestTrait;
 use Drupal\commerce_order\Entity\Order;
 use Drupal\commerce_product\Entity\ProductVariation;
 use Drupal\commerce_product\Entity\ProductVariationType;
-use Drupal\Tests\commerce_cart\Functional\CartBrowserTestBase;
 
 /**
  * Tests the add to cart form.
  *
  * @group commerce
  */
-class AddToCartMultiAttributeTest extends CartBrowserTestBase {
-
-  use JavascriptTestTrait;
+class AddToCartMultiAttributeTest extends CartWebDriverTestBase {
 
   /**
    * {@inheritdoc}

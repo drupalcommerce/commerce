@@ -10,7 +10,10 @@ language: php
 
 sudo: false
 
-dist: precise
+dist: trusty
+
+addons:
+  chrome: stable
 
 php:
   - 7.2
@@ -52,8 +55,8 @@ env:
     - DRUPAL_TI_WEBSERVER_PORT="8080"
 
     # Simpletest specific commandline arguments, the DRUPAL_TI_SIMPLETEST_GROUP is appended at the end.
-    - DRUPAL_TI_SIMPLETEST_ARGS="--verbose --color --concurrency 20 --url $DRUPAL_TI_WEBSERVER_URL:$DRUPAL_TI_WEBSERVER_PORT --types Simpletest,PHPUnit-Unit,PHPUnit-Kernel,PHPUnit-Functional --suppress-deprecations"
-    - DRUPAL_TI_SIMPLETEST_JS_ARGS="--verbose --color --concurrency 1 --url $DRUPAL_TI_WEBSERVER_URL:$DRUPAL_TI_WEBSERVER_PORT --types PHPUnit-FunctionalJavascript --suppress-deprecations"
+    - DRUPAL_TI_SIMPLETEST_ARGS="--verbose --color --concurrency 25 --url $DRUPAL_TI_WEBSERVER_URL:$DRUPAL_TI_WEBSERVER_PORT --types Simpletest,PHPUnit-Unit,PHPUnit-Kernel,PHPUnit-Functional --suppress-deprecations"
+    - DRUPAL_TI_SIMPLETEST_JS_ARGS="--verbose --color --concurrency 5 --url $DRUPAL_TI_WEBSERVER_URL:$DRUPAL_TI_WEBSERVER_PORT --types PHPUnit-FunctionalJavascript --suppress-deprecations"
 
     # === Behat specific variables.
     # This is relative to $TRAVIS_BUILD_DIR
@@ -112,11 +115,16 @@ before_install:
 
 install:
   - drupal-ti install
-  - mkdir travis-phantomjs
-  - wget https://s3.amazonaws.com/travis-phantomjs/phantomjs-2.0.0-ubuntu-12.04.tar.bz2 -O $PWD/travis-phantomjs/phantomjs-2.0.0-ubuntu-12.04.tar.bz2
-  - tar -xvf $PWD/travis-phantomjs/phantomjs-2.0.0-ubuntu-12.04.tar.bz2 -C $PWD/travis-phantomjs
-  - export PATH=$PWD/travis-phantomjs:$PATH
-  - phantomjs --version
+
+  # Install Chromedriver.
+  - mkdir travis-chromedriver
+  - CHROMEDRIVER_VERSION=$(wget http://chromedriver.storage.googleapis.com/LATEST_RELEASE -qO-)
+  - wget http://chromedriver.storage.googleapis.com/$CHROMEDRIVER_VERSION/chromedriver_linux64.zip
+  - unzip chromedriver_linux64.zip -d travis-chromedriver && rm -f chromedriver_linux64.zip
+  - chmod a+x travis-chromedriver/chromedriver
+  - export PATH=$PWD/travis-chromedriver:$PATH
+  - chromedriver --version
+
   # Installed after Drush to prevent Composer conflicts around symfony/yaml.
   - composer global require "drupal/coder:8.3.*"
   - phpcs --config-set installed_paths $HOME/.composer/vendor/drupal/coder/coder_sniffer

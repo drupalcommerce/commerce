@@ -3,17 +3,13 @@
 namespace Drupal\Tests\commerce_order\FunctionalJavascript;
 
 use Drupal\commerce_order\Entity\Order;
-use Drupal\Tests\commerce\Functional\CommerceBrowserTestBase;
-use Drupal\Tests\commerce\FunctionalJavascript\JavascriptTestTrait;
 
 /**
  * Tests the commerce_order reassign form.
  *
  * @group commerce
  */
-class OrderReassignTest extends CommerceBrowserTestBase {
-
-  use JavascriptTestTrait;
+class OrderReassignTest extends OrderWebDriverTestBase {
 
   /**
    * Modules to enable.

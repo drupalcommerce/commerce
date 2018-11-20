@@ -2,16 +2,14 @@
 
 namespace Drupal\Tests\commerce_price\FunctionalJavascript;
 
-use Drupal\Tests\commerce\Functional\CommerceBrowserTestBase;
-use Drupal\Tests\commerce\FunctionalJavascript\JavascriptTestTrait;
+use Drupal\Tests\commerce\FunctionalJavascript\CommerceWebDriverTestBase;
 
 /**
  * Tests the price element with AJAX.
  *
  * @group commerce
  */
-class AjaxPriceElementTest extends CommerceBrowserTestBase {
-  use JavascriptTestTrait;
+class AjaxPriceElementTest extends CommerceWebDriverTestBase {
 
   /**
    * Modules to enable.

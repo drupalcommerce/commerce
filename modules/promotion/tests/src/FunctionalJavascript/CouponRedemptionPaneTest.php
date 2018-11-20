@@ -7,17 +7,14 @@ use Drupal\commerce_order\Entity\OrderItemType;
 use Drupal\commerce_payment\Entity\PaymentGateway;
 use Drupal\commerce_price\Price;
 use Drupal\Core\Url;
-use Drupal\Tests\commerce\Functional\CommerceBrowserTestBase;
-use Drupal\Tests\commerce\FunctionalJavascript\JavascriptTestTrait;
+use Drupal\Tests\commerce\FunctionalJavascript\CommerceWebDriverTestBase;
 
 /**
  * Tests the coupon redemption checkout pane.
  *
  * @group commerce
  */
-class CouponRedemptionPaneTest extends CommerceBrowserTestBase {
-
-  use JavascriptTestTrait;
+class CouponRedemptionPaneTest extends CommerceWebDriverTestBase {
 
   /**
    * The cart order to test against.
@@ -285,7 +282,7 @@ class CouponRedemptionPaneTest extends CommerceBrowserTestBase {
   public function testCheckoutSubmit() {
     // Start checkout, and enter billing information.
     $this->drupalGet(Url::fromRoute('commerce_checkout.form', ['commerce_order' => $this->cart->id()]));
-    $this->getSession()->getPage()->findField('Example')->check();
+    $this->getSession()->getPage()->findField('Example')->click();
     $this->waitForAjaxToFinish();
     $this->submitForm([
       'payment_information[billing_information][address][0][address][given_name]' => 'Johnny',

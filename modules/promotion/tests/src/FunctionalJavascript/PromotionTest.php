@@ -3,17 +3,14 @@
 namespace Drupal\Tests\commerce_promotion\FunctionalJavascript;
 
 use Drupal\commerce_promotion\Entity\Promotion;
-use Drupal\Tests\commerce\Functional\CommerceBrowserTestBase;
-use Drupal\Tests\commerce\FunctionalJavascript\JavascriptTestTrait;
+use Drupal\Tests\commerce\FunctionalJavascript\CommerceWebDriverTestBase;
 
 /**
  * Tests the admin UI for promotions.
  *
  * @group commerce
  */
-class PromotionTest extends CommerceBrowserTestBase {
-
-  use JavascriptTestTrait;
+class PromotionTest extends CommerceWebDriverTestBase {
 
   /**
    * Modules to enable.
@@ -73,7 +70,8 @@ class PromotionTest extends CommerceBrowserTestBase {
     $this->getSession()->getPage()->hasCheckedField(' Unlimited');
     $usage_limit_xpath = '//input[@type="number" and @name="usage_limit[0][usage_limit]"]';
     $this->assertFalse($this->getSession()->getDriver()->isVisible($usage_limit_xpath));
-    $this->getSession()->getPage()->checkField('Limited number of uses');
+    // Select 'Limited number of uses'.
+    $this->getSession()->getPage()->selectFieldOption('usage_limit[0][limit]', '1');
     $this->assertTrue($this->getSession()->getDriver()->isVisible($usage_limit_xpath));
     $this->getSession()->getPage()->fillField('usage_limit[0][usage_limit]', '99');
 
@@ -112,16 +110,14 @@ class PromotionTest extends CommerceBrowserTestBase {
     $this->waitForAjaxToFinish();
 
     $name = $this->randomMachineName(8);
+    $this->getSession()->getPage()->checkField('end_date[0][has_value]');
     $edit = [
       'name[0][value]' => $name,
       'offer[0][target_plugin_configuration][order_percentage_off][percentage]' => '10.0',
+      // Set an end date.
+      'end_date[0][container][value][date]' => '1010' . date("Y") + 1,
     ];
-
-    // Set an end date.
-    $this->getSession()->getPage()->checkField('end_date[0][has_value]');
-    $edit['end_date[0][container][value][date]'] = date("Y") + 1 . '-01-01';
-
-    $this->submitForm($edit, t('Save'));
+    $this->drupalPostForm(NULL, $edit, t('Save'));
     $this->assertSession()->pageTextContains("Saved the $name promotion.");
     $promotion_count = $this->getSession()->getPage()->findAll('xpath', '//table/tbody/tr/td[text()="' . $name . '"]');
     $this->assertEquals(count($promotion_count), 1, 'promotions exists in the table.');
@@ -190,7 +186,6 @@ class PromotionTest extends CommerceBrowserTestBase {
       'name' => $this->randomMachineName(8),
     ]);
     $this->drupalGet($promotion->toUrl('delete-form'));
-    $this->assertSession()->statusCodeEquals(200);
     $this->assertSession()->pageTextContains('This action cannot be undone.');
     $this->submitForm([], t('Delete'));
 

@@ -2,17 +2,12 @@
 
 namespace Drupal\Tests\commerce_product\FunctionalJavascript;
 
-use Drupal\Tests\commerce\FunctionalJavascript\JavascriptTestTrait;
-use Drupal\Tests\commerce_product\Functional\ProductBrowserTestBase;
-
 /**
  * Create, edit, delete, and change product attributes.
  *
  * @group commerce
  */
-class ProductAttributeJavascriptTest extends ProductBrowserTestBase {
-
-  use JavascriptTestTrait;
+class ProductAttributeJavascriptTest extends ProductWebDriverTestBase {
 
   /**
    * {@inheritdoc}

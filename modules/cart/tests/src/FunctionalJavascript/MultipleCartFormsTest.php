@@ -5,17 +5,13 @@ namespace Drupal\Tests\commerce_cart\FunctionalJavascript;
 use Drupal\commerce_order\Entity\Order;
 use Drupal\commerce_product\Entity\ProductVariationType;
 use Drupal\Core\Entity\Entity\EntityFormDisplay;
-use Drupal\Tests\commerce\FunctionalJavascript\JavascriptTestTrait;
-use Drupal\Tests\commerce_cart\Functional\CartBrowserTestBase;
 
 /**
  * Tests pages with multiple products rendered with add to cart forms.
  *
  * @group commerce
  */
-class MultipleCartFormsTest extends CartBrowserTestBase {
-
-  use JavascriptTestTrait;
+class MultipleCartFormsTest extends CartWebDriverTestBase {
 
   /**
    * Modules to enable.
@@ -123,8 +119,6 @@ class MultipleCartFormsTest extends CartBrowserTestBase {
       $this->assertFalse(in_array($form_id, $seen_ids));
       $seen_ids[] = $form_id;
     }
-    $this->assertSession()->responseHeaderNotEquals('BigPipe-Test-Placeholders', '<none>');
-    $this->assertSession()->responseHeaderEquals('BigPipe-Test-No-Js-Placeholders', '<none>');
 
     $forms[1]->selectFieldOption('Size', 'Large');
     $this->assertSession()->assertWaitOnAjaxRequest();
