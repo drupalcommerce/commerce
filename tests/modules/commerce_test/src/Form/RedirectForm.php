@@ -22,7 +22,7 @@ class RedirectForm extends FormBase {
    * {@inheritdoc}
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
-    throw new NeedsRedirectException('https://www.drupal.org/');
+    throw new NeedsRedirectException('https://www.example.org/');
   }
 
   /**

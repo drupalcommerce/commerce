@@ -20,7 +20,7 @@ class RedirectTest extends CommerceBrowserTestBase {
   public function testRedirectForm() {
     $this->drupalGet('/commerce_test/redirect_form');
     $this->assertSession()->statusCodeEquals(200);
-    $this->assertEquals('https://www.drupal.org/', $this->getSession()->getCurrentUrl());
+    $this->assertEquals('https://www.example.org/', $this->getSession()->getCurrentUrl());
   }
 
 }
