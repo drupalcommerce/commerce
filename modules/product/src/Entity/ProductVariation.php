@@ -104,7 +104,7 @@ class ProductVariation extends CommerceContentEntityBase implements ProductVaria
       $route_parameters = [
         'commerce_product' => $this->getProductId(),
       ];
-      $options = [
+      $options += [
         'query' => [
           'v' => $this->id(),
         ],
