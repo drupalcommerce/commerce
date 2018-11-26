@@ -68,3 +68,7 @@ services:
   plugin.manager.commerce_entity_trait:
     class: Drupal\commerce\EntityTraitManager
     arguments: ['@container.namespaces', '@cache.discovery', '@module_handler', '@commerce.configurable_field_manager']
+
+  plugin.manager.commerce_inline_form:
+    class: Drupal\commerce\InlineFormManager
+    arguments: ['@container.namespaces', '@cache.discovery', '@module_handler']

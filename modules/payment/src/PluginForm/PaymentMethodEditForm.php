@@ -2,6 +2,7 @@
 
 namespace Drupal\commerce_payment\PluginForm;
 
+use Drupal\commerce\InlineFormManager;
 use Drupal\commerce_payment\CreditCard;
 use Drupal\commerce_payment\Entity\PaymentMethodInterface;
 use Drupal\commerce_payment\Exception\DeclineException;
@@ -13,6 +14,13 @@ use Drupal\Core\Logger\LoggerChannelFactoryInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class PaymentMethodEditForm extends PaymentGatewayFormBase implements ContainerInjectionInterface {
+
+  /**
+   * The inline form manager.
+   *
+   * @var \Drupal\commerce\InlineFormManager
+   */
+  protected $inlineFormManager;
 
   /**
    * The store storage.
@@ -31,6 +39,8 @@ class PaymentMethodEditForm extends PaymentGatewayFormBase implements ContainerI
   /**
    * Constructs a new PaymentMethodEditForm object.
    *
+   * @param \Drupal\commerce\InlineFormManager $inline_form_manager
+   *   The inline form manager.
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
    * @param \Drupal\Core\Logger\LoggerChannelFactoryInterface $logger_factory
@@ -38,7 +48,8 @@ class PaymentMethodEditForm extends PaymentGatewayFormBase implements ContainerI
    *
    * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
    */
-  public function __construct(EntityTypeManagerInterface $entity_type_manager, LoggerChannelFactoryInterface $logger_factory) {
+  public function __construct(InlineFormManager $inline_form_manager, EntityTypeManagerInterface $entity_type_manager, LoggerChannelFactoryInterface $logger_factory) {
+    $this->inlineFormManager = $inline_form_manager;
     $this->storeStorage = $entity_type_manager->getStorage('commerce_store');
     $this->logger = $logger_factory->get('commerce_payment');
   }
@@ -48,6 +59,7 @@ class PaymentMethodEditForm extends PaymentGatewayFormBase implements ContainerI
    */
   public static function create(ContainerInterface $container) {
     return new static(
+      $container->get('plugin.manager.commerce_inline_form'),
       $container->get('entity_type.manager'),
       $container->get('logger.factory')
     );
@@ -61,17 +73,18 @@ class PaymentMethodEditForm extends PaymentGatewayFormBase implements ContainerI
     $payment_method = $this->entity;
     $billing_profile = $payment_method->getBillingProfile();
     $store = $this->storeStorage->loadDefault();
+    $inline_form = $this->inlineFormManager->createInstance('customer_profile', [
+      'default_country' => $store ? $store->getAddress()->getCountryCode() : NULL,
+      'available_countries' => $store ? $store->getBillingCountries() : [],
+    ], $billing_profile);
 
     $form['#tree'] = TRUE;
     $form['#attached']['library'][] = 'commerce_payment/payment_method_form';
     $form['billing_information'] = [
       '#parents' => array_merge($form['#parents'], ['billing_information']),
-      '#type' => 'commerce_profile_select',
-      '#default_value' => $billing_profile,
-      '#default_country' => $store ? $store->getAddress()->getCountryCode() : NULL,
-      '#available_countries' => $store ? $store->getBillingCountries() : [],
-      '#weight' => 50,
+      '#inline_form' => $inline_form,
     ];
+    $form['billing_information'] = $inline_form->buildInlineForm($form['billing_information'], $form_state);
     if ($payment_method->bundle() == 'credit_card') {
       $form['payment_details'] = $this->buildCreditCardForm($payment_method, $form_state);
     }
@@ -85,10 +98,24 @@ class PaymentMethodEditForm extends PaymentGatewayFormBase implements ContainerI
   /**
    * {@inheritdoc}
    */
+  public function validateConfigurationForm(array &$form, FormStateInterface $form_state) {
+    /** @var \Drupal\commerce\Plugin\Commerce\InlineForm\EntityInlineFormInterface $inline_form */
+    $inline_form = $form['billing_information']['#inline_form'];
+    $inline_form->validateInlineForm($form['billing_information'], $form_state);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function submitConfigurationForm(array &$form, FormStateInterface $form_state) {
+    /** @var \Drupal\commerce\Plugin\Commerce\InlineForm\EntityInlineFormInterface $inline_form */
+    $inline_form = $form['billing_information']['#inline_form'];
+    $inline_form->submitInlineForm($form['billing_information'], $form_state);
+    /** @var \Drupal\profile\Entity\ProfileInterface $billing_profile */
+    $billing_profile = $inline_form->getEntity();
     /** @var \Drupal\commerce_payment\Entity\PaymentMethodInterface $payment_method */
     $payment_method = $this->entity;
-    $payment_method->setBillingProfile($form['billing_information']['#profile']);
+    $payment_method->setBillingProfile($billing_profile);
 
     if ($payment_method->bundle() == 'credit_card') {
       $expiration_date = $form_state->getValue(['payment_method', 'payment_details', 'expiration']);

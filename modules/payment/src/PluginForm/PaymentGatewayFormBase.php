@@ -3,6 +3,7 @@
 namespace Drupal\commerce_payment\PluginForm;
 
 use Drupal\commerce_payment\Entity\EntityWithPaymentGatewayInterface;
+use Drupal\Core\DependencyInjection\DependencySerializationTrait;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Plugin\PluginFormBase;
 
@@ -12,6 +13,8 @@ use Drupal\Core\Plugin\PluginFormBase;
  * @see \Drupal\Core\Plugin\PluginFormBase
  */
 abstract class PaymentGatewayFormBase extends PluginFormBase implements PaymentGatewayFormInterface {
+
+  use DependencySerializationTrait;
 
   /**
    * The form entity.

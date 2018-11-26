@@ -190,6 +190,7 @@ class ManualPaymentAdminTest extends CommerceBrowserTestBase {
     $this->paymentGateway->getPlugin()->createPayment($payment);
 
     $this->drupalGet($this->paymentUri . '/' . $payment->id() . '/operation/void');
+    $this->assertSession()->pageTextContains('Are you sure you want to void the 10 USD payment?');
     $this->getSession()->getPage()->pressButton('Void');
     $this->assertSession()->addressEquals($this->paymentUri);
     $this->assertSession()->pageTextContains('Voided');

@@ -2,6 +2,7 @@
 
 namespace Drupal\commerce_payment\Form;
 
+use Drupal\commerce\InlineFormManager;
 use Drupal\commerce_payment\Plugin\Commerce\PaymentGateway\SupportsStoredPaymentMethodsInterface;
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
@@ -24,13 +25,23 @@ class PaymentMethodAddForm extends FormBase implements ContainerInjectionInterfa
   protected $entityTypeManager;
 
   /**
+   * The inline form manager.
+   *
+   * @var \Drupal\commerce\InlineFormManager
+   */
+  protected $inlineFormManager;
+
+  /**
    * Constructs a new PaymentMethodAddForm instance.
    *
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
+   * @param \Drupal\commerce\InlineFormManager $inline_form_manager
+   *   The inline form manager.
    */
-  public function __construct(EntityTypeManagerInterface $entity_type_manager) {
+  public function __construct(EntityTypeManagerInterface $entity_type_manager, InlineFormManager $inline_form_manager) {
     $this->entityTypeManager = $entity_type_manager;
+    $this->inlineFormManager = $inline_form_manager;
   }
 
   /**
@@ -38,7 +49,8 @@ class PaymentMethodAddForm extends FormBase implements ContainerInjectionInterfa
    */
   public static function create(ContainerInterface $container) {
     return new static(
-      $container->get('entity_type.manager')
+      $container->get('entity_type.manager'),
+      $container->get('plugin.manager.commerce_inline_form')
     );
   }
 
@@ -140,12 +152,15 @@ class PaymentMethodAddForm extends FormBase implements ContainerInjectionInterfa
       'payment_gateway' => $form_state->get('payment_gateway'),
       'uid' => $form_state->getBuildInfo()['args'][0]->id(),
     ]);
+    $inline_form = $this->inlineFormManager->createInstance('payment_gateway_form', [
+      'operation' => 'add-payment-method',
+    ], $payment_method);
 
     $form['payment_method'] = [
-      '#type' => 'commerce_payment_gateway_form',
-      '#operation' => 'add-payment-method',
-      '#default_value' => $payment_method,
+      '#parents' => ['payment_method'],
+      '#inline_form' => $inline_form,
     ];
+    $form['payment_method'] = $inline_form->buildInlineForm($form['payment_method'], $form_state);
     $form['actions']['submit'] = [
       '#type' => 'submit',
       '#value' => $this->t('Save'),
@@ -153,6 +168,18 @@ class PaymentMethodAddForm extends FormBase implements ContainerInjectionInterfa
     ];
 
     return $form;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function validateForm(array &$form, FormStateInterface $form_state) {
+    $step = $form_state->get('step');
+    if ($step == 'payment_method') {
+      /** @var \Drupal\commerce\Plugin\Commerce\InlineForm\EntityInlineFormInterface $inline_form */
+      $inline_form = $form['payment_method']['#inline_form'];
+      $inline_form->validateInlineForm($form['payment_method'], $form_state);
+    }
   }
 
   /**
@@ -166,8 +193,11 @@ class PaymentMethodAddForm extends FormBase implements ContainerInjectionInterfa
       $form_state->setRebuild(TRUE);
     }
     elseif ($step == 'payment_method') {
+      /** @var \Drupal\commerce\Plugin\Commerce\InlineForm\EntityInlineFormInterface $inline_form */
+      $inline_form = $form['payment_method']['#inline_form'];
+      $inline_form->submitInlineForm($form['payment_method'], $form_state);
       /** @var \Drupal\commerce_payment\Entity\PaymentMethodInterface $payment_method */
-      $payment_method = $form_state->getValue('payment_method');
+      $payment_method = $inline_form->getEntity();
       $this->messenger()->addMessage($this->t('%label saved to your payment methods.', ['%label' => $payment_method->label()]));
       $form_state->setRedirect('entity.commerce_payment_method.collection', ['user' => $payment_method->getOwnerId()]);
     }

@@ -3,6 +3,7 @@
 namespace Drupal\commerce_payment\Form;
 
 use Drupal\commerce\EntityHelper;
+use Drupal\commerce\InlineFormManager;
 use Drupal\commerce_payment\Plugin\Commerce\PaymentGateway\OffsitePaymentGatewayInterface;
 use Drupal\commerce_payment\Plugin\Commerce\PaymentGateway\SupportsStoredPaymentMethodsInterface;
 use Drupal\Component\Utility\Html;
@@ -27,6 +28,13 @@ class PaymentAddForm extends FormBase implements ContainerInjectionInterface {
   protected $entityTypeManager;
 
   /**
+   * The inline form manager.
+   *
+   * @var \Drupal\commerce\InlineFormManager
+   */
+  protected $inlineFormManager;
+
+  /**
    * The current order.
    *
    * @var \Drupal\commerce_order\Entity\OrderInterface
@@ -38,11 +46,14 @@ class PaymentAddForm extends FormBase implements ContainerInjectionInterface {
    *
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
+   * @param \Drupal\commerce\InlineFormManager $inline_form_manager
+   *   The inline form manager.
    * @param \Drupal\Core\Routing\RouteMatchInterface $route_match
    *   The route match.
    */
-  public function __construct(EntityTypeManagerInterface $entity_type_manager, RouteMatchInterface $route_match) {
+  public function __construct(EntityTypeManagerInterface $entity_type_manager, InlineFormManager $inline_form_manager, RouteMatchInterface $route_match) {
     $this->entityTypeManager = $entity_type_manager;
+    $this->inlineFormManager = $inline_form_manager;
     $this->order = $route_match->getParameter('commerce_order');
   }
 
@@ -52,6 +63,7 @@ class PaymentAddForm extends FormBase implements ContainerInjectionInterface {
   public static function create(ContainerInterface $container) {
     return new static(
       $container->get('entity_type.manager'),
+      $container->get('plugin.manager.commerce_inline_form'),
       $container->get('current_route_match')
     );
   }
@@ -221,12 +233,15 @@ class PaymentAddForm extends FormBase implements ContainerInjectionInterface {
     }
     $payment_storage = $this->entityTypeManager->getStorage('commerce_payment');
     $payment = $payment_storage->create($values);
+    $inline_form = $this->inlineFormManager->createInstance('payment_gateway_form', [
+      'operation' => 'add-payment',
+    ], $payment);
 
     $form['payment'] = [
-      '#type' => 'commerce_payment_gateway_form',
-      '#operation' => 'add-payment',
-      '#default_value' => $payment,
+      '#parents' => ['payment'],
+      '#inline_form' => $inline_form,
     ];
+    $form['payment'] = $inline_form->buildInlineForm($form['payment'], $form_state);
     $form['actions']['submit'] = [
       '#type' => 'submit',
       '#value' => $this->t('Add payment'),
@@ -239,6 +254,18 @@ class PaymentAddForm extends FormBase implements ContainerInjectionInterface {
   /**
    * {@inheritdoc}
    */
+  public function validateForm(array &$form, FormStateInterface $form_state) {
+    $step = $form_state->get('step');
+    if ($step == 'payment') {
+      /** @var \Drupal\commerce\Plugin\Commerce\InlineForm\EntityInlineFormInterface $inline_form */
+      $inline_form = $form['payment']['#inline_form'];
+      $inline_form->validateInlineForm($form['payment'], $form_state);
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function submitForm(array &$form, FormStateInterface $form_state) {
     $step = $form_state->get('step');
     if ($step == 'payment_gateway') {
@@ -246,10 +273,12 @@ class PaymentAddForm extends FormBase implements ContainerInjectionInterface {
       $form_state->setRebuild(TRUE);
     }
     elseif ($step == 'payment') {
-      /** @var \Drupal\commerce_payment\Entity\PaymentInterface $payment */
-      $payment = $form_state->getValue('payment');
+      /** @var \Drupal\commerce\Plugin\Commerce\InlineForm\EntityInlineFormInterface $inline_form */
+      $inline_form = $form['payment']['#inline_form'];
+      $inline_form->submitInlineForm($form['payment'], $form_state);
+
       $this->messenger()->addMessage($this->t('Payment saved.'));
-      $form_state->setRedirect('entity.commerce_payment.collection', ['commerce_order' => $payment->getOrderId()]);
+      $form_state->setRedirect('entity.commerce_payment.collection', ['commerce_order' => $this->order->id()]);
     }
   }
 

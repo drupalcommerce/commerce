@@ -3,13 +3,16 @@
 namespace Drupal\commerce_order\Element;
 
 use Drupal\commerce\Element\CommerceElementTrait;
-use Drupal\Core\Entity\Entity\EntityFormDisplay;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\Element\RenderElement;
 use Drupal\profile\Entity\ProfileInterface;
 
+@trigger_error('The ' . __NAMESPACE__ . '\ProfileSelect is deprecated. Instead, use the customer_profile inline form. See https://www.drupal.org/node/3015309.', E_USER_DEPRECATED);
+
 /**
  * Provides a form element for selecting a customer profile.
+ *
+ * @deprecated Use the customer_profile inline form instead.
  *
  * Usage example:
  * @code
@@ -85,29 +88,16 @@ class ProfileSelect extends RenderElement {
     if (!is_array($element['#available_countries'])) {
       throw new \InvalidArgumentException('The commerce_profile_select #available_countries property must be an array.');
     }
-    // Make sure that the specified default country is available.
-    if (!empty($element['#default_country']) && !empty($element['#available_countries'])) {
-      if (!in_array($element['#default_country'], $element['#available_countries'])) {
-        $element['#default_country'] = NULL;
-      }
-    }
 
-    $element['#profile'] = $element['#default_value'];
-    $form_display = EntityFormDisplay::collectRenderDisplay($element['#profile'], 'default');
-    $form_display->buildForm($element['#profile'], $element, $form_state);
-    if (!empty($element['address']['widget'][0])) {
-      $widget_element = &$element['address']['widget'][0];
-      // Remove the details wrapper from the address widget.
-      $widget_element['#type'] = 'container';
-      // Provide a default country.
-      if (!empty($element['#default_country']) && empty($widget_element['address']['#default_value']['country_code'])) {
-        $widget_element['address']['#default_value']['country_code'] = $element['#default_country'];
-      }
-      // Limit the available countries.
-      if (!empty($element['#available_countries'])) {
-        $widget_element['address']['#available_countries'] = $element['#available_countries'];
-      }
-    }
+    /** @var \Drupal\commerce\InlineFormManager $inline_form_manager */
+    $inline_form_manager = \Drupal::service('plugin.manager.commerce_inline_form');
+    $inline_form = $inline_form_manager->createInstance('customer_profile', [
+      'default_country' => $element['#default_country'],
+      'available_countries' => $element['#available_countries'],
+    ], $element['#default_value']);
+
+    $element['#inline_form'] = $inline_form;
+    $element = $inline_form->buildInlineForm($element, $form_state);
 
     return $element;
   }
@@ -119,15 +109,12 @@ class ProfileSelect extends RenderElement {
    *   The form element.
    * @param \Drupal\Core\Form\FormStateInterface $form_state
    *   The current state of the form.
-   *
-   * @throws \Exception
-   *   Thrown if button-level #validate handlers are detected on the parent
-   *   form, as a protection against buggy behavior.
    */
   public static function validateForm(array &$element, FormStateInterface $form_state) {
-    $form_display = EntityFormDisplay::collectRenderDisplay($element['#profile'], 'default');
-    $form_display->extractFormValues($element['#profile'], $element, $form_state);
-    $form_display->validateFormValues($element['#profile'], $element, $form_state);
+    /** @var \Drupal\commerce\Plugin\Commerce\InlineForm\EntityInlineFormInterface $inline_form */
+    $inline_form = $element['#inline_form'];
+    $inline_form->validateInlineForm($element, $form_state);
+    $element['#profile'] = $inline_form->getEntity();
   }
 
   /**
@@ -139,9 +126,10 @@ class ProfileSelect extends RenderElement {
    *   The current state of the form.
    */
   public static function submitForm(array &$element, FormStateInterface $form_state) {
-    $form_display = EntityFormDisplay::collectRenderDisplay($element['#profile'], 'default');
-    $form_display->extractFormValues($element['#profile'], $element, $form_state);
-    $element['#profile']->save();
+    /** @var \Drupal\commerce\Plugin\Commerce\InlineForm\EntityInlineFormInterface $inline_form */
+    $inline_form = $element['#inline_form'];
+    $inline_form->submitInlineForm($element, $form_state);
+    $element['#profile'] = $inline_form->getEntity();
   }
 
 }
