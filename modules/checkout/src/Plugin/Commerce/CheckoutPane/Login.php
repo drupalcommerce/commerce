@@ -4,6 +4,7 @@ namespace Drupal\commerce_checkout\Plugin\Commerce\CheckoutPane;
 
 use Drupal\commerce\CredentialsCheckFloodInterface;
 use Drupal\commerce_checkout\Plugin\Commerce\CheckoutFlow\CheckoutFlowInterface;
+use Drupal\Core\Entity\Entity\EntityFormDisplay;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
@@ -242,6 +243,7 @@ class Login extends CheckoutPaneBase implements CheckoutPaneInterface, Container
     ];
 
     $pane_form['register'] = [
+      '#parents' => array_merge($pane_form['#parents'], ['register']),
       '#type' => 'fieldset',
       '#title' => $this->t('New Customer'),
       '#access' => $this->configuration['allow_registration'],
@@ -281,7 +283,13 @@ class Login extends CheckoutPaneBase implements CheckoutPaneInterface, Container
       '#type' => 'submit',
       '#value' => $this->t('Create account and continue'),
       '#op' => 'register',
+      '#weight' => 50,
     ];
+
+    /** @var \Drupal\user\UserInterface $account */
+    $account = $this->entityTypeManager->getStorage('user')->create([]);
+    $form_display = EntityFormDisplay::collectRenderDisplay($account, 'register');
+    $form_display->buildForm($account, $pane_form['register'], $form_state);
 
     return $pane_form;
   }
@@ -355,10 +363,17 @@ class Login extends CheckoutPaneBase implements CheckoutPaneInterface, Container
           'pass' => $password,
           'status' => TRUE,
         ]);
-        // Validate the entity. This will ensure that the username and email
-        // are in the right format and not already taken.
+
+        $form_display = EntityFormDisplay::collectRenderDisplay($account, 'register');
+        $form_display->extractFormValues($account, $pane_form['register'], $form_state);
+        $form_display->validateFormValues($account, $pane_form['register'], $form_state);
+
+        // Manually flag violations of fields not handled by the form display.
+        // This is necessary as entity form displays only flag violations for
+        // fields contained in the display.
+        // @see \Drupal\user\AccountForm::flagViolations
         $violations = $account->validate();
-        foreach ($violations->getByFields(['name', 'mail']) as $violation) {
+        foreach ($violations->getByFields(['name', 'pass', 'mail']) as $violation) {
           list($field_name) = explode('.', $violation->getPropertyPath(), 2);
           $form_state->setError($pane_form['register'][$field_name], $violation->getMessage());
         }

@@ -2,6 +2,8 @@
 
 namespace Drupal\Tests\commerce_checkout\Functional;
 
+use Drupal\field\Entity\FieldConfig;
+use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\Tests\commerce\Functional\CommerceBrowserTestBase;
 
 /**
@@ -282,6 +284,66 @@ class CheckoutOrderTest extends CommerceBrowserTestBase {
       'login[register][password][pass2]' => 'pass',
     ], 'Create account and continue');
     $this->assertSession()->pageTextContains('The username User name is already taken.');
+  }
+
+  /**
+   * Tests that you can register from the checkout pane with custom user fields.
+   */
+  public function testRegisterOrderCheckoutWithCustomUserFields() {
+    $field_storage = FieldStorageConfig::create([
+      'field_name' => 'test_user_field',
+      'entity_type' => 'user',
+      'type' => 'string',
+      'cardinality' => 1,
+    ]);
+    $field_storage->save();
+    $field = FieldConfig::create([
+      'field_storage' => $field_storage,
+      'label' => 'Custom user field',
+      'bundle' => 'user',
+      'required' => TRUE,
+    ]);
+    $field->save();
+    $form_display = commerce_get_entity_display('user', 'user', 'form');
+    $form_display->setComponent('test_user_field', ['type' => 'string_textfield']);
+    $form_display->save();
+
+    $config = \Drupal::configFactory()->getEditable('commerce_checkout.commerce_checkout_flow.default');
+    $config->set('configuration.panes.login.allow_guest_checkout', FALSE);
+    $config->set('configuration.panes.login.allow_registration', TRUE);
+    $config->save();
+
+    $this->drupalLogout();
+    $this->drupalGet($this->product->toUrl()->toString());
+    $this->submitForm([], 'Add to cart');
+    $cart_link = $this->getSession()->getPage()->findLink('your cart');
+    $cart_link->click();
+    $this->submitForm([], 'Checkout');
+    $this->assertSession()->pageTextContains('New Customer');
+    $this->submitForm([
+      'login[register][name]' => 'User name',
+      'login[register][mail]' => 'guest@example.com',
+      'login[register][password][pass1]' => 'pass',
+      'login[register][password][pass2]' => 'pass',
+    ], 'Create account and continue');
+    $this->assertSession()->pageTextContains('Custom user field field is required.');
+
+    $this->submitForm([
+      'login[register][name]' => 'User name',
+      'login[register][mail]' => 'guest@example.com',
+      'login[register][password][pass1]' => 'pass',
+      'login[register][password][pass2]' => 'pass',
+      'login[register][test_user_field][0][value]' => 'test_user_field_value',
+    ], 'Create account and continue');
+    $this->assertSession()->pageTextContains('Billing information');
+
+    $accounts = $this->container->get('entity_type.manager')
+      ->getStorage('user')
+      ->loadByProperties(['mail' => 'guest@example.com']);
+    /** @var \Drupal\user\UserInterface $account */
+    $account = reset($accounts);
+    $this->assertTrue($account->isActive());
+    $this->assertEquals('test_user_field_value', $account->get('test_user_field')->value);
   }
 
   /**
