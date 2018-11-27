@@ -40,16 +40,14 @@ class ProductVariationFieldRenderer implements ProductVariationFieldRendererInte
     // Rendering the product can cause an infinite loop.
     unset($build['product_id']);
     // Fields are rendered individually, top-level properties are not needed.
-    foreach ($build as $key => $value) {
+    foreach (array_keys($build) as $key) {
       if (Element::property($key)) {
         unset($build[$key]);
       }
     }
     // Prepare the fields for AJAX replacement.
-    foreach ($build as $field_name => &$elements) {
-      $ajax_class = $this->buildAjaxReplacementClass($field_name, $variation);
-      $elements['#attributes']['class'][] = $ajax_class;
-      $elements['#ajax_replace_class'] = $ajax_class;
+    foreach ($build as $field_name => $rendered_field) {
+      $build[$field_name] = $this->prepareForAjax($rendered_field, $field_name, $variation);
     }
 
     return $build;
@@ -59,15 +57,13 @@ class ProductVariationFieldRenderer implements ProductVariationFieldRendererInte
    * {@inheritdoc}
    */
   public function renderField($field_name, ProductVariationInterface $variation, $display_options = []) {
-    $build = $this->variationViewBuilder->viewField($variation->get($field_name), $display_options);
-    if (!empty($build)) {
-      // Prepare the fields for AJAX replacement.
-      $ajax_class = $this->buildAjaxReplacementClass($field_name, $variation);
-      $build['#attributes']['class'][] = $ajax_class;
-      $build['#ajax_replace_class'] = $ajax_class;
+    $rendered_field = $this->variationViewBuilder->viewField($variation->get($field_name), $display_options);
+    // An empty array indicates that the field is hidden on the view display.
+    if (!empty($rendered_field)) {
+      $rendered_field = $this->prepareForAjax($rendered_field, $field_name, $variation);
     }
 
-    return $build;
+    return $rendered_field;
   }
 
   /**
@@ -78,6 +74,32 @@ class ProductVariationFieldRenderer implements ProductVariationFieldRendererInte
     foreach ($rendered_fields as $field_name => $rendered_field) {
       $response->addCommand(new ReplaceCommand('.' . $rendered_field['#ajax_replace_class'], $rendered_field));
     }
+  }
+
+  /**
+   * Prepares the rendered field for AJAX replacement.
+   *
+   * @param array $rendered_field
+   *   The rendered field.
+   * @param string $field_name
+   *   The field name.
+   * @param \Drupal\commerce_product\Entity\ProductVariationInterface $variation
+   *   The product variation.
+   *
+   * @return array
+   *   The prepared rendered field.
+   */
+  protected function prepareForAjax(array $rendered_field, $field_name, ProductVariationInterface $variation) {
+    $ajax_class = $this->buildAjaxReplacementClass($field_name, $variation);
+    $rendered_field['#attributes']['class'][] = $ajax_class;
+    $rendered_field['#ajax_replace_class'] = $ajax_class;
+    // Ensure that a <div> is rendered even if the field is empty, to allow
+    // field replacement to work when the variation changes.
+    if (!Element::children($rendered_field)) {
+      $rendered_field['#type'] = 'container';
+    }
+
+    return $rendered_field;
   }
 
   /**

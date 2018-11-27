@@ -6,13 +6,15 @@ use Drupal\commerce_price\Entity\Currency;
 use Drupal\Core\Entity\Entity\EntityFormDisplay;
 use Drupal\Core\Entity\Entity\EntityViewDisplay;
 use Drupal\Core\Entity\Entity\EntityViewMode;
+use Drupal\field\Entity\FieldConfig;
+use Drupal\field\Entity\FieldStorageConfig;
 
 /**
- * Confirms that changing the product variation keeps the same view mode.
+ * Tests AJAX field replacement on the add to cart form.
  *
  * @group commerce
  */
-class AddToCartViewModeTest extends CartWebDriverTestBase {
+class AddToCartFieldReplacementTest extends CartWebDriverTestBase {
 
   /**
    * The first product variation.
@@ -50,6 +52,20 @@ class AddToCartViewModeTest extends CartWebDriverTestBase {
     ]);
     $order_item_form_display->save();
 
+    // Create an optional field that will have a value only on 1 variation.
+    FieldStorageConfig::create([
+      'field_name' => 'field_number',
+      'entity_type' => 'commerce_product_variation',
+      'type' => 'integer',
+    ])->save();
+
+    FieldConfig::create([
+      'field_name' => 'field_number',
+      'entity_type' => 'commerce_product_variation',
+      'bundle' => 'default',
+      'settings' => [],
+    ])->save();
+
     // Set up the Full view modes.
     EntityViewMode::create([
       'id' => 'commerce_product.full',
@@ -86,6 +102,9 @@ class AddToCartViewModeTest extends CartWebDriverTestBase {
         'status' => TRUE,
       ]);
     }
+    $full_view_display->setComponent('field_number', [
+      'type' => 'number_integer',
+    ]);
     $full_view_display->setComponent('price', [
       'type' => 'commerce_price_plain',
     ]);
@@ -99,6 +118,7 @@ class AddToCartViewModeTest extends CartWebDriverTestBase {
         'number' => 10,
         'currency_code' => 'USD',
       ],
+      'field_number' => 202,
     ]);
     $this->secondVariation = $this->createEntity('commerce_product_variation', [
       'title' => 'Second variation',
@@ -118,14 +138,13 @@ class AddToCartViewModeTest extends CartWebDriverTestBase {
   }
 
   /**
-   * Tests changing the product variation.
+   * Tests the field replacement.
    *
-   * The `commerce_product_variation.default.full` configuration uses the
-   * `commerce_price_plain` formatter, but the default view mode still uses the
-   * `commerce_price_default` formatter. The AJAX refresh should return currency
-   *  in the plain format of ##.00 USD and not $##.00.
+   * Expectations:
+   * 1) The initial view mode is preserved on AJAX refresh.
+   * 2) Optional fields are correctly replaced even if the field is empty.
    */
-  public function testAjaxChange() {
+  public function testFieldReplacement() {
     $this->drupalGet($this->product->toUrl());
 
     $page = $this->getSession()->getPage();
@@ -145,20 +164,27 @@ class AddToCartViewModeTest extends CartWebDriverTestBase {
     $second_variation_price = trim($renderer->renderPlain($second_variation_price));
 
     $price_field_selector = '.product--variation-field--variation_price__' . $this->product->id();
+    $integer_field_selector = '.product--variation-field--variation_field_number__' . $this->product->id();
 
     $this->assertSession()->elementExists('css', $price_field_selector);
+    $this->assertSession()->elementExists('css', $integer_field_selector);
     $this->assertSession()->elementTextContains('css', $price_field_selector . ' .field__item', $first_variation_price);
+    $this->assertSession()->elementTextContains('css', $integer_field_selector . ' .field__item', $this->firstVariation->get('field_number')->value);
     $this->assertSession()->fieldValueEquals('purchased_entity[0][variation]', $this->firstVariation->id());
     $page->selectFieldOption('purchased_entity[0][variation]', $this->secondVariation->id());
     $this->assertSession()->assertWaitOnAjaxRequest();
 
     $this->assertSession()->elementExists('css', $price_field_selector);
+    $this->assertSession()->elementExists('css', $integer_field_selector);
     $this->assertSession()->elementTextContains('css', $price_field_selector . ' .field__item', $second_variation_price);
+    $this->assertSession()->elementNotExists('css', $integer_field_selector . ' .field__item');
 
     $page->selectFieldOption('purchased_entity[0][variation]', $this->firstVariation->id());
     $this->assertSession()->assertWaitOnAjaxRequest();
     $this->assertSession()->elementExists('css', $price_field_selector);
+    $this->assertSession()->elementExists('css', $integer_field_selector);
     $this->assertSession()->elementTextContains('css', $price_field_selector . ' .field__item', $first_variation_price);
+    $this->assertSession()->elementTextContains('css', $integer_field_selector . ' .field__item', $this->firstVariation->get('field_number')->value);
   }
 
 }

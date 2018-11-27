@@ -153,6 +153,10 @@ class ProductVariationFieldRendererTest extends CommerceKernelTestBase {
       'label' => 'above',
       'type' => 'entity_reference_entity_view',
     ]);
+    $entity_display->setComponent('list_price', [
+      'label' => 'above',
+      'type' => 'commerce_price_default',
+    ]);
     $entity_display->removeComponent('price');
     $entity_display->save();
 
@@ -162,10 +166,17 @@ class ProductVariationFieldRendererTest extends CommerceKernelTestBase {
     $this->assertArrayNotHasKey('price', $rendered_fields);
     $this->assertArrayHasKey('sku', $rendered_fields);
     $this->assertArrayHasKey('attribute_color', $rendered_fields);
+    $this->assertNotEmpty($rendered_fields['sku']);
     $this->assertNotEmpty($rendered_fields['sku'][0]);
+    $this->assertNotEmpty($rendered_fields['attribute_color']);
     $this->assertNotEmpty($rendered_fields['attribute_color'][0]);
     $this->assertEquals('product--variation-field--variation_sku__' . $variation->getProductId(), $rendered_fields['sku']['#ajax_replace_class']);
     $this->assertEquals('product--variation-field--variation_attribute_color__' . $variation->getProductId(), $rendered_fields['attribute_color']['#ajax_replace_class']);
+    // Confirm that an empty field gets a rendered wrapper.
+    $this->assertArrayHasKey('list_price', $rendered_fields);
+    $this->assertNotEmpty($rendered_fields['list_price']);
+    $this->assertEquals('product--variation-field--variation_list_price__' . $variation->getProductId(), $rendered_fields['list_price']['#ajax_replace_class']);
+    $this->assertEquals('container', $rendered_fields['list_price']['#type']);
 
     $product_view_builder = $this->container->get('entity_type.manager')->getViewBuilder('commerce_product');
     $product_build = $product_view_builder->view($product);
@@ -296,12 +307,23 @@ class ProductVariationFieldRendererTest extends CommerceKernelTestBase {
       'label' => 'above',
       'type' => 'string',
     ]);
+    $entity_display->setComponent('list_price', [
+      'label' => 'above',
+      'type' => 'commerce_price_default',
+    ]);
     $entity_display->removeComponent('price');
     $entity_display->save();
 
     $rendered_field = $this->variationFieldRenderer->renderField('sku', $variation, 'default');
+    $this->assertNotEmpty($rendered_field);
     $this->assertNotEmpty($rendered_field[0]);
     $this->assertEquals('product--variation-field--variation_sku__' . $variation->getProductId(), $rendered_field['#ajax_replace_class']);
+
+    // Confirm that an empty field gets a rendered wrapper.
+    $rendered_field = $this->variationFieldRenderer->renderField('list_price', $variation, 'default');
+    $this->assertNotEmpty($rendered_field);
+    $this->assertEquals('product--variation-field--variation_list_price__' . $variation->getProductId(), $rendered_field['#ajax_replace_class']);
+    $this->assertEquals('container', $rendered_field['#type']);
 
     // Confirm that hidden fields don't get AJAX classes.
     $rendered_field = $this->variationFieldRenderer->renderField('price', $variation, 'default');
@@ -311,6 +333,7 @@ class ProductVariationFieldRendererTest extends CommerceKernelTestBase {
     $rendered_field = $this->variationFieldRenderer->renderField('price', $variation, [
       'type' => 'commerce_price_default',
     ]);
+    $this->assertNotEmpty($rendered_field);
     $this->assertNotEmpty($rendered_field[0]);
     $this->assertEquals('product--variation-field--variation_price__' . $variation->getProductId(), $rendered_field['#ajax_replace_class']);
   }
