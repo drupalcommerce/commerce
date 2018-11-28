@@ -153,8 +153,10 @@ class OrderIntegrationTest extends CommerceKernelTestBase {
       'type' => 'test',
       'quantity' => '1',
       'unit_price' => new Price('12.00', 'USD'),
+      'overridden_unit_price' => TRUE,
     ]);
     $order_item->save();
+    $this->assertTrue((bool) $order_item->isUnitPriceOverridden());
     $this->order->addItem($order_item);
     $this->order->setBillingProfile($profile);
     $this->order->save();
@@ -163,6 +165,7 @@ class OrderIntegrationTest extends CommerceKernelTestBase {
     $order_items = $this->order->getItems();
     $order_item = reset($order_items);
     $this->assertEquals(new Price('10.00', 'USD'), $order_item->getUnitPrice());
+    $this->assertTrue((bool) $order_item->isUnitPriceOverridden());
   }
 
 }
