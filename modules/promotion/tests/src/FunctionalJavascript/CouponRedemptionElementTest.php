@@ -110,7 +110,6 @@ class CouponRedemptionElementTest extends CommerceWebDriverTestBase {
     $coupon = reset($coupons);
 
     $this->drupalGet(Url::fromRoute('commerce_cart.page', [], ['query' => ['coupon_cardinality' => 1]]));
-    $this->assertSession()->pageTextContains('Enter your coupon code to redeem a promotion.');
     // Empty coupon.
     $this->getSession()->getPage()->pressButton('Apply coupon');
     $this->waitForAjaxToFinish();

@@ -16,7 +16,6 @@ function commerce_promotion_test_form_views_form_commerce_cart_form_default_alte
 
   $form['coupons'] = [
     '#type' => 'commerce_coupon_redemption_form',
-    '#description' => 'Enter your coupon code to redeem a promotion.',
     '#order_id' => $order_id,
     '#cardinality' => Drupal::request()->query->get('coupon_cardinality'),
   ];

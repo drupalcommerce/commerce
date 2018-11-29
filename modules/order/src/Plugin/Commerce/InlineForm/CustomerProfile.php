@@ -8,7 +8,7 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\profile\Entity\ProfileInterface;
 
 /**
- * Provides a form element for managing a customer profile.
+ * Provides an inlne form for managing a customer profile.
  *
  * @CommerceInlineForm(
  *   id = "customer_profile",

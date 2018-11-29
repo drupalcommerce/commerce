@@ -2,9 +2,13 @@
 
 namespace Drupal\commerce_promotion\Plugin\Commerce\CheckoutPane;
 
+use Drupal\commerce\InlineFormManager;
+use Drupal\commerce_checkout\Plugin\Commerce\CheckoutFlow\CheckoutFlowInterface;
 use Drupal\commerce_checkout\Plugin\Commerce\CheckoutPane\CheckoutPaneBase;
 use Drupal\Core\Ajax\InsertCommand;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\FormStateInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Provides the coupon redemption pane.
@@ -17,6 +21,49 @@ use Drupal\Core\Form\FormStateInterface;
  * )
  */
 class CouponRedemption extends CheckoutPaneBase {
+
+  /**
+   * The inline form manager.
+   *
+   * @var \Drupal\commerce\InlineFormManager
+   */
+  protected $inlineFormManager;
+
+  /**
+   * Constructs a new CouponRedemption object.
+   *
+   * @param array $configuration
+   *   A configuration array containing information about the plugin instance.
+   * @param string $plugin_id
+   *   The plugin_id for the plugin instance.
+   * @param mixed $plugin_definition
+   *   The plugin implementation definition.
+   * @param \Drupal\commerce_checkout\Plugin\Commerce\CheckoutFlow\CheckoutFlowInterface $checkout_flow
+   *   The parent checkout flow.
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   *   The entity type manager.
+   * @param \Drupal\commerce\InlineFormManager $inline_form_manager
+   *   The inline form manager.
+   */
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, CheckoutFlowInterface $checkout_flow, EntityTypeManagerInterface $entity_type_manager, InlineFormManager $inline_form_manager) {
+    parent::__construct($configuration, $plugin_id, $plugin_definition, $checkout_flow, $entity_type_manager);
+
+    $this->inlineFormManager = $inline_form_manager;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition, CheckoutFlowInterface $checkout_flow = NULL) {
+    return new static(
+      $configuration,
+      $plugin_id,
+      $plugin_definition,
+      $checkout_flow,
+      $container->get('entity_type.manager'),
+      $container->get('plugin.manager.commerce_inline_form')
+    );
+  }
 
   /**
    * {@inheritdoc}
@@ -71,16 +118,47 @@ class CouponRedemption extends CheckoutPaneBase {
    * {@inheritdoc}
    */
   public function buildPaneForm(array $pane_form, FormStateInterface $form_state, array &$complete_form) {
-    $pane_form['form'] = [
-      '#type' => 'commerce_coupon_redemption_form',
-      '#order_id' => $this->order->id(),
-      '#cardinality' => $this->configuration['allow_multiple'] ? NULL : 1,
-      '#element_ajax' => [
+    $inline_form = $this->inlineFormManager->createInstance('coupon_redemption', [
+      'order_id' => $this->order->id(),
+      'max_coupons' => $this->configuration['allow_multiple'] ? NULL : 1,
+      'ajax_callbacks' => [
         [get_class($this), 'ajaxRefreshSummary'],
       ],
+    ]);
+
+    $pane_form['form'] = [
+      '#parents' => array_merge($pane_form['#parents'], ['form']),
+      '#inline_form' => $inline_form,
     ];
+    $pane_form['form'] = $inline_form->buildInlineForm($pane_form['form'], $form_state);
 
     return $pane_form;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function validatePaneForm(array &$pane_form, FormStateInterface $form_state, array &$complete_form) {
+    parent::validatePaneForm($pane_form, $form_state, $complete_form);
+
+    /** @var \Drupal\commerce\Plugin\Commerce\InlineForm\InlineFormInterface $inline_form */
+    $inline_form = $pane_form['form']['#inline_form'];
+    $inline_form->validateInlineForm($pane_form['form'], $form_state);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function submitPaneForm(array &$pane_form, FormStateInterface $form_state, array &$complete_form) {
+    /** @var \Drupal\commerce\Plugin\Commerce\InlineForm\InlineFormInterface $inline_form */
+    $inline_form = $pane_form['form']['#inline_form'];
+    $inline_form->submitInlineForm($pane_form['form'], $form_state);
+
+    // The form was submitted with a non-applied coupon in the input field,
+    // mapped to a coupon ID in CouponRedemptionForm::validateForm().
+    if (!empty($pane_form['form']['code']['#coupon_id'])) {
+      $this->order->get('coupons')->appendItem($pane_form['form']['code']['#coupon_id']);
+    }
   }
 
   /**
@@ -90,17 +168,6 @@ class CouponRedemption extends CheckoutPaneBase {
     if (isset($form['sidebar']['order_summary'])) {
       $summary_element = $form['sidebar']['order_summary'];
       return new InsertCommand('[data-drupal-selector="edit-sidebar-order-summary"]', $summary_element);
-    }
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function submitPaneForm(array &$pane_form, FormStateInterface $form_state, array &$complete_form) {
-    // The form was submitted with a non-applied coupon in the input field,
-    // mapped to a coupon ID in CouponRedemptionForm::validateForm().
-    if (!empty($pane_form['form']['code']['#coupon_id'])) {
-      $this->order->get('coupons')->appendItem($pane_form['form']['code']['#coupon_id']);
     }
   }
 
