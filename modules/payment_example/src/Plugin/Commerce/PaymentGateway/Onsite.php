@@ -186,6 +186,15 @@ class Onsite extends OnsitePaymentGatewayBase implements OnsiteInterface {
       }
     }
 
+    // Add a built in test for testing decline exceptions.
+    /** @var \Drupal\address\Plugin\Field\FieldType\AddressItem $billing_address */
+    if ($billing_address = $payment_method->getBillingProfile()) {
+      $billing_address = $payment_method->getBillingProfile()->get('address')->first();
+      if ($billing_address->getPostalCode() == '53141') {
+        throw new HardDeclineException('The payment method was declined');
+      }
+    }
+
     // If the remote API needs a remote customer to be created.
     $owner = $payment_method->getOwner();
     if ($owner && $owner->isAuthenticated()) {

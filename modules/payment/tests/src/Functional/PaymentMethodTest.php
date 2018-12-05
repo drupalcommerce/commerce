@@ -132,6 +132,33 @@ class PaymentMethodTest extends CommerceBrowserTestBase {
   }
 
   /**
+   * Tests creating a payment method declined by the remote API.
+   */
+  public function testPaymentMethodDecline() {
+    /** @var \Drupal\commerce_payment_example\Plugin\Commerce\PaymentGateway\OnsiteInterface $plugin */
+    $this->drupalGet($this->collectionUrl);
+    $this->getSession()->getPage()->clickLink('Add payment method');
+    $this->assertSession()->addressEquals($this->collectionUrl . '/add');
+
+    $form_values = [
+      'payment_method[payment_details][number]' => '4111111111111111',
+      'payment_method[payment_details][expiration][month]' => '01',
+      'payment_method[payment_details][expiration][year]' => date('Y') + 1,
+      'payment_method[payment_details][security_code]' => '111',
+      'payment_method[billing_information][address][0][address][given_name]' => 'Johnny',
+      'payment_method[billing_information][address][0][address][family_name]' => 'Appleseed',
+      'payment_method[billing_information][address][0][address][address_line1]' => '123 New York Drive',
+      'payment_method[billing_information][address][0][address][locality]' => 'Somewhere',
+      'payment_method[billing_information][address][0][address][administrative_area]' => 'WI',
+      'payment_method[billing_information][address][0][address][postal_code]' => '53141',
+    ];
+    $this->submitForm($form_values, 'Save');
+    $this->assertSession()->addressNotEquals($this->collectionUrl);
+    $this->assertSession()->pageTextNotContains('Visa ending in 1111 saved to your payment methods.');
+    $this->assertSession()->pageTextContains('We encountered an error processing your payment method. Please verify your details and try again.');
+  }
+
+  /**
    * Tests deleting a payment method.
    */
   public function testPaymentMethodDeletion() {

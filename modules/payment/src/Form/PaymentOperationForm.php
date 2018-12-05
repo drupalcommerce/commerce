@@ -81,19 +81,9 @@ class PaymentOperationForm extends EntityForm implements ContainerInjectionInter
   /**
    * {@inheritdoc}
    */
-  public function validateForm(array &$form, FormStateInterface $form_state) {
-    /** @var \Drupal\commerce\Plugin\Commerce\InlineForm\EntityInlineFormInterface $inline_form */
-    $inline_form = $form['payment']['#inline_form'];
-    $inline_form->validateInlineForm($form['payment'], $form_state);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function submitForm(array &$form, FormStateInterface $form_state) {
     /** @var \Drupal\commerce\Plugin\Commerce\InlineForm\EntityInlineFormInterface $inline_form */
     $inline_form = $form['payment']['#inline_form'];
-    $inline_form->submitInlineForm($form['payment'], $form_state);
     /** @var \Drupal\commerce_payment\Entity\PaymentInterface $payment */
     $payment = $inline_form->getEntity();
 

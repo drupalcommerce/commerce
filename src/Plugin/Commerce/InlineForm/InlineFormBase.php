@@ -2,6 +2,7 @@
 
 namespace Drupal\commerce\Plugin\Commerce\InlineForm;
 
+use Drupal\commerce\Element\CommerceElementTrait;
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
@@ -104,6 +105,12 @@ abstract class InlineFormBase extends PluginBase implements InlineFormInterface,
    * {@inheritdoc}
    */
   public function buildInlineForm(array $inline_form, FormStateInterface $form_state) {
+    // Automatically validate and submit inline forms.
+    $inline_form['#inline_form'] = $this;
+    $inline_form['#process'][] = [CommerceElementTrait::class, 'attachElementSubmit'];
+    $inline_form['#element_validate'][] = [CommerceElementTrait::class, 'validateElementSubmit'];
+    $inline_form['#element_validate'][] = [get_class($this), 'runValidate'];
+    $inline_form['#commerce_element_submit'][] = [get_class($this), 'runSubmit'];
     // Allow inline forms to modify the page title.
     $inline_form['#process'][] = [get_class($this), 'updatePageTitle'];
 
@@ -119,6 +126,34 @@ abstract class InlineFormBase extends PluginBase implements InlineFormInterface,
    * {@inheritdoc}
    */
   public function submitInlineForm(array &$inline_form, FormStateInterface $form_state) {}
+
+  /**
+   * Runs the inline form validation.
+   *
+   * @param array $inline_form
+   *   The inline form.
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   *   The current state of the form.
+   */
+  public static function runValidate(array &$inline_form, FormStateInterface $form_state) {
+    /** @var \Drupal\commerce\Plugin\Commerce\InlineForm\InlineFormInterface $plugin */
+    $plugin = $inline_form['#inline_form'];
+    $plugin->validateInlineForm($inline_form, $form_state);
+  }
+
+  /**
+   * Runs the inline form submission.
+   *
+   * @param array $inline_form
+   *   The inline form.
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   *   The current state of the form.
+   */
+  public static function runSubmit(array &$inline_form, FormStateInterface $form_state) {
+    /** @var \Drupal\commerce\Plugin\Commerce\InlineForm\InlineFormInterface $plugin */
+    $plugin = $inline_form['#inline_form'];
+    $plugin->submitInlineForm($inline_form, $form_state);
+  }
 
   /**
    * Updates the page title based on the inline form's #page_title property.

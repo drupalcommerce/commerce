@@ -2,7 +2,6 @@
 
 namespace Drupal\commerce_order\Plugin\Field\FieldWidget;
 
-use Drupal\commerce\Element\CommerceElementTrait;
 use Drupal\commerce\InlineFormManager;
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
@@ -107,10 +106,6 @@ class BillingProfileWidget extends WidgetBase implements ContainerFactoryPluginI
       '#inline_form' => $inline_form,
     ];
     $element['profile'] = $inline_form->buildInlineForm($element['profile'], $form_state);
-    // Workaround for widgets not having validate/submit callbacks.
-    CommerceElementTrait::attachElementSubmit($element, $form_state, $form);
-    $element['#element_validate'][] = [get_class($this), 'validateElement'];
-    $element['#commerce_element_submit'][] = [get_class($this), 'submitElement'];
     // Workaround for massageFormValues() not getting $element.
     $element['array_parents'] = [
       '#type' => 'value',
@@ -118,34 +113,6 @@ class BillingProfileWidget extends WidgetBase implements ContainerFactoryPluginI
     ];
 
     return $element;
-  }
-
-  /**
-   * Validates the element.
-   *
-   * @param array $element
-   *   The form element.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
-   *   The current state of the form.
-   */
-  public static function validateElement(array $element, FormStateInterface $form_state) {
-    /** @var \Drupal\commerce\Plugin\Commerce\InlineForm\EntityInlineFormInterface $inline_form */
-    $inline_form = $element['profile']['#inline_form'];
-    $inline_form->validateInlineForm($element['profile'], $form_state);
-  }
-
-  /**
-   * Submits the element.
-   *
-   * @param array $element
-   *   The form element.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
-   *   The current state of the form.
-   */
-  public static function submitElement(array $element, FormStateInterface $form_state) {
-    /** @var \Drupal\commerce\Plugin\Commerce\InlineForm\EntityInlineFormInterface $inline_form */
-    $inline_form = $element['profile']['#inline_form'];
-    $inline_form->submitInlineForm($element['profile'], $form_state);
   }
 
   /**

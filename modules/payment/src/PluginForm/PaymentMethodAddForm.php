@@ -145,9 +145,6 @@ class PaymentMethodAddForm extends PaymentGatewayFormBase implements ContainerIn
     elseif ($payment_method->bundle() == 'paypal') {
       $this->validatePayPalForm($form['payment_details'], $form_state);
     }
-    /** @var \Drupal\commerce\Plugin\Commerce\InlineForm\EntityInlineFormInterface $inline_form */
-    $inline_form = $form['billing_information']['#inline_form'];
-    $inline_form->validateInlineForm($form['billing_information'], $form_state);
   }
 
   /**
@@ -164,7 +161,6 @@ class PaymentMethodAddForm extends PaymentGatewayFormBase implements ContainerIn
     }
     /** @var \Drupal\commerce\Plugin\Commerce\InlineForm\EntityInlineFormInterface $inline_form */
     $inline_form = $form['billing_information']['#inline_form'];
-    $inline_form->submitInlineForm($form['billing_information'], $form_state);
     /** @var \Drupal\profile\Entity\ProfileInterface $billing_profile */
     $billing_profile = $inline_form->getEntity();
     $payment_method->setBillingProfile($billing_profile);

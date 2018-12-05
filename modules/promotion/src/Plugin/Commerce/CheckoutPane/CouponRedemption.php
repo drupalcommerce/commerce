@@ -128,7 +128,6 @@ class CouponRedemption extends CheckoutPaneBase {
 
     $pane_form['form'] = [
       '#parents' => array_merge($pane_form['#parents'], ['form']),
-      '#inline_form' => $inline_form,
     ];
     $pane_form['form'] = $inline_form->buildInlineForm($pane_form['form'], $form_state);
 
@@ -138,22 +137,7 @@ class CouponRedemption extends CheckoutPaneBase {
   /**
    * {@inheritdoc}
    */
-  public function validatePaneForm(array &$pane_form, FormStateInterface $form_state, array &$complete_form) {
-    parent::validatePaneForm($pane_form, $form_state, $complete_form);
-
-    /** @var \Drupal\commerce\Plugin\Commerce\InlineForm\InlineFormInterface $inline_form */
-    $inline_form = $pane_form['form']['#inline_form'];
-    $inline_form->validateInlineForm($pane_form['form'], $form_state);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function submitPaneForm(array &$pane_form, FormStateInterface $form_state, array &$complete_form) {
-    /** @var \Drupal\commerce\Plugin\Commerce\InlineForm\InlineFormInterface $inline_form */
-    $inline_form = $pane_form['form']['#inline_form'];
-    $inline_form->submitInlineForm($pane_form['form'], $form_state);
-
     // The form was submitted with a non-applied coupon in the input field,
     // mapped to a coupon ID in CouponRedemptionForm::validateForm().
     if (!empty($pane_form['form']['code']['#coupon_id'])) {

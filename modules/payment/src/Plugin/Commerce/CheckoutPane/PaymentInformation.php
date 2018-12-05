@@ -305,18 +305,8 @@ class PaymentInformation extends CheckoutPaneBase {
    * {@inheritdoc}
    */
   public function validatePaneForm(array &$pane_form, FormStateInterface $form_state, array &$complete_form) {
-    if (isset($pane_form['billing_information'])) {
-      /** @var \Drupal\commerce\Plugin\Commerce\InlineForm\EntityInlineFormInterface $inline_form */
-      $inline_form = $pane_form['billing_information']['#inline_form'];
-      $inline_form->validateInlineForm($pane_form['billing_information'], $form_state);
-      if ($this->order->isPaid() || $this->order->getTotalPrice()->isZero()) {
-        return;
-      }
-    }
-    elseif (isset($pane_form['add_payment_method'])) {
-      /** @var \Drupal\commerce\Plugin\Commerce\InlineForm\EntityInlineFormInterface $inline_form */
-      $inline_form = $pane_form['add_payment_method']['#inline_form'];
-      $inline_form->validateInlineForm($pane_form['add_payment_method'], $form_state);
+    if ($this->order->isPaid() || $this->order->getTotalPrice()->isZero()) {
+      return;
     }
 
     $values = $form_state->getValue($pane_form['#parents']);
@@ -333,7 +323,6 @@ class PaymentInformation extends CheckoutPaneBase {
     if (isset($pane_form['billing_information'])) {
       /** @var \Drupal\commerce\Plugin\Commerce\InlineForm\EntityInlineFormInterface $inline_form */
       $inline_form = $pane_form['billing_information']['#inline_form'];
-      $inline_form->submitInlineForm($pane_form['billing_information'], $form_state);
       /** @var \Drupal\profile\Entity\ProfileInterface $billing_profile */
       $billing_profile = $inline_form->getEntity();
       if ($this->order->isPaid() || $this->order->getTotalPrice()->isZero()) {
@@ -357,7 +346,6 @@ class PaymentInformation extends CheckoutPaneBase {
       if (!empty($selected_option->getPaymentMethodTypeId())) {
         /** @var \Drupal\commerce\Plugin\Commerce\InlineForm\EntityInlineFormInterface $inline_form */
         $inline_form = $pane_form['add_payment_method']['#inline_form'];
-        $inline_form->submitInlineForm($pane_form['add_payment_method'], $form_state);
         // The payment method was just created.
         $payment_method = $inline_form->getEntity();
       }

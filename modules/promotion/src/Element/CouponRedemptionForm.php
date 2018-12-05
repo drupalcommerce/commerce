@@ -42,9 +42,6 @@ class CouponRedemptionForm extends FormElement {
       '#process' => [
         [$class, 'processForm'],
       ],
-      '#element_validate' => [
-        [$class, 'validateForm'],
-      ],
       '#theme_wrappers' => ['container'],
     ];
   }
@@ -82,20 +79,6 @@ class CouponRedemptionForm extends FormElement {
     $element = $inline_form->buildInlineForm($element, $form_state);
 
     return $element;
-  }
-
-  /**
-   * Validates the coupon redemption form.
-   *
-   * @param array $element
-   *   The form element.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
-   *   The current state of the form.
-   */
-  public static function validateForm(array &$element, FormStateInterface $form_state) {
-    /** @var \Drupal\commerce\Plugin\Commerce\InlineForm\InlineFormInterface $inline_form */
-    $inline_form = $element['#inline_form'];
-    $inline_form->validateInlineForm($element, $form_state);
   }
 
 }

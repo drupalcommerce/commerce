@@ -105,19 +105,9 @@ class BillingInformation extends CheckoutPaneBase implements CheckoutPaneInterfa
   /**
    * {@inheritdoc}
    */
-  public function validatePaneForm(array &$pane_form, FormStateInterface $form_state, array &$complete_form) {
-    /** @var \Drupal\commerce\Plugin\Commerce\InlineForm\EntityInlineFormInterface $inline_form */
-    $inline_form = $pane_form['profile']['#inline_form'];
-    $inline_form->validateInlineForm($pane_form['profile'], $form_state);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function submitPaneForm(array &$pane_form, FormStateInterface $form_state, array &$complete_form) {
     /** @var \Drupal\commerce\Plugin\Commerce\InlineForm\EntityInlineFormInterface $inline_form */
     $inline_form = $pane_form['profile']['#inline_form'];
-    $inline_form->submitInlineForm($pane_form['profile'], $form_state);
     /** @var \Drupal\profile\Entity\ProfileInterface $profile */
     $profile = $inline_form->getEntity();
     $this->order->setBillingProfile($profile);

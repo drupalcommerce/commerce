@@ -52,10 +52,6 @@ class ProfileSelect extends RenderElement {
       ],
       '#element_validate' => [
         [$class, 'validateElementSubmit'],
-        [$class, 'validateForm'],
-      ],
-      '#commerce_element_submit' => [
-        [$class, 'submitForm'],
       ],
       '#theme_wrappers' => ['container'],
     ];
@@ -98,37 +94,24 @@ class ProfileSelect extends RenderElement {
 
     $element['#inline_form'] = $inline_form;
     $element = $inline_form->buildInlineForm($element, $form_state);
+    // The updateProfile() callback needs to run after the inline form ones.
+    $element['#element_validate'][] = [get_called_class(), 'updateProfile'];
+    $element['#commerce_element_submit'][] = [get_called_class(), 'updateProfile'];
 
     return $element;
   }
 
   /**
-   * Validates the element form.
+   * Updates $element['#profile'] with the inline form's entity.
    *
    * @param array $element
    *   The form element.
    * @param \Drupal\Core\Form\FormStateInterface $form_state
    *   The current state of the form.
    */
-  public static function validateForm(array &$element, FormStateInterface $form_state) {
+  public static function updateProfile(array &$element, FormStateInterface $form_state) {
     /** @var \Drupal\commerce\Plugin\Commerce\InlineForm\EntityInlineFormInterface $inline_form */
     $inline_form = $element['#inline_form'];
-    $inline_form->validateInlineForm($element, $form_state);
-    $element['#profile'] = $inline_form->getEntity();
-  }
-
-  /**
-   * Submits the element form.
-   *
-   * @param array $element
-   *   The form element.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
-   *   The current state of the form.
-   */
-  public static function submitForm(array &$element, FormStateInterface $form_state) {
-    /** @var \Drupal\commerce\Plugin\Commerce\InlineForm\EntityInlineFormInterface $inline_form */
-    $inline_form = $element['#inline_form'];
-    $inline_form->submitInlineForm($element, $form_state);
     $element['#profile'] = $inline_form->getEntity();
   }
 

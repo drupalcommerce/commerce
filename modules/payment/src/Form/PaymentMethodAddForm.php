@@ -173,18 +173,6 @@ class PaymentMethodAddForm extends FormBase implements ContainerInjectionInterfa
   /**
    * {@inheritdoc}
    */
-  public function validateForm(array &$form, FormStateInterface $form_state) {
-    $step = $form_state->get('step');
-    if ($step == 'payment_method') {
-      /** @var \Drupal\commerce\Plugin\Commerce\InlineForm\EntityInlineFormInterface $inline_form */
-      $inline_form = $form['payment_method']['#inline_form'];
-      $inline_form->validateInlineForm($form['payment_method'], $form_state);
-    }
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function submitForm(array &$form, FormStateInterface $form_state) {
     $step = $form_state->get('step');
     if ($step == 'payment_method_type') {
@@ -195,7 +183,6 @@ class PaymentMethodAddForm extends FormBase implements ContainerInjectionInterfa
     elseif ($step == 'payment_method') {
       /** @var \Drupal\commerce\Plugin\Commerce\InlineForm\EntityInlineFormInterface $inline_form */
       $inline_form = $form['payment_method']['#inline_form'];
-      $inline_form->submitInlineForm($form['payment_method'], $form_state);
       /** @var \Drupal\commerce_payment\Entity\PaymentMethodInterface $payment_method */
       $payment_method = $inline_form->getEntity();
       $this->messenger()->addMessage($this->t('%label saved to your payment methods.', ['%label' => $payment_method->label()]));

@@ -14,6 +14,9 @@ use Drupal\Component\Plugin\PluginInspectionInterface;
  * which have problems with rebuilding on #ajax due to being processed too
  * early. Unlike form elements, inline forms support dependency injection
  * and allow swapping out the implementing class through an alter hook.
+ *
+ * Just like form elements, inline forms are automatically validated and
+ * submitted when the complete form is validated/submitted.
  */
 interface InlineFormInterface extends ConfigurablePluginInterface, PluginInspectionInterface {
 

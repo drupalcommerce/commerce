@@ -98,19 +98,9 @@ class PaymentMethodEditForm extends PaymentGatewayFormBase implements ContainerI
   /**
    * {@inheritdoc}
    */
-  public function validateConfigurationForm(array &$form, FormStateInterface $form_state) {
-    /** @var \Drupal\commerce\Plugin\Commerce\InlineForm\EntityInlineFormInterface $inline_form */
-    $inline_form = $form['billing_information']['#inline_form'];
-    $inline_form->validateInlineForm($form['billing_information'], $form_state);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function submitConfigurationForm(array &$form, FormStateInterface $form_state) {
     /** @var \Drupal\commerce\Plugin\Commerce\InlineForm\EntityInlineFormInterface $inline_form */
     $inline_form = $form['billing_information']['#inline_form'];
-    $inline_form->submitInlineForm($form['billing_information'], $form_state);
     /** @var \Drupal\profile\Entity\ProfileInterface $billing_profile */
     $billing_profile = $inline_form->getEntity();
     /** @var \Drupal\commerce_payment\Entity\PaymentMethodInterface $payment_method */

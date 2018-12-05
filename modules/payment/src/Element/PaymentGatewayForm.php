@@ -52,10 +52,6 @@ class PaymentGatewayForm extends RenderElement {
       ],
       '#element_validate' => [
         [$class, 'validateElementSubmit'],
-        [$class, 'validateForm'],
-      ],
-      '#commerce_element_submit' => [
-        [$class, 'submitForm'],
       ],
       '#theme_wrappers' => ['container'],
     ];
@@ -99,36 +95,23 @@ class PaymentGatewayForm extends RenderElement {
 
     $element['#inline_form'] = $inline_form;
     $element = $inline_form->buildInlineForm($element, $form_state);
+    // The updateValue() callback needs to run after the inline form ones.
+    $element['#commerce_element_submit'][] = [get_called_class(), 'updateValue'];
 
     return $element;
   }
 
   /**
-   * Validates the payment gateway form.
+   * Updates the form state value after the inline form is submitted.
    *
    * @param array $element
    *   The form element.
    * @param \Drupal\Core\Form\FormStateInterface $form_state
    *   The current state of the form.
    */
-  public static function validateForm(array &$element, FormStateInterface $form_state) {
+  public static function updateValue(array &$element, FormStateInterface $form_state) {
     /** @var \Drupal\commerce\Plugin\Commerce\InlineForm\EntityInlineFormInterface $inline_form */
     $inline_form = $element['#inline_form'];
-    $inline_form->validateInlineForm($element, $form_state);
-  }
-
-  /**
-   * Submits the payment gateway form.
-   *
-   * @param array $element
-   *   The form element.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
-   *   The current state of the form.
-   */
-  public static function submitForm(array &$element, FormStateInterface $form_state) {
-    /** @var \Drupal\commerce\Plugin\Commerce\InlineForm\EntityInlineFormInterface $inline_form */
-    $inline_form = $element['#inline_form'];
-    $inline_form->submitInlineForm($element, $form_state);
     $form_state->setValueForElement($element, $inline_form->getEntity());
   }
 

@@ -239,7 +239,6 @@ class PaymentAddForm extends FormBase implements ContainerInjectionInterface {
 
     $form['payment'] = [
       '#parents' => ['payment'],
-      '#inline_form' => $inline_form,
     ];
     $form['payment'] = $inline_form->buildInlineForm($form['payment'], $form_state);
     $form['actions']['submit'] = [
@@ -254,18 +253,6 @@ class PaymentAddForm extends FormBase implements ContainerInjectionInterface {
   /**
    * {@inheritdoc}
    */
-  public function validateForm(array &$form, FormStateInterface $form_state) {
-    $step = $form_state->get('step');
-    if ($step == 'payment') {
-      /** @var \Drupal\commerce\Plugin\Commerce\InlineForm\EntityInlineFormInterface $inline_form */
-      $inline_form = $form['payment']['#inline_form'];
-      $inline_form->validateInlineForm($form['payment'], $form_state);
-    }
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function submitForm(array &$form, FormStateInterface $form_state) {
     $step = $form_state->get('step');
     if ($step == 'payment_gateway') {
@@ -273,10 +260,6 @@ class PaymentAddForm extends FormBase implements ContainerInjectionInterface {
       $form_state->setRebuild(TRUE);
     }
     elseif ($step == 'payment') {
-      /** @var \Drupal\commerce\Plugin\Commerce\InlineForm\EntityInlineFormInterface $inline_form */
-      $inline_form = $form['payment']['#inline_form'];
-      $inline_form->submitInlineForm($form['payment'], $form_state);
-
       $this->messenger()->addMessage($this->t('Payment saved.'));
       $form_state->setRedirect('entity.commerce_payment.collection', ['commerce_order' => $this->order->id()]);
     }
