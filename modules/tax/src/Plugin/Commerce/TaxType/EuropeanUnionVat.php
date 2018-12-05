@@ -674,7 +674,7 @@ class EuropeanUnionVat extends LocalTaxTypeBase {
           'id' => 'second_reduced',
           'label' => $labels['second_reduced'],
           'percentages' => [
-            ['number' => '0.09', 'start_date' => '2011-07-01'],
+            ['number' => '0.09', 'start_date' => '2011-07-01', 'end_date' => '2018-12-31'],
           ],
         ],
         [
