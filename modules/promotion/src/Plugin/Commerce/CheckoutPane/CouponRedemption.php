@@ -169,6 +169,10 @@ class CouponRedemption extends CheckoutPaneBase {
       $summary_element = $form['sidebar']['order_summary'];
       return new InsertCommand('[data-drupal-selector="edit-sidebar-order-summary"]', $summary_element);
     }
+    elseif (isset($form['order_summary'])) {
+      $summary_element = $form['order_summary'];
+      return new InsertCommand('[data-drupal-selector="edit-order-summary"]', $summary_element);
+    }
   }
 
 }

@@ -103,7 +103,7 @@ class CouponRedemptionElementTest extends CommerceWebDriverTestBase {
   /**
    * Tests redeeming a single coupon.
    *
-   * @see commerce_promotion_test_form_views_form_commerce_cart_form_default_alter
+   * @see commerce_promotion_test_form_views_form_commerce_cart_form_default_alter()
    */
   public function testSingleCouponRedemption() {
     $coupons = $this->promotion->getCoupons();
@@ -140,7 +140,7 @@ class CouponRedemptionElementTest extends CommerceWebDriverTestBase {
   /**
    * Tests redeeming coupon on the cart form, with multiple coupons allowed.
    *
-   * @see commerce_promotion_test_form_views_form_commerce_cart_form_default_alter
+   * @see commerce_promotion_test_form_views_form_commerce_cart_form_default_alter()
    */
   public function testMultipleCouponRedemption() {
     $coupons = $this->promotion->getCoupons();
