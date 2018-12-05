@@ -15,7 +15,7 @@ use Drupal\commerce_promotion\Entity\PromotionInterface;
 interface PromotionUsageInterface {
 
   /**
-   * Registers promotion usage for the given order.
+   * Registers usage for the given order.
    *
    * @param \Drupal\commerce_order\Entity\OrderInterface $order
    *   The order.
@@ -25,6 +25,16 @@ interface PromotionUsageInterface {
    *   (Optional) The used coupon.
    */
   public function register(OrderInterface $order, PromotionInterface $promotion, CouponInterface $coupon = NULL);
+
+  /**
+   * Reassigns usage to a new customer email.
+   *
+   * @param string $old_mail
+   *   The old customer email.
+   * @param string $new_mail
+   *   The new customer email.
+   */
+  public function reassign($old_mail, $new_mail);
 
   /**
    * Deletes all usage for the given promotions.

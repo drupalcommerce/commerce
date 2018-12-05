@@ -9,6 +9,7 @@ use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\Element;
+use Drupal\user\UserInterface;
 
 /**
  * Implements hook_commerce_condition_info_alter().
@@ -21,6 +22,21 @@ function commerce_promotion_commerce_condition_info_alter(&$definitions) {
     if ($definition['entity_type'] == 'commerce_order_item') {
       $definition['category'] = t('Products');
     }
+  }
+}
+
+/**
+ * Implements hook_user_presave().
+ */
+function commerce_promotion_user_presave(UserInterface $account) {
+  if ($account->isNew()) {
+    return;
+  }
+
+  $old_mail = $account->original->getEmail();
+  $new_mail = $account->getEmail();
+  if ($old_mail && $new_mail && $old_mail != $new_mail) {
+    \Drupal::service('commerce_promotion.usage')->reassign($old_mail, $new_mail);
   }
 }
 

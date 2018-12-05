@@ -114,6 +114,7 @@ class UsageTest extends CommerceKernelTestBase {
    * Tests the usage API.
    *
    * @covers ::register
+   * @covers ::reassign
    * @covers ::delete
    * @covers ::deleteByCoupon
    * @covers ::load
@@ -152,12 +153,63 @@ class UsageTest extends CommerceKernelTestBase {
     $this->assertEquals(2, $this->usage->load($promotion, 'admin@example.com'));
     $this->assertEquals(1, $this->usage->load($promotion, 'customer@example.com'));
 
+    // Test usage reassignment.
+    $this->usage->reassign('admin@example.com', 'new@example.com');
+    $this->assertEquals(0, $this->usage->load($promotion, 'admin@example.com'));
+    $this->assertEquals(1, $this->usage->load($promotion, 'customer@example.com'));
+    $this->assertEquals(2, $this->usage->load($promotion, 'new@example.com'));
+
     $this->usage->deleteByCoupon([$coupon]);
     $this->assertEquals(0, $this->usage->loadByCoupon($coupon));
     $this->assertEquals(2, $this->usage->load($promotion));
 
     $this->usage->delete([$promotion]);
     $this->assertEquals(0, $this->usage->load($promotion));
+  }
+
+  /**
+   * Tests the customer account integration.
+   *
+   * @covers ::register
+   * @covers ::reassign
+   * @covers ::load
+   * @covers ::loadMultiple
+   */
+  public function testCustomerAccountIntegration() {
+    $user = $this->createUser(['mail' => 'admin@example.com']);
+    $this->assertEquals('admin@example.com', $user->getEmail());
+
+    $promotion = $this->prophesize(PromotionInterface::class);
+    $promotion->id()->willReturn('100');
+    $promotion = $promotion->reveal();
+    $order = $this->prophesize(OrderInterface::class);
+    $order->id()->willReturn('1');
+    $order->getEmail()->willReturn($user->getEmail());
+    $order = $order->reveal();
+    $another_order = $this->prophesize(OrderInterface::class);
+    $another_order->id()->willReturn('2');
+    $another_order->getEmail()->willReturn('customer@example.com');
+    $another_order = $another_order->reveal();
+
+    // Register usage for several orders.
+    $this->usage->register($order, $promotion);
+    $this->usage->register($another_order, $promotion);
+    $this->usage->register($order, $promotion);
+    $this->assertEquals(3, $this->usage->load($promotion));
+    // Test filtering by customer email.
+    $this->assertEquals(2, $this->usage->load($promotion, $user->getEmail()));
+    $this->assertEquals(1, $this->usage->load($promotion, 'customer@example.com'));
+
+    // Update customer account email.
+    $user->setEmail('new@example.com');
+    $user->save();
+    $user = $this->reloadEntity($user);
+    $this->assertEquals('new@example.com', $user->getEmail());
+
+    // Confirm that usage has been reassigned.
+    $this->assertEquals(0, $this->usage->load($promotion, 'admin@example.com'));
+    $this->assertEquals(1, $this->usage->load($promotion, 'customer@example.com'));
+    $this->assertEquals(2, $this->usage->load($promotion, 'new@example.com'));
   }
 
   /**

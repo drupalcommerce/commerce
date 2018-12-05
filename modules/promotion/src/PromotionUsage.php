@@ -44,6 +44,16 @@ class PromotionUsage implements PromotionUsageInterface {
   /**
    * {@inheritdoc}
    */
+  public function reassign($old_mail, $new_mail) {
+    $this->connection->update('commerce_promotion_usage')
+      ->fields(['mail' => $new_mail])
+      ->condition('mail', $old_mail)
+      ->execute();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function delete(array $promotions) {
     $this->connection->delete('commerce_promotion_usage')
       ->condition('promotion_id', EntityHelper::extractIds($promotions), 'IN')
