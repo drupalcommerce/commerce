@@ -31,8 +31,10 @@ class ProductTypeTest extends ProductBrowserTestBase {
   public function testProductTypeCreation() {
     $user = $this->drupalCreateUser(['administer commerce_product_type']);
     $this->drupalLogin($user);
-
     $this->drupalGet('admin/commerce/config/product-types/add');
+
+    $variation_type_field = $this->getSession()->getPage()->findField('variationType');
+    $this->assertFalse($variation_type_field->hasAttribute('disabled'));
     $edit = [
       'id' => strtolower($this->randomMachineName(8)),
       'label' => $this->randomMachineName(),
@@ -138,6 +140,9 @@ class ProductTypeTest extends ProductBrowserTestBase {
    */
   public function testProductTypeEditing() {
     $this->drupalGet('admin/commerce/config/product-types/default/edit');
+
+    $variation_type_field = $this->getSession()->getPage()->findField('variationType');
+    $this->assertFalse($variation_type_field->hasAttribute('disabled'));
     $edit = [
       'label' => 'Default2',
       'description' => 'New description.',
@@ -168,6 +173,15 @@ class ProductTypeTest extends ProductBrowserTestBase {
     // Confirm that the product display was updated.
     $form_display = commerce_get_entity_display('commerce_product', 'default', 'form');
     $this->assertEmpty($form_display->getComponent('variations'));
+
+    // Cannot change the variation type once a product has been created.
+    $product = $this->createEntity('commerce_product', [
+      'type' => 'default',
+      'title' => 'Test product',
+    ]);
+    $this->drupalGet('admin/commerce/config/product-types/default/edit');
+    $variation_type_field = $this->getSession()->getPage()->findField('variationType');
+    $this->assertTrue($variation_type_field->hasAttribute('disabled'));
   }
 
   /**

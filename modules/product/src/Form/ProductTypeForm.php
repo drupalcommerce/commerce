@@ -69,9 +69,12 @@ class ProductTypeForm extends CommerceBundleEntityFormBase {
     // @todo Clean up once https://www.drupal.org/node/2318187 is fixed.
     if ($this->operation == 'add') {
       $product = $this->entityTypeManager->getStorage('commerce_product')->create(['type' => $product_type->uuid()]);
+      $products_exist = FALSE;
     }
     else {
-      $product = $this->entityTypeManager->getStorage('commerce_product')->create(['type' => $product_type->id()]);
+      $storage = $this->entityTypeManager->getStorage('commerce_product');
+      $product = $storage->create(['type' => $product_type->id()]);
+      $products_exist = $storage->getQuery()->condition('type', $product_type->id())->execute();
     }
     $form_state->set('original_entity', $this->entity->createDuplicate());
 
@@ -102,7 +105,7 @@ class ProductTypeForm extends CommerceBundleEntityFormBase {
       '#title' => $this->t('Product variation type'),
       '#default_value' => $product_type->getVariationTypeId(),
       '#options' => EntityHelper::extractLabels($variation_types),
-      '#disabled' => !$product_type->isNew(),
+      '#disabled' => $products_exist,
     ];
     if ($product_type->isNew()) {
       $form['variationType']['#empty_option'] = $this->t('- Create new -');
