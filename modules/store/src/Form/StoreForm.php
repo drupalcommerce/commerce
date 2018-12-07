@@ -20,6 +20,7 @@ class StoreForm extends ContentEntityForm {
       '#title' => $this->t('URL path settings'),
       '#open' => !empty($form['path']['widget'][0]['alias']['#default_value']),
       '#group' => 'advanced',
+      '#access' => !empty($form['path']['#access']) && $store->get('path')->access('edit'),
       '#attributes' => [
         'class' => ['path-form'],
       ],
