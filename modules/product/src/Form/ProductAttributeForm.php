@@ -7,6 +7,7 @@ use Drupal\commerce_product\ProductAttributeFieldManagerInterface;
 use Drupal\Component\Utility\Html;
 use Drupal\Core\Entity\BundleEntityFormBase;
 use Drupal\Core\Entity\EntityTypeInterface;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -24,9 +25,12 @@ class ProductAttributeForm extends BundleEntityFormBase {
    *
    * @param \Drupal\commerce_product\ProductAttributeFieldManagerInterface $attribute_field_manager
    *   The attribute field manager.
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
+   *   The entity type manager.
    */
-  public function __construct(ProductAttributeFieldManagerInterface $attribute_field_manager) {
+  public function __construct(ProductAttributeFieldManagerInterface $attribute_field_manager, EntityTypeManagerInterface $entityTypeManager) {
     $this->attributeFieldManager = $attribute_field_manager;
+    $this->entityTypeManager = $entityTypeManager;
   }
 
   /**
@@ -34,7 +38,8 @@ class ProductAttributeForm extends BundleEntityFormBase {
    */
   public static function create(ContainerInterface $container) {
     return new static(
-      $container->get('commerce_product.attribute_field_manager')
+      $container->get('commerce_product.attribute_field_manager'),
+      $container->get('entity_type.manager')
     );
   }
 
@@ -192,6 +197,18 @@ class ProductAttributeForm extends BundleEntityFormBase {
     // Taken from WidgetBase::formMultipleElements().
     $max_weight = count($value_map);
 
+    // Determine the field names on the variation type entities that are used
+    // to reference attributes of this type.
+    $attribute_field_map = $this->attributeFieldManager->getFieldMap();
+    $delete_field_maps = [];
+    foreach ($attribute_field_map as $variation_type_id => $variation_type_map) {
+      foreach ($variation_type_map as $field_map) {
+        if ($field_map['attribute_id'] === $attribute->id()) {
+          $delete_field_maps[$variation_type_id] = $field_map['field_name'];
+        }
+      }
+    }
+
     foreach ($value_map as $index => $id) {
       $value_form = &$form['values'][$index];
       // The tabledrag element is always added to the first cell in the row,
@@ -249,6 +266,23 @@ class ProductAttributeForm extends BundleEntityFormBase {
         $value_form['#weight'] = $default_weight;
       }
 
+      // Prevent the attribute value from being deleted if it is being used
+      // by a product variation.
+      $used = FALSE;
+      foreach ($delete_field_maps as $variation_type => $field) {
+        $variation_ids = $this->entityTypeManager
+          ->getStorage('commerce_product_variation')
+          ->getQuery()
+          ->condition('type', $variation_type)
+          ->condition($field, $id)
+          ->execute();
+
+        if (!empty($variation_ids)) {
+          $used = TRUE;
+          break;
+        }
+      }
+
       $value_form['remove'] = [
         '#type' => 'submit',
         '#name' => 'remove_value' . $index,
@@ -261,6 +295,7 @@ class ProductAttributeForm extends BundleEntityFormBase {
           'wrapper' => $wrapper_id,
         ],
         '#access' => $remove_access,
+        '#disabled' => $used,
       ];
     }
 
