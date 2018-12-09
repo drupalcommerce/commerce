@@ -126,7 +126,7 @@ abstract class ProductVariationWidgetBase extends WidgetBase implements Containe
     $view_mode = $form_state->get('view_mode');
     $variation_field_renderer->replaceRenderedFields($response, $variation, $view_mode);
     // Allow modules to add arbitrary ajax commands to the response.
-    $event = new ProductVariationAjaxChangeEvent($variation, $response, $view_mode);
+    $event = new ProductVariationAjaxChangeEvent($variation, $response, $view_mode, $form_state);
     $event_dispatcher = \Drupal::service('event_dispatcher');
     $event_dispatcher->dispatch(ProductEvents::PRODUCT_VARIATION_AJAX_CHANGE, $event);
 

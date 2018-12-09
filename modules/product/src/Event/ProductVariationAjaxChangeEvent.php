@@ -2,6 +2,7 @@
 
 namespace Drupal\commerce_product\Event;
 
+use Drupal\Core\Form\FormStateInterface;
 use Drupal\commerce_product\Entity\ProductVariationInterface;
 use Drupal\Core\Ajax\AjaxResponse;
 use Symfony\Component\EventDispatcher\Event;
@@ -35,6 +36,13 @@ class ProductVariationAjaxChangeEvent extends Event {
   protected $viewMode;
 
   /**
+   * The form state.
+   *
+   * @var \Drupal\Core\Form\FormStateInterface
+   */
+  protected $formState;
+
+  /**
    * Constructs a new ProductVariationAjaxChangeEvent.
    *
    * @param \Drupal\commerce_product\Entity\ProductVariationInterface $product_variation
@@ -44,10 +52,11 @@ class ProductVariationAjaxChangeEvent extends Event {
    * @param string $view_mode
    *   The view mode used to render the product variation.
    */
-  public function __construct(ProductVariationInterface $product_variation, AjaxResponse $response, $view_mode = 'default') {
+  public function __construct(ProductVariationInterface $product_variation, AjaxResponse $response, $view_mode = 'default', FormStateInterface $form_state) {
     $this->productVariation = $product_variation;
     $this->response = $response;
     $this->viewMode = $view_mode;
+    $this->formState = $form_state;
   }
 
   /**
@@ -80,4 +89,13 @@ class ProductVariationAjaxChangeEvent extends Event {
     return $this->viewMode;
   }
 
+  /**
+   * The view mode used to render the product variation.
+   *
+   * @return \Drupal\Core\Form\FormStateInterface
+   *   The form state.
+   */
+  public function getFormState() {
+    return $this->formState;
+  }
 }
