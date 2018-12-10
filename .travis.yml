@@ -33,6 +33,8 @@ env:
     # add composer's global bin directory to the path
     # see: https://github.com/drush-ops/drush#install---composer
     - PATH="$PATH:$HOME/.composer/vendor/bin"
+    # force composer 1.8+ to use a specific folder as home
+    - export COMPOSER_HOME="$HOME/.composer/"
 
     # Configuration variables.
     - DRUPAL_TI_MODULE_NAME="commerce"
