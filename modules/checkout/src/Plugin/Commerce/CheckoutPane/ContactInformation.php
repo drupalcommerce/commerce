@@ -2,6 +2,7 @@
 
 namespace Drupal\commerce_checkout\Plugin\Commerce\CheckoutPane;
 
+use Drupal\commerce_order\Entity\OrderInterface;
 use Drupal\Core\Form\FormStateInterface;
 
 /**
@@ -70,6 +71,9 @@ class ContactInformation extends CheckoutPaneBase implements CheckoutPaneInterfa
    * {@inheritdoc}
    */
   public function isVisible() {
+    if (!$this->order instanceof OrderInterface) {
+      return FALSE;
+    }    
     // Show the pane only for guest checkout.
     return empty($this->order->getCustomerId());
   }
