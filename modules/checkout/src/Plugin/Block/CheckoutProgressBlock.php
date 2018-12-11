@@ -3,6 +3,7 @@
 namespace Drupal\commerce_checkout\Plugin\Block;
 
 use Drupal\commerce_checkout\CheckoutOrderManagerInterface;
+use Drupal\commerce_order\Entity\OrderInterface;
 use Drupal\Core\Block\BlockBase;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
@@ -79,6 +80,17 @@ class CheckoutProgressBlock extends BlockBase implements ContainerFactoryPluginI
       // The block is being rendered outside of the checkout page.
       return [];
     }
+    
+    return $this->render($order);
+  }
+
+  /**
+   * Builds the checkout progress block.
+   *
+   * @return array
+   *   A render array.
+   */
+  public function render(OrderInterface $order) {
     $checkout_flow = $this->checkoutOrderManager->getCheckoutFlow($order);
     $checkout_flow_plugin = $checkout_flow->getPlugin();
     $configuration = $checkout_flow_plugin->getConfiguration();
