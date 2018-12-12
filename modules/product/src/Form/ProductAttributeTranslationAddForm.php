@@ -2,6 +2,7 @@
 
 namespace Drupal\commerce_product\Form;
 
+use Drupal\commerce\InlineFormManager;
 use Drupal\config_translation\ConfigMapperManagerInterface;
 use Drupal\config_translation\Form\ConfigTranslationAddForm;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
@@ -19,13 +20,6 @@ class ProductAttributeTranslationAddForm extends ConfigTranslationAddForm {
   use ProductAttributeTranslationFormTrait;
 
   /**
-   * The entity type manager.
-   *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
-   */
-  protected $entityTypeManager;
-
-  /**
    * Constructs a new ProductAttributeTranslationAddForm object.
    *
    * @param \Drupal\Core\Config\TypedConfigManagerInterface $typed_config_manager
@@ -36,11 +30,14 @@ class ProductAttributeTranslationAddForm extends ConfigTranslationAddForm {
    *   The configurable language manager.
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
+   * @param \Drupal\commerce\InlineFormManager $inline_form_manager
+   *   The inline form manager.
    */
-  public function __construct(TypedConfigManagerInterface $typed_config_manager, ConfigMapperManagerInterface $config_mapper_manager, ConfigurableLanguageManagerInterface $language_manager, EntityTypeManagerInterface $entity_type_manager) {
+  public function __construct(TypedConfigManagerInterface $typed_config_manager, ConfigMapperManagerInterface $config_mapper_manager, ConfigurableLanguageManagerInterface $language_manager, EntityTypeManagerInterface $entity_type_manager, InlineFormManager $inline_form_manager) {
     parent::__construct($typed_config_manager, $config_mapper_manager, $language_manager);
 
     $this->entityTypeManager = $entity_type_manager;
+    $this->inlineFormManager = $inline_form_manager;
   }
 
   /**
@@ -51,7 +48,8 @@ class ProductAttributeTranslationAddForm extends ConfigTranslationAddForm {
       $container->get('config.typed'),
       $container->get('plugin.manager.config_translation.mapper'),
       $container->get('language_manager'),
-      $container->get('entity_type.manager')
+      $container->get('entity_type.manager'),
+      $container->get('plugin.manager.commerce_inline_form')
     );
   }
 

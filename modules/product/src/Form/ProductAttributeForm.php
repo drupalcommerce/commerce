@@ -3,6 +3,7 @@
 namespace Drupal\commerce_product\Form;
 
 use Drupal\commerce\EntityHelper;
+use Drupal\commerce\InlineFormManager;
 use Drupal\commerce_product\ProductAttributeFieldManagerInterface;
 use Drupal\Component\Utility\Html;
 use Drupal\Core\Entity\BundleEntityFormBase;
@@ -20,13 +21,23 @@ class ProductAttributeForm extends BundleEntityFormBase {
   protected $attributeFieldManager;
 
   /**
+   * The inline form manager.
+   *
+   * @var \Drupal\commerce\InlineFormManager
+   */
+  protected $inlineFormManager;
+
+  /**
    * Constructs a new ProductAttributeForm object.
    *
    * @param \Drupal\commerce_product\ProductAttributeFieldManagerInterface $attribute_field_manager
    *   The attribute field manager.
+   * @param \Drupal\commerce\InlineFormManager $inline_form_manager
+   *   The inline form manager.
    */
-  public function __construct(ProductAttributeFieldManagerInterface $attribute_field_manager) {
+  public function __construct(ProductAttributeFieldManagerInterface $attribute_field_manager, InlineFormManager $inline_form_manager) {
     $this->attributeFieldManager = $attribute_field_manager;
+    $this->inlineFormManager = $inline_form_manager;
   }
 
   /**
@@ -34,7 +45,8 @@ class ProductAttributeForm extends BundleEntityFormBase {
    */
   public static function create(ContainerInterface $container) {
     return new static(
-      $container->get('commerce_product.attribute_field_manager')
+      $container->get('commerce_product.attribute_field_manager'),
+      $container->get('plugin.manager.commerce_inline_form')
     );
   }
 
@@ -183,7 +195,7 @@ class ProductAttributeForm extends BundleEntityFormBase {
       '#weight' => 5,
       '#prefix' => '<div id="' . $wrapper_id . '">',
       '#suffix' => '</div>',
-      // #input defaults to TRUE, which breaks file fields in the IEF element.
+      // #input defaults to TRUE, which breaks file fields on the value form.
       // This table is used for visual grouping only, the element itself
       // doesn't have any values of its own that need processing.
       '#input' => FALSE,
@@ -200,24 +212,28 @@ class ProductAttributeForm extends BundleEntityFormBase {
       $value_form['tabledrag'] = [
         '#markup' => '',
       ];
-
-      $value_form['entity'] = [
-        '#type' => 'inline_entity_form',
-        '#entity_type' => 'commerce_product_attribute_value',
-        '#bundle' => $attribute->id(),
-        '#langcode' => $attribute->get('langcode'),
-        '#save_entity' => FALSE,
-      ];
       if ($id == '_new') {
+        $value = $this->entityTypeManager->getStorage('commerce_product_attribute_value')->create([
+          'attribute' => $attribute->id(),
+          'langcode' => $attribute->get('langcode'),
+        ]);
         $default_weight = $max_weight;
         $remove_access = TRUE;
       }
       else {
         $value = $values[$id];
-        $value_form['entity']['#default_value'] = $value;
         $default_weight = $value->getWeight();
         $remove_access = $value->access('delete');
       }
+      $inline_form = $this->inlineFormManager->createInstance('content_entity', [
+        'skip_save' => TRUE,
+      ], $value);
+
+      $value_form['entity'] = [
+        '#parents' => ['values', $index, 'entity'],
+        '#inline_form' => $inline_form,
+      ];
+      $value_form['entity'] = $inline_form->buildInlineForm($value_form['entity'], $form_state);
 
       $value_form['weight'] = [
         '#type' => 'weight',
@@ -364,8 +380,10 @@ class ProductAttributeForm extends BundleEntityFormBase {
     }
 
     foreach ($form_state->getValue(['values']) as $index => $value_data) {
+      /** @var \Drupal\commerce\Plugin\Commerce\InlineForm\EntityInlineFormInterface $inline_form */
+      $inline_form = $form['values'][$index]['entity']['#inline_form'];
       /** @var \Drupal\commerce_product\Entity\ProductAttributeValueInterface $value */
-      $value = $form['values'][$index]['entity']['#entity'];
+      $value = $inline_form->getEntity();
       $value->setWeight($value_data['weight']);
       $value->save();
     }

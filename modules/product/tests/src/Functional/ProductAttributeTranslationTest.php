@@ -101,18 +101,18 @@ class ProductAttributeTranslationTest extends ProductBrowserTestBase {
     $language_manager = \Drupal::languageManager();
     $config_name = $color_attribute->getConfigDependencyName();
     $config_translation = $language_manager->getLanguageConfigOverride('fr', $config_name);
-    $this->assertEquals($config_translation->get('label'), 'Couleur');
+    $this->assertEquals('Couleur', $config_translation->get('label'));
 
     // Confirm the attribute value translations.
     $values = $color_attribute->getValues();
     $first_value = reset($values);
     $first_value = $first_value->getTranslation('fr');
-    $this->assertEquals($first_value->language()->getId(), 'fr');
-    $this->assertEquals($first_value->label(), 'Rouge');
+    $this->assertEquals('fr', $first_value->language()->getId());
+    $this->assertEquals('Rouge', $first_value->label());
     $second_value = end($values);
     $second_value = $second_value->getTranslation('fr');
-    $this->assertEquals($second_value->language()->getId(), 'fr');
-    $this->assertEquals($second_value->label(), 'Blue');
+    $this->assertEquals('fr', $second_value->language()->getId());
+    $this->assertEquals('Blue', $second_value->label());
   }
 
 }
