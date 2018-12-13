@@ -6,11 +6,12 @@ use Drupal\commerce\PurchasableEntityInterface;
 use Drupal\commerce_price\Price;
 use Drupal\Core\Entity\EntityChangedInterface;
 use Drupal\user\EntityOwnerInterface;
+use Drupal\Core\Entity\EntityPublishedInterface;
 
 /**
  * Defines the interface for product variations.
  */
-interface ProductVariationInterface extends PurchasableEntityInterface, EntityChangedInterface, EntityOwnerInterface {
+interface ProductVariationInterface extends PurchasableEntityInterface, EntityChangedInterface, EntityOwnerInterface, EntityPublishedInterface {
 
   /**
    * Gets the parent product.
@@ -99,6 +100,9 @@ interface ProductVariationInterface extends PurchasableEntityInterface, EntityCh
    *
    * @return bool
    *   TRUE if the variation is active, FALSE otherwise.
+   *
+   * @deprecated in Commerce 8.x-2.11.
+   *   Use $this->isPublished() instead.
    */
   public function isActive();
 
@@ -109,6 +113,9 @@ interface ProductVariationInterface extends PurchasableEntityInterface, EntityCh
    *   Whether the variation is active.
    *
    * @return $this
+   *
+   * @deprecated in Commerce 8.x-2.11.
+   *   Use $this->setPublished() or $this->setUnpublished() instead.
    */
   public function setActive($active);
 

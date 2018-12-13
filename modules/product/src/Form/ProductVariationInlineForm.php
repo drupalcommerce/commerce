@@ -47,8 +47,8 @@ class ProductVariationInlineForm extends EntityInlineForm {
       'display_options' => [
         'settings' => [
           'format' => 'custom',
-          'format_custom_true' => t('Active'),
-          'format_custom_false' => t('Inactive'),
+          'format_custom_true' => t('Published'),
+          'format_custom_false' => t('Unpublished'),
         ],
       ],
     ];

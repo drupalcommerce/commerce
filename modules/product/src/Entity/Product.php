@@ -253,7 +253,7 @@ class Product extends CommerceContentEntityBase implements ProductInterface {
   public function getDefaultVariation() {
     foreach ($this->getVariations() as $variation) {
       // Return the first active variation.
-      if ($variation->isActive() && $variation->access('view')) {
+      if ($variation->isPublished() && $variation->access('view')) {
         return $variation;
       }
     }

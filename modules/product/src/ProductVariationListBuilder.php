@@ -135,7 +135,7 @@ class ProductVariationListBuilder extends EntityListBuilder implements FormInter
     $row['sku'] = $entity->getSku();
     $row['title'] = $title;
     $row['price'] = $entity->getPrice();
-    $row['status'] = $entity->isActive() ? $this->t('Active') : $this->t('Inactive');
+    $row['status'] = $entity->isPublished() ? $this->t('Published') : $this->t('Unpublished');
     if ($this->hasTableDrag) {
       $row['weight'] = [
         '#type' => 'weight',

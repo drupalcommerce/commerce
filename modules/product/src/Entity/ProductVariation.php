@@ -7,6 +7,7 @@ use Drupal\commerce\EntityHelper;
 use Drupal\commerce_price\Price;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Entity\EntityChangedTrait;
+use Drupal\Core\Entity\EntityPublishedTrait;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
@@ -62,7 +63,7 @@ use Drupal\user\UserInterface;
  *     "langcode" = "langcode",
  *     "uuid" = "uuid",
  *     "label" = "title",
- *     "status" = "status",
+ *     "published" = "status",
  *     "owner" = "uid",
  *     "uid" = "uid",
  *   },
@@ -84,6 +85,7 @@ use Drupal\user\UserInterface;
 class ProductVariation extends CommerceContentEntityBase implements ProductVariationInterface {
 
   use EntityChangedTrait;
+  use EntityPublishedTrait;
 
   /**
    * {@inheritdoc}
@@ -446,6 +448,7 @@ class ProductVariation extends CommerceContentEntityBase implements ProductVaria
    */
   public static function baseFieldDefinitions(EntityTypeInterface $entity_type) {
     $fields = parent::baseFieldDefinitions($entity_type);
+    $fields += static::publishedBaseFieldDefinitions($entity_type);
 
     $fields['uid'] = BaseFieldDefinition::create('entity_reference')
       ->setLabel(t('Author'))
@@ -524,14 +527,14 @@ class ProductVariation extends CommerceContentEntityBase implements ProductVaria
       ->setDisplayConfigurable('form', TRUE)
       ->setDisplayConfigurable('view', TRUE);
 
-    $fields['status'] = BaseFieldDefinition::create('boolean')
-      ->setLabel(t('Active'))
-      ->setDescription(t('Whether the variation is active.'))
-      ->setDefaultValue(TRUE)
-      ->setTranslatable(TRUE)
+    $fields['status']
+      ->setLabel(t('Published'))
       ->setDisplayOptions('form', [
         'type' => 'boolean_checkbox',
-        'weight' => 99,
+        'settings' => [
+          'display_label' => TRUE,
+        ],
+        'weight' => 90,
       ])
       ->setDisplayConfigurable('form', TRUE);
 

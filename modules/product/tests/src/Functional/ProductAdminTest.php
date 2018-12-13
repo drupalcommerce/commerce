@@ -342,7 +342,7 @@ class ProductAdminTest extends ProductBrowserTestBase {
     $variation = ProductVariation::load($expected_variation_id);
     $this->assertEquals($variation->getSku(), $new_sku);
     $this->assertEquals($variation->getPrice()->getNumber(), '12.00');
-    $this->assertTrue($variation->isActive());
+    $this->assertTrue($variation->isPublished());
   }
 
   /**

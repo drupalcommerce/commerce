@@ -110,3 +110,16 @@ function commerce_product_update_8205() {
     $definition_update_manager->updateFieldStorageDefinition($uid_storage_definition);
   }
 }
+
+/**
+ * Set the 'published' entity key for variations.
+ */
+function commerce_product_update_8206() {
+  $definition_update_manager = \Drupal::entityDefinitionUpdateManager();
+  $entity_type = $definition_update_manager->getEntityType('commerce_product_variation');
+  $keys = $entity_type->getKeys();
+  $keys['published'] = 'status';
+  unset($keys['status']);
+  $entity_type->set('entity_keys', $keys);
+  $definition_update_manager->updateEntityType($entity_type);
+}

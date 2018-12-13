@@ -89,7 +89,7 @@ class ProductVariationStorage extends CommerceContentEntityStorage implements Pr
       if (in_array($variation_id, $product->getVariationIds())) {
         /** @var \Drupal\commerce_product\Entity\ProductVariationInterface $variation */
         $variation = $this->load($variation_id);
-        if ($variation->isActive() && $variation->access('view')) {
+        if ($variation->isPublished() && $variation->access('view')) {
           return $variation;
         }
       }
