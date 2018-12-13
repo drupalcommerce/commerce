@@ -10,6 +10,7 @@ use Drupal\commerce_payment\Exception\PaymentGatewayException;
 use Drupal\commerce_payment\Plugin\Commerce\PaymentGateway\ManualPaymentGatewayInterface;
 use Drupal\commerce_payment\Plugin\Commerce\PaymentGateway\OffsitePaymentGatewayInterface;
 use Drupal\commerce_payment\Plugin\Commerce\PaymentGateway\OnsitePaymentGatewayInterface;
+use Drupal\Core\Access\CsrfTokenGenerator;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Link;
@@ -27,6 +28,13 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * )
  */
 class PaymentProcess extends CheckoutPaneBase {
+
+  /**
+   * The CSRF token generator.
+   *
+   * @var \Drupal\Core\Access\CsrfTokenGenerator
+   */
+  protected $csrfToken;
 
   /**
    * The inline form manager.
@@ -48,12 +56,15 @@ class PaymentProcess extends CheckoutPaneBase {
    *   The parent checkout flow.
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
+   * @param \Drupal\Core\Access\CsrfTokenGenerator $csrf_token
+   *   The CSRF token generator.
    * @param \Drupal\commerce\InlineFormManager $inline_form_manager
    *   The inline form manager.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, CheckoutFlowInterface $checkout_flow, EntityTypeManagerInterface $entity_type_manager, InlineFormManager $inline_form_manager) {
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, CheckoutFlowInterface $checkout_flow, EntityTypeManagerInterface $entity_type_manager, CsrfTokenGenerator $csrf_token, InlineFormManager $inline_form_manager) {
     parent::__construct($configuration, $plugin_id, $plugin_definition, $checkout_flow, $entity_type_manager);
 
+    $this->csrfToken = $csrf_token;
     $this->inlineFormManager = $inline_form_manager;
   }
 
@@ -67,6 +78,7 @@ class PaymentProcess extends CheckoutPaneBase {
       $plugin_definition,
       $checkout_flow,
       $container->get('entity_type.manager'),
+      $container->get('csrf_token'),
       $container->get('plugin.manager.commerce_inline_form')
     );
   }
@@ -238,10 +250,14 @@ class PaymentProcess extends CheckoutPaneBase {
    *   The "return" page URL.
    */
   protected function buildReturnUrl() {
-    return Url::fromRoute('commerce_payment.checkout.return', [
+    $url = Url::fromRoute('commerce_payment.checkout.return', [
       'commerce_order' => $this->order->id(),
       'step' => 'payment',
-    ], ['absolute' => TRUE]);
+    ]);
+    $token = $this->csrfToken->get($url->getInternalPath());
+    $url = $url->setOptions(['absolute' => TRUE, 'query' => ['token' => $token]]);
+
+    return $url;
   }
 
   /**
@@ -251,10 +267,14 @@ class PaymentProcess extends CheckoutPaneBase {
    *   The "cancel" page URL.
    */
   protected function buildCancelUrl() {
-    return Url::fromRoute('commerce_payment.checkout.cancel', [
+    $url = Url::fromRoute('commerce_payment.checkout.cancel', [
       'commerce_order' => $this->order->id(),
       'step' => 'payment',
-    ], ['absolute' => TRUE]);
+    ]);
+    $token = $this->csrfToken->get($url->getInternalPath());
+    $url = $url->setOptions(['absolute' => TRUE, 'query' => ['token' => $token]]);
+
+    return $url;
   }
 
   /**
