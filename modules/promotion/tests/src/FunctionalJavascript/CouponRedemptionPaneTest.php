@@ -2,6 +2,7 @@
 
 namespace Drupal\Tests\commerce_promotion\FunctionalJavascript;
 
+use Drupal\commerce_checkout\Entity\CheckoutFlow;
 use Drupal\commerce_order\Entity\OrderItem;
 use Drupal\commerce_order\Entity\OrderItemType;
 use Drupal\commerce_payment\Entity\PaymentGateway;
@@ -166,8 +167,11 @@ class CouponRedemptionPaneTest extends CommerceWebDriverTestBase {
   public function testCouponRedemption() {
     $coupons = $this->promotion->getCoupons();
     $coupon = reset($coupons);
+    $checkout_url = Url::fromRoute('commerce_checkout.form', [
+      'commerce_order' => $this->cart->id(),
+    ]);
 
-    $this->drupalGet(Url::fromRoute('commerce_checkout.form', ['commerce_order' => $this->cart->id()]));
+    $this->drupalGet($checkout_url);
     // Confirm that validation errors set by the form element are visible.
     $this->getSession()->getPage()->pressButton('Apply coupon');
     $this->waitForAjaxToFinish();
@@ -191,6 +195,23 @@ class CouponRedemptionPaneTest extends CommerceWebDriverTestBase {
     $this->assertSession()->buttonExists('Apply coupon');
     $this->assertSession()->pageTextNotContains('-$99.90');
     $this->assertSession()->pageTextContains('$999');
+
+    // Confirm that the order summary is refreshed when outside of the sidebar.
+    $checkout_flow = CheckoutFlow::load('default');
+    $configuration = $checkout_flow->get('configuration');
+    $configuration['panes']['order_summary']['step'] = 'order_information';
+    $checkout_flow->set('configuration', $configuration);
+    $checkout_flow->save();
+
+    $this->drupalGet($checkout_url);
+    $this->getSession()->getPage()->fillField('Coupon code', $coupon->getCode());
+    $this->getSession()->getPage()->pressButton('Apply coupon');
+    $this->waitForAjaxToFinish();
+    $this->assertSession()->pageTextContains($coupon->getCode());
+    $this->assertSession()->fieldNotExists('Coupon code');
+    $this->assertSession()->buttonNotExists('Apply coupon');
+    $this->assertSession()->pageTextContains('-$99.90');
+    $this->assertSession()->pageTextContains('$899.10');
   }
 
   /**
