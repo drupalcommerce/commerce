@@ -10,9 +10,10 @@
  */
 function commerce_price_requirements($phase) {
   $requirements = [];
-  if ($phase == 'install') {
+  if ($phase == 'install' || $phase == 'runtime') {
     if (!class_exists('\CommerceGuys\Intl\Currency\CurrencyRepository')) {
-      $requirements['commerce_price_library'] = [
+      $requirements['commerce_price_intl'] = [
+        'title' => t('Intl library'),
         'description' => t("Commerce Price requires the commerceguys/intl library."),
         'severity' => REQUIREMENT_ERROR,
       ];
