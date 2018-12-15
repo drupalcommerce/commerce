@@ -2,7 +2,9 @@
 
 namespace Drupal\Tests\commerce_cart\Functional;
 
+use Drupal\Tests\commerce_cart\Traits\CartBrowserTestTrait;
 use Drupal\Tests\commerce_order\Functional\OrderBrowserTestBase;
+use Drupal\Tests\commerce_product\Traits\ProductAttributeTestTrait;
 
 /**
  * Defines base class for commerce_cart test cases.
@@ -10,6 +12,7 @@ use Drupal\Tests\commerce_order\Functional\OrderBrowserTestBase;
 abstract class CartBrowserTestBase extends OrderBrowserTestBase {
 
   use CartBrowserTestTrait;
+  use ProductAttributeTestTrait;
 
   /**
    * The cart order to test against.
@@ -24,13 +27,6 @@ abstract class CartBrowserTestBase extends OrderBrowserTestBase {
    * @var \Drupal\commerce_cart\CartManagerInterface
    */
   protected $cartManager;
-
-  /**
-   * The attribute field manager.
-   *
-   * @var \Drupal\commerce_product\ProductAttributeFieldManagerInterface
-   */
-  protected $attributeFieldManager;
 
   /**
    * Modules to enable.

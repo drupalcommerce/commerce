@@ -2,8 +2,9 @@
 
 namespace Drupal\Tests\commerce_cart\FunctionalJavascript;
 
-use Drupal\Tests\commerce_cart\Functional\CartBrowserTestTrait;
+use Drupal\Tests\commerce_cart\Traits\CartBrowserTestTrait;
 use Drupal\Tests\commerce_order\FunctionalJavascript\OrderWebDriverTestBase;
+use Drupal\Tests\commerce_product\Traits\ProductAttributeTestTrait;
 
 /**
  * Defines base class for commerce_cart test cases.
@@ -11,6 +12,7 @@ use Drupal\Tests\commerce_order\FunctionalJavascript\OrderWebDriverTestBase;
 abstract class CartWebDriverTestBase extends OrderWebDriverTestBase {
 
   use CartBrowserTestTrait;
+  use ProductAttributeTestTrait;
 
   /**
    * The cart order to test against.
@@ -25,13 +27,6 @@ abstract class CartWebDriverTestBase extends OrderWebDriverTestBase {
    * @var \Drupal\commerce_cart\CartManagerInterface
    */
   protected $cartManager;
-
-  /**
-   * The attribute field manager.
-   *
-   * @var \Drupal\commerce_product\ProductAttributeFieldManagerInterface
-   */
-  protected $attributeFieldManager;
 
   /**
    * Modules to enable.

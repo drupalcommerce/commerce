@@ -3,6 +3,9 @@
 namespace Drupal\Tests\commerce_product\Functional;
 
 use Drupal\commerce_product\Entity\ProductVariationType;
+use Drupal\commerce_product\Entity\ProductVariation;
+use Drupal\Tests\commerce_cart\Traits\CartBrowserTestTrait;
+use Drupal\Tests\commerce_product\Traits\ProductAttributeTestTrait;
 
 /**
  * Tests the product variation title generation.
@@ -10,6 +13,9 @@ use Drupal\commerce_product\Entity\ProductVariationType;
  * @group commerce
  */
 class ProductVariationTitleGenerationTest extends ProductBrowserTestBase {
+
+  use CartBrowserTestTrait;
+  use ProductAttributeTestTrait;
 
   /**
    * The variation type to test against.
@@ -29,6 +35,7 @@ class ProductVariationTitleGenerationTest extends ProductBrowserTestBase {
       'label' => 'Test Default',
       'orderItemType' => 'default',
     ]);
+    $this->attributeFieldManager = \Drupal::service('commerce_product.attribute_field_manager');
   }
 
   /**
@@ -85,7 +92,26 @@ class ProductVariationTitleGenerationTest extends ProductBrowserTestBase {
     ]);
     $this->assertEquals($variation->getTitle(), $product->getTitle());
 
-    // @todo Create attributes, then retest title generation.
+    // Adding attributes should change the titles.
+    $variation_type = ProductVariationType::load($variation->bundle());
+    $size_attributes = $this->createAttributeSet($variation_type, 'size', [
+      'small' => 'Small',
+      'medium' => 'Medium',
+      'large' => 'Large',
+    ]);
+    $variation = ProductVariation::load($variation->id());
+    $variation->attribute_size = $size_attributes['small']->id();
+    $variation->save();
+    $this->assertEquals($product->getTitle() . ' - Small', $variation->getTitle());
+
+    $color_attributes = $this->createAttributeSet($variation_type, 'color', [
+      'red' => 'Red',
+    ]);
+    $variation = ProductVariation::load($variation->id());
+    $variation->attribute_color = $color_attributes['red']->id();
+    $variation->save();
+
+    $this->assertEquals($product->getTitle() . ' - Small, Red', $variation->getTitle());
   }
 
 }
