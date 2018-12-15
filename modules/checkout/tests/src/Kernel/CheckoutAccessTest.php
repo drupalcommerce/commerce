@@ -9,7 +9,7 @@ use Drupal\commerce_product\Entity\ProductVariation;
 use Drupal\commerce_store\StoreCreationTrait;
 use Drupal\Core\Url;
 use Drupal\Tests\commerce\Kernel\CommerceKernelTestBase;
-use Drupal\Tests\commerce_cart\Kernel\CartManagerTestTrait;
+use Drupal\Tests\commerce_cart\Traits\CartManagerTestTrait;
 use Drupal\user\UserInterface;
 use Symfony\Cmf\Component\Routing\RouteObjectInterface;
 use Symfony\Component\HttpFoundation\Request;

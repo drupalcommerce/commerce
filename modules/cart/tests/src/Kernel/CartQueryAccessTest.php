@@ -5,6 +5,7 @@ namespace Drupal\Tests\commerce_cart\Kernel;
 use Drupal\commerce_order\OrderQueryAccessHandler;
 use Drupal\entity\QueryAccess\Condition;
 use Drupal\Tests\commerce\Kernel\CommerceKernelTestBase;
+use Drupal\Tests\commerce_cart\Traits\CartManagerTestTrait;
 
 /**
  * Tests query access filtering for carts.

@@ -7,6 +7,7 @@ use Drupal\commerce_order\Entity\OrderItemType;
 use Drupal\commerce_price\Price;
 use Drupal\commerce_product\Entity\ProductVariation;
 use Drupal\Tests\commerce\Kernel\CommerceKernelTestBase;
+use Drupal\Tests\commerce_cart\Traits\CartManagerTestTrait;
 
 /**
  * Tests the order item matcher.

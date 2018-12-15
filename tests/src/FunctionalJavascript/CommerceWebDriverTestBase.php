@@ -6,7 +6,7 @@ use Drupal\commerce_store\StoreCreationTrait;
 use Drupal\FunctionalJavascriptTests\JSWebAssert;
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
 use Drupal\Tests\block\Traits\BlockCreationTrait;
-use Drupal\Tests\commerce\Functional\CommerceBrowserTestTrait;
+use Drupal\Tests\commerce\Traits\CommerceBrowserTestTrait;
 
 /**
  * Provides a base class for Commerce functional tests.

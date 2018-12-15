@@ -5,6 +5,7 @@ namespace Drupal\Tests\commerce\Functional;
 use Drupal\commerce_store\StoreCreationTrait;
 use Drupal\Tests\block\Traits\BlockCreationTrait;
 use Drupal\Tests\BrowserTestBase;
+use Drupal\Tests\commerce\Traits\CommerceBrowserTestTrait;
 
 /**
  * Provides a base class for Commerce functional tests.

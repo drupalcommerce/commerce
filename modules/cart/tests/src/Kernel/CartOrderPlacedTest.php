@@ -4,6 +4,7 @@ namespace Drupal\Tests\commerce_cart\Kernel;
 
 use Drupal\Component\Render\FormattableMarkup;
 use Drupal\Tests\commerce\Kernel\CommerceKernelTestBase;
+use Drupal\Tests\commerce_cart\Traits\CartManagerTestTrait;
 
 /**
  * Tests the unsetting of the cart flag when order is placed.

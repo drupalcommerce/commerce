@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\Tests\commerce_cart\Kernel;
+namespace Drupal\Tests\commerce_cart\Traits;
 
 trait CartManagerTestTrait {
 

@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\Tests\commerce\FunctionalJavascript;
+namespace Drupal\Tests\commerce\Traits;
 
 @trigger_error('The ' . __NAMESPACE__ . '\JavascriptTestTrait is deprecated in Commerce 2.x and will be removed before Commerce 3.0.0. Instead, use ' . __NAMESPACE__ . '\CommerceWebDriverTestBase. See https://www.drupal.org/project/commerce/issues/2998745', E_USER_DEPRECATED);
 

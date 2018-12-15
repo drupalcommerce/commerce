@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\Tests\commerce\Functional;
+namespace Drupal\Tests\commerce\Traits;
 
 use Drupal\Component\Render\FormattableMarkup;
 
