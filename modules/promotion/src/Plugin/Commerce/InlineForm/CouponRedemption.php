@@ -225,7 +225,7 @@ class CouponRedemption extends InlineFormBase {
     $order = $order_storage->load($this->configuration['order_id']);
     foreach ($order->get('coupons') as $item) {
       if ($item->target_id == $coupon->id()) {
-        $form_state->setErrorByName($coupon_code_path, t('The provided coupon code is invalid.'));
+        // Coupon already applied. Error message not set for UX reasons.
         return;
       }
     }
@@ -253,11 +253,13 @@ class CouponRedemption extends InlineFormBase {
     $user_input = &$form_state->getUserInput();
     NestedArray::setValue($user_input, array_merge($parents, ['code']), '');
 
-    $order_storage = \Drupal::entityTypeManager()->getStorage('commerce_order');
-    /** @var \Drupal\commerce_order\Entity\OrderInterface $order */
-    $order = $order_storage->load($inline_form['#configuration']['order_id']);
-    $order->get('coupons')->appendItem($inline_form['code']['#coupon_id']);
-    $order->save();
+    if (isset($inline_form['code']['#coupon_id'])) {
+      $order_storage = \Drupal::entityTypeManager()->getStorage('commerce_order');
+      /** @var \Drupal\commerce_order\Entity\OrderInterface $order */
+      $order = $order_storage->load($inline_form['#configuration']['order_id']);
+      $order->get('coupons')->appendItem($inline_form['code']['#coupon_id']);
+      $order->save();
+    }
     $form_state->setRebuild();
   }
 

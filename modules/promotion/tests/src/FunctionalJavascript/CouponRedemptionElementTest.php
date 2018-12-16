@@ -161,7 +161,8 @@ class CouponRedemptionElementTest extends CommerceWebDriverTestBase {
     $this->getSession()->getPage()->fillField('Coupon code', $first_coupon->getCode());
     $this->getSession()->getPage()->pressButton('Apply coupon');
     $this->waitForAjaxToFinish();
-    $this->assertSession()->pageTextContains('The provided coupon code is invalid');
+    $this->assertSession()->pageTextNotContains('The provided coupon code is invalid');
+    $this->assertSession()->pageTextContains($first_coupon->getCode());
 
     // Second coupon.
     $this->getSession()->getPage()->fillField('Coupon code', $second_coupon->getCode());
