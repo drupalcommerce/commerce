@@ -21,6 +21,11 @@ services:
     tags:
       - { name: event_subscriber }
 
+  commerce_payment.order_assign_subscriber:
+    class: Drupal\commerce_payment\EventSubscriber\OrderAssignSubscriber
+    tags:
+    - { name: event_subscriber }
+
   commerce_payment.order_paid_subscriber:
     class: Drupal\commerce_payment\EventSubscriber\OrderPaidSubscriber
     tags:

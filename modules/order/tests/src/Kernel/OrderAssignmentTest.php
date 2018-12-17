@@ -3,6 +3,8 @@
 namespace Drupal\Tests\commerce_order\Kernel;
 
 use Drupal\commerce_order\Entity\Order;
+use Drupal\commerce_payment\Entity\PaymentGateway;
+use Drupal\commerce_payment\Entity\PaymentMethod;
 use Drupal\commerce_price\Price;
 use Drupal\commerce_product\Entity\Product;
 use Drupal\commerce_product\Entity\ProductVariation;
@@ -51,6 +53,8 @@ class OrderAssignmentTest extends CommerceKernelTestBase {
     'state_machine',
     'commerce_product',
     'commerce_order',
+    'commerce_payment',
+    'commerce_payment_example',
     'commerce_test',
   ];
 
@@ -65,7 +69,9 @@ class OrderAssignmentTest extends CommerceKernelTestBase {
     $this->installEntitySchema('commerce_order_item');
     $this->installEntitySchema('commerce_product');
     $this->installEntitySchema('commerce_product_variation');
-    $this->installConfig(['commerce_product', 'commerce_order']);
+    $this->installEntitySchema('commerce_payment');
+    $this->installEntitySchema('commerce_payment_method');
+    $this->installConfig(['commerce_product', 'commerce_order', 'commerce_payment']);
     $this->user = $this->createUser(['mail' => $this->randomString() . '@example.com']);
 
     // Turn off title generation to allow explicit values to be used.
@@ -104,6 +110,26 @@ class OrderAssignmentTest extends CommerceKernelTestBase {
     $profile->save();
     $profile = $this->reloadEntity($profile);
 
+    $payment_gateway = PaymentGateway::create([
+      'id' => 'example',
+      'label' => 'Example',
+      'plugin' => 'example_onsite',
+    ]);
+    $payment_gateway->getPlugin()->setConfiguration([
+      'api_key' => '2342fewfsfs',
+      'mode' => 'test',
+      'payment_method_types' => ['credit_card'],
+    ]);
+    $payment_gateway->save();
+
+    /** @var \Drupal\commerce_payment\Entity\PaymentMethodInterface $payment_method */
+    $payment_method = PaymentMethod::create([
+      'type' => 'credit_card',
+      'payment_gateway' => 'example',
+      'payment_gateway_mode' => 'test',
+    ]);
+    $payment_method->save();
+
     /** @var \Drupal\commerce_order\OrderItemStorageInterface $order_item_storage */
     $order_item_storage = $this->container->get('entity_type.manager')->getStorage('commerce_order_item');
 
@@ -116,6 +142,7 @@ class OrderAssignmentTest extends CommerceKernelTestBase {
       'mail' => $this->user->getEmail(),
       'ip_address' => '127.0.0.1',
       'billing_profile' => $profile,
+      'payment_method' => $payment_method,
       'state' => 'draft',
     ]);
     $order->save();
@@ -136,13 +163,24 @@ class OrderAssignmentTest extends CommerceKernelTestBase {
    * @covers ::assign
    */
   public function testAssign() {
-    $another_user = $this->createUser(['mail' => $this->randomString() . '@example.com']);
-    $this->orderAssignment->assignMultiple([$this->order], $another_user);
+    $second_user = $this->createUser(['mail' => $this->randomString() . '@example.com']);
+    $this->orderAssignment->assignMultiple([$this->order], $second_user);
 
     $this->order = $this->reloadEntity($this->order);
-    $this->assertEquals($another_user->id(), $this->order->getCustomerId());
-    $this->assertEquals($another_user->getEmail(), $this->order->getEmail());
-    $this->assertEquals($another_user->id(), $this->order->getBillingProfile()->getOwnerId());
+    $this->assertEquals($second_user->id(), $this->order->getCustomerId());
+    $this->assertEquals($second_user->getEmail(), $this->order->getEmail());
+    $this->assertEquals($second_user->id(), $this->order->getBillingProfile()->getOwnerId());
+    $this->assertEquals($second_user->id(), $this->order->get('payment_method')->entity->getOwnerId());
+
+    $third_user = $this->createUser(['mail' => $this->randomString() . '@example.com']);
+    $this->orderAssignment->assignMultiple([$this->order], $third_user);
+
+    $this->order = $this->reloadEntity($this->order);
+    $this->assertEquals($third_user->id(), $this->order->getCustomerId());
+    $this->assertEquals($third_user->getEmail(), $this->order->getEmail());
+    // Confirm that the billing profile and payment method were not reassigned.
+    $this->assertEquals($second_user->id(), $this->order->getBillingProfile()->getOwnerId());
+    $this->assertEquals($second_user->id(), $this->order->get('payment_method')->entity->getOwnerId());
   }
 
 }
