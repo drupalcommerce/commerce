@@ -86,11 +86,11 @@ class CurrencyForm extends EntityForm {
       '#required' => TRUE,
     ];
     $form['fractionDigits'] = [
-      '#type' => 'number',
+      '#type' => 'select',
       '#title' => $this->t('Fraction digits'),
       '#description' => $this->t('The number of digits after the decimal sign.'),
+      '#options' => range(0, 6),
       '#default_value' => $currency->getFractionDigits(),
-      '#min' => 0,
       '#required' => TRUE,
     ];
 
