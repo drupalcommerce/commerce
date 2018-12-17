@@ -3,6 +3,7 @@
 namespace Drupal\Tests\commerce\Traits;
 
 use Drupal\Component\Render\FormattableMarkup;
+use Drupal\Core\Entity\EntityInterface;
 
 /**
  * Provides a trait for Commerce functional tests.
@@ -35,6 +36,22 @@ trait CommerceBrowserTestTrait {
     $entity = $storage->load($entity->id());
 
     return $entity;
+  }
+
+  /**
+   * Reloads the entity after clearing the static cache.
+   *
+   * @param \Drupal\Core\Entity\EntityInterface $entity
+   *   The entity to reload.
+   *
+   * @return \Drupal\Core\Entity\EntityInterface
+   *   The reloaded entity.
+   */
+  protected function reloadEntity(EntityInterface $entity) {
+    /** @var \Drupal\Core\Entity\EntityStorageInterface $storage */
+    $storage = \Drupal::service('entity_type.manager')->getStorage($entity->getEntityTypeId());
+    $storage->resetCache([$entity->id()]);
+    return $storage->load($entity->id());
   }
 
   /**

@@ -42,11 +42,6 @@ class OrderAssignment implements OrderAssignmentInterface {
    * {@inheritdoc}
    */
   public function assign(OrderInterface $order, UserInterface $account) {
-    if ($order->getCustomer()->isAuthenticated()) {
-      // Skip orders which already have a customer.
-      return;
-    }
-
     $order->setCustomer($account);
     $order->setEmail($account->getEmail());
     // Update the referenced billing profile.

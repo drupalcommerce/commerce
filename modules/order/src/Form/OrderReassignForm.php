@@ -2,6 +2,8 @@
 
 namespace Drupal\commerce_order\Form;
 
+use Drupal\commerce_order\OrderAssignmentInterface;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Routing\CurrentRouteMatch;
@@ -22,20 +24,44 @@ class OrderReassignForm extends FormBase {
   protected $order;
 
   /**
+   * The order assignment service.
+   *
+   * @var \Drupal\commerce_order\OrderAssignmentInterface
+   */
+  protected $orderAssignment;
+
+  /**
+   * The user storage.
+   *
+   * @var \Drupal\Core\Entity\EntityStorageInterface
+   */
+  protected $userStorage;
+
+  /**
    * Constructs a new OrderReassignForm object.
    *
    * @param \Drupal\Core\Routing\CurrentRouteMatch $current_route_match
    *   The current route match.
+   * @param \Drupal\commerce_order\OrderAssignmentInterface $order_assignment
+   *   The order assignment service.
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   *   The entity type manager.
    */
-  public function __construct(CurrentRouteMatch $current_route_match) {
+  public function __construct(CurrentRouteMatch $current_route_match, OrderAssignmentInterface $order_assignment, EntityTypeManagerInterface $entity_type_manager) {
     $this->order = $current_route_match->getParameter('commerce_order');
+    $this->orderAssignment = $order_assignment;
+    $this->userStorage = $entity_type_manager->getStorage('user');
   }
 
   /**
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container) {
-    return new static($container->get('current_route_match'));
+    return new static(
+      $container->get('current_route_match'),
+      $container->get('commerce_order.order_assignment'),
+      $container->get('entity_type.manager')
+    );
   }
 
   /**
@@ -96,9 +122,9 @@ class OrderReassignForm extends FormBase {
     $this->submitCustomerForm($form, $form_state);
 
     $values = $form_state->getValues();
-    $this->order->setEmail($values['mail']);
-    $this->order->setCustomerId($values['uid']);
-    $this->order->save();
+    /** @var \Drupal\user\UserInterface $user */
+    $user = $this->userStorage->load($values['uid']);
+    $this->orderAssignment->assign($this->order, $user);
     $this->messenger()->addMessage($this->t('The order %label has been assigned to customer %customer.', [
       '%label' => $this->order->label(),
       '%customer' => $this->order->getCustomer()->label(),
