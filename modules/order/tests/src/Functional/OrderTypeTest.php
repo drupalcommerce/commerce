@@ -77,7 +77,7 @@ class OrderTypeTest extends OrderBrowserTestBase {
   }
 
   /**
-   * Tests deleting an order Type through the form.
+   * Tests deleting an order type through the form.
    */
   public function testDeleteOrderType() {
     /** @var \Drupal\commerce_order\Entity\OrderTypeInterface $type */
@@ -114,6 +114,20 @@ class OrderTypeTest extends OrderBrowserTestBase {
     $this->submitForm([], t('Delete'));
     $type_exists = (bool) OrderType::load($type->id());
     $this->assertEmpty($type_exists);
+  }
+
+  /**
+   * Tests order type dependencies.
+   */
+  public function testOrderTypeDependencies() {
+    $this->drupalGet('admin/commerce/config/order-types/default/edit');
+    $this->submitForm(['workflow' => 'test_workflow'], t('Save'));
+
+    $order_type = OrderType::load('default');
+    $this->assertEquals('test_workflow', $order_type->getWorkflowId());
+    $dependencies = $order_type->getDependencies();
+    $this->assertArrayHasKey('module', $dependencies);
+    $this->assertContains('commerce_order_test', $dependencies['module']);
   }
 
 }
