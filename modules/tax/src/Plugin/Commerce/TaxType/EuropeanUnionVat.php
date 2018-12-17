@@ -19,6 +19,17 @@ use Drupal\profile\Entity\ProfileInterface;
 class EuropeanUnionVat extends LocalTaxTypeBase {
 
   /**
+   * The customer profile tax number field name.
+   *
+   * Allows child classes to enable B2B logic without overriding resolveZones().
+   *
+   * @todo Default to "tax_number" once implemented.
+   *
+   * @var string
+   */
+  protected $taxNumberFieldName;
+
+  /**
    * {@inheritdoc}
    */
   public function buildConfigurationForm(array $form, FormStateInterface $form_state) {
@@ -58,9 +69,10 @@ class EuropeanUnionVat extends LocalTaxTypeBase {
       return $this->checkRegistrations($store, $zone);
     });
 
-    // @todo Replace with $customer_profile->get('tax_number')->value
-    // once tax numbers are implemented.
     $customer_tax_number = '';
+    if ($this->taxNumberFieldName) {
+      $customer_tax_number = $customer_profile->get($this->taxNumberFieldName)->value;
+    }
     // Since january 1st 2015 all digital goods sold to EU customers
     // must use the customer zone. For example, an ebook sold
     // to Germany needs to have German VAT applied.
