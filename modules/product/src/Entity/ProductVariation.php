@@ -210,7 +210,7 @@ class ProductVariation extends CommerceContentEntityBase implements ProductVaria
    * {@inheritdoc}
    */
   public function setActive($active) {
-    $this->set('published', (bool) $active);
+    $this->set('status', (bool) $active);
     return $this;
   }
 
