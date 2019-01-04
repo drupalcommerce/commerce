@@ -169,7 +169,7 @@ class PromotionTest extends CommerceWebDriverTestBase {
     ];
     $this->submitForm($edit, 'Save');
 
-    \Drupal::service('entity_type.manager')->getStorage('commerce_promotion')->resetCache([$promotion->id()]);
+    $this->container->get('entity_type.manager')->getStorage('commerce_promotion')->resetCache([$promotion->id()]);
     $promotion_changed = Promotion::load($promotion->id());
     $this->assertEquals($new_promotion_name, $promotion_changed->getName(), 'The promotion name successfully updated.');
 
@@ -189,7 +189,7 @@ class PromotionTest extends CommerceWebDriverTestBase {
     $this->assertSession()->pageTextContains('This action cannot be undone.');
     $this->submitForm([], t('Delete'));
 
-    \Drupal::service('entity_type.manager')->getStorage('commerce_promotion')->resetCache([$promotion->id()]);
+    $this->container->get('entity_type.manager')->getStorage('commerce_promotion')->resetCache([$promotion->id()]);
     $promotion_exists = (bool) Promotion::load($promotion->id());
     $this->assertEmpty($promotion_exists, 'The new promotion has been deleted from the database using UI.');
   }

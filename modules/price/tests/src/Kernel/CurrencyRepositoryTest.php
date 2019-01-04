@@ -27,7 +27,7 @@ class CurrencyRepositoryTest extends CommerceKernelTestBase {
     parent::setUp();
 
     // The parent has already imported USD.
-    $currency_importer = \Drupal::service('commerce_price.currency_importer');
+    $currency_importer = $this->container->get('commerce_price.currency_importer');
     $currency_importer->import('EUR');
 
     $this->currencyRepository = $this->container->get('commerce_price.currency_repository');

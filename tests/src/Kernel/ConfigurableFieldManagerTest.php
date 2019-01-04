@@ -28,7 +28,7 @@ class ConfigurableFieldManagerTest extends CommerceKernelTestBase {
   protected function setUp() {
     parent::setUp();
 
-    $this->configurableFieldManager = \Drupal::service('commerce.configurable_field_manager');
+    $this->configurableFieldManager = $this->container->get('commerce.configurable_field_manager');
   }
 
   /**

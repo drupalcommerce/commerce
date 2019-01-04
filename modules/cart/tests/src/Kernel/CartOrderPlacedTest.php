@@ -121,7 +121,7 @@ class CartOrderPlacedTest extends CommerceKernelTestBase {
    */
   protected function createEntity($entity_type, array $values) {
     /** @var \Drupal\Core\Entity\EntityStorageInterface $storage */
-    $storage = \Drupal::service('entity_type.manager')->getStorage($entity_type);
+    $storage = $this->container->get('entity_type.manager')->getStorage($entity_type);
     $entity = $storage->create($values);
     $status = $entity->save();
     $this->assertEquals(SAVED_NEW, $status, new FormattableMarkup('Created %label entity %type.', [

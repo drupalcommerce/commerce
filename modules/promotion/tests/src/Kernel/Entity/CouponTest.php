@@ -138,7 +138,7 @@ class CouponTest extends CommerceKernelTestBase {
     $this->assertFalse($coupon->available($order));
     $coupon->setEnabled(TRUE);
 
-    \Drupal::service('commerce_promotion.usage')->register($order, $promotion, $coupon);
+    $this->container->get('commerce_promotion.usage')->register($order, $promotion, $coupon);
     $this->assertFalse($coupon->available($order));
   }
 

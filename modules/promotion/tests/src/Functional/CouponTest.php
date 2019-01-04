@@ -83,7 +83,7 @@ class CouponTest extends CommerceBrowserTestBase {
     $this->assertEquals($this->promotion->id(), $coupon->getPromotionId());
     $this->assertEquals($code, $coupon->getCode());
 
-    \Drupal::service('entity_type.manager')->getStorage('commerce_promotion')->resetCache([$this->promotion->id()]);
+    $this->container->get('entity_type.manager')->getStorage('commerce_promotion')->resetCache([$this->promotion->id()]);
     $this->promotion = Promotion::load($this->promotion->id());
     $this->assertTrue($this->promotion->hasCoupon($coupon));
   }
@@ -105,7 +105,7 @@ class CouponTest extends CommerceBrowserTestBase {
     ];
     $this->submitForm($edit, 'Save');
 
-    \Drupal::service('entity_type.manager')->getStorage('commerce_promotion_coupon')->resetCache([$coupon->id()]);
+    $this->container->get('entity_type.manager')->getStorage('commerce_promotion_coupon')->resetCache([$coupon->id()]);
     $coupon = Coupon::load($coupon->id());
     $this->assertEquals($new_code, $coupon->getCode());
   }
@@ -125,7 +125,7 @@ class CouponTest extends CommerceBrowserTestBase {
     $this->assertSession()->pageTextContains('This action cannot be undone.');
     $this->submitForm([], t('Delete'));
 
-    \Drupal::service('entity_type.manager')->getStorage('commerce_promotion_coupon')->resetCache([$coupon->id()]);
+    $this->container->get('entity_type.manager')->getStorage('commerce_promotion_coupon')->resetCache([$coupon->id()]);
     $coupon_exists = (bool) Coupon::load($coupon->id());
     $this->assertFalse($coupon_exists);
   }
@@ -161,7 +161,7 @@ class CouponTest extends CommerceBrowserTestBase {
       $this->assertEquals(strlen($coupon->getCode()), 8);
     }
 
-    \Drupal::service('entity_type.manager')->getStorage('commerce_promotion')->resetCache([$this->promotion->id()]);
+    $this->container->get('entity_type.manager')->getStorage('commerce_promotion')->resetCache([$this->promotion->id()]);
     $this->promotion = Promotion::load($this->promotion->id());
     foreach ($coupons as $id => $coupon) {
       $this->assertTrue($this->promotion->hasCoupon($coupon));

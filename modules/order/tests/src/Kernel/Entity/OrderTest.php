@@ -464,7 +464,7 @@ class OrderTest extends CommerceKernelTestBase {
    * @covers ::getTotalPrice
    */
   public function testMultipleCurrencies() {
-    $currency_importer = \Drupal::service('commerce_price.currency_importer');
+    $currency_importer = $this->container->get('commerce_price.currency_importer');
     $currency_importer->import('EUR');
 
     $usd_order_item = OrderItem::create([

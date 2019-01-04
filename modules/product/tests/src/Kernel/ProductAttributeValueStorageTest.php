@@ -65,7 +65,7 @@ class ProductAttributeValueStorageTest extends CommerceKernelTestBase {
     ])->save();
 
     /** @var \Drupal\commerce_product\ProductAttributeValueStorageInterface $attribute_value_storage */
-    $attribute_value_storage = \Drupal::service('entity_type.manager')->getStorage('commerce_product_attribute_value');
+    $attribute_value_storage = $this->container->get('entity_type.manager')->getStorage('commerce_product_attribute_value');
     /** @var \Drupal\commerce_product\Entity\ProductAttributeValueInterface[] $attribute_values */
     $attribute_values = $attribute_value_storage->loadMultipleByAttribute('color');
 

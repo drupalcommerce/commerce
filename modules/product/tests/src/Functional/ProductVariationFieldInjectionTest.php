@@ -28,7 +28,7 @@ class ProductVariationFieldInjectionTest extends ProductBrowserTestBase {
       'label' => 'Color',
     ]);
     $attribute->save();
-    \Drupal::service('commerce_product.attribute_field_manager')->createField($attribute, 'default');
+    $this->container->get('commerce_product.attribute_field_manager')->createField($attribute, 'default');
 
     $attribute_values = [];
     foreach (['Cyan', 'Magenta', 'Yellow', 'Black'] as $color_attribute_value) {

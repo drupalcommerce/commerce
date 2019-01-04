@@ -40,8 +40,8 @@ class EmptyCartButtonTest extends OrderBrowserTestBase {
   protected function setUp() {
     parent::setUp();
 
-    $this->cart = \Drupal::service('commerce_cart.cart_provider')->createCart('default', $this->store);
-    $this->cartManager = \Drupal::service('commerce_cart.cart_manager');
+    $this->cart = $this->container->get('commerce_cart.cart_provider')->createCart('default', $this->store);
+    $this->cartManager = $this->container->get('commerce_cart.cart_manager');
   }
 
   /**

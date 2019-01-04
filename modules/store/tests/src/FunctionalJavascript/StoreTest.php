@@ -81,7 +81,7 @@ class StoreTest extends CommerceWebDriverTestBase {
     ];
     $this->submitForm($edit, 'Save');
 
-    \Drupal::service('entity_type.manager')->getStorage('commerce_store')->resetCache([$store->id()]);
+    $this->container->get('entity_type.manager')->getStorage('commerce_store')->resetCache([$store->id()]);
     $store_changed = Store::load($store->id());
     $this->assertEquals($new_store_name, $store_changed->getName(), 'The store name successfully updated.');
   }
@@ -95,7 +95,7 @@ class StoreTest extends CommerceWebDriverTestBase {
     $this->assertSession()->pageTextContains('This action cannot be undone.');
     $this->submitForm([], t('Delete'));
 
-    \Drupal::service('entity_type.manager')->getStorage('commerce_store')->resetCache([$store->id()]);
+    $this->container->get('entity_type.manager')->getStorage('commerce_store')->resetCache([$store->id()]);
     $store_exists = (bool) Store::load($store->id());
     $this->assertEmpty($store_exists, 'The new store has been deleted from the database using UI.');
   }

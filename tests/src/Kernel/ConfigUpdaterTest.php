@@ -41,7 +41,7 @@ class ConfigUpdaterTest extends CommerceKernelTestBase {
     $this->installConfig('commerce_order');
     $this->installConfig('commerce_update_test');
 
-    $this->configUpdater = \Drupal::service('commerce.config_updater');
+    $this->configUpdater = $this->container->get('commerce.config_updater');
   }
 
   /**

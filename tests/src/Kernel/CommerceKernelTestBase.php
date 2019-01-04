@@ -50,7 +50,7 @@ abstract class CommerceKernelTestBase extends EntityKernelTestBase {
     $this->installEntitySchema('commerce_store');
     $this->installConfig(['commerce_store']);
 
-    $currency_importer = \Drupal::service('commerce_price.currency_importer');
+    $currency_importer = $this->container->get('commerce_price.currency_importer');
     $currency_importer->import('USD');
 
     $this->store = $this->createStore('Default store', 'admin@example.com');

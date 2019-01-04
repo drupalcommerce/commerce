@@ -27,7 +27,7 @@ class OrderAdminTest extends OrderBrowserTestBase {
    */
   protected function setUp() {
     parent::setUp();
-    \Drupal::service('module_installer')->install(['profile']);
+    $this->container->get('module_installer')->install(['profile']);
 
     $profile_values = [
       'type' => 'customer',
@@ -222,7 +222,7 @@ class OrderAdminTest extends OrderBrowserTestBase {
     $this->assertSession()->pageTextContains('This action cannot be undone.');
     $this->submitForm([], t('Delete'));
 
-    \Drupal::service('entity_type.manager')->getStorage('commerce_order')->resetCache([$order->id()]);
+    $this->container->get('entity_type.manager')->getStorage('commerce_order')->resetCache([$order->id()]);
     $order_exists = (bool) Order::load($order->id());
     $this->assertEmpty($order_exists, 'The order has been deleted from the database.');
   }
@@ -245,7 +245,7 @@ class OrderAdminTest extends OrderBrowserTestBase {
     ]));
     $this->submitForm([], t('Unlock'));
 
-    \Drupal::service('entity_type.manager')->getStorage('commerce_order')->resetCache([$order->id()]);
+    $this->container->get('entity_type.manager')->getStorage('commerce_order')->resetCache([$order->id()]);
     $order = Order::load($order->id());
     $this->assertFalse($order->isLocked());
   }

@@ -69,7 +69,7 @@ class CustomTest extends CommerceWebDriverTestBase {
     $this->getSession()->getPage()->selectFieldOption('configuration[custom][territories][1][territory][country_code]', 'IT');
     $this->waitForAjaxToFinish();
     $this->submitForm([], t('Save'));
-    \Drupal::service('entity_type.manager')->getStorage('commerce_tax_type')->resetCache([$tax_type->id()]);
+    $this->container->get('entity_type.manager')->getStorage('commerce_tax_type')->resetCache([$tax_type->id()]);
     $tax_type = TaxType::load($tax_type->id());
     $plugin_configuration = $tax_type->getPlugin()->getConfiguration();
     $this->assertEquals('vat', $plugin_configuration['display_label']);

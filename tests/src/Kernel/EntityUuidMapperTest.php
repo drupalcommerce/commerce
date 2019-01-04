@@ -23,7 +23,7 @@ class EntityUuidMapperTest extends CommerceKernelTestBase {
   protected function setUp() {
     parent::setUp();
 
-    $this->entityUuidMapper = \Drupal::service('commerce.entity_uuid_mapper');
+    $this->entityUuidMapper = $this->container->get('commerce.entity_uuid_mapper');
   }
 
   /**
