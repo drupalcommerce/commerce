@@ -22,6 +22,8 @@ class CustomerProfile extends EntityInlineFormBase {
    */
   public function defaultConfiguration() {
     return [
+      // Where the profile is being used. Passed along to field widgets.
+      'parent_entity_type' => 'commerce_order',
       // The country to select if the address widget doesn't have a default.
       'default_country' => NULL,
       // If empty, all countries will be available.
@@ -51,6 +53,9 @@ class CustomerProfile extends EntityInlineFormBase {
    */
   public function buildInlineForm(array $inline_form, FormStateInterface $form_state) {
     $inline_form = parent::buildInlineForm($inline_form, $form_state);
+    // Allows a widget to vary when used for billing versus shipping purposes.
+    // Available in hook_field_widget_form_alter() via $context['form'].
+    $inline_form['#parent_entity_type'] = $this->configuration['parent_entity_type'];
 
     assert($this->entity instanceof ProfileInterface);
     $form_display = EntityFormDisplay::collectRenderDisplay($this->entity, 'default');
