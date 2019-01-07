@@ -46,7 +46,7 @@ function commerce_product_update_8202() {
 }
 
 /**
- * Update the 'status' field.
+ * Update the product 'status' field.
  */
 function commerce_product_update_8203() {
   $definition_update_manager = \Drupal::entityDefinitionUpdateManager();
@@ -122,4 +122,29 @@ function commerce_product_update_8206() {
   unset($keys['status']);
   $entity_type->set('entity_keys', $keys);
   $definition_update_manager->updateEntityType($entity_type);
+}
+
+/**
+ * Update the variation 'status' field.
+ */
+function commerce_product_update_8207() {
+  $definition_update_manager = \Drupal::entityDefinitionUpdateManager();
+
+  $storage_definition = BaseFieldDefinition::create('boolean')
+    ->setName('status')
+    ->setTargetEntityTypeId('commerce_product_variation')
+    ->setLabel(t('Published'))
+    ->setRevisionable(TRUE)
+    ->setTranslatable(TRUE)
+    ->setDefaultValue(TRUE)
+    ->setDisplayOptions('form', [
+      'type' => 'boolean_checkbox',
+      'settings' => [
+        'display_label' => TRUE,
+      ],
+      'weight' => 90,
+    ])
+    ->setDisplayConfigurable('form', TRUE);
+
+  $definition_update_manager->updateFieldStorageDefinition($storage_definition);
 }
