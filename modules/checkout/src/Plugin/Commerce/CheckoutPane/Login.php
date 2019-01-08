@@ -235,6 +235,7 @@ class Login extends CheckoutPaneBase implements CheckoutPaneInterface, Container
       '#prefix' => '<p>',
       '#suffix' => '</p>',
       '#markup' => $this->t('Proceed to checkout. You can optionally create an account at the end.'),
+      '#access' => $this->canRegisterAfterCheckout(),
     ];
     $pane_form['guest']['continue'] = [
       '#type' => 'submit',
@@ -300,7 +301,8 @@ class Login extends CheckoutPaneBase implements CheckoutPaneInterface, Container
   public function validatePaneForm(array &$pane_form, FormStateInterface $form_state, array &$complete_form) {
     $values = $form_state->getValue($pane_form['#parents']);
     $triggering_element = $form_state->getTriggeringElement();
-    switch ($triggering_element['#op']) {
+    $trigger = !empty($triggering_element['#op']) ? $triggering_element['#op'] : 'continue';
+    switch ($trigger) {
       case 'continue':
         return;
 
@@ -391,7 +393,8 @@ class Login extends CheckoutPaneBase implements CheckoutPaneInterface, Container
    */
   public function submitPaneForm(array &$pane_form, FormStateInterface $form_state, array &$complete_form) {
     $triggering_element = $form_state->getTriggeringElement();
-    switch ($triggering_element['#op']) {
+    $trigger = !empty($triggering_element['#op']) ? $triggering_element['#op'] : 'continue';
+    switch ($trigger) {
       case 'continue':
         break;
 
@@ -410,6 +413,17 @@ class Login extends CheckoutPaneBase implements CheckoutPaneInterface, Container
       'commerce_order' => $this->order->id(),
       'step' => $this->checkoutFlow->getNextStepId($this->getStepId()),
     ]);
+  }
+
+  /**
+   * Checks whether guests can register after checkout is complete.
+   *
+   * @return bool
+   *   TRUE if guests can register after checkout is complete, FALSE otherwise.
+   */
+  protected function canRegisterAfterCheckout() {
+    $completion_register_pane = $this->checkoutFlow->getPane('completion_register');
+    return $completion_register_pane->getStepId() != '_disabled';
   }
 
 }

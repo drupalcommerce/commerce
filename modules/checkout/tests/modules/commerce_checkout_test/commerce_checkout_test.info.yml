@@ -1,0 +1,7 @@
+name: Commerce Checkout Test
+type: module
+description: Contains various non-specific things needed in tests.
+package: Testing
+core: 8.x
+dependencies:
+  - commerce:commerce_checkout

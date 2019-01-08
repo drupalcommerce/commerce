@@ -43,6 +43,9 @@ function commerce_checkout_theme() {
     'commerce_checkout_pane' => [
       'render element' => 'elements',
     ],
+    'commerce_checkout_completion_register' => [
+      'render element' => 'form',
+    ],
   ];
 
   return $theme;
