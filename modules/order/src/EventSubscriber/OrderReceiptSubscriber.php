@@ -9,6 +9,8 @@ use Drupal\Core\Mail\MailManagerInterface;
 use Drupal\Core\Render\RenderContext;
 use Drupal\Core\Render\Renderer;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
+use Drupal\Core\Theme\ThemeInitializationInterface;
+use Drupal\Core\Theme\ThemeManagerInterface;
 use Drupal\state_machine\Event\WorkflowTransitionEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -62,6 +64,20 @@ class OrderReceiptSubscriber implements EventSubscriberInterface {
   protected $renderer;
 
   /**
+   * The theme manager.
+   *
+   * @var \Drupal\Core\Theme\ThemeManagerInterface
+   */
+  protected $themeManager;
+
+  /**
+   * The theme initialization.
+   *
+   * @var \Drupal\Core\Theme\ThemeInitializationInterface
+   */
+  protected $themeInitialization;
+
+  /**
    * Constructs a new OrderReceiptSubscriber object.
    *
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
@@ -74,14 +90,20 @@ class OrderReceiptSubscriber implements EventSubscriberInterface {
    *   The order total summary.
    * @param \Drupal\Core\Render\Renderer $renderer
    *   The renderer.
+   * @param \Drupal\Core\Theme\ThemeManagerInterface $theme_manager
+   *   The theme manager.
+   * @param \Drupal\Core\Theme\ThemeInitializationInterface $theme_initialization
+   *   The theme initialization.
    */
-  public function __construct(EntityTypeManagerInterface $entity_type_manager, LanguageManagerInterface $language_manager, MailManagerInterface $mail_manager, OrderTotalSummaryInterface $order_total_summary, Renderer $renderer) {
+  public function __construct(EntityTypeManagerInterface $entity_type_manager, LanguageManagerInterface $language_manager, MailManagerInterface $mail_manager, OrderTotalSummaryInterface $order_total_summary, Renderer $renderer, ThemeManagerInterface $theme_manager, ThemeInitializationInterface $theme_initialization) {
     $this->orderTypeStorage = $entity_type_manager->getStorage('commerce_order_type');
     $this->orderTotalSummary = $order_total_summary;
     $this->profileViewBuilder = $entity_type_manager->getViewBuilder('profile');
     $this->languageManager = $language_manager;
     $this->mailManager = $mail_manager;
     $this->renderer = $renderer;
+    $this->themeManager = $theme_manager;
+    $this->themeInitialization = $theme_initialization;
   }
 
   /**
@@ -117,17 +139,39 @@ class OrderReceiptSubscriber implements EventSubscriberInterface {
       $params['headers']['Bcc'] = $receipt_bcc;
     }
 
-    $build = [
-      '#theme' => 'commerce_order_receipt',
-      '#order_entity' => $order,
-      '#totals' => $this->orderTotalSummary->buildTotals($order),
-    ];
-    if ($billing_profile = $order->getBillingProfile()) {
-      $build['#billing_information'] = $this->profileViewBuilder->view($billing_profile);
+    // Switch the theme to the configured mail theme.
+    $mail_theme = NULL;
+    $current_active_theme = $this->themeManager->getActiveTheme();
+
+    // The Mail System module swaps out core's MailManager, adding a
+    // getMailTheme() method. However, this method is not on any interface.
+    if (method_exists($this->mailManager, 'getMailTheme')) {
+      $mail_theme = $this->mailManager->getMailTheme();
+      if ($mail_theme != $current_active_theme->getName()) {
+        $initialized_mail_theme = $this->themeInitialization->initTheme($mail_theme);
+        $this->themeManager->setActiveTheme($initialized_mail_theme);
+      }
     }
-    $params['body'] = $this->renderer->executeInRenderContext(new RenderContext(), function () use ($build) {
-      return $this->renderer->render($build);
-    });
+
+    try {
+      $build = [
+        '#theme' => 'commerce_order_receipt',
+        '#order_entity' => $order,
+        '#totals' => $this->orderTotalSummary->buildTotals($order),
+      ];
+      if ($billing_profile = $order->getBillingProfile()) {
+        $build['#billing_information'] = $this->profileViewBuilder->view($billing_profile);
+      }
+      $params['body'] = $this->renderer->executeInRenderContext(new RenderContext(), function () use ($build) {
+        return $this->renderer->render($build);
+      });
+    }
+    finally {
+      // Revert the active theme.
+      if ($mail_theme != $current_active_theme->getName()) {
+        $this->themeManager->setActiveTheme($current_active_theme);
+      }
+    }
 
     // Replicated logic from EmailAction and contact's MailHandler.
     $customer = $order->getCustomer();
