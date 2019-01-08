@@ -286,8 +286,9 @@ class Product extends CommerceContentEntityBase implements ProductInterface {
       $variation = $item->entity;
       if ($variation->product_id->isEmpty()) {
         $variation->product_id = $this->id();
-        $variation->save();
       }
+      // Ensure the variation title is updated.
+      $variation->save();
     }
   }
 

@@ -119,6 +119,12 @@ class ProductVariationGeneratedTitleTest extends CommerceKernelTestBase {
     $variation = $this->reloadEntity($variation);
     $this->assertEquals($variation->label(), $product->label());
 
+    // Changing product title should update variation title.
+    $product->set('title', 'My Renamed Product');
+    $product->save();
+    $variation = $this->reloadEntity($variation);
+    $this->assertEquals($variation->label(), $product->label());
+
     // With attribute values, the variation title should be the product plus all
     // of its attributes.
     $color_black = ProductAttributeValue::create([
