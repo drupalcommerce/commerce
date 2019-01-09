@@ -29,7 +29,7 @@ abstract class OffsitePaymentGatewayBase extends PaymentGatewayBase implements O
    * {@inheritdoc}
    */
   public function onCancel(OrderInterface $order, Request $request) {
-    $this->messenger->addMessage($this->t('You have canceled checkout at @gateway but may resume the checkout process here when you are ready.', [
+    $this->messenger()->addMessage($this->t('You have canceled checkout at @gateway but may resume the checkout process here when you are ready.', [
       '@gateway' => $this->getDisplayLabel(),
     ]));
   }
