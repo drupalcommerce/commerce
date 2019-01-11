@@ -607,7 +607,7 @@ class PaymentCheckoutTest extends CommerceWebDriverTestBase {
     $this->assertFalse($order->isLocked());
 
     // Go to the return url and confirm that it works.
-    $this->submitForm([], 'Proceed to Example');
+    $this->drupalGet('checkout/1/payment/return');
     $this->assertSession()->addressEquals('checkout/1/complete');
     $this->assertSession()->pageTextContains('Your order number is 1. You can view your order on your account page when logged in.');
 
