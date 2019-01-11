@@ -19,7 +19,6 @@ use Drupal\profile\Entity\ProfileInterface;
  * $form['billing_profile'] = [
  *   '#type' => 'commerce_profile_select',
  *   '#default_value' => $profile,
- *   '#default_country' => 'FR',
  *   '#available_countries' => ['US', 'FR'],
  * ];
  * @endcode
@@ -39,8 +38,6 @@ class ProfileSelect extends RenderElement {
   public function getInfo() {
     $class = get_class($this);
     return [
-      // The country to select if the address widget doesn't have a default.
-      '#default_country' => NULL,
       // A list of country codes. If empty, all countries will be available.
       '#available_countries' => [],
 
@@ -88,7 +85,6 @@ class ProfileSelect extends RenderElement {
     /** @var \Drupal\commerce\InlineFormManager $inline_form_manager */
     $inline_form_manager = \Drupal::service('plugin.manager.commerce_inline_form');
     $inline_form = $inline_form_manager->createInstance('customer_profile', [
-      'default_country' => $element['#default_country'],
       'available_countries' => $element['#available_countries'],
     ], $element['#default_value']);
 

@@ -270,7 +270,6 @@ class PaymentInformation extends CheckoutPaneBase {
    *   The modified pane form.
    */
   protected function buildBillingProfileForm(array $pane_form, FormStateInterface $form_state) {
-    $store = $this->order->getStore();
     $billing_profile = $this->order->getBillingProfile();
     if (!$billing_profile) {
       $billing_profile = $this->entityTypeManager->getStorage('profile')->create([
@@ -279,8 +278,7 @@ class PaymentInformation extends CheckoutPaneBase {
       ]);
     }
     $inline_form = $this->inlineFormManager->createInstance('customer_profile', [
-      'default_country' => $store->getAddress()->getCountryCode(),
-      'available_countries' => $store->getBillingCountries(),
+      'available_countries' => $this->order->getStore()->getBillingCountries(),
     ], $billing_profile);
 
     $pane_form['billing_information'] = [

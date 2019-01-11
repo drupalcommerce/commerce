@@ -2,10 +2,12 @@
 
 namespace Drupal\commerce_order\Plugin\Commerce\InlineForm;
 
+use Drupal\commerce\CurrentCountryInterface;
 use Drupal\commerce\Plugin\Commerce\InlineForm\EntityInlineFormBase;
 use Drupal\Core\Entity\Entity\EntityFormDisplay;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\profile\Entity\ProfileInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Provides an inline form for managing a customer profile.
@@ -18,14 +20,49 @@ use Drupal\profile\Entity\ProfileInterface;
 class CustomerProfile extends EntityInlineFormBase {
 
   /**
+   * The current country.
+   *
+   * @var \Drupal\commerce\CurrentCountryInterface
+   */
+  protected $currentCountry;
+
+  /**
+   * Constructs a new CustomerProfile object.
+   *
+   * @param array $configuration
+   *   A configuration array containing information about the plugin instance.
+   * @param string $plugin_id
+   *   The plugin_id for the plugin instance.
+   * @param mixed $plugin_definition
+   *   The plugin implementation definition.
+   * @param \Drupal\commerce\CurrentCountryInterface $current_country
+   *   The current country.
+   */
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, CurrentCountryInterface $current_country) {
+    parent::__construct($configuration, $plugin_id, $plugin_definition);
+
+    $this->currentCountry = $current_country;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
+    return new static(
+      $configuration,
+      $plugin_id,
+      $plugin_definition,
+      $container->get('commerce.current_country')
+    );
+  }
+
+  /**
    * {@inheritdoc}
    */
   public function defaultConfiguration() {
     return [
       // Where the profile is being used. Passed along to field widgets.
       'parent_entity_type' => 'commerce_order',
-      // The country to select if the address widget doesn't have a default.
-      'default_country' => NULL,
       // If empty, all countries will be available.
       'available_countries' => [],
     ];
@@ -39,12 +76,6 @@ class CustomerProfile extends EntityInlineFormBase {
 
     if (!is_array($this->configuration['available_countries'])) {
       throw new \RuntimeException('The available_countries configuration value must be an array.');
-    }
-    // Make sure that the specified default country is available.
-    if (!empty($this->configuration['default_country']) && !empty($this->configuration['available_countries'])) {
-      if (!in_array($this->configuration['default_country'], $this->configuration['available_countries'])) {
-        $this->configuration['default_country'] = NULL;
-      }
     }
   }
 
@@ -60,21 +91,7 @@ class CustomerProfile extends EntityInlineFormBase {
     assert($this->entity instanceof ProfileInterface);
     $form_display = EntityFormDisplay::collectRenderDisplay($this->entity, 'default');
     $form_display->buildForm($this->entity, $inline_form, $form_state);
-    if (!empty($inline_form['address']['widget'][0])) {
-      $widget_element = &$inline_form['address']['widget'][0];
-      // Remove the details wrapper from the address widget.
-      $widget_element['#type'] = 'container';
-      // Provide a default country.
-      $default_country = $this->configuration['default_country'];
-      if ($default_country && empty($widget_element['address']['#default_value']['country_code'])) {
-        $widget_element['address']['#default_value']['country_code'] = $default_country;
-      }
-      // Limit the available countries.
-      $available_countries = $this->configuration['available_countries'];
-      if ($available_countries) {
-        $widget_element['address']['#available_countries'] = $available_countries;
-      }
-    }
+    $inline_form = $this->prepareProfileForm($inline_form, $form_state);
 
     return $inline_form;
   }
@@ -101,6 +118,42 @@ class CustomerProfile extends EntityInlineFormBase {
     $form_display = EntityFormDisplay::collectRenderDisplay($this->entity, 'default');
     $form_display->extractFormValues($this->entity, $inline_form, $form_state);
     $this->entity->save();
+  }
+
+  /**
+   * Prepares the profile form.
+   *
+   * @param array $profile_form
+   *   The profile form.
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   *   The current state of the form.
+   *
+   * @return array
+   *   The prepared profile form.
+   */
+  protected function prepareProfileForm(array $profile_form, FormStateInterface $form_state) {
+    if (!empty($profile_form['address']['widget'][0])) {
+      $address_widget = &$profile_form['address']['widget'][0];
+      // Remove the details wrapper from the address widget.
+      $address_widget['#type'] = 'container';
+      // Limit the available countries.
+      $available_countries = $this->configuration['available_countries'];
+      if ($available_countries) {
+        $address_widget['address']['#available_countries'] = $available_countries;
+      }
+      // Provide a default country.
+      $default_country = $this->currentCountry->getCountry();
+      if ($default_country && empty($address_widget['address']['#default_value']['country_code'])) {
+        $default_country = $default_country->getCountryCode();
+        // The address element ensures that the default country is always
+        // available, which must be avoided in this case, to prevent the
+        // customer from ordering to an unsupported country.
+        if (!$available_countries || in_array($default_country, $available_countries)) {
+          $address_widget['address']['#default_value']['country_code'] = $default_country;
+        }
+      }
+    }
+    return $profile_form;
   }
 
 }

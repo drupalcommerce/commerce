@@ -120,7 +120,6 @@ class PaymentMethodAddForm extends PaymentGatewayFormBase implements ContainerIn
       $store = $this->storeStorage->loadDefault();
     }
     $inline_form = $this->inlineFormManager->createInstance('customer_profile', [
-      'default_country' => $store ? $store->getAddress()->getCountryCode() : NULL,
       'available_countries' => $store ? $store->getBillingCountries() : [],
     ], $billing_profile);
 

@@ -79,7 +79,6 @@ class BillingInformation extends CheckoutPaneBase implements CheckoutPaneInterfa
    * {@inheritdoc}
    */
   public function buildPaneForm(array $pane_form, FormStateInterface $form_state, array &$complete_form) {
-    $store = $this->order->getStore();
     $profile = $this->order->getBillingProfile();
     if (!$profile) {
       $profile_storage = $this->entityTypeManager->getStorage('profile');
@@ -89,8 +88,7 @@ class BillingInformation extends CheckoutPaneBase implements CheckoutPaneInterfa
       ]);
     }
     $inline_form = $this->inlineFormManager->createInstance('customer_profile', [
-      'default_country' => $store->getAddress()->getCountryCode(),
-      'available_countries' => $store->getBillingCountries(),
+      'available_countries' => $this->order->getStore()->getBillingCountries(),
     ], $profile);
 
     $pane_form['profile'] = [

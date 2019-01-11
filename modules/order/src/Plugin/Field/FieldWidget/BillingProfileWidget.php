@@ -96,7 +96,6 @@ class BillingProfileWidget extends WidgetBase implements ContainerFactoryPluginI
       ]);
     }
     $inline_form = $this->inlineFormManager->createInstance('customer_profile', [
-      'default_country' => $store->getAddress()->getCountryCode(),
       'available_countries' => $store->getBillingCountries(),
     ], $profile);
 
