@@ -107,7 +107,7 @@ abstract class PaymentOffsiteForm extends PaymentGatewayFormBase {
    */
   public static function processRedirectForm(array $element, FormStateInterface $form_state, array &$complete_form) {
     $complete_form['#action'] = $element['#action'];
-    $complete_form['#attributes']['class'][] = 'payment-redirect-form';
+    $complete_form['#attributes']['class'][] = 'js-payment-redirect-form';
     unset($element['#action']);
     // The form actions are hidden by default, but needed in this case.
     $complete_form['actions']['#access'] = TRUE;

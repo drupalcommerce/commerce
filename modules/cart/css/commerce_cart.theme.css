@@ -13,7 +13,7 @@
 .cart-block--contents__inner {
   padding: 10px;
 }
-.cart--cart-block .cart-block--contents a {
+.js-cart--cart-block .cart-block--contents a {
   color: inherit;
 }
 .cart-block--summary,
@@ -22,7 +22,7 @@
   vertical-align: middle;
 }
 
-.cart--cart-block li.cart-block--contents__item {
+.js-cart--cart-block li.cart-block--contents__item {
   clear: both;
   margin-bottom: 10px;
   border-bottom: 1px #eaeaea solid;

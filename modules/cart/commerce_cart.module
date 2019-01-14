@@ -253,5 +253,5 @@ function commerce_cart_views_data_alter(array &$data) {
  * Prepares variables for the cart block element template.
  */
 function template_preprocess_commerce_cart_block(&$variables) {
-  $variables['attributes']['class'][] = 'cart--cart-block';
+  $variables['attributes']['class'][] = 'js-cart--cart-block';
 }
