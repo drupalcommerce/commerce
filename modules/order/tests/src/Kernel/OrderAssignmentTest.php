@@ -132,6 +132,8 @@ class OrderAssignmentTest extends CommerceKernelTestBase {
 
     /** @var \Drupal\commerce_order\OrderItemStorageInterface $order_item_storage */
     $order_item_storage = $this->container->get('entity_type.manager')->getStorage('commerce_order_item');
+    $order_item = $order_item_storage->createFromPurchasableEntity($variation);
+    $order_item->save();
 
     /** @var \Drupal\commerce_order\Entity\OrderInterface $order */
     $order = Order::create([
@@ -143,14 +145,10 @@ class OrderAssignmentTest extends CommerceKernelTestBase {
       'ip_address' => '127.0.0.1',
       'billing_profile' => $profile,
       'payment_method' => $payment_method,
+      'order_items' => [$order_item],
       'state' => 'draft',
     ]);
     $order->save();
-
-    $order_item = $order_item_storage->createFromPurchasableEntity($variation, [
-      'order_id' => $order->id(),
-    ]);
-    $order_item->save();
     $this->order = $this->reloadEntity($order);
 
     $this->orderAssignment = $this->container->get('commerce_order.order_assignment');
