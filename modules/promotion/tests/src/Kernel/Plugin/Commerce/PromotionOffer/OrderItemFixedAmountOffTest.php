@@ -106,11 +106,74 @@ class OrderItemFixedAmountOffTest extends CommerceKernelTestBase {
   }
 
   /**
-   * Tests the offer.
+   * Tests the display-inclusive offer.
    *
    * @covers ::apply
    */
-  public function testOffer() {
+  public function testDisplayInclusive() {
+    // Starts now, enabled. No end time.
+    $promotion = Promotion::create([
+      'name' => 'Promotion 1',
+      'order_types' => [$this->order->bundle()],
+      'stores' => [$this->store->id()],
+      'offer' => [
+        'target_plugin_id' => 'order_item_fixed_amount_off',
+        'target_plugin_configuration' => [
+          'display_inclusive' => TRUE,
+          'amount' => [
+            'number' => '15.00',
+            'currency_code' => 'USD',
+          ],
+        ],
+      ],
+      'status' => TRUE,
+    ]);
+    $promotion->save();
+
+    $order_item = OrderItem::create([
+      'type' => 'default',
+      'quantity' => '2',
+      'unit_price' => $this->variation->getPrice(),
+      'purchased_entity' => $this->variation->id(),
+    ]);
+    $order_item->save();
+    $this->order->addItem($order_item);
+    $this->order->save();
+    $this->container->get('commerce_order.order_refresh')->refresh($this->order);
+    $this->order = $this->reloadEntity($this->order);
+    /** @var \Drupal\commerce_order\Entity\OrderItemInterface $order_item */
+    $order_item = $this->reloadEntity($order_item);
+
+    // Offer amount larger than the order item unit price.
+    $this->assertEquals(new Price('0.00', 'USD'), $order_item->getUnitPrice());
+    $this->assertEquals(new Price('0.00', 'USD'), $order_item->getTotalPrice());
+    $this->assertEquals(new Price('0.00', 'USD'), $order_item->getAdjustedTotalPrice());
+    $this->assertEquals(1, count($order_item->getAdjustments()));
+    $adjustment = $order_item->getAdjustments()[0];
+    $this->assertEquals(new Price('-20.00', 'USD'), $adjustment->getAmount());
+    $this->assertTrue($adjustment->isIncluded());
+
+    // Offer amount smaller than the order item unit price.
+    $this->variation->setPrice(new Price('20', 'USD'));
+    $this->variation->save();
+    $this->container->get('commerce_order.order_refresh')->refresh($this->order);
+    $this->order = $this->reloadEntity($this->order);
+    $order_item = $this->reloadEntity($order_item);
+    $this->assertEquals(new Price('5.00', 'USD'), $order_item->getUnitPrice());
+    $this->assertEquals(new Price('10.00', 'USD'), $order_item->getTotalPrice());
+    $this->assertEquals(new Price('10.00', 'USD'), $order_item->getAdjustedTotalPrice());
+    $this->assertEquals(1, count($order_item->getAdjustments()));
+    $adjustment = $order_item->getAdjustments()[0];
+    $this->assertEquals(new Price('-30.00', 'USD'), $adjustment->getAmount());
+    $this->assertTrue($adjustment->isIncluded());
+  }
+
+  /**
+   * Tests the non-display-inclusive offer.
+   *
+   * @covers ::apply
+   */
+  public function testNonDisplayInclusive() {
     // Starts now, enabled. No end time.
     $promotion = Promotion::create([
       'name' => 'Promotion 1',
@@ -120,6 +183,7 @@ class OrderItemFixedAmountOffTest extends CommerceKernelTestBase {
       'offer' => [
         'target_plugin_id' => 'order_item_fixed_amount_off',
         'target_plugin_configuration' => [
+          'display_inclusive' => FALSE,
           'amount' => [
             'number' => '15.00',
             'currency_code' => 'USD',
@@ -143,11 +207,14 @@ class OrderItemFixedAmountOffTest extends CommerceKernelTestBase {
     /** @var \Drupal\commerce_order\Entity\OrderItemInterface $order_item */
     $order_item = $this->reloadEntity($order_item);
 
-    // Offer amount larger than the order item total price.
-    $this->assertEquals(1, count($order_item->getAdjustments()));
+    // Offer amount larger than the order item unit price.
+    $this->assertEquals(new Price('10.00', 'USD'), $order_item->getUnitPrice());
     $this->assertEquals(new Price('20.00', 'USD'), $order_item->getTotalPrice());
     $this->assertEquals(new Price('0.00', 'USD'), $order_item->getAdjustedTotalPrice());
-    $this->assertEquals(new Price('-20.00', 'USD'), $order_item->getAdjustments()[0]->getAmount());
+    $this->assertEquals(1, count($order_item->getAdjustments()));
+    $adjustment = $order_item->getAdjustments()[0];
+    $this->assertEquals(new Price('-20.00', 'USD'), $adjustment->getAmount());
+    $this->assertFalse($adjustment->isIncluded());
 
     // Offer amount smaller than the order item unit price.
     $this->variation->setPrice(new Price('20', 'USD'));
@@ -156,9 +223,13 @@ class OrderItemFixedAmountOffTest extends CommerceKernelTestBase {
     $this->order = $this->reloadEntity($this->order);
     $order_item = $this->reloadEntity($order_item);
     $this->assertEquals(1, count($order_item->getAdjustments()));
+    $this->assertEquals(new Price('20.00', 'USD'), $order_item->getUnitPrice());
     $this->assertEquals(new Price('40.00', 'USD'), $order_item->getTotalPrice());
     $this->assertEquals(new Price('10.00', 'USD'), $order_item->getAdjustedTotalPrice());
-    $this->assertEquals(new Price('-30.00', 'USD'), $order_item->getAdjustments()[0]->getAmount());
+    $this->assertEquals(1, count($order_item->getAdjustments()));
+    $adjustment = $order_item->getAdjustments()[0];
+    $this->assertEquals(new Price('-30.00', 'USD'), $adjustment->getAmount());
+    $this->assertFalse($adjustment->isIncluded());
   }
 
 }

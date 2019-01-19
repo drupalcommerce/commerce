@@ -27,7 +27,18 @@ class OrderItemPercentageOff extends OrderItemPromotionOfferBase {
     /** @var \Drupal\commerce_order\Entity\OrderItemInterface $order_item */
     $order_item = $entity;
     $percentage = $this->getPercentage();
-    $adjustment_amount = $order_item->getTotalPrice()->multiply($percentage);
+    if ($this->configuration['display_inclusive']) {
+      // Display-inclusive promotions must first be applied to the unit price.
+      $unit_price = $order_item->getUnitPrice();
+      $amount = $unit_price->multiply($percentage);
+      $amount = $this->rounder->round($amount);
+      $new_unit_price = $unit_price->subtract($amount);
+      $order_item->setUnitPrice($new_unit_price);
+      $adjustment_amount = $amount->multiply($order_item->getQuantity());
+    }
+    else {
+      $adjustment_amount = $order_item->getTotalPrice()->multiply($percentage);
+    }
     $adjustment_amount = $this->rounder->round($adjustment_amount);
 
     $order_item->addAdjustment(new Adjustment([
@@ -37,6 +48,7 @@ class OrderItemPercentageOff extends OrderItemPromotionOfferBase {
       'amount' => $adjustment_amount->multiply('-1'),
       'percentage' => $percentage,
       'source_id' => $promotion->id(),
+      'included' => $this->configuration['display_inclusive'],
     ]));
   }
 

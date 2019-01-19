@@ -15,6 +15,7 @@ abstract class OrderItemPromotionOfferBase extends PromotionOfferBase implements
    */
   public function defaultConfiguration() {
     return [
+      'display_inclusive' => TRUE,
       'conditions' => [],
     ] + parent::defaultConfiguration();
   }
@@ -25,6 +26,16 @@ abstract class OrderItemPromotionOfferBase extends PromotionOfferBase implements
   public function buildConfigurationForm(array $form, FormStateInterface $form_state) {
     $form = parent::buildConfigurationForm($form, $form_state);
 
+    $form['display_inclusive'] = [
+      '#type' => 'radios',
+      '#title' => $this->t('Discount display'),
+      '#title_display' => 'invisible',
+      '#options' => [
+        TRUE => $this->t('Include the discount in the displayed unit price'),
+        FALSE => $this->t('Only show the discount on the order total summary'),
+      ],
+      '#default_value' => (int) $this->configuration['display_inclusive'],
+    ];
     $form['conditions'] = [
       '#type' => 'commerce_conditions',
       '#title' => $this->t('Applies to'),
@@ -44,6 +55,8 @@ abstract class OrderItemPromotionOfferBase extends PromotionOfferBase implements
 
     if (!$form_state->getErrors()) {
       $values = $form_state->getValue($form['#parents']);
+      $this->configuration = [];
+      $this->configuration['display_inclusive'] = !empty($values['display_inclusive']);
       $this->configuration['conditions'] = $values['conditions'];
     }
   }
