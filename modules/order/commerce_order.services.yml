@@ -53,7 +53,7 @@ services:
 
   commerce_order.order_receipt_subscriber:
     class: Drupal\commerce_order\EventSubscriber\OrderReceiptSubscriber
-    arguments: ['@entity_type.manager', '@language_manager', '@plugin.manager.mail', '@commerce_order.order_total_summary', '@renderer', '@theme.manager', '@theme.initialization']
+    arguments: ['@entity_type.manager', '@commerce.mail_handler', '@commerce_order.order_total_summary']
     tags:
       - { name: 'event_subscriber' }
 

@@ -124,6 +124,21 @@ function commerce_get_entity_display($entity_type, $bundle, $display_context) {
 }
 
 /**
+ * Implements hook_mail().
+ *
+ * Captures the outgoing mail and sets appropriate message body and headers.
+ */
+function commerce_mail($key, &$message, $params) {
+  if (isset($params['headers'])) {
+    $message['headers'] = array_merge($message['headers'], $params['headers']);
+  }
+
+  $message['from'] = $params['from'];
+  $message['subject'] = $params['subject'];
+  $message['body'][] = $params['body'];
+}
+
+/**
  * Helper for providing entity theme suggestions.
  *
  * @param string $entity_type_id

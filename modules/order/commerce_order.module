@@ -186,21 +186,6 @@ function commerce_order_views_data_alter(array &$data) {
 }
 
 /**
- * Implements hook_mail().
- *
- * Captures the outgoing mail and sets appropriate message body and headers.
- */
-function commerce_order_mail($key, &$message, $params) {
-  if (isset($params['headers'])) {
-    $message['headers'] = array_merge($message['headers'], $params['headers']);
-  }
-
-  $message['from'] = $params['from'];
-  $message['subject'] = $params['subject'];
-  $message['body'][] = $params['body'];
-}
-
-/**
  * Implements hook_ENTITY_TYPE_access().
  *
  * Forbids the profile 'address' field from being deletable.
