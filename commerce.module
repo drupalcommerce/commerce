@@ -126,16 +126,18 @@ function commerce_get_entity_display($entity_type, $bundle, $display_context) {
 /**
  * Implements hook_mail().
  *
- * Captures the outgoing mail and sets appropriate message body and headers.
+ * Prepares emails sent by the MailHandler service.
  */
 function commerce_mail($key, &$message, $params) {
+  /** @var \Drupal\Core\Render\RendererInterface $renderer */
+  $renderer = \Drupal::service('renderer');
+
   if (isset($params['headers'])) {
     $message['headers'] = array_merge($message['headers'], $params['headers']);
   }
-
   $message['from'] = $params['from'];
   $message['subject'] = $params['subject'];
-  $message['body'][] = $params['body'];
+  $message['body'][] = $renderer->render($params['body']);
 }
 
 /**
