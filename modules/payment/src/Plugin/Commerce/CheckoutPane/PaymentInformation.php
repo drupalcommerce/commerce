@@ -8,7 +8,6 @@ use Drupal\commerce_checkout\Plugin\Commerce\CheckoutPane\CheckoutPaneBase;
 use Drupal\commerce_payment\PaymentOption;
 use Drupal\commerce_payment\PaymentOptionsBuilderInterface;
 use Drupal\commerce_payment\Plugin\Commerce\PaymentGateway\SupportsStoredPaymentMethodsInterface;
-use Drupal\Component\Utility\Html;
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\FormStateInterface;
@@ -162,10 +161,6 @@ class PaymentInformation extends CheckoutPaneBase {
       return $pane_form;
     }
 
-    // Prepare the form for ajax.
-    $pane_form['#wrapper_id'] = Html::getUniqueId('payment-information-wrapper');
-    $pane_form['#prefix'] = '<div id="' . $pane_form['#wrapper_id'] . '">';
-    $pane_form['#suffix'] = '</div>';
     // Core bug #1988968 doesn't allow the payment method add form JS to depend
     // on an external library, so the libraries need to be preloaded here.
     foreach ($payment_gateways as $payment_gateway) {
@@ -194,7 +189,7 @@ class PaymentInformation extends CheckoutPaneBase {
       '#default_value' => $default_option->getId(),
       '#ajax' => [
         'callback' => [get_class($this), 'ajaxRefresh'],
-        'wrapper' => $pane_form['#wrapper_id'],
+        'wrapper' => $pane_form['#id'],
       ],
       '#access' => count($options) > 1,
     ];

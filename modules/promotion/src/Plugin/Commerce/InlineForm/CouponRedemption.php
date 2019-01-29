@@ -5,10 +5,6 @@ namespace Drupal\commerce_promotion\Plugin\Commerce\InlineForm;
 use Drupal\commerce\Plugin\Commerce\InlineForm\InlineFormBase;
 use Drupal\commerce_order\Entity\OrderInterface;
 use Drupal\Component\Utility\NestedArray;
-use Drupal\Core\Ajax\AjaxResponse;
-use Drupal\Core\Ajax\CommandInterface;
-use Drupal\Core\Ajax\InsertCommand;
-use Drupal\Core\Ajax\PrependCommand;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -71,7 +67,6 @@ class CouponRedemption extends InlineFormBase {
       'order_id' => '',
       // NULL for unlimited.
       'max_coupons' => NULL,
-      'ajax_callbacks' => [],
     ];
   }
 
@@ -80,17 +75,6 @@ class CouponRedemption extends InlineFormBase {
    */
   protected function requiredConfiguration() {
     return ['order_id'];
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  protected function validateConfiguration() {
-    parent::validateConfiguration();
-
-    if (!is_array($this->configuration['ajax_callbacks'])) {
-      throw new \RuntimeException('The ajax_callbacks configuration value must be an array.');
-    }
   }
 
   /**
@@ -107,22 +91,12 @@ class CouponRedemption extends InlineFormBase {
     /** @var \Drupal\commerce_promotion\Entity\CouponInterface[] $coupons */
     $coupons = $order->get('coupons')->referencedEntities();
 
-    $id_prefix = implode('-', $inline_form['#parents']);
-    // @todo We cannot use unique IDs, or multiple elements on a page currently.
-    // @see https://www.drupal.org/node/2675688
-    // $wrapper_id = Html::getUniqueId($id_prefix . '-ajax-wrapper');
-    $wrapper_id = $id_prefix . '-ajax-wrapper';
-
     $inline_form = [
       '#tree' => TRUE,
       '#attached' => [
         'library' => ['commerce_promotion/coupon_redemption_form'],
       ],
       '#theme' => 'commerce_coupon_redemption_form',
-      '#prefix' => '<div id="' . $wrapper_id . '">',
-      '#suffix' => '</div>',
-      // Pass the id along to other methods.
-      '#wrapper_id' => $wrapper_id,
       '#configuration' => $this->getConfiguration(),
     ] + $inline_form;
     $inline_form['code'] = [
@@ -145,8 +119,8 @@ class CouponRedemption extends InlineFormBase {
         [get_called_class(), 'applyCoupon'],
       ],
       '#ajax' => [
-        'callback' => [get_called_class(), 'ajaxRefresh'],
-        'wrapper' => $inline_form['#wrapper_id'],
+        'callback' => [get_called_class(), 'ajaxRefreshForm'],
+        'element' => $inline_form['#parents'],
       ],
     ];
     $max_coupons = $this->configuration['max_coupons'];
@@ -169,8 +143,8 @@ class CouponRedemption extends InlineFormBase {
         '#value' => t('Remove coupon'),
         '#name' => 'remove_coupon_' . $index,
         '#ajax' => [
-          'callback' => [get_called_class(), 'ajaxRefresh'],
-          'wrapper' => $inline_form['#wrapper_id'],
+          'callback' => [get_called_class(), 'ajaxRefreshForm'],
+          'element' => $inline_form['#parents'],
         ],
         '#weight' => 50,
         '#limit_validation_errors' => [
@@ -279,30 +253,6 @@ class CouponRedemption extends InlineFormBase {
     $order->get('coupons')->removeItem($coupon_index);
     $order->save();
     $form_state->setRebuild();
-  }
-
-  /**
-   * Ajax callback.
-   */
-  public static function ajaxRefresh(array $form, FormStateInterface $form_state) {
-    $parents = $form_state->getTriggeringElement()['#parents'];
-    array_pop($parents);
-    $inline_form = NestedArray::getValue($form, $parents);
-
-    $response = new AjaxResponse();
-    $response->addCommand(new InsertCommand(NULL, $inline_form));
-    $response->addCommand(new PrependCommand(NULL, ['#type' => 'status_messages']));
-    // Allow parent elements to hook into the ajax refresh.
-    foreach ($inline_form['#configuration']['ajax_callbacks'] as $callback) {
-      if (is_callable($callback)) {
-        $command = $callback($form, $form_state);
-        if ($command instanceof CommandInterface) {
-          $response->addCommand($command);
-        }
-      }
-    }
-
-    return $response;
   }
 
 }

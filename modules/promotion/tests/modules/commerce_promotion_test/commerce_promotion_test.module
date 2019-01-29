@@ -5,6 +5,7 @@
  * Test module for Promotion.
  */
 
+use Drupal\Component\Utility\Html;
 use Drupal\Core\Form\FormStateInterface;
 
 /**
@@ -13,6 +14,8 @@ use Drupal\Core\Form\FormStateInterface;
 function commerce_promotion_test_form_views_form_commerce_cart_form_default_alter(&$form, FormStateInterface $form_state, $form_id) {
   // We know that view forms are build on the base ID plus arguments.
   $order_id = substr($form_id, strlen('views_form_commerce_cart_form_default_'));
+  // Workaround for core bug #2897377.
+  $form['#id'] = Html::getId($form_state->getBuildInfo()['form_id']);
 
   $form['coupons'] = [
     '#type' => 'commerce_coupon_redemption_form',

@@ -2,7 +2,9 @@
 
 namespace Drupal\commerce_checkout\Plugin\Commerce\CheckoutFlow;
 
+use Drupal\commerce\AjaxFormTrait;
 use Drupal\commerce\Response\NeedsRedirectException;
+use Drupal\Component\Utility\Html;
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
@@ -22,6 +24,8 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
  * checkout panes. Otherwise they should extend CheckoutFlowWithPanesBase.
  */
 abstract class CheckoutFlowBase extends PluginBase implements CheckoutFlowInterface, ContainerFactoryPluginInterface {
+
+  use AjaxFormTrait;
 
   /**
    * The entity manager.
@@ -264,6 +268,8 @@ abstract class CheckoutFlowBase extends PluginBase implements CheckoutFlowInterf
     $form['#title'] = $steps[$step_id]['label'];
     $form['#theme'] = ['commerce_checkout_form'];
     $form['#attached']['library'][] = 'commerce_checkout/form';
+    // Workaround for core bug #2897377.
+    $form['#id'] = Html::getId($form_state->getBuildInfo()['form_id']);
     if ($this->hasSidebar($step_id)) {
       $form['sidebar']['order_summary'] = [
         '#theme' => 'commerce_checkout_order_summary',

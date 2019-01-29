@@ -5,7 +5,6 @@ namespace Drupal\commerce_promotion\Plugin\Commerce\CheckoutPane;
 use Drupal\commerce\InlineFormManager;
 use Drupal\commerce_checkout\Plugin\Commerce\CheckoutFlow\CheckoutFlowInterface;
 use Drupal\commerce_checkout\Plugin\Commerce\CheckoutPane\CheckoutPaneBase;
-use Drupal\Core\Ajax\InsertCommand;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -121,9 +120,6 @@ class CouponRedemption extends CheckoutPaneBase {
     $inline_form = $this->inlineFormManager->createInstance('coupon_redemption', [
       'order_id' => $this->order->id(),
       'max_coupons' => $this->configuration['allow_multiple'] ? NULL : 1,
-      'ajax_callbacks' => [
-        [get_class($this), 'ajaxRefreshSummary'],
-      ],
     ]);
 
     $pane_form['form'] = [
@@ -142,20 +138,6 @@ class CouponRedemption extends CheckoutPaneBase {
     // mapped to a coupon ID in CouponRedemptionForm::validateForm().
     if (!empty($pane_form['form']['code']['#coupon_id'])) {
       $this->order->get('coupons')->appendItem($pane_form['form']['code']['#coupon_id']);
-    }
-  }
-
-  /**
-   * Ajax callback for refreshing the order summary.
-   */
-  public static function ajaxRefreshSummary(array $form, FormStateInterface $form_state) {
-    if (isset($form['sidebar']['order_summary'])) {
-      $summary_element = $form['sidebar']['order_summary'];
-      return new InsertCommand('[data-drupal-selector="edit-sidebar-order-summary"]', $summary_element);
-    }
-    elseif (isset($form['order_summary'])) {
-      $summary_element = $form['order_summary'];
-      return new InsertCommand('[data-drupal-selector="edit-order-summary"]', $summary_element);
     }
   }
 

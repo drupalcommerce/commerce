@@ -544,6 +544,8 @@ abstract class CheckoutFlowWithPanesBase extends CheckoutFlowBase implements Che
 
     foreach ($this->getVisiblePanes($step_id) as $pane_id => $pane) {
       $form[$pane_id] = [
+        // Workaround for core bug #2897377.
+        '#id' => Html::getId('edit-' . $pane_id),
         '#parents' => [$pane_id],
         '#theme' => 'commerce_checkout_pane',
         '#type' => $pane->getWrapperElement(),
@@ -562,6 +564,8 @@ abstract class CheckoutFlowWithPanesBase extends CheckoutFlowBase implements Che
 
       foreach ($this->getVisiblePanes('_sidebar') as $pane_id => $pane) {
         $form['sidebar'][$pane_id] = [
+          // Workaround for core bug #2897377.
+          '#id' => Html::getId('edit-' . $pane_id),
           '#parents' => ['sidebar', $pane_id],
           '#type' => $pane->getWrapperElement(),
           '#title' => $pane->getDisplayLabel(),

@@ -2,7 +2,9 @@
 
 namespace Drupal\commerce\Plugin\Commerce\InlineForm;
 
+use Drupal\commerce\AjaxFormTrait;
 use Drupal\commerce\Element\CommerceElementTrait;
+use Drupal\Component\Utility\Html;
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
@@ -13,6 +15,8 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * Provides the base class for inline forms.
  */
 abstract class InlineFormBase extends PluginBase implements InlineFormInterface, ContainerFactoryPluginInterface {
+
+  use AjaxFormTrait;
 
   /**
    * Constructs a new InlineFormBase object.
@@ -105,6 +109,9 @@ abstract class InlineFormBase extends PluginBase implements InlineFormInterface,
    * {@inheritdoc}
    */
   public function buildInlineForm(array $inline_form, FormStateInterface $form_state) {
+    $inline_form['#theme_wrappers'] = ['container'];
+    // Workaround for core bug #2897377.
+    $inline_form['#id'] = Html::getId('edit-' . implode('-', $inline_form['#parents']));
     // Automatically validate and submit inline forms.
     $inline_form['#inline_form'] = $this;
     $inline_form['#process'][] = [CommerceElementTrait::class, 'attachElementSubmit'];
