@@ -7,12 +7,11 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\Element\RenderElement;
 use Drupal\profile\Entity\ProfileInterface;
 
-@trigger_error('The ' . __NAMESPACE__ . '\ProfileSelect is deprecated. Instead, use the customer_profile inline form. See https://www.drupal.org/node/3015309.', E_USER_DEPRECATED);
-
 /**
  * Provides a form element for selecting a customer profile.
  *
  * @deprecated Use the customer_profile inline form instead.
+ * @see https://www.drupal.org/node/3015309
  *
  * Usage example:
  * @code

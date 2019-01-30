@@ -5,12 +5,11 @@ namespace Drupal\commerce_promotion\Element;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\Element\FormElement;
 
-@trigger_error('The ' . __NAMESPACE__ . '\CouponRedemptionForm is deprecated. Instead, use the coupon_redemption inline form. See https://www.drupal.org/node/3015309.', E_USER_DEPRECATED);
-
 /**
  * Provides a form element for redeeming a coupon.
  *
  * @deprecated Use the coupon_redemption inline form instead.
+ * @see https://www.drupal.org/node/3015309
  *
  * Usage example:
  * @code

@@ -7,12 +7,11 @@ use Drupal\commerce_payment\Entity\EntityWithPaymentGatewayInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\Element\RenderElement;
 
-@trigger_error('The ' . __NAMESPACE__ . '\PaymentGatewayForm is deprecated. Instead, use the payment_gateway_form inline form. See https://www.drupal.org/node/3015309.', E_USER_DEPRECATED);
-
 /**
  * Provides a form element for embedding the payment gateway forms.
  *
  * @deprecated Use the payment_gateway_form inline form instead.
+ * @see https://www.drupal.org/node/3015309
  *
  * Usage example:
  * @code
