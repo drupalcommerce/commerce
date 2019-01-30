@@ -179,10 +179,6 @@ class ProductVariationAttributesWidget extends ProductVariationWidgetBase implem
         }
         unset($attribute_element['#options']['_none']);
       }
-      // 1 required value -> Disable the element to skip unneeded ajax calls.
-      if ($attribute_element['#required'] && count($attribute->getValues()) === 1) {
-        $attribute_element['#disabled'] = TRUE;
-      }
       // Optimize the UX of optional attributes:
       // - Hide attributes that have no values.
       // - Require attributes that have a value on each variation.

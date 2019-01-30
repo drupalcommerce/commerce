@@ -134,59 +134,6 @@ class AddToCartFormTest extends CartBrowserTestBase {
   }
 
   /**
-   * Tests that an attribute field is disabled if there's only one value.
-   */
-  public function testProductAttributeDisabledIfOne() {
-    /** @var \Drupal\commerce_product\Entity\ProductVariationTypeInterface $variation_type */
-    $variation_type = ProductVariationType::load($this->variation->bundle());
-
-    $size_attributes = $this->createAttributeSet($variation_type, 'size', [
-      'small' => 'Small',
-      'medium' => 'Medium',
-      'large' => 'Large',
-    ]);
-    $color_attributes = $this->createAttributeSet($variation_type, 'color', [
-      'red' => 'Red',
-    ]);
-
-    // Reload the variation since we have new fields.
-    $this->variation = ProductVariation::load($this->variation->id());
-    $product = $this->variation->getProduct();
-
-    // Update first variation to have the attribute's value.
-    $this->variation->attribute_size = $size_attributes['small']->id();
-    $this->variation->attribute_color = $color_attributes['red']->id();
-    $this->variation->save();
-
-    $attribute_values_matrix = [
-      ['medium', 'red'],
-      ['large', 'red'],
-    ];
-    $variations = [
-      $this->variation,
-    ];
-    // Generate variations off of the attributes values matrix.
-    foreach ($attribute_values_matrix as $key => $value) {
-      $variation = $this->createEntity('commerce_product_variation', [
-        'type' => $variation_type->id(),
-        'sku' => $this->randomMachineName(),
-        'price' => [
-          'number' => 999,
-          'currency_code' => 'USD',
-        ],
-        'attribute_size' => $size_attributes[$value[0]]->id(),
-        'attribute_color' => $color_attributes[$value[1]]->id(),
-      ]);
-      $variations[] = $variation;
-      $product->variations->appendItem($variation);
-    }
-    $product->save();
-
-    $this->drupalGet($product->toUrl());
-    $this->assertSession()->elementExists('xpath', '//select[@id="edit-purchased-entity-0-attributes-attribute-color" and @disabled]');
-  }
-
-  /**
    * Tests that the add to cart form renders an attribute entity.
    */
   public function testRenderedAttributeElement() {
