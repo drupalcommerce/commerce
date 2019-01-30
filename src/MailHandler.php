@@ -3,9 +3,11 @@
 namespace Drupal\commerce;
 
 use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\Language\LanguageDefault;
 use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\Mail\MailManagerInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
+use Drupal\Core\StringTranslation\TranslationManager;
 use Drupal\user\UserInterface;
 
 class MailHandler implements MailHandlerInterface {
@@ -18,6 +20,13 @@ class MailHandler implements MailHandlerInterface {
    * @var \Drupal\commerce_store\StoreStorageInterface
    */
   protected $storeStorage;
+
+  /**
+   * The language default.
+   *
+   * @var \Drupal\Core\Language\LanguageDefault
+   */
+  protected $languageDefault;
 
   /**
    * The language manager.
@@ -38,13 +47,16 @@ class MailHandler implements MailHandlerInterface {
    *
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
    *   The current store.
+   * @param \Drupal\Core\Language\LanguageDefault $language_default
+   *   The language default.
    * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
    *   The language manager.
    * @param \Drupal\Core\Mail\MailManagerInterface $mail_manager
    *   The mail manager.
    */
-  public function __construct(EntityTypeManagerInterface $entity_type_manager, LanguageManagerInterface $language_manager, MailManagerInterface $mail_manager) {
+  public function __construct(EntityTypeManagerInterface $entity_type_manager, LanguageDefault $language_default, LanguageManagerInterface $language_manager, MailManagerInterface $mail_manager) {
     $this->storeStorage = $entity_type_manager->getStorage('commerce_store');
+    $this->languageDefault = $language_default;
     $this->languageManager = $language_manager;
     $this->mailManager = $mail_manager;
   }
@@ -68,6 +80,14 @@ class MailHandler implements MailHandlerInterface {
       return FALSE;
     }
 
+    // Change the active language to the one preferred by the customer
+    // to ensure the email is properly translated.
+    $default_langcode = $this->languageManager->getDefaultLanguage()->getId();
+    $preferred_langcode = $account->getPreferredLangcode();
+    if ($default_langcode !== $preferred_langcode) {
+      $this->changeActiveLanguage($preferred_langcode);
+    }
+
     $default_store = $this->storeStorage->loadDefault();
     $default_params = [
       'headers' => [
@@ -87,16 +107,48 @@ class MailHandler implements MailHandlerInterface {
     }
     $params = array_replace($default_params, $params);
 
-    // Replicated logic from EmailAction and contact's MailHandler.
-    if ($account->isAuthenticated()) {
-      $langcode = $account->getPreferredLangcode();
+    $message = $this->mailManager->mail('commerce', $params['id'], $to, $preferred_langcode, $params);
+
+    // Revert back to the original active language.
+    if ($default_langcode !== $preferred_langcode) {
+      $this->changeActiveLanguage($default_langcode);
     }
-    else {
-      $langcode = $this->languageManager->getDefaultLanguage()->getId();
-    }
-    $message = $this->mailManager->mail('commerce', $params['id'], $to, $langcode, $params);
 
     return (bool) $message['result'];
+  }
+
+  /**
+   * Changes the active language for translations.
+   *
+   * @param string $langcode
+   *   The langcode.
+   */
+  protected function changeActiveLanguage($langcode) {
+    if (!$this->languageManager->isMultilingual()) {
+      return;
+    }
+    $language = $this->languageManager->getLanguage($langcode);
+    if (!$language) {
+      return;
+    }
+    // The language manager has no method for overriding the default
+    // language, like it does for config overrides. We have to change the
+    // default language service's current language.
+    // @see https://www.drupal.org/project/drupal/issues/3029010
+    $this->languageDefault->set($language);
+    $this->languageManager->setConfigOverrideLanguage($language);
+    $this->languageManager->reset();
+
+    // The default string_translation service, TranslationManager, has a
+    // setDefaultLangcode method. However, this method is not present on
+    // either of its interfaces. Therefore we check for the concrete class
+    // here so that any swapped service does not break the application.
+    // @see https://www.drupal.org/project/drupal/issues/3029003
+    $string_translation = $this->getStringTranslation();
+    if ($string_translation instanceof TranslationManager) {
+      $string_translation->setDefaultLangcode($language->getId());
+      $string_translation->reset();
+    }
   }
 
 }
