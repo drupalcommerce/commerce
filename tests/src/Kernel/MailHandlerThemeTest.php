@@ -65,7 +65,7 @@ class MailHandlerThemeTest extends CommerceKernelTestBase {
       '#theme' => 'username',
       '#account' => $this->user,
     ];
-    $this->mailHandler->sendEmail($this->user, 'Hello, customer!', $body);
+    $this->mailHandler->sendMail($this->user->getEmail(), 'Hello, customer!', $body);
 
     $emails = $this->getMails();
     $this->assertEquals(1, count($emails));
@@ -94,7 +94,7 @@ class MailHandlerThemeTest extends CommerceKernelTestBase {
       '#theme' => 'username',
       '#account' => $this->user,
     ];
-    $this->mailHandler->sendEmail($this->user, 'Hello, customer!', $body);
+    $this->mailHandler->sendMail($this->user->getEmail(), 'Hello, customer!', $body);
 
     $emails = $this->getMails();
     $this->assertEquals(1, count($emails));

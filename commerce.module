@@ -10,6 +10,25 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\Element;
 
 /**
+ * Implements hook_mail().
+ *
+ * Prepares emails sent by the MailHandler service.
+ */
+function commerce_mail($key, &$message, $params) {
+  /** @var \Drupal\Core\Render\RendererInterface $renderer */
+  $renderer = \Drupal::service('renderer');
+
+  if (isset($params['headers'])) {
+    $message['headers'] = array_merge($message['headers'], $params['headers']);
+  }
+  if (!empty($params['from'])) {
+    $message['from'] = $params['from'];
+  }
+  $message['subject'] = $params['subject'];
+  $message['body'][] = $renderer->render($params['body']);
+}
+
+/**
  * Implements hook_toolbar_alter().
  */
 function commerce_toolbar_alter(&$items) {
@@ -121,23 +140,6 @@ function commerce_get_entity_display($entity_type, $bundle, $display_context) {
   }
 
   return $display;
-}
-
-/**
- * Implements hook_mail().
- *
- * Prepares emails sent by the MailHandler service.
- */
-function commerce_mail($key, &$message, $params) {
-  /** @var \Drupal\Core\Render\RendererInterface $renderer */
-  $renderer = \Drupal::service('renderer');
-
-  if (isset($params['headers'])) {
-    $message['headers'] = array_merge($message['headers'], $params['headers']);
-  }
-  $message['from'] = $params['from'];
-  $message['subject'] = $params['subject'];
-  $message['body'][] = $renderer->render($params['body']);
 }
 
 /**

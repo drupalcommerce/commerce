@@ -9,6 +9,22 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\Element;
 
 /**
+ * Implements hook_mail_alter().
+ *
+ * Sets the default "from" address to the current store email.
+ */
+function commerce_store_mail_alter(&$message) {
+  if (substr($message['id'], 0, 9) == 'commerce_' && empty($message['params']['from'])) {
+    /** @var \Drupal\commerce_store\CurrentStoreInterface $current_store */
+    $current_store = \Drupal::service('commerce_store.current_store');
+    $current_store = $current_store->getStore();
+    if ($current_store) {
+      $message['from'] = $current_store->getEmail();
+    }
+  }
+}
+
+/**
  * Implements hook_theme().
  */
 function commerce_store_theme() {
