@@ -7,6 +7,7 @@ use Drupal\commerce\ConditionGroup;
 use Drupal\commerce\Plugin\Commerce\Condition\ParentEntityAwareInterface;
 use Drupal\commerce_order\Entity\OrderInterface;
 use Drupal\Core\Config\Entity\ConfigEntityBase;
+use Drupal\Core\Entity\EntityStorageInterface;
 
 /**
  * Defines the payment gateway entity class.
@@ -258,9 +259,43 @@ class PaymentGateway extends ConfigEntityBase implements PaymentGatewayInterface
   protected function getPluginCollection() {
     if (!$this->pluginCollection) {
       $plugin_manager = \Drupal::service('plugin.manager.commerce_payment_gateway');
-      $this->pluginCollection = new CommerceSinglePluginCollection($plugin_manager, $this->plugin, $this->configuration, $this->id);
+      $this->pluginCollection = new CommerceSinglePluginCollection(
+        $plugin_manager,
+        $this->plugin,
+        $this->configuration,
+        $this->id
+      );
     }
     return $this->pluginCollection;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function postDelete(EntityStorageInterface $storage, array $entities) {
+    parent::postDelete($storage, $entities);
+
+    /** @var \Drupal\commerce_payment\PaymentMethodStorageInterface $payment_method_storage */
+    $payment_method_storage = \Drupal::service('entity_type.manager')
+      ->getStorage('commerce_payment_method');
+
+    foreach ($entities as $payment_gateway) {
+      $payment_methods = $payment_method_storage->loadByPaymentGateway($payment_gateway);
+      if (empty($payment_methods)) {
+        continue;
+      }
+      if (count($payment_methods) < 50) {
+        // If there is less than 50 payment methods, we delete them straight away.
+        $payment_method_storage->delete($payment_methods);
+      }
+      else {
+        // Else we queue them for deletion.
+        $queue = \Drupal::queue('payment_methods_delete_queue');
+        foreach (array_chunk($payment_methods, 50) as $payment_methods_chunk) {
+          $queue->createItem($payment_methods_chunk);
+        }
+      }
+    }
   }
 
 }
