@@ -61,7 +61,7 @@ class ProductForm extends ContentEntityForm {
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
     // Skip building the form if there are no available stores.
-    $store_query = $this->entityManager->getStorage('commerce_store')->getQuery();
+    $store_query = $this->entityTypeManager->getStorage('commerce_store')->getQuery();
     if ($store_query->count()->execute() == 0) {
       $link = Link::createFromRoute('Add a new store.', 'entity.commerce_store.add_page');
       $form['warning'] = [

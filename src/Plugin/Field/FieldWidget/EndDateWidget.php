@@ -58,7 +58,7 @@ class EndDateWidget extends DateTimeDefaultWidget {
       if (!empty($item['container']['value']) && $item['container']['value'] instanceof DrupalDateTime) {
         $date = $item['container']['value'];
         // Adjust the date for storage.
-        datetime_date_default_time($date);
+        $date->setDefaultDateTime();
         $date->setTimezone(new \DateTimezone(DATETIME_STORAGE_TIMEZONE));
         $item['value'] = $date->format(DATETIME_DATE_STORAGE_FORMAT);
         unset($item['container']);

@@ -88,11 +88,11 @@ class OrderReassignTest extends OrderWebDriverTestBase {
   public function testReassignToExistingUser() {
     $another_user = $this->createUser();
     $this->drupalGet($this->order->toUrl('reassign-form'));
-    $this->submitForm(['uid' => $another_user->getUsername()], 'Reassign order');
+    $this->submitForm(['uid' => $another_user->getAccountName()], 'Reassign order');
     $collection_url = $this->order->toUrl('collection', ['absolute' => TRUE]);
     $this->assertSession()->addressEquals($collection_url);
     $this->assertSession()->pageTextContains(t('has been assigned to customer @customer.', [
-      '@customer' => $another_user->getUsername(),
+      '@customer' => $another_user->getAccountName(),
     ]));
 
     $this->order = $this->reloadEntity($this->order);

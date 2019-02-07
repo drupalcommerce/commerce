@@ -2,7 +2,7 @@
 
 namespace Drupal\commerce_order;
 
-use Drupal\commerce\EntityPermissionProvider;
+use Drupal\entity\EntityPermissionProvider;
 use Drupal\Core\Entity\EntityTypeInterface;
 
 /**

@@ -30,7 +30,7 @@ class DefaultCountryResolverTest extends UnitTestCase {
       ->with('country.default')
       ->will($this->returnValue('RS'));
 
-    $config_factory = $this->getMock('Drupal\Core\Config\ConfigFactoryInterface');
+    $config_factory = $this->createMock('Drupal\Core\Config\ConfigFactoryInterface');
     $config_factory->expects($this->once())
       ->method('get')
       ->with('system.date')

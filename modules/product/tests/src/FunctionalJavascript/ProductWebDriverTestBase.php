@@ -2,7 +2,7 @@
 
 namespace Drupal\Tests\commerce_product\FunctionalJavascript;
 
-use Drupal\field\Tests\EntityReference\EntityReferenceTestTrait;
+use Drupal\Tests\field\Traits\EntityReferenceTestTrait;
 use Drupal\Tests\commerce\FunctionalJavascript\CommerceWebDriverTestBase;
 
 /**
