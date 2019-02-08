@@ -87,7 +87,6 @@ class OrderTypeForm extends CommerceBundleEntityFormBase {
       '#title' => $this->t('Order refresh'),
       '#weight' => 5,
       '#open' => TRUE,
-      '#collapsible' => TRUE,
       '#tree' => FALSE,
     ];
     $form['refresh']['refresh_intro'] = [

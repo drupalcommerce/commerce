@@ -276,7 +276,6 @@ abstract class LocalTaxTypeBase extends TaxTypeBase implements LocalTaxTypeInter
       '#type' => 'details',
       '#title' => $this->t('Tax rates'),
       '#markup' => $this->t('The following tax rates are provided:'),
-      '#collapsible' => TRUE,
       '#open' => TRUE,
     ];
     $element['table'] = [

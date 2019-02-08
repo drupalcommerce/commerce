@@ -134,7 +134,6 @@ function commerce_checkout_form_commerce_order_type_form_alter(array &$form, For
     '#title' => t('Checkout settings'),
     '#weight' => 5,
     '#open' => TRUE,
-    '#collapsible' => TRUE,
   ];
   $form['commerce_checkout']['checkout_flow'] = [
     '#type' => 'select',

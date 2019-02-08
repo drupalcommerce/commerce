@@ -196,7 +196,6 @@ function commerce_cart_form_commerce_order_type_form_alter(array &$form, FormSta
     '#title' => t('Shopping cart settings'),
     '#weight' => 5,
     '#open' => TRUE,
-    '#collapsible' => TRUE,
   ];
   $form['commerce_cart']['cart_form_view'] = [
     '#type' => 'select',

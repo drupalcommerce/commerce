@@ -50,10 +50,9 @@ function commerce_tax_entity_base_field_info(EntityTypeInterface $entity_type) {
 function commerce_tax_form_commerce_store_form_alter(&$form, FormStateInterface $form_state) {
   if (isset($form['prices_include_tax']) || isset($form['tax_registrations'])) {
     $form['tax_settings'] = [
+      '#type' => 'details',
       '#title' => t('Tax settings'),
       '#weight' => 90,
-      '#type' => 'details',
-      '#collapsible' => TRUE,
       '#open' => TRUE,
     ];
     $form['prices_include_tax']['#group'] = 'tax_settings';
