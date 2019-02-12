@@ -23,7 +23,7 @@
     <span class="order-total-line-label">{{ 'Subtotal'|t }} </span><span class="order-total-line-value">{{ totals.subtotal|commerce_price_format }}</span>
   </div>
   {% for adjustment in totals.adjustments %}
-    <div class="order-total-line order-total-line__adjustment">
+    <div class="order-total-line order-total-line__adjustment order-total-line__adjustment--{{ adjustment.type|clean_class }}">
       <span class="order-total-line-label">{{ adjustment.label }} </span><span class="order-total-line-value">{{ adjustment.amount|commerce_price_format }}</span>
     </div>
   {% endfor %}
