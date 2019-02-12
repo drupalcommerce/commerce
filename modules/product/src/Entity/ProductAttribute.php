@@ -79,8 +79,17 @@ class ProductAttribute extends ConfigEntityBundleBase implements ProductAttribut
    * {@inheritdoc}
    */
   public function getValues() {
+    /** @var \Drupal\commerce_product\ProductAttributeValueStorageInterface $storage */
     $storage = $this->entityTypeManager()->getStorage('commerce_product_attribute_value');
-    return $storage->loadMultipleByAttribute($this->id());
+    $values = $storage->loadMultipleByAttribute($this->id());
+    // Make sure that the values are returned in the attribute language.
+    $langcode = $this->language()->getId();
+    foreach ($values as $index => $value) {
+      if ($value->hasTranslation($langcode)) {
+        $values[$index] = $value->getTranslation($langcode);
+      }
+    }
+    return $values;
   }
 
   /**

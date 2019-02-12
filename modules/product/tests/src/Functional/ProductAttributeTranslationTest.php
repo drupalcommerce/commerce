@@ -116,9 +116,9 @@ class ProductAttributeTranslationTest extends ProductBrowserTestBase {
   }
 
   /**
-   * Tests product attribute translation when it is not in the default language.
+   * Tests the product attribute UI with mismatched languages.
    */
-  public function testProductAttributeTranslationNonDefaultLanguage() {
+  public function testMismatchedLanguages() {
     // Create a French attribute with two English (default language) values.
     $this->createEntity('commerce_product_attribute', [
       'id' => 'color',
@@ -149,7 +149,12 @@ class ProductAttributeTranslationTest extends ProductBrowserTestBase {
     $blue_value_en = $blue_value->addTranslation('fr', ['name' => 'Bleu']);
     $blue_value_en->save();
 
-    // Check for French values on the English translation form.
+    // Since the attribute language is French, the displayed values should
+    // also be in French, not English.
+    $this->drupalGet('admin/commerce/product-attributes/manage/color');
+    $this->assertSession()->elementExists('xpath', "//input[@value='Rouge']");
+    $this->assertSession()->elementExists('xpath', "//input[@value='Bleu']");
+
     $this->drupalGet('admin/commerce/product-attributes/manage/color/translate/en/add');
     $this->assertSession()->pageTextContains('Rouge');
     $this->assertSession()->pageTextContains('Bleu');
