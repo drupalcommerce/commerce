@@ -215,11 +215,11 @@ class PaymentTest extends CommerceKernelTestBase {
   }
 
   /**
-   * Tests the timestamp generation on preSave.
+   * Tests the preSave logic.
    *
    * @covers ::preSave
    */
-  public function testTimestamps() {
+  public function testPreSave() {
     $request_time = \Drupal::time()->getRequestTime();
     /** @var \Drupal\commerce_payment\Entity\PaymentInterface $payment */
     $payment = Payment::create([
@@ -229,8 +229,16 @@ class PaymentTest extends CommerceKernelTestBase {
       'amount' => new Price('30', 'USD'),
       'state' => 'authorization',
     ]);
-    $payment->save();
+    $this->assertEmpty($payment->getPaymentGatewayMode());
+    $this->assertEmpty($payment->getRefundedAmount());
+    $this->assertEmpty($payment->getAuthorizedTime());
+    $this->assertEmpty($payment->getCompletedTime());
+    // Confirm that getBalance() works before the payment is saved.
+    $this->assertEquals(new Price('30', 'USD'), $payment->getBalance());
 
+    $payment->save();
+    $this->assertEquals('test', $payment->getPaymentGatewayMode());
+    $this->assertEquals(new Price('0', 'USD'), $payment->getRefundedAmount());
     $this->assertEquals($request_time, $payment->getAuthorizedTime());
     $this->assertEmpty($payment->getCompletedTime());
 

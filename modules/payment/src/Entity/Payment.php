@@ -162,8 +162,11 @@ class Payment extends ContentEntityBase implements PaymentInterface {
    */
   public function getBalance() {
     if ($amount = $this->getAmount()) {
-      $refunded_amount = $this->getRefundedAmount();
-      return $amount->subtract($refunded_amount);
+      $balance = $amount;
+      if ($refunded_amount = $this->getRefundedAmount()) {
+        $balance = $balance->subtract($refunded_amount);
+      }
+      return $balance;
     }
   }
 
