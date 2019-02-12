@@ -66,7 +66,7 @@ class MailHandler implements MailHandlerInterface {
       // The 'from' address will be set by commerce_store_mail_alter().
       'from' => '',
       'subject' => $subject,
-      'langcode' => $this->languageManager->getDefaultLanguage()->getId(),
+      'langcode' => $this->languageManager->getCurrentLanguage()->getId(),
       // The body will be rendered in commerce_mail(), because that's what
       // MailManager expects. The correct theme and render context aren't
       // setup until then.

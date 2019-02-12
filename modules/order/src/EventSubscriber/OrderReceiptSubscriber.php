@@ -96,9 +96,12 @@ class OrderReceiptSubscriber implements EventSubscriberInterface {
       'id' => 'order_receipt',
       'from' => $order->getStore()->getEmail(),
       'bcc' => $order_type->getReceiptBcc(),
-      'langcode' => $order->getCustomer()->getPreferredLangcode(),
       'order' => $order,
     ];
+    $customer = $order->getCustomer();
+    if ($customer->isAuthenticated()) {
+      $params['langcode'] = $customer->getPreferredLangcode();
+    }
     $this->mailHandler->sendMail($to, $subject, $body, $params);
   }
 

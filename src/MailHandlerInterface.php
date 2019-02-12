@@ -31,7 +31,7 @@ interface MailHandlerInterface {
    *       Defaults to the current store email.
    *     - bcc: The BCC address or addresses. No default value.
    *     - langcode: The email langcode. Every translatable string and entity
-   *       will be rendered in this language.
+   *       will be rendered in this language. Defaults to the current language.
    *
    * @return bool
    *   TRUE if the email sent successfully, FALSE otherwise.

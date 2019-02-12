@@ -41,6 +41,7 @@ class MailHandlerTest extends CommerceKernelTestBase {
     $result = $this->mailHandler->sendMail('customer@example.com', 'Test subject', $body);
     $this->assertTrue($result);
 
+    $language_manager = $this->container->get('language_manager');
     $emails = $this->getMails();
     $this->assertEquals(1, count($emails));
     $email = reset($emails);
@@ -51,6 +52,7 @@ class MailHandlerTest extends CommerceKernelTestBase {
     $this->assertEquals($this->store->getEmail(), $email['from']);
     $this->assertEquals('Test subject', $email['subject']);
     $this->assertContains('Mail Handler Test', $email['body']);
+    $this->assertEquals($language_manager->getCurrentLanguage()->getId(), $email['langcode']);
 
     // No email should be sent if the recipient is empty.
     $result = $this->mailHandler->sendMail('', 'Test subject', $body);
