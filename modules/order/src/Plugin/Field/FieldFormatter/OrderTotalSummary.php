@@ -81,6 +81,7 @@ class OrderTotalSummary extends FormatterBase implements ContainerFactoryPluginI
     if (!$items->isEmpty()) {
       $elements[0] = [
         '#theme' => 'commerce_order_total_summary',
+        '#order_entity' => $order,
         '#totals' => $this->orderTotalSummary->buildTotals($order),
       ];
     }

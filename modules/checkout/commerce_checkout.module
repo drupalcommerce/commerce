@@ -87,6 +87,7 @@ function commerce_checkout_preprocess_commerce_checkout_order_summary(&$variable
   $variables['totals'] = $order_total_summary->buildTotals($order);
   $variables['rendered_totals'] = [
     '#theme' => 'commerce_order_total_summary',
+    '#order_entity' => $order,
     '#totals' => $variables['totals'],
   ];
 }
