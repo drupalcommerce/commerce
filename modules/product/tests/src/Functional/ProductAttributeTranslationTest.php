@@ -115,4 +115,44 @@ class ProductAttributeTranslationTest extends ProductBrowserTestBase {
     $this->assertEquals('Blue', $second_value->label());
   }
 
+  /**
+   * Tests product attribute translation when it is not in the default language.
+   */
+  public function testProductAttributeTranslationNonDefaultLanguage() {
+    // Create a French attribute with two English (default language) values.
+    $this->createEntity('commerce_product_attribute', [
+      'id' => 'color',
+      'label' => 'Couleur',
+      'langcode' => 'fr',
+    ]);
+    $red_value = $this->createEntity('commerce_product_attribute_value', [
+      'attribute' => 'color',
+      'name' => 'Red',
+      'weight' => 0,
+    ]);
+    $blue_value = $this->createEntity('commerce_product_attribute_value', [
+      'attribute' => 'color',
+      'name' => 'Blue',
+      'weight' => 1,
+    ]);
+
+    // Enable attribute value translations.
+    $edit = [
+      'enable_value_translation' => TRUE,
+    ];
+    $this->drupalGet('admin/commerce/product-attributes/manage/color');
+    $this->submitForm($edit, t('Save'));
+
+    // Translate the English values to French.
+    $red_value_en = $red_value->addTranslation('fr', ['name' => 'Rouge']);
+    $red_value_en->save();
+    $blue_value_en = $blue_value->addTranslation('fr', ['name' => 'Bleu']);
+    $blue_value_en->save();
+
+    // Check for French values on the English translation form.
+    $this->drupalGet('admin/commerce/product-attributes/manage/color/translate/en/add');
+    $this->assertSession()->pageTextContains('Rouge');
+    $this->assertSession()->pageTextContains('Bleu');
+  }
+
 }

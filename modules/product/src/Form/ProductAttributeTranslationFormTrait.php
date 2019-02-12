@@ -69,10 +69,14 @@ trait ProductAttributeTranslationFormTrait {
     ];
     foreach ($values as $index => $value) {
       $inline_form = $this->inlineFormManager->createInstance('content_entity', [], $value);
+      $original_value = $value;
+      if ($value->hasTranslation($source_language->getId())) {
+        $original_value = $value->getTranslation($source_language->getId());
+      }
 
       $value_form = &$form['values'][$index];
       $value_form['source'] = [
-        'value' => $this->renderOriginalValue($value),
+        'value' => $this->renderOriginalValue($original_value),
         '#wrapper_attributes' => ['style' => 'width: 50%'],
       ];
       $value_form['translation'] = [
@@ -97,7 +101,6 @@ trait ProductAttributeTranslationFormTrait {
    *   The render array.
    */
   protected function renderOriginalValue(ProductAttributeValueInterface $value) {
-    $value = $value->getUntranslated();
     $view_builder = $this->entityTypeManager->getViewBuilder('commerce_product_variation');
     $build = [];
     foreach ($value->getFieldDefinitions() as $field_name => $definition) {
