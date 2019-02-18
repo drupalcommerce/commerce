@@ -49,7 +49,7 @@ class OrderEmail extends ConditionBase {
     parent::submitConfigurationForm($form, $form_state);
 
     $values = $form_state->getValue($form['#parents']);
-    $this->configuration['mail'] = strtolower($values['mail']);
+    $this->configuration['mail'] = $values['mail'];
   }
 
   /**
@@ -60,7 +60,7 @@ class OrderEmail extends ConditionBase {
     /** @var \Drupal\commerce_order\Entity\OrderInterface $order */
     $order = $entity;
 
-    return $this->configuration['mail'] == strtolower($order->getEmail());
+    return strcasecmp($this->configuration['mail'], $order->getEmail()) === 0;
   }
 
 }
