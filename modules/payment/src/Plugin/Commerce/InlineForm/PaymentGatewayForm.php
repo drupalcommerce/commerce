@@ -3,7 +3,6 @@
 namespace Drupal\commerce_payment\Plugin\Commerce\InlineForm;
 
 use Drupal\commerce\Plugin\Commerce\InlineForm\EntityInlineFormBase;
-use Drupal\commerce\Response\NeedsRedirectException;
 use Drupal\commerce_payment\Entity\EntityWithPaymentGatewayInterface;
 use Drupal\commerce_payment\Exception\PaymentGatewayException;
 use Drupal\commerce_payment\PluginForm\PaymentGatewayFormInterface;
@@ -92,10 +91,9 @@ class PaymentGatewayForm extends EntityInlineFormBase {
   public function defaultConfiguration() {
     return [
       'operation' => NULL,
-      // The url to which the user will be redirected if an exception is thrown
-      // while building the form. If empty, the error will be shown inline.
-      'exception_url' => '',
-      'exception_message' => $this->t('An error occurred while contacting the gateway. Please try again later.'),
+      // Allows parent forms to handle exceptions themselves (in order to
+      // perform a redirect, or some other logic).
+      'catch_build_exceptions' => TRUE,
     ];
   }
 
@@ -122,17 +120,14 @@ class PaymentGatewayForm extends EntityInlineFormBase {
       $inline_form = $this->pluginForm->buildConfigurationForm($inline_form, $form_state);
     }
     catch (PaymentGatewayException $e) {
-      $this->logger->error($e->getMessage());
-      if (!empty($this->configuration['exception_url'])) {
-        $this->messenger()->addError($this->configuration['exception_message']);
-        throw new NeedsRedirectException($this->configuration['exception_url']);
+      if (empty($this->configuration['catch_build_exceptions'])) {
+        throw $e;
       }
-      else {
-        $inline_form['error'] = [
-          '#markup' => $this->configuration['exception_message'],
-        ];
-        $inline_form['#process'][] = [get_class($this), 'preventSubmit'];
-      }
+
+      $inline_form['error'] = [
+        '#markup' => $this->t('An error occurred while contacting the gateway. Please try again later.'),
+      ];
+      $inline_form['#process'][] = [get_class($this), 'preventSubmit'];
     }
 
     return $inline_form;

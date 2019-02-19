@@ -550,8 +550,7 @@ class PaymentCheckoutTest extends CommerceWebDriverTestBase {
     $this->assertSession()->addressEquals('checkout/1/order_information');
 
     $order = Order::load(1);
-    // @todo Fix order unlocking in this situation.
-    // $this->assertFalse($order->isLocked());
+    $this->assertFalse($order->isLocked());
     // Verify a payment was not created.
     $payment = Payment::load(1);
     $this->assertNull($payment);

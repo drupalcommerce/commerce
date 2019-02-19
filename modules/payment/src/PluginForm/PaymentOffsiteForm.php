@@ -60,6 +60,9 @@ abstract class PaymentOffsiteForm extends PaymentGatewayFormBase {
   protected function buildRedirectForm(array $form, FormStateInterface $form_state, $redirect_url, array $data, $redirect_method = self::REDIRECT_GET) {
     if ($redirect_method == self::REDIRECT_POST) {
       $form['#attached']['library'][] = 'commerce_payment/offsite_redirect';
+      $form['#process'][] = [get_class($this), 'processRedirectForm'];
+      $form['#redirect_url'] = $redirect_url;
+
       foreach ($data as $key => $value) {
         $form[$key] = [
           '#type' => 'hidden',
@@ -68,17 +71,10 @@ abstract class PaymentOffsiteForm extends PaymentGatewayFormBase {
           '#parents' => [$key],
         ];
       }
-
       // The key is prefixed with 'commerce_' to prevent conflicts with $data.
       $form['commerce_message'] = [
         '#markup' => '<div class="checkout-help">' . t('Please wait while you are redirected to the payment server. If nothing happens within 10 seconds, please click on the button below.') . '</div>',
         '#weight' => -10,
-        // Plugin forms are embedded using #process, so it's too late to attach
-        // another #process to $form itself, it must be on a sub-element.
-        '#process' => [
-          [get_class($this), 'processRedirectForm'],
-        ],
-        '#action' => $redirect_url,
       ];
     }
     else {
@@ -95,8 +91,8 @@ abstract class PaymentOffsiteForm extends PaymentGatewayFormBase {
    * Sets the form #action, adds a class for the JS to target.
    * Workaround for buildConfigurationForm() not receiving $complete_form.
    *
-   * @param array $element
-   *   The form element whose value is being processed.
+   * @param array $form
+   *   The plugin form.
    * @param \Drupal\Core\Form\FormStateInterface $form_state
    *   The current state of the form.
    * @param array $complete_form
@@ -105,17 +101,16 @@ abstract class PaymentOffsiteForm extends PaymentGatewayFormBase {
    * @return array
    *   The processed form element.
    */
-  public static function processRedirectForm(array $element, FormStateInterface $form_state, array &$complete_form) {
-    $complete_form['#action'] = $element['#action'];
+  public static function processRedirectForm(array $form, FormStateInterface $form_state, array &$complete_form) {
+    $complete_form['#action'] = $form['#redirect_url'];
     $complete_form['#attributes']['class'][] = 'payment-redirect-form';
-    unset($element['#action']);
     // The form actions are hidden by default, but needed in this case.
     $complete_form['actions']['#access'] = TRUE;
     foreach (Element::children($complete_form['actions']) as $element_name) {
       $complete_form['actions'][$element_name]['#access'] = TRUE;
     }
 
-    return $element;
+    return $form;
   }
 
   /**

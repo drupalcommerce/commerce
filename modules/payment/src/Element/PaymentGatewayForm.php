@@ -40,10 +40,6 @@ class PaymentGatewayForm extends RenderElement {
       '#operation' => '',
       // The entity operated on. Instance of EntityWithPaymentGatewayInterface.
       '#default_value' => NULL,
-      // The url to which the user will be redirected if an exception is thrown
-      // while building the form. If empty, the error will be shown inline.
-      '#exception_url' => '',
-      '#exception_message' => t('An error occurred while contacting the gateway. Please try again later.'),
 
       '#process' => [
         [$class, 'attachElementSubmit'],
@@ -88,8 +84,6 @@ class PaymentGatewayForm extends RenderElement {
     $inline_form_manager = \Drupal::service('plugin.manager.commerce_inline_form');
     $inline_form = $inline_form_manager->createInstance('payment_gateway_form', [
       'operation' => $element['#operation'],
-      'exception_url' => $element['#exception_url'],
-      'exception_message' => $element['#exception_message'],
     ], $element['#default_value']);
 
     $element['#inline_form'] = $inline_form;

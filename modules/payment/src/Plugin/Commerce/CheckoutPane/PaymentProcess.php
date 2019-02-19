@@ -186,10 +186,19 @@ class PaymentProcess extends CheckoutPaneBase {
       }
     }
     elseif ($payment_gateway_plugin instanceof OffsitePaymentGatewayInterface) {
+      $complete_form['actions']['next']['#value'] = $this->t('Proceed to @gateway', [
+        '@gateway' => $payment_gateway_plugin->getDisplayLabel(),
+      ]);
+      // Make sure that the payment gateway's onCancel() method is invoked,
+      // by pointing the "Go back" link to the cancel URL.
+      $complete_form['actions']['next']['#suffix'] = Link::fromTextAndUrl($this->t('Go back'), $this->buildCancelUrl())->toString();
+      // Actions are not needed by gateways that embed iframes or redirect
+      // via GET. The inline form can show them when needed (redirect via POST).
+      $complete_form['actions']['#access'] = FALSE;
+
       $inline_form = $this->inlineFormManager->createInstance('payment_gateway_form', [
         'operation' => 'offsite-payment',
-        'exception_url' => $this->buildErrorUrl()->toString(),
-        'exception_message' => $this->t('We encountered an unexpected error processing your payment. Please try again later.'),
+        'catch_build_exceptions' => FALSE,
       ], $payment);
 
       $pane_form['offsite_payment'] = [
@@ -199,18 +208,15 @@ class PaymentProcess extends CheckoutPaneBase {
         '#cancel_url' => $this->buildCancelUrl()->toString(),
         '#capture' => $this->configuration['capture'],
       ];
-      $pane_form['offsite_payment'] = $inline_form->buildInlineForm($pane_form['offsite_payment'], $form_state);
-
-      $complete_form['actions']['next']['#value'] = $this->t('Proceed to @gateway', [
-        '@gateway' => $payment_gateway_plugin->getDisplayLabel(),
-      ]);
-      // Make sure that the payment gateway's onCancel() method is invoked,
-      // by pointing the "Go back" link to the cancel URL.
-      $complete_form['actions']['next']['#suffix'] = Link::fromTextAndUrl($this->t('Go back'), $this->buildCancelUrl())->toString();
-      // Hide the actions by default, they are not needed by gateways that
-      // embed iframes or redirect via GET. The offsite-payment form can
-      // choose to show them when needed (redirect via POST).
-      $complete_form['actions']['#access'] = FALSE;
+      try {
+        $pane_form['offsite_payment'] = $inline_form->buildInlineForm($pane_form['offsite_payment'], $form_state);
+      }
+      catch (PaymentGatewayException $e) {
+        \Drupal::logger('commerce_payment')->error($e->getMessage());
+        $message = $this->t('We encountered an unexpected error processing your payment. Please try again later.');
+        $this->messenger()->addError($message);
+        $this->checkoutFlow->redirectToStep($error_step_id);
+      }
 
       return $pane_form;
     }
@@ -254,19 +260,6 @@ class PaymentProcess extends CheckoutPaneBase {
     return Url::fromRoute('commerce_payment.checkout.cancel', [
       'commerce_order' => $this->order->id(),
       'step' => 'payment',
-    ], ['absolute' => TRUE]);
-  }
-
-  /**
-   * Builds the URL to the "error" page.
-   *
-   * @return \Drupal\Core\Url
-   *   The "error" page URL.
-   */
-  protected function buildErrorUrl() {
-    return Url::fromRoute('commerce_checkout.form', [
-      'commerce_order' => $this->order->id(),
-      'step' => $this->getErrorStepId(),
     ], ['absolute' => TRUE]);
   }
 
