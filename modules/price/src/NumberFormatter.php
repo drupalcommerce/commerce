@@ -20,9 +20,11 @@ class NumberFormatter extends ExternalNumberFormatter {
    *   The number format repository.
    * @param \Drupal\commerce\CurrentLocaleInterface $current_locale
    *   The current locale.
+   * @param array $default_options
+   *   The default options.
    */
-  public function __construct(NumberFormatRepositoryInterface $number_format_repository, CurrentLocaleInterface $current_locale) {
-    $default_options = [
+  public function __construct(NumberFormatRepositoryInterface $number_format_repository, CurrentLocaleInterface $current_locale, array $default_options = []) {
+    $default_options += [
       'locale' => $current_locale->getLocale()->getLocaleCode(),
     ];
 
