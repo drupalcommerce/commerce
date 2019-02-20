@@ -53,9 +53,13 @@ services:
 
   commerce_order.order_receipt_subscriber:
     class: Drupal\commerce_order\EventSubscriber\OrderReceiptSubscriber
-    arguments: ['@entity_type.manager', '@commerce.mail_handler', '@commerce_order.order_total_summary']
+    arguments: ['@entity_type.manager', '@commerce_order.order_receipt_mail']
     tags:
       - { name: 'event_subscriber' }
+
+  commerce_order.order_receipt_mail:
+    class: Drupal\commerce_order\Mail\OrderReceiptMail
+    arguments: ['@entity_type.manager', '@commerce.mail_handler', '@commerce_order.order_total_summary']
 
   commerce_order.order_total_summary:
     class: Drupal\commerce_order\OrderTotalSummary

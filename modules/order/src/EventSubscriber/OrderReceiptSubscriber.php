@@ -2,10 +2,8 @@
 
 namespace Drupal\commerce_order\EventSubscriber;
 
-use Drupal\commerce\MailHandlerInterface;
-use Drupal\commerce_order\OrderTotalSummaryInterface;
+use Drupal\commerce_order\Mail\OrderReceiptMailInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
-use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\state_machine\Event\WorkflowTransitionEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -13,8 +11,6 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  * Sends a receipt email when an order is placed.
  */
 class OrderReceiptSubscriber implements EventSubscriberInterface {
-
-  use StringTranslationTrait;
 
   /**
    * The entity type manager.
@@ -24,33 +20,23 @@ class OrderReceiptSubscriber implements EventSubscriberInterface {
   protected $entityTypeManager;
 
   /**
-   * The mail handler.
+   * The order receipt mail.
    *
-   * @var \Drupal\commerce\MailHandlerInterface
+   * @var \Drupal\commerce_order\Mail\OrderReceiptMailInterface
    */
-  protected $mailHandler;
-
-  /**
-   * The order total summary.
-   *
-   * @var \Drupal\commerce_order\OrderTotalSummaryInterface
-   */
-  protected $orderTotalSummary;
+  protected $orderReceiptMail;
 
   /**
    * Constructs a new OrderReceiptSubscriber object.
    *
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
-   * @param \Drupal\commerce\MailHandlerInterface $mail_handler
+   * @param \Drupal\commerce_order\Mail\OrderReceiptMailInterface $order_receipt_mail
    *   The mail handler.
-   * @param \Drupal\commerce_order\OrderTotalSummaryInterface $order_total_summary
-   *   The order total summary.
    */
-  public function __construct(EntityTypeManagerInterface $entity_type_manager, MailHandlerInterface $mail_handler, OrderTotalSummaryInterface $order_total_summary) {
+  public function __construct(EntityTypeManagerInterface $entity_type_manager, OrderReceiptMailInterface $order_receipt_mail) {
     $this->entityTypeManager = $entity_type_manager;
-    $this->mailHandler = $mail_handler;
-    $this->orderTotalSummary = $order_total_summary;
+    $this->orderReceiptMail = $order_receipt_mail;
   }
 
   /**
@@ -73,36 +59,9 @@ class OrderReceiptSubscriber implements EventSubscriberInterface {
     $order_type_storage = $this->entityTypeManager->getStorage('commerce_order_type');
     /** @var \Drupal\commerce_order\Entity\OrderTypeInterface $order_type */
     $order_type = $order_type_storage->load($order->bundle());
-    if (!$order_type->shouldSendReceipt()) {
-      return;
+    if ($order_type->shouldSendReceipt()) {
+      $this->orderReceiptMail->send($order, $order->getEmail(), $order_type->getReceiptBcc());
     }
-    $to = $order->getEmail();
-    if (!$to) {
-      // The email should not be empty, unless the order is malformed.
-      return;
-    }
-
-    $subject = $this->t('Order #@number confirmed', ['@number' => $order->getOrderNumber()]);
-    $body = [
-      '#theme' => 'commerce_order_receipt',
-      '#order_entity' => $order,
-      '#totals' => $this->orderTotalSummary->buildTotals($order),
-    ];
-    if ($billing_profile = $order->getBillingProfile()) {
-      $profile_view_builder = $this->entityTypeManager->getViewBuilder('profile');;
-      $body['#billing_information'] = $profile_view_builder->view($billing_profile);
-    }
-    $params = [
-      'id' => 'order_receipt',
-      'from' => $order->getStore()->getEmail(),
-      'bcc' => $order_type->getReceiptBcc(),
-      'order' => $order,
-    ];
-    $customer = $order->getCustomer();
-    if ($customer->isAuthenticated()) {
-      $params['langcode'] = $customer->getPreferredLangcode();
-    }
-    $this->mailHandler->sendMail($to, $subject, $body, $params);
   }
 
 }

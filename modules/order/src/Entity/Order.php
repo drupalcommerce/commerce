@@ -42,6 +42,7 @@ use Drupal\profile\Entity\ProfileInterface;
  *       "edit" = "Drupal\commerce_order\Form\OrderForm",
  *       "delete" = "Drupal\Core\Entity\ContentEntityDeleteForm",
  *       "unlock" = "Drupal\commerce_order\Form\OrderUnlockForm",
+ *       "resend-receipt" = "Drupal\commerce_order\Form\OrderReceiptResendForm",
  *     },
  *     "route_provider" = {
  *       "default" = "Drupal\commerce_order\OrderRouteProvider",
@@ -64,7 +65,8 @@ use Drupal\profile\Entity\ProfileInterface;
  *     "delete-multiple-form" = "/admin/commerce/orders/delete",
  *     "reassign-form" = "/admin/commerce/orders/{commerce_order}/reassign",
  *     "unlock-form" = "/admin/commerce/orders/{commerce_order}/unlock",
- *     "collection" = "/admin/commerce/orders"
+ *     "collection" = "/admin/commerce/orders",
+ *     "resend-receipt-form" = "/admin/commerce/orders/{commerce_order}/resend-receipt"
  *   },
  *   bundle_entity_type = "commerce_order_type",
  *   field_ui_base_route = "entity.commerce_order_type.edit_form"

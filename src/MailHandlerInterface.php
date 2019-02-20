@@ -29,12 +29,12 @@ interface MailHandlerInterface {
    *       Defaults to "mail". Automatically prefixed with "commerce_".
    *     - from: The address the email will be marked as being from.
    *       Defaults to the current store email.
-   *     - bcc: The BCC address or addresses. No default value.
+   *     - bcc: The BCC address or addresses (separated by a comma). No default.
    *     - langcode: The email langcode. Every translatable string and entity
    *       will be rendered in this language. Defaults to the current language.
    *
    * @return bool
-   *   TRUE if the email sent successfully, FALSE otherwise.
+   *   TRUE if the email was sent successfully, FALSE otherwise.
    */
   public function sendMail($to, $subject, array $body, array $params = []);
 

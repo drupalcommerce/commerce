@@ -122,6 +122,13 @@ class OrderListBuilder extends EntityListBuilder {
         'url' => $entity->toUrl('unlock-form'),
       ];
     }
+    if ($entity->access('resend_receipt')) {
+      $operations['resend_receipt'] = [
+        'title' => $this->t('Resend receipt'),
+        'weight' => 20,
+        'url' => $entity->toUrl('resend-receipt-form'),
+      ];
+    }
 
     return $operations;
   }
