@@ -182,6 +182,9 @@ class ProductVariationRouteProvider extends DefaultHtmlRouteProvider {
       'commerce_product' => [
         'type' => 'entity:commerce_product',
       ],
+      'commerce_product_variation' => [
+        'type' => 'entity:commerce_product_variation',
+      ],
     ]);
     $route->setOption('_admin_route', TRUE);
 
@@ -197,6 +200,9 @@ class ProductVariationRouteProvider extends DefaultHtmlRouteProvider {
     $route->setOption('parameters', [
       'commerce_product' => [
         'type' => 'entity:commerce_product',
+      ],
+      'commerce_product_variation' => [
+        'type' => 'entity:commerce_product_variation',
       ],
     ]);
     $route->setOption('_admin_route', TRUE);
