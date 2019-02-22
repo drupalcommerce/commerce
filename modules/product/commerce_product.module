@@ -6,6 +6,7 @@
  */
 
 use Drupal\entity\BundleFieldDefinition;
+use Drupal\commerce\EntityHelper;
 use Drupal\commerce_product\Entity\ProductTypeInterface;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Form\FormStateInterface;
@@ -313,4 +314,40 @@ function commerce_product_form_entity_form_display_edit_form_alter(array &$form,
       $settings['match_operator']['#access'] = FALSE;
     }
   }
+}
+
+/**
+ * Implements hook_search_api_views_handler_mapping_alter().
+ *
+ * Search API views filters do not use the options filter by default
+ * for all entity bundle fields.
+ *
+ * @see https://www.drupal.org/project/search_api/issues/2847994
+ */
+function commerce_product_search_api_views_handler_mapping_alter(array &$mapping) {
+  $mapping['entity:commerce_product_type'] = [
+    'argument' => [
+      'id' => 'search_api',
+    ],
+    'filter' => [
+      'id' => 'search_api_options',
+      'options callback' => 'commerce_product_type_labels',
+    ],
+    'sort' => [
+      'id' => 'search_api',
+    ],
+  ];
+}
+
+/**
+ * Gets the list of available product type labels.
+ *
+ * @return string[]
+ *   The product type labels, keyed by product type ID.
+ */
+function commerce_product_type_labels() {
+  $product_type_storage = \Drupal::entityTypeManager()->getStorage('commerce_product_type');
+  $product_types = $product_type_storage->loadMultiple();
+
+  return EntityHelper::extractLabels($product_types);
 }
