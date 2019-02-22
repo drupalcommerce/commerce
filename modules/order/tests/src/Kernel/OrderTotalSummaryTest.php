@@ -97,13 +97,13 @@ class OrderTotalSummaryTest extends CommerceKernelTestBase {
     /** @var \Drupal\commerce_order\Entity\Order $order */
     $order = Order::create([
       'type' => 'default',
-      'state' => 'draft',
       'mail' => $user->getEmail(),
       'uid' => $user->id(),
       'ip_address' => '127.0.0.1',
       'order_number' => '6',
       'billing_profile' => $profile,
       'store_id' => $this->store->id(),
+      'state' => 'completed',
     ]);
 
     $order->save();
@@ -124,15 +124,13 @@ class OrderTotalSummaryTest extends CommerceKernelTestBase {
     $order_item = $this->reloadEntity($order_item);
     $this->order->addItem($order_item);
 
-    $test_order_adjustments = [];
-    $test_order_adjustments[] = new Adjustment([
+    $this->order->addAdjustment(new Adjustment([
       'type' => 'promotion',
       'label' => 'Back to school discount',
       'amount' => new Price('-5.00', 'USD'),
       'percentage' => '0.1',
       'source_id' => '1',
-    ]);
-    $this->order->setData('test_adjustments', $test_order_adjustments);
+    ]));
     $this->order->save();
 
     $totals = $this->orderTotalSummary->buildTotals($this->order);
@@ -157,15 +155,13 @@ class OrderTotalSummaryTest extends CommerceKernelTestBase {
       'quantity' => 1,
       'unit_price' => new Price('12.00', 'USD'),
     ]);
-    $order_item_test_adjustments = [];
-    $order_item_test_adjustments[] = new Adjustment([
+    $order_item->addAdjustment(new Adjustment([
       'type' => 'promotion',
       'label' => 'Back to school discount',
       'amount' => new Price('-1.00', 'USD'),
       'percentage' => '0.1',
       'source_id' => '1',
-    ]);
-    $order_item->setData('test_adjustments', $order_item_test_adjustments);
+    ]));
     $order_item->save();
     $order_item = $this->reloadEntity($order_item);
     $this->order->addItem($order_item);
@@ -193,35 +189,30 @@ class OrderTotalSummaryTest extends CommerceKernelTestBase {
       'quantity' => 2,
       'unit_price' => new Price('12.00', 'USD'),
     ]);
-    $order_item_test_adjustments = [];
-    $order_item_test_adjustments[] = new Adjustment([
+    $order_item->addAdjustment(new Adjustment([
       'type' => 'promotion',
       'label' => 'Back to school discount',
       'amount' => new Price('-1.00', 'USD'),
       'percentage' => '0.1',
       'source_id' => '1',
-    ]);
+    ]));
     // This adjustment should be first.
-    $order_item_test_adjustments[] = new Adjustment([
+    $order_item->addAdjustment(new Adjustment([
       'type' => 'test_adjustment_type',
       'label' => '50 cent item fee',
       'amount' => new Price('0.50', 'USD'),
-    ]);
-    $order_item->setData('test_adjustments', $order_item_test_adjustments);
+    ]));
     $order_item->save();
     $order_item = $this->reloadEntity($order_item);
     $this->order->addItem($order_item);
 
-    $test_order_adjustments = [];
-    $test_order_adjustments[] = new Adjustment([
+    $this->order->addAdjustment(new Adjustment([
       'type' => 'promotion',
       'label' => 'Back to school discount',
       'amount' => new Price('-5.00', 'USD'),
       'percentage' => '0.1',
       'source_id' => '1',
-    ]);
-    $this->order->setData('test_adjustments', $test_order_adjustments);
-
+    ]));
     $this->order->addAdjustment(new Adjustment([
       'type' => 'custom',
       'label' => 'Handling fee',

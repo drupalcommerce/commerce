@@ -17,11 +17,6 @@ class TestAdjustmentProcessor implements OrderProcessorInterface {
    */
   public function process(OrderInterface $order) {
     foreach ($order->getItems() as $order_item) {
-      $test_adjustments = $order_item->getData('test_adjustments', []);
-      foreach ($test_adjustments as $test_adjustment) {
-        $order_item->addAdjustment($test_adjustment);
-      }
-
       // Add adjustment for PriceCalculatorTest.
       if ($order->getEmail() == 'user2@example.com') {
         $order_item->addAdjustment(new Adjustment([
@@ -30,11 +25,6 @@ class TestAdjustmentProcessor implements OrderProcessorInterface {
           'amount' => new Price('2.00', 'USD'),
         ]));
       }
-    }
-
-    $test_adjustments = $order->getData('test_adjustments', []);
-    foreach ($test_adjustments as $test_adjustment) {
-      $order->addAdjustment($test_adjustment);
     }
   }
 
