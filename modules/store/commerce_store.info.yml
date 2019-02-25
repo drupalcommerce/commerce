@@ -3,6 +3,7 @@ type: module
 description: 'Defines the Store entity and associated features.'
 package: Commerce
 core: 8.x
+configure: entity.commerce_store.collection
 dependencies:
   - commerce:commerce
   - commerce:commerce_price

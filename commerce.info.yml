@@ -3,7 +3,7 @@ type: module
 description: 'Defines common functionality for all Commerce modules.'
 package: Commerce
 core: 8.x
-configure: commerce.admin_commerce
+configure: commerce.configuration
 dependencies:
   - address:address
   - entity:entity

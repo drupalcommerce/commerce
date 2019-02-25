@@ -3,6 +3,7 @@ type: module
 description: 'Provides payment functionality.'
 package: Commerce
 core: 8.x
+configure: commerce_payment.configuration
 dependencies:
   - commerce:commerce
   - commerce:commerce_order

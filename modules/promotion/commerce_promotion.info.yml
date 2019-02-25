@@ -3,6 +3,7 @@ type: module
 description: 'Provides a UI for managing promotions.'
 package: Commerce
 core: 8.x
+configure: entity.commerce_promotion.collection
 dependencies:
   - commerce:commerce
   - commerce:commerce_order
