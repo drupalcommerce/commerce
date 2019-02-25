@@ -15,7 +15,6 @@ entity.commerce_store.edit_form:
 
 entity.commerce_store_type.collection:
   route_name: entity.commerce_store_type.collection
-  route_name: entity.commerce_store_type.collection
   title: List
 
 entity.commerce_store_type.edit_form:
