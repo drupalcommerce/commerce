@@ -8,8 +8,6 @@ use Drupal\Core\Entity\EntityTypeManagerInterface;
 
 /**
  * Applies promotions to orders during the order refresh process.
- *
- * @see \Drupal\commerce_promotion\CouponOrderProcessor
  */
 class PromotionOrderProcessor implements OrderProcessorInterface {
 
