@@ -39,7 +39,7 @@ class EntitySelectWidget extends WidgetBase {
     $element = [];
     $element['hide_single_entity'] = [
       '#type' => 'checkbox',
-      '#title' => t("Hide if there's only one available entity."),
+      '#title' => $this->t("Hide if there's only one available entity."),
       '#default_value' => $this->getSetting('hide_single_entity'),
       '#access' => $this->fieldDefinition->isRequired(),
     ];
