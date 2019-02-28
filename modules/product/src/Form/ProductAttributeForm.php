@@ -88,7 +88,10 @@ class ProductAttributeForm extends BundleEntityFormBase {
       '#default_value' => $attribute->getElementType(),
     ];
 
-    // Allow the attribute to be assigned to a product variaton type.
+    $attribute_field_map = $this->attributeFieldManager->getFieldMap();
+    $variation_type_storage = $this->entityTypeManager->getStorage('commerce_product_variation_type');
+    $variation_types = $variation_type_storage->loadMultiple();
+    // Allow the attribute to be assigned to a product variation type.
     $form['original_variation_types'] = [
       '#type' => 'value',
       '#value' => [],
@@ -96,15 +99,11 @@ class ProductAttributeForm extends BundleEntityFormBase {
     $form['variation_types'] = [
       '#type' => 'checkboxes',
       '#title' => $this->t('Product variation types'),
+      '#options' => EntityHelper::extractLabels($variation_types),
+      '#access' => count($variation_types) > 0,
     ];
-    $attribute_field_map = $this->attributeFieldManager->getFieldMap();
-    $variation_type_storage = $this->entityTypeManager->getStorage('commerce_product_variation_type');
-    $variation_types = $variation_type_storage->loadMultiple();
     $disabled_variation_types = [];
-    foreach ($variation_types as $variation_type) {
-      $variation_type_id = $variation_type->id();
-      $form['variation_types']['#options'][$variation_type_id] = $variation_type->label();
-
+    foreach ($variation_types as $variation_type_id => $variation_type) {
       if (!$attribute->isNew() && isset($attribute_field_map[$variation_type_id])) {
         $used_attributes = array_column($attribute_field_map[$variation_type_id], 'attribute_id');
         if (in_array($attribute->id(), $used_attributes)) {

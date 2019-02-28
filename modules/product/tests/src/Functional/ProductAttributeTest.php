@@ -3,6 +3,7 @@
 namespace Drupal\Tests\commerce_product\Functional;
 
 use Drupal\commerce_product\Entity\ProductAttribute;
+use Drupal\commerce_product\Entity\ProductVariationType;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 
@@ -26,8 +27,14 @@ class ProductAttributeTest extends ProductBrowserTestBase {
    * Tests creation of a product attribute.
    */
   public function testProductAttributeCreation() {
+    // Test the form without any variation types.
+    $variation_type = ProductVariationType::load('default');
+    $variation_type->delete();
+
     $this->drupalGet('admin/commerce/product-attributes');
     $this->getSession()->getPage()->clickLink('Add product attribute');
+    $this->assertSession()->elementNotExists('css', '#edit-variation-types');
+
     $this->submitForm([
       'label' => 'Size',
       'elementType' => 'commerce_product_rendered_attribute',
@@ -47,11 +54,17 @@ class ProductAttributeTest extends ProductBrowserTestBase {
    * Tests editing a product attribute.
    */
   public function testProductAttributeEditing() {
+    // Test the form without any variation types.
+    $variation_type = ProductVariationType::load('default');
+    $variation_type->delete();
+
     $this->createEntity('commerce_product_attribute', [
       'id' => 'color',
       'label' => 'Color',
     ]);
     $this->drupalGet('admin/commerce/product-attributes/manage/color');
+    $this->assertSession()->elementNotExists('css', '#edit-variation-types');
+
     $this->submitForm([
       'label' => 'Colour',
       'elementType' => 'radios',
