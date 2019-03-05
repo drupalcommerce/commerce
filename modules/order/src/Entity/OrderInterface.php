@@ -242,12 +242,16 @@ interface OrderInterface extends ContentEntityInterface, EntityAdjustableInterfa
    * Important:
    * The returned adjustments are unprocessed, and must be processed before use.
    *
-   * @see \Drupal\commerce_order\AdjustmentTransformerInterface::processAdjustments()
+   * @param string[] $adjustment_types
+   *   The adjustment types to include.
+   *   Examples: fee, promotion, tax. Defaults to all adjustment types.
    *
    * @return \Drupal\commerce_order\Adjustment[]
    *   The adjustments.
+   *
+   * @see \Drupal\commerce_order\AdjustmentTransformerInterface::processAdjustments()
    */
-  public function collectAdjustments();
+  public function collectAdjustments(array $adjustment_types = []);
 
   /**
    * Gets the order subtotal price.

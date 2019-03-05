@@ -275,8 +275,20 @@ class Order extends CommerceContentEntityBase implements OrderInterface {
   /**
    * {@inheritdoc}
    */
-  public function getAdjustments() {
-    return $this->get('adjustments')->getAdjustments();
+  public function getAdjustments(array $adjustment_types = []) {
+    /** @var \Drupal\commerce_order\Adjustment[] $adjustments */
+    $adjustments = $this->get('adjustments')->getAdjustments();
+    // Filter adjustments by type, if needed.
+    if ($adjustment_types) {
+      foreach ($adjustments as $index => $adjustment) {
+        if (!in_array($adjustment->getType(), $adjustment_types)) {
+          unset($adjustments[$index]);
+        }
+      }
+      $adjustments = array_values($adjustments);
+    }
+
+    return $adjustments;
   }
 
   /**
@@ -336,17 +348,17 @@ class Order extends CommerceContentEntityBase implements OrderInterface {
   /**
    * {@inheritdoc}
    */
-  public function collectAdjustments() {
+  public function collectAdjustments(array $adjustment_types = []) {
     $adjustments = [];
     foreach ($this->getItems() as $order_item) {
-      foreach ($order_item->getAdjustments() as $adjustment) {
+      foreach ($order_item->getAdjustments($adjustment_types) as $adjustment) {
         if ($order_item->usesLegacyAdjustments()) {
           $adjustment = $adjustment->multiply($order_item->getQuantity());
         }
         $adjustments[] = $adjustment;
       }
     }
-    foreach ($this->getAdjustments() as $adjustment) {
+    foreach ($this->getAdjustments($adjustment_types) as $adjustment) {
       $adjustments[] = $adjustment;
     }
 

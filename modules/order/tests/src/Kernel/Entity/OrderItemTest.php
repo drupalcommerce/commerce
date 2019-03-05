@@ -108,6 +108,9 @@ class OrderItemTest extends CommerceKernelTestBase {
     $order_item->addAdjustment($adjustments[1]);
     $adjustments = $order_item->getAdjustments();
     $this->assertEquals($adjustments, $order_item->getAdjustments());
+    $this->assertEquals($adjustments, $order_item->getAdjustments(['custom', 'fee']));
+    $this->assertEquals([$adjustments[0]], $order_item->getAdjustments(['custom']));
+    $this->assertEquals([$adjustments[1]], $order_item->getAdjustments(['fee']));
     $order_item->removeAdjustment($adjustments[0]);
     $this->assertEquals([$adjustments[1]], $order_item->getAdjustments());
     $this->assertEquals(new Price('21.98', 'USD'), $order_item->getAdjustedTotalPrice());

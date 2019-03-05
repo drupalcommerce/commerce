@@ -28,10 +28,14 @@ interface EntityAdjustableInterface extends EntityInterface {
   /**
    * Gets the adjustments.
    *
+   * @param string[] $adjustment_types
+   *   The adjustment types to include.
+   *   Examples: fee, promotion, tax. Defaults to all adjustment types.
+   *
    * @return \Drupal\commerce_order\Adjustment[]
    *   The adjustments.
    */
-  public function getAdjustments();
+  public function getAdjustments(array $adjustment_types = []);
 
   /**
    * Sets the adjustments.

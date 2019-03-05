@@ -214,9 +214,9 @@ class OrderTest extends CommerceKernelTestBase {
     $order->addAdjustment($adjustments[0]);
     $order->addAdjustment($adjustments[1]);
     $this->assertEquals($adjustments, $order->getAdjustments());
-    $collected_adjustments = $order->collectAdjustments();
-    $this->assertEquals($adjustments[0]->getAmount(), $collected_adjustments[0]->getAmount());
-    $this->assertEquals($adjustments[1]->getAmount(), $collected_adjustments[1]->getAmount());
+    $this->assertEquals($adjustments, $order->getAdjustments(['custom', 'fee']));
+    $this->assertEquals([$adjustments[0]], $order->getAdjustments(['custom']));
+    $this->assertEquals([$adjustments[1]], $order->getAdjustments(['fee']));
     $order->removeAdjustment($adjustments[0]);
     $this->assertEquals(new Price('8.00', 'USD'), $order->getSubtotalPrice());
     $this->assertEquals(new Price('18.00', 'USD'), $order->getTotalPrice());
@@ -233,6 +233,11 @@ class OrderTest extends CommerceKernelTestBase {
     ]));
     $order->clearAdjustments();
     $this->assertEquals($adjustments, $order->getAdjustments());
+
+    $this->assertEquals($adjustments, $order->collectAdjustments());
+    $this->assertEquals($adjustments, $order->collectAdjustments(['custom', 'fee']));
+    $this->assertEquals([$adjustments[0]], $order->collectAdjustments(['custom']));
+    $this->assertEquals([$adjustments[1]], $order->collectAdjustments(['fee']));
 
     $this->assertEquals(new Price('0', 'USD'), $order->getTotalPaid());
     $this->assertEquals(new Price('17.00', 'USD'), $order->getBalance());

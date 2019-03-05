@@ -154,8 +154,20 @@ class OrderItem extends CommerceContentEntityBase implements OrderItemInterface 
   /**
    * {@inheritdoc}
    */
-  public function getAdjustments() {
-    return $this->get('adjustments')->getAdjustments();
+  public function getAdjustments(array $adjustment_types = []) {
+    /** @var \Drupal\commerce_order\Adjustment[] $adjustments */
+    $adjustments = $this->get('adjustments')->getAdjustments();
+    // Filter adjustments by type, if needed.
+    if ($adjustment_types) {
+      foreach ($adjustments as $index => $adjustment) {
+        if (!in_array($adjustment->getType(), $adjustment_types)) {
+          unset($adjustments[$index]);
+        }
+      }
+      $adjustments = array_values($adjustments);
+    }
+
+    return $adjustments;
   }
 
   /**
@@ -249,17 +261,11 @@ class OrderItem extends CommerceContentEntityBase implements OrderItemInterface 
    */
   protected function applyAdjustments(Price $price, array $adjustment_types = []) {
     $adjusted_price = $price;
-    foreach ($this->getAdjustments() as $adjustment) {
-      if ($adjustment_types && !in_array($adjustment->getType(), $adjustment_types)) {
-        continue;
+    foreach ($this->getAdjustments($adjustment_types) as $adjustment) {
+      if (!$adjustment->isIncluded()) {
+        $adjusted_price = $adjusted_price->add($adjustment->getAmount());
       }
-      if ($adjustment->isIncluded()) {
-        continue;
-      }
-
-      $adjusted_price = $adjusted_price->add($adjustment->getAmount());
     }
-
     return $adjusted_price;
   }
 
