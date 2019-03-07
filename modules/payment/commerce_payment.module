@@ -10,6 +10,7 @@ use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
+use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\Element;
 use Drupal\Core\Url;
 
@@ -166,5 +167,25 @@ function commerce_payment_preprocess_commerce_order_receipt(&$variables) {
     $variables['payment_method'] = [
       '#markup' => $order->get('payment_method')->first()->entity->label(),
     ];
+  }
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ */
+function commerce_payment_form_commerce_checkout_flow_edit_form_alter(array &$form, FormStateInterface $form_state) {
+  $form['#validate'][] = 'commerce_payment_validate_checkout_flow';
+}
+
+/**
+ * Validate callback for the checkout flow form.
+ *
+ * Prevents users from putting the PaymentInformation and PaymentProcess panes
+ * on the same step, which would result in an infinite loop.
+ */
+function commerce_payment_validate_checkout_flow(array $form, FormStateInterface $form_state) {
+  $pane_configuration = $form_state->getValue(['configuration', 'panes']);
+  if ($pane_configuration['payment_information']['step_id'] === $pane_configuration['payment_process']['step_id']) {
+    $form_state->setError($form, t('<em>Payment information</em> and <em>Payment process</em> panes need to be on separate steps.'));
   }
 }
