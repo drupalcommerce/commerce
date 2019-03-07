@@ -4,6 +4,7 @@ namespace Drupal\commerce_price;
 
 use CommerceGuys\Addressing\Country\CountryRepository;
 use CommerceGuys\Intl\Currency\CurrencyRepository;
+use CommerceGuys\Intl\Exception\UnknownCurrencyException;
 use CommerceGuys\Intl\Exception\UnknownLocaleException;
 use Drupal\commerce_price\Entity\CurrencyInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
@@ -25,7 +26,7 @@ class CurrencyImporter implements CurrencyImporterInterface {
   /**
    * The language manager.
    *
-   * @var \Drupal\Core\Language\LanguageManagerInterface
+   * @var \Drupal\language\ConfigurableLanguageManagerInterface
    */
   protected $languageManager;
 
@@ -140,6 +141,10 @@ class CurrencyImporter implements CurrencyImporterInterface {
     foreach ($langcodes as $langcode) {
       try {
         $translated_currency = $this->externalRepository->get($currency_code, $langcode);
+      }
+      catch (UnknownCurrencyException $e) {
+        // The currency is custom and doesn't exist in the library.
+        return;
       }
       catch (UnknownLocaleException $e) {
         // No translation found.
