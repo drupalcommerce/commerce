@@ -154,7 +154,6 @@ class AddToCartMultilingualTest extends CartWebDriverTestBase {
     $this->container->get('content_translation.manager')->setEnabled('commerce_product_variation', $this->variation->bundle(), TRUE);
     $this->container->get('entity_type.manager')->clearCachedDefinitions();
     $this->container->get('router.builder')->rebuild();
-    $this->container->get('entity.definition_update_manager')->applyUpdates();
 
     // Rebuild the container so that the new languages are picked up by services
     // that hold a list of languages.

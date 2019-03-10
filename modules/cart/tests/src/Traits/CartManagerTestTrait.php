@@ -15,7 +15,10 @@ trait CartManagerTestTrait {
   protected function installCommerceCart() {
     $this->enableModules(['commerce_cart']);
     $this->installConfig('commerce_cart');
-    $this->container->get('entity.definition_update_manager')->applyUpdates();
+
+    $entity_type = \Drupal::entityDefinitionUpdateManager()->getEntityType('commerce_order');
+    $cart_field_definition = commerce_cart_entity_base_field_info($entity_type)['cart'];
+    \Drupal::entityDefinitionUpdateManager()->installFieldStorageDefinition('cart', 'commerce_order', 'commerce_cart', $cart_field_definition);
     $this->cartProvider = $this->container->get('commerce_cart.cart_provider');
     $this->cartManager = $this->container->get('commerce_cart.cart_manager');
   }

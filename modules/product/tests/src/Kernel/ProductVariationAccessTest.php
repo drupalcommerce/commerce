@@ -44,6 +44,8 @@ class ProductVariationAccessTest extends CommerceKernelTestBase {
 
     // Create uid: 1 here so that it's skipped in test cases.
     $admin_user = $this->createUser();
+    $regular_user = $this->createUser(['uid' => 2]);
+    \Drupal::currentUser()->setAccount($regular_user);
   }
 
   /**

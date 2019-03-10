@@ -8,6 +8,7 @@ use Drupal\commerce_order\Entity\OrderItemType;
 use Drupal\commerce_store\Entity\Store;
 use Drupal\commerce_store\Entity\StoreType;
 use Drupal\Tests\commerce\Kernel\CommerceKernelTestBase;
+use Drupal\Tests\commerce_cart\Traits\CartManagerTestTrait;
 
 /**
  * Tests the cart provider.
@@ -16,6 +17,8 @@ use Drupal\Tests\commerce\Kernel\CommerceKernelTestBase;
  * @group commerce
  */
 class CartProviderTest extends CommerceKernelTestBase {
+
+  use CartManagerTestTrait;
 
   /**
    * Modules to enable.
@@ -84,22 +87,6 @@ class CartProviderTest extends CommerceKernelTestBase {
     $this->authenticatedUser = $this->createUser();
 
     $this->entityTypeManager = $this->container->get('entity_type.manager');
-  }
-
-  /**
-   * Installs commerce_cart module.
-   *
-   * Do to issues with hook_entity_bundle_create, we need to run this manually
-   * and cannot add commerce_cart to the $modules property.
-   *
-   * @see https://www.drupal.org/node/2711645
-   *
-   * @todo patch core so it doesn't explode in Kernel tests.
-   */
-  protected function installCommerceCart() {
-    $this->enableModules(['commerce_cart']);
-    $this->installConfig('commerce_cart');
-    $this->container->get('entity.definition_update_manager')->applyUpdates();
   }
 
   /**
