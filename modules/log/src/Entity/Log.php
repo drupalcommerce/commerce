@@ -113,7 +113,12 @@ class Log extends ContentEntityBase implements LogInterface {
    * {@inheritdoc}
    */
   public function getParams() {
-    return $this->get('params')->first()->getValue();
+    if (!$this->get('params')->isEmpty()) {
+      return $this->get('params')->first()->getValue();
+    }
+    else {
+      return [];
+    }
   }
 
   /**
