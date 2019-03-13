@@ -80,7 +80,7 @@ class MultipleCartMultipleVariationTypesTest extends CartBrowserTestBase {
 
     // Create products.
     $product_matrix = [
-      'My Colors & Sizes - FIRST' => [
+      'My Colors and Sizes FIRST' => [
         'type' => 'color_sizes',
         'variations' => [
           ['attribute_color' => $this->colorAttributes['red']->id(), 'attribute_size' => $this->sizeAttributes['small']->id()],
@@ -94,7 +94,7 @@ class MultipleCartMultipleVariationTypesTest extends CartBrowserTestBase {
           ['attribute_color' => $this->colorAttributes['blue']->id(), 'attribute_size' => $this->sizeAttributes['large']->id()],
         ],
       ],
-      'My Colors - FIRST' => [
+      'My Colors FIRST' => [
         'type' => 'colors',
         'variations' => [
           ['attribute_color' => $this->colorAttributes['red']->id()],
@@ -102,7 +102,7 @@ class MultipleCartMultipleVariationTypesTest extends CartBrowserTestBase {
           ['attribute_color' => $this->colorAttributes['blue']->id()],
         ],
       ],
-      'My Sizes - FIRST' => [
+      'My Sizes FIRST' => [
         'type' => 'sizes',
         'variations' => [
           ['attribute_size' => $this->sizeAttributes['small']->id()],
@@ -143,10 +143,10 @@ class MultipleCartMultipleVariationTypesTest extends CartBrowserTestBase {
     /** @var \Behat\Mink\Element\NodeElement[] $forms */
     $forms = $this->getSession()->getPage()->findAll('css', '.commerce-order-item-add-to-cart-form');
 
-    // Due to sorting by title, we know `My Colors - FIRST` is second form.
+    // Due to sorting by title, we know `My Colors FIRST` is the second form.
     $forms[1]->selectFieldOption('Color', 'Blue');
     $forms[1]->pressButton('Add to cart');
-    $this->assertSession()->pageTextContains('My Colors - FIRST - Blue added to your cart.');
+    $this->assertSession()->pageTextContains('My Colors FIRST - Blue added to your cart.');
 
     $this->cart = Order::load($this->cart->id());
     $order_items = $this->cart->getItems();
@@ -159,7 +159,7 @@ class MultipleCartMultipleVariationTypesTest extends CartBrowserTestBase {
     $forms[0]->selectFieldOption('Color', 'Green');
     $forms[0]->selectFieldOption('Size', 'Medium');
     $forms[0]->pressButton('Add to cart');
-    $this->assertSession()->pageTextContains('My Colors & Sizes - FIRST - Green, Medium added to your cart.');
+    $this->assertSession()->pageTextContains('My Colors and Sizes FIRST - Green, Medium added to your cart.');
 
     $this->container->get('entity_type.manager')->getStorage('commerce_order')->resetCache([$this->cart->id()]);
     $this->cart = Order::load($this->cart->id());

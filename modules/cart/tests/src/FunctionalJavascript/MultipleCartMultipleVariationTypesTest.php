@@ -93,7 +93,7 @@ class MultipleCartMultipleVariationTypesTest extends CartWebDriverTestBase {
 
     // Create products.
     $product_matrix = [
-      'My Colors - FIRST' => [
+      'My Colors FIRST' => [
         'type' => 'colors',
         'variations' => [
           ['attribute_color' => $this->colorAttributes['red']->id()],
@@ -101,7 +101,7 @@ class MultipleCartMultipleVariationTypesTest extends CartWebDriverTestBase {
           ['attribute_color' => $this->colorAttributes['blue']->id()],
         ],
       ],
-      'My Colors & Sizes - FIRST' => [
+      'My Colors and Sizes FIRST' => [
         'type' => 'color_sizes',
         'variations' => [
           ['attribute_color' => $this->colorAttributes['red']->id(), 'attribute_size' => $this->sizeAttributes['small']->id()],
@@ -115,7 +115,7 @@ class MultipleCartMultipleVariationTypesTest extends CartWebDriverTestBase {
           ['attribute_color' => $this->colorAttributes['blue']->id(), 'attribute_size' => $this->sizeAttributes['large']->id()],
         ],
       ],
-      'My Sizes - FIRST' => [
+      'My Sizes FIRST' => [
         'type' => 'sizes',
         'variations' => [
           ['attribute_size' => $this->sizeAttributes['small']->id()],
@@ -123,7 +123,7 @@ class MultipleCartMultipleVariationTypesTest extends CartWebDriverTestBase {
           ['attribute_size' => $this->sizeAttributes['large']->id()],
         ],
       ],
-      'My Colors - SECOND' => [
+      'My Colors SECOND' => [
         'type' => 'colors',
         'variations' => [
           ['attribute_color' => $this->colorAttributes['red']->id()],
@@ -131,7 +131,7 @@ class MultipleCartMultipleVariationTypesTest extends CartWebDriverTestBase {
           ['attribute_color' => $this->colorAttributes['blue']->id()],
         ],
       ],
-      'My Colors & Sizes - SECOND' => [
+      'My Colors and Sizes SECOND' => [
         'type' => 'color_sizes',
         'variations' => [
           ['attribute_color' => $this->colorAttributes['red']->id(), 'attribute_size' => $this->sizeAttributes['small']->id()],
@@ -145,7 +145,7 @@ class MultipleCartMultipleVariationTypesTest extends CartWebDriverTestBase {
           ['attribute_color' => $this->colorAttributes['blue']->id(), 'attribute_size' => $this->sizeAttributes['large']->id()],
         ],
       ],
-      'My Sizes - SECOND' => [
+      'My Sizes SECOND' => [
         'type' => 'sizes',
         'variations' => [
           ['attribute_size' => $this->sizeAttributes['small']->id()],
@@ -191,7 +191,7 @@ class MultipleCartMultipleVariationTypesTest extends CartWebDriverTestBase {
     $forms[1]->selectFieldOption('Size', 'Medium');
     $this->assertSession()->assertWaitOnAjaxRequest();
     $forms[1]->pressButton('Add to cart');
-    $this->assertSession()->pageTextContains('My Colors & Sizes - FIRST - Green, Medium added to your cart.');
+    $this->assertSession()->pageTextContains('My Colors and Sizes FIRST - Green, Medium added to your cart.');
 
     $this->container->get('entity_type.manager')->getStorage('commerce_order')->resetCache([$this->cart->id()]);
     $this->cart = Order::load($this->cart->id());
