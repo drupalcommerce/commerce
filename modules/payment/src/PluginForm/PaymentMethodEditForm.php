@@ -10,7 +10,7 @@ use Drupal\commerce_payment\Exception\PaymentGatewayException;
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\Core\Logger\LoggerChannelFactoryInterface;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class PaymentMethodEditForm extends PaymentGatewayFormBase implements ContainerInjectionInterface {
@@ -32,7 +32,7 @@ class PaymentMethodEditForm extends PaymentGatewayFormBase implements ContainerI
   /**
    * The logger.
    *
-   * @var \Drupal\Core\Logger\LoggerChannelInterface
+   * @var \Psr\Log\LoggerInterface
    */
   protected $logger;
 
@@ -43,15 +43,13 @@ class PaymentMethodEditForm extends PaymentGatewayFormBase implements ContainerI
    *   The inline form manager.
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
-   * @param \Drupal\Core\Logger\LoggerChannelFactoryInterface $logger_factory
-   *   The logger factory.
-   *
-   * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
+   * @param \Psr\Log\LoggerInterface $logger
+   *   The logger.
    */
-  public function __construct(InlineFormManager $inline_form_manager, EntityTypeManagerInterface $entity_type_manager, LoggerChannelFactoryInterface $logger_factory) {
+  public function __construct(InlineFormManager $inline_form_manager, EntityTypeManagerInterface $entity_type_manager, LoggerInterface $logger) {
     $this->inlineFormManager = $inline_form_manager;
     $this->storeStorage = $entity_type_manager->getStorage('commerce_store');
-    $this->logger = $logger_factory->get('commerce_payment');
+    $this->logger = $logger;
   }
 
   /**
@@ -61,7 +59,7 @@ class PaymentMethodEditForm extends PaymentGatewayFormBase implements ContainerI
     return new static(
       $container->get('plugin.manager.commerce_inline_form'),
       $container->get('entity_type.manager'),
-      $container->get('logger.factory')
+      $container->get('logger.channel.commerce_payment')
     );
   }
 

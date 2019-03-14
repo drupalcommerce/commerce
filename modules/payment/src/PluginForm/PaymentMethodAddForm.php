@@ -71,7 +71,7 @@ class PaymentMethodAddForm extends PaymentGatewayFormBase implements ContainerIn
       $container->get('plugin.manager.commerce_inline_form'),
       $container->get('current_route_match'),
       $container->get('entity_type.manager'),
-      $container->get('logger.factory')->get('commerce_payment')
+      $container->get('logger.channel.commerce_payment')
     );
   }
 
