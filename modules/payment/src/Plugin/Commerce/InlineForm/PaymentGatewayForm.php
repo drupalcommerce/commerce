@@ -8,7 +8,6 @@ use Drupal\commerce_payment\Exception\PaymentGatewayException;
 use Drupal\commerce_payment\PluginForm\PaymentGatewayFormInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Plugin\PluginFormFactoryInterface;
-use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -29,13 +28,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * )
  */
 class PaymentGatewayForm extends EntityInlineFormBase {
-
-  /**
-   * The logger.
-   *
-   * @var \Psr\Log\LoggerInterface
-   */
-  protected $logger;
 
   /**
    * The plugin form factory.
@@ -60,15 +52,12 @@ class PaymentGatewayForm extends EntityInlineFormBase {
    *   The plugin_id for the plugin instance.
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
-   * @param \Psr\Log\LoggerInterface $logger
-   *   The logger.
    * @param \Drupal\Core\Plugin\PluginFormFactoryInterface $plugin_form_factory
    *   The plugin form factory.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, LoggerInterface $logger, PluginFormFactoryInterface $plugin_form_factory) {
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, PluginFormFactoryInterface $plugin_form_factory) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
 
-    $this->logger = $logger;
     $this->pluginFormFactory = $plugin_form_factory;
   }
 
@@ -80,7 +69,6 @@ class PaymentGatewayForm extends EntityInlineFormBase {
       $configuration,
       $plugin_id,
       $plugin_definition,
-      $container->get('logger.factory')->get('commerce_payment'),
       $container->get('plugin_form.factory')
     );
   }
