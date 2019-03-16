@@ -14,6 +14,7 @@ use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Link;
 use Drupal\Core\Url;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -36,6 +37,13 @@ class PaymentProcess extends CheckoutPaneBase {
   protected $inlineFormManager;
 
   /**
+   * The logger.
+   *
+   * @var \Psr\Log\LoggerInterface
+   */
+  protected $logger;
+
+  /**
    * Constructs a new PaymentProcess object.
    *
    * @param array $configuration
@@ -50,11 +58,14 @@ class PaymentProcess extends CheckoutPaneBase {
    *   The entity type manager.
    * @param \Drupal\commerce\InlineFormManager $inline_form_manager
    *   The inline form manager.
+   * @param \Psr\Log\LoggerInterface $logger
+   *   The logger.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, CheckoutFlowInterface $checkout_flow, EntityTypeManagerInterface $entity_type_manager, InlineFormManager $inline_form_manager) {
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, CheckoutFlowInterface $checkout_flow, EntityTypeManagerInterface $entity_type_manager, InlineFormManager $inline_form_manager, LoggerInterface $logger) {
     parent::__construct($configuration, $plugin_id, $plugin_definition, $checkout_flow, $entity_type_manager);
 
     $this->inlineFormManager = $inline_form_manager;
+    $this->logger = $logger;
   }
 
   /**
@@ -67,7 +78,8 @@ class PaymentProcess extends CheckoutPaneBase {
       $plugin_definition,
       $checkout_flow,
       $container->get('entity_type.manager'),
-      $container->get('plugin.manager.commerce_inline_form')
+      $container->get('plugin.manager.commerce_inline_form'),
+      $container->get('logger.channel.commerce_payment')
     );
   }
 
@@ -179,7 +191,7 @@ class PaymentProcess extends CheckoutPaneBase {
         $this->checkoutFlow->redirectToStep($error_step_id);
       }
       catch (PaymentGatewayException $e) {
-        \Drupal::logger('commerce_payment')->error($e->getMessage());
+        $this->logger->error($e->getMessage());
         $message = $this->t('We encountered an unexpected error processing your payment method. Please try again later.');
         $this->messenger()->addError($message);
         $this->checkoutFlow->redirectToStep($error_step_id);
@@ -212,7 +224,7 @@ class PaymentProcess extends CheckoutPaneBase {
         $pane_form['offsite_payment'] = $inline_form->buildInlineForm($pane_form['offsite_payment'], $form_state);
       }
       catch (PaymentGatewayException $e) {
-        \Drupal::logger('commerce_payment')->error($e->getMessage());
+        $this->logger->error($e->getMessage());
         $message = $this->t('We encountered an unexpected error processing your payment. Please try again later.');
         $this->messenger()->addError($message);
         $this->checkoutFlow->redirectToStep($error_step_id);
@@ -226,7 +238,7 @@ class PaymentProcess extends CheckoutPaneBase {
         $this->checkoutFlow->redirectToStep($next_step_id);
       }
       catch (PaymentGatewayException $e) {
-        \Drupal::logger('commerce_payment')->error($e->getMessage());
+        $this->logger->error($e->getMessage());
         $message = $this->t('We encountered an unexpected error processing your payment. Please try again later.');
         $this->messenger()->addError($message);
         $this->checkoutFlow->redirectToStep($error_step_id);

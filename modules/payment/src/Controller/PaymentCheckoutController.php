@@ -12,6 +12,7 @@ use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 use Drupal\Core\Messenger\MessengerInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Url;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -35,16 +36,26 @@ class PaymentCheckoutController implements ContainerInjectionInterface {
   protected $messenger;
 
   /**
+   * The logger.
+   *
+   * @var \Psr\Log\LoggerInterface
+   */
+  protected $logger;
+
+  /**
    * Constructs a new PaymentCheckoutController object.
    *
    * @param \Drupal\commerce_checkout\CheckoutOrderManagerInterface $checkout_order_manager
    *   The checkout order manager.
    * @param \Drupal\Core\Messenger\MessengerInterface $messenger
    *   The messenger.
+   * @param \Psr\Log\LoggerInterface $logger
+   *   The logger.
    */
-  public function __construct(CheckoutOrderManagerInterface $checkout_order_manager, MessengerInterface $messenger) {
+  public function __construct(CheckoutOrderManagerInterface $checkout_order_manager, MessengerInterface $messenger, LoggerInterface $logger) {
     $this->checkoutOrderManager = $checkout_order_manager;
     $this->messenger = $messenger;
+    $this->logger = $logger;
   }
 
   /**
@@ -53,7 +64,8 @@ class PaymentCheckoutController implements ContainerInjectionInterface {
   public static function create(ContainerInterface $container) {
     return new static(
       $container->get('commerce_checkout.checkout_order_manager'),
-      $container->get('messenger')
+      $container->get('messenger'),
+      $container->get('logger.channel.commerce_payment')
     );
   }
 
@@ -87,7 +99,7 @@ class PaymentCheckoutController implements ContainerInjectionInterface {
       $redirect_step_id = $checkout_flow_plugin->getNextStepId($step_id);
     }
     catch (PaymentGatewayException $e) {
-      \Drupal::logger('commerce_payment')->error($e->getMessage());
+      $this->logger->error($e->getMessage());
       $this->messenger->addError(t('Payment failed at the payment server. Please review your information and try again.'));
       $redirect_step_id = $checkout_flow_plugin->getPreviousStepId($step_id);
     }
