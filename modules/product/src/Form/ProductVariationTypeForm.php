@@ -8,10 +8,13 @@ use Drupal\commerce\Form\CommerceBundleEntityFormBase;
 use Drupal\commerce_product\ProductAttributeFieldManagerInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
+use Drupal\entity\Form\EntityDuplicateFormTrait;
 use Drupal\language\Entity\ContentLanguageSettings;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class ProductVariationTypeForm extends CommerceBundleEntityFormBase {
+
+  use EntityDuplicateFormTrait;
 
   /**
    * The attribute field manager.
@@ -80,6 +83,7 @@ class ProductVariationTypeForm extends CommerceBundleEntityFormBase {
       $order_item_type_storage = $this->entityTypeManager->getStorage('commerce_order_item_type');
       $order_item_types = $order_item_type_storage->loadMultiple();
       $order_item_types = array_filter($order_item_types, function ($order_item_type) {
+        /** @var \Drupal\commerce_order\Entity\OrderItemTypeInterface $order_item_type */
         return $order_item_type->getPurchasableEntityTypeId() == 'commerce_product_variation';
       });
 
@@ -93,11 +97,14 @@ class ProductVariationTypeForm extends CommerceBundleEntityFormBase {
       ];
     }
 
-    $used_attributes = [];
-    if (!$variation_type->isNew()) {
+    $attribute_map = [];
+    if ($this->operation == 'edit') {
       $attribute_map = $this->attributeFieldManager->getFieldMap($variation_type->id());
-      $used_attributes = array_column($attribute_map, 'attribute_id');
     }
+    elseif ($this->operation == 'duplicate') {
+      $attribute_map = $this->attributeFieldManager->getFieldMap($this->sourceEntity->id());
+    }
+    $used_attributes = array_column($attribute_map, 'attribute_id');
     /** @var \Drupal\commerce_product\Entity\ProductAttributeInterface[] $attributes */
     $attributes = $this->entityTypeManager->getStorage('commerce_product_attribute')->loadMultiple();
     $attribute_options = EntityHelper::extractLabels($attributes);
@@ -113,14 +120,16 @@ class ProductVariationTypeForm extends CommerceBundleEntityFormBase {
       '#default_value' => $used_attributes,
       '#access' => !empty($attribute_options),
     ];
-    // Disable options which cannot be unset because of existing data.
     $disabled_attributes = [];
-    foreach ($used_attributes as $attribute_id) {
-      if (!$this->attributeFieldManager->canDeleteField($attributes[$attribute_id], $variation_type->id())) {
-        $form['attributes'][$attribute_id] = [
-          '#disabled' => TRUE,
-        ];
-        $disabled_attributes[] = $attribute_id;
+    if (!$variation_type->isNew()) {
+      // Disable options which cannot be unset because of existing data.
+      foreach ($used_attributes as $attribute_id) {
+        if (!$this->attributeFieldManager->canDeleteField($attributes[$attribute_id], $variation_type->id())) {
+          $form['attributes'][$attribute_id] = [
+            '#disabled' => TRUE,
+          ];
+          $disabled_attributes[] = $attribute_id;
+        }
       }
     }
     $form['disabled_attributes'] = [
@@ -160,10 +169,9 @@ class ProductVariationTypeForm extends CommerceBundleEntityFormBase {
    */
   public function save(array $form, FormStateInterface $form_state) {
     $this->entity->save();
-    $this->messenger()->addMessage($this->t('Saved the %label product variation type.', ['%label' => $this->entity->label()]));
-    $form_state->setRedirect('entity.commerce_product_variation_type.collection');
-
+    $this->postSave($this->entity, $this->operation);
     $this->submitTraitForm($form, $form_state);
+
     $attribute_storage = $this->entityTypeManager->getStorage('commerce_product_attribute');
     $original_attributes = $form_state->getValue('original_attributes');
     $attributes = array_filter($form_state->getValue('attributes'));
@@ -185,6 +193,9 @@ class ProductVariationTypeForm extends CommerceBundleEntityFormBase {
         $this->attributeFieldManager->deleteField($attribute, $this->entity->id());
       }
     }
+
+    $this->messenger()->addMessage($this->t('Saved the %label product variation type.', ['%label' => $this->entity->label()]));
+    $form_state->setRedirect('entity.commerce_product_variation_type.collection');
   }
 
 }

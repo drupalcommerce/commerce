@@ -23,10 +23,11 @@ use Drupal\commerce\Entity\CommerceBundleEntityBase;
  *     "form" = {
  *       "add" = "Drupal\commerce_store\Form\StoreTypeForm",
  *       "edit" = "Drupal\commerce_store\Form\StoreTypeForm",
+ *       "duplicate" = "Drupal\commerce_store\Form\StoreTypeForm",
  *       "delete" = "Drupal\commerce\Form\CommerceBundleEntityDeleteFormBase"
  *     },
  *     "route_provider" = {
- *       "default" = "Drupal\Core\Entity\Routing\DefaultHtmlRouteProvider",
+ *       "default" = "Drupal\entity\Routing\DefaultHtmlRouteProvider",
  *     },
  *   },
  *   admin_permission = "administer commerce_store_type",
@@ -48,6 +49,7 @@ use Drupal\commerce\Entity\CommerceBundleEntityBase;
  *   links = {
  *     "add-form" = "/admin/commerce/config/store-types/add",
  *     "edit-form" = "/admin/commerce/config/store-types/{commerce_store_type}/edit",
+ *     "duplicate-form" = "/admin/commerce/config/store-types/{commerce_store_type}/duplicate",
  *     "delete-form" = "/admin/commerce/config/store-types/{commerce_store_type}/delete",
  *     "collection" = "/admin/commerce/config/store-types",
  *   }

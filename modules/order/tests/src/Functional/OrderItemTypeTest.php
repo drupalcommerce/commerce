@@ -5,70 +5,78 @@ namespace Drupal\Tests\commerce_order\Functional;
 use Drupal\commerce_order\Entity\OrderItemType;
 
 /**
- * Tests the commerce_order_item_type entity type.
+ * Tests the order item type UI.
  *
  * @group commerce
  */
 class OrderItemTypeTest extends OrderBrowserTestBase {
 
   /**
-   * Tests creating an order item type programmatically and through the add form.
+   * Tests adding an order item type.
    */
-  public function testOrderItemTypeCreation() {
-    $values = [
-      'id' => strtolower($this->randomMachineName(8)),
-      'label' => $this->randomMachineName(16),
-      'purchasableEntityType' => 'commerce_product_variation',
-      'orderType' => 'default',
-    ];
-    $this->createEntity('commerce_order_item_type', $values);
-    $order_item_type = OrderItemType::load($values['id']);
-    $this->assertEquals($order_item_type->label(), $values['label'], 'The new order item type has the correct label.');
-    $this->assertEquals($order_item_type->getPurchasableEntityTypeId(), $values['purchasableEntityType'], 'The new order item type has the correct purchasable entity type.');
-    $this->assertEquals($order_item_type->getOrderTypeId(), $values['orderType'], 'The new order item type has the correct order type.');
-
+  public function testAdd() {
     $this->drupalGet('admin/commerce/config/order-item-types/add');
     $edit = [
-      'id' => strtolower($this->randomMachineName(8)),
-      'label' => $this->randomMachineName(16),
+      'id' => 'foo',
+      'label' => 'Foo',
       'purchasableEntityType' => 'commerce_product_variation',
       'orderType' => 'default',
     ];
     $this->submitForm($edit, t('Save'));
+    $this->assertSession()->pageTextContains('Saved the Foo order item type.');
+
     $order_item_type = OrderItemType::load($edit['id']);
-    $this->assertEquals($order_item_type->label(), $edit['label'], 'The new order item type has the correct label.');
-    $this->assertEquals($order_item_type->getPurchasableEntityTypeId(), $edit['purchasableEntityType'], 'The new order item type has the correct purchasable entity type.');
-    $this->assertEquals($order_item_type->getOrderTypeId(), $edit['orderType'], 'The new order item type has the correct order type.');
+    $this->assertNotEmpty($order_item_type);
+    $this->assertEquals($edit['label'], $order_item_type->label());
+    $this->assertEquals($edit['purchasableEntityType'], $order_item_type->getPurchasableEntityTypeId());
+    $this->assertEquals($edit['orderType'], $order_item_type->getOrderTypeId());
   }
 
   /**
-   * Tests updating an order item type through the edit form.
+   * Tests editing an order item type.
    */
-  public function testOrderItemTypeEditing() {
-    $values = [
-      'id' => strtolower($this->randomMachineName(8)),
-      'label' => $this->randomMachineName(16),
-      'purchasableEntityType' => 'commerce_product_variation',
-      'orderType' => 'default',
-    ];
-    /** @var \Drupal\commerce_order\Entity\OrderItemTypeInterface $type */
-    $order_item_type = $this->createEntity('commerce_order_item_type', $values);
-
-    $this->drupalGet($order_item_type->toUrl('edit-form'));
+  public function testEdit() {
+    $this->drupalGet('admin/commerce/config/order-item-types/default/edit');
     $edit = [
-      'label' => $this->randomMachineName(16),
+      'label' => 'Default!',
+    ];
+    $this->submitForm($edit, 'Save');
+    $this->assertSession()->pageTextContains('Saved the Default! order item type.');
+
+    $order_item_type = OrderItemType::load('default');
+    $this->assertEquals($edit['label'], $order_item_type->label());
+  }
+
+  /**
+   * Tests duplicating an order item type.
+   */
+  public function testDuplicate() {
+    $this->drupalGet('admin/commerce/config/order-item-types/default/duplicate');
+    $this->assertSession()->fieldValueEquals('label', 'Default');
+    $edit = [
+      'label' => 'Default2',
+      'id' => 'default2',
     ];
     $this->submitForm($edit, t('Save'));
-    $order_item_type = OrderItemType::load($values['id']);
-    $this->assertEquals($order_item_type->label(), $edit['label'], 'The label of the order item type has been changed.');
+    $this->assertSession()->pageTextContains('Saved the Default2 order item type.');
+
+    // Confirm that the original order item type is unchanged.
+    $order_item_type = OrderItemType::load('default');
+    $this->assertNotEmpty($order_item_type);
+    $this->assertEquals('Default', $order_item_type->label());
+
+    // Confirm that the new order item type has the expected data.
+    $order_item_type = OrderItemType::load('default2');
+    $this->assertNotEmpty($order_item_type);
+    $this->assertEquals('Default2', $order_item_type->label());
   }
 
   /**
-   * Tests deleting an order item type programmatically and through the form.
+   * Tests deleting an order item type.
    */
-  public function testOrderItemTypeDeletion() {
-    /** @var \Drupal\commerce_order\Entity\OrderItemTypeInterface $type */
-    $type = $this->createEntity('commerce_order_item_type', [
+  public function testDelete() {
+    /** @var \Drupal\commerce_order\Entity\OrderItemTypeInterface $order_item_type */
+    $order_item_type = $this->createEntity('commerce_order_item_type', [
       'id' => strtolower($this->randomMachineName(8)),
       'label' => $this->randomMachineName(16),
       'purchasableEntityType' => 'commerce_product_variation',
@@ -76,20 +84,20 @@ class OrderItemTypeTest extends OrderBrowserTestBase {
     ]);
 
     // Confirm that the delete page is not available when the type is locked.
-    $type->lock();
-    $type->save();
-    $this->drupalGet($type->toUrl('delete-form'));
+    $order_item_type->lock();
+    $order_item_type->save();
+    $this->drupalGet($order_item_type->toUrl('delete-form'));
     $this->assertSession()->statusCodeEquals('403');
 
     // Unlock the type, confirm that deletion works.
-    $type->unlock();
-    $type->save();
-    $this->drupalGet($type->toUrl('delete-form'));
+    $order_item_type->unlock();
+    $order_item_type->save();
+    $this->drupalGet($order_item_type->toUrl('delete-form'));
     $this->assertSession()->statusCodeEquals(200);
     $this->assertSession()->pageTextContains(t('This action cannot be undone.'));
     $this->submitForm([], t('Delete'));
-    $order_item_type_exists = (bool) OrderItemType::load($type->id());
-    $this->assertEmpty($order_item_type_exists, 'The order item type has been deleted form the database.');
+    $order_item_type_exists = (bool) OrderItemType::load($order_item_type->id());
+    $this->assertEmpty($order_item_type_exists);
   }
 
 }

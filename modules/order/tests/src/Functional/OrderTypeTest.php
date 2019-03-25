@@ -5,115 +5,134 @@ namespace Drupal\Tests\commerce_order\Functional;
 use Drupal\commerce_order\Entity\OrderType;
 
 /**
- * Tests the commerce_order_type entity forms.
+ * Tests the order type UI.
  *
  * @group commerce
  */
 class OrderTypeTest extends OrderBrowserTestBase {
 
   /**
-   * Tests if the default Order Type was created.
+   * Tests whether the default order type was created.
    */
-  public function testDefaultOrderType() {
-    $order_types = OrderType::loadMultiple();
-    $this->assertNotEmpty(isset($order_types['default']), 'Order Type Order is available');
-
+  public function testDefault() {
     $order_type = OrderType::load('default');
-    $this->assertEquals($order_types['default'], $order_type, 'The correct Order Type is loaded');
+    $this->assertNotEmpty($order_type);
+
+    $this->drupalGet('admin/commerce/config/order-types');
+    $rows = $this->getSession()->getPage()->findAll('css', 'table tbody tr');
+    $this->assertCount(1, $rows);
   }
 
   /**
-   * Tests creating an order Type programaticaly and through the add form.
+   * Tests adding an order type.
    */
-  public function testCreateOrderType() {
+  public function testAdd() {
     // Remove the default order type to be able to test creating the
     // order_items field anew.
     OrderType::load('default')->delete();
 
-    // Create an order type programmaticaly.
-    $type = $this->createEntity('commerce_order_type', [
-      'id' => 'kitten',
-      'label' => 'Label of kitten',
-      'workflow' => 'order_default',
-    ]);
-
-    $type_exists = (bool) OrderType::load($type->id());
-    $this->assertNotEmpty($type_exists, 'The new order type has been created in the database.');
-
-    // Create an order type through the add form.
-    $this->drupalGet('/admin/commerce/config/order-types');
-    $this->getSession()->getPage()->clickLink('Add order type');
-
-    $values = [
+    $this->drupalGet('admin/commerce/config/order-types/add');
+    $edit = [
       'id' => 'foo',
-      'label' => 'Label of foo',
+      'label' => 'Foo',
+      'refresh_mode' => 'always',
+      'refresh_frequency' => 60,
     ];
-    $this->submitForm($values, t('Save'));
+    $this->submitForm($edit, t('Save'));
+    $this->assertSession()->pageTextContains('Saved the Foo order type.');
 
-    $type_exists = (bool) OrderType::load($values['id']);
-    $this->assertNotEmpty($type_exists, 'The new order type has been created in the database.');
+    $order_type = OrderType::load('foo');
+    $this->assertNotEmpty($order_type);
+    $this->assertEquals($edit['refresh_mode'], $order_type->getRefreshMode());
+    $this->assertEquals($edit['refresh_frequency'], $order_type->getRefreshFrequency());
 
     // Testing the target type of the order_items field.
     $settings = $this->config('field.storage.commerce_order.order_items')->get('settings');
-    $this->assertEquals('commerce_order_item', $settings['target_type'], t('Order item field target type is correct.'));
+    $this->assertEquals('commerce_order_item', $settings['target_type']);
   }
 
   /**
-   * Tests draft order refresh options in order type form.
+   * Tests editing an order type.
    */
-  public function testDraftOrderRefreshSettings() {
-    $url = 'admin/commerce/config/order-types/default/edit';
-    $this->drupalGet($url);
-    $this->assertSession()->fieldExists('refresh_mode');
-    $this->assertSession()->fieldExists('refresh_frequency');
+  public function testEdit() {
+    $this->drupalGet('admin/commerce/config/order-types/default/edit');
+    $edit = [
+      'label' => 'Default!',
+      'refresh_mode' => 'always',
+      'refresh_frequency' => 60,
+    ];
+    $this->submitForm($edit, 'Save');
+    $this->assertSession()->pageTextContains('Saved the Default! order type.');
 
-    $edit['refresh_mode'] = 'always';
-    $edit['refresh_frequency'] = 60;
-    $this->submitForm($edit, t('Save'));
     $order_type = OrderType::load('default');
-    $this->drupalGet($url);
-    $this->assertEquals($order_type->getRefreshMode(), $edit['refresh_mode'], 'The value of the draft order refresh mode has been changed.');
-    $this->assertEquals($order_type->getRefreshFrequency(), $edit['refresh_frequency'], 'The value of the draft order refresh frequency has been changed.');
+    $this->assertNotEmpty($order_type);
+    $this->assertEquals($edit['label'], $order_type->label());
+    $this->assertEquals($edit['refresh_mode'], $order_type->getRefreshMode());
+    $this->assertEquals($edit['refresh_frequency'], $order_type->getRefreshFrequency());
   }
 
   /**
-   * Tests deleting an order type through the form.
+   * Tests duplicating an order type.
    */
-  public function testDeleteOrderType() {
-    /** @var \Drupal\commerce_order\Entity\OrderTypeInterface $type */
-    $type = $this->createEntity('commerce_order_type', [
+  public function testDuplicate() {
+    $this->drupalGet('admin/commerce/config/order-types/default/duplicate');
+    $this->assertSession()->fieldValueEquals('label', 'Default');
+    $edit = [
+      'label' => 'Default2',
+      'id' => 'default2',
+    ];
+    $this->submitForm($edit, t('Save'));
+    $this->assertSession()->pageTextContains('Saved the Default2 order type.');
+
+    // Confirm that the original order type is unchanged.
+    $order_type = OrderType::load('default');
+    $this->assertNotEmpty($order_type);
+    $this->assertEquals('Default', $order_type->label());
+
+    // Confirm that the new order type has the expected data.
+    $order_type = OrderType::load('default2');
+    $this->assertNotEmpty($order_type);
+    $this->assertEquals('Default2', $order_type->label());
+  }
+
+  /**
+   * Tests deleting an order type.
+   */
+  public function testDelete() {
+    /** @var \Drupal\commerce_order\Entity\OrderTypeInterface $order_type */
+    $order_type = $this->createEntity('commerce_order_type', [
       'id' => 'foo',
       'label' => 'Label for foo',
       'workflow' => 'order_default',
     ]);
-    commerce_order_add_order_items_field($type);
+    commerce_order_add_order_items_field($order_type);
     $order = $this->createEntity('commerce_order', [
-      'type' => $type->id(),
+      'type' => $order_type->id(),
       'mail' => $this->loggedInUser->getEmail(),
       'store_id' => $this->store,
     ]);
 
     // Confirm that the type can't be deleted while there's an order.
-    $this->drupalGet($type->toUrl('delete-form'));
-    $this->assertSession()->pageTextContains(t('@type is used by 1 order on your site. You cannot remove this order type until you have removed all of the @type orders.', ['@type' => $type->label()]));
+    $this->drupalGet($order_type->toUrl('delete-form'));
+    $this->assertSession()->pageTextContains(t('@type is used by 1 order on your site. You cannot remove this order type until you have removed all of the @type orders.', ['@type' => $order_type->label()]));
     $this->assertSession()->pageTextNotContains(t('This action cannot be undone.'));
 
     // Confirm that the delete page is not available when the type is locked.
-    $type->lock();
-    $type->save();
-    $this->drupalGet($type->toUrl('delete-form'));
+    $order_type->lock();
+    $order_type->save();
+    $this->drupalGet($order_type->toUrl('delete-form'));
     $this->assertSession()->statusCodeEquals('403');
 
     // Delete the order, unlock the type, confirm that deletion works.
     $order->delete();
-    $type->unlock();
-    $type->save();
-    $this->drupalGet($type->toUrl('delete-form'));
-    $this->assertSession()->pageTextContains(t('Are you sure you want to delete the order type @label?', ['@label' => $type->label()]));
+    $order_type->unlock();
+    $order_type->save();
+    $this->drupalGet($order_type->toUrl('delete-form'));
+    $this->assertSession()->pageTextContains(t('Are you sure you want to delete the order type @label?', ['@label' => $order_type->label()]));
     $this->assertSession()->pageTextContains(t('This action cannot be undone.'));
     $this->submitForm([], t('Delete'));
-    $type_exists = (bool) OrderType::load($type->id());
-    $this->assertEmpty($type_exists);
+    $order_type_exists = (bool) OrderType::load($order_type->id());
+    $this->assertEmpty($order_type_exists);
   }
 
   /**

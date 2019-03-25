@@ -81,4 +81,34 @@ class EntityTraitTest extends CommerceBrowserTestBase {
     $this->assertSession()->pageTextNotContains('phone');
   }
 
+  /**
+   * Tests the trait functionality on the duplicate form.
+   */
+  public function testDuplicateTraits() {
+    $this->drupalGet('admin/commerce/config/store-types/online/edit');
+    $edit = [
+      'traits[first]' => 'first',
+      'traits[second]' => FALSE,
+    ];
+    $this->submitForm($edit, 'Save');
+
+    $this->drupalGet('admin/commerce/config/store-types/online/duplicate');
+    $this->assertSession()->checkboxChecked('traits[first]');
+    $this->assertSession()->checkboxNotChecked('traits[second]');
+    $edit = [
+      'label' => 'Online2',
+      'id' => 'online2',
+      'traits[first]' => FALSE,
+      'traits[second]' => FALSE,
+    ];
+    $this->submitForm($edit, 'Save');
+    $this->assertSession()->pageTextContains('Saved the Online2 store type.');
+
+    $store_type = StoreType::load('online2');
+    $this->assertEquals([], $store_type->getTraits());
+    // The field was removed.
+    $this->drupalGet('admin/commerce/config/store-types/online2/edit/fields');
+    $this->assertSession()->pageTextNotContains('phone');
+  }
+
 }

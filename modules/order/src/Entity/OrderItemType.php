@@ -22,10 +22,11 @@ use Drupal\commerce\Entity\CommerceBundleEntityBase;
  *     "form" = {
  *       "add" = "Drupal\commerce_order\Form\OrderItemTypeForm",
  *       "edit" = "Drupal\commerce_order\Form\OrderItemTypeForm",
+ *       "duplicate" = "Drupal\commerce_order\Form\OrderItemTypeForm",
  *       "delete" = "Drupal\commerce\Form\CommerceBundleEntityDeleteFormBase"
  *     },
  *     "route_provider" = {
- *       "default" = "Drupal\Core\Entity\Routing\DefaultHtmlRouteProvider",
+ *       "default" = "Drupal\entity\Routing\DefaultHtmlRouteProvider",
  *     },
  *     "list_builder" = "Drupal\commerce_order\OrderItemTypeListBuilder",
  *   },
@@ -48,6 +49,7 @@ use Drupal\commerce\Entity\CommerceBundleEntityBase;
  *   links = {
  *     "add-form" = "/admin/commerce/config/order-item-types/add",
  *     "edit-form" = "/admin/commerce/config/order-item-types/{commerce_order_item_type}/edit",
+ *     "duplicate-form" = "/admin/commerce/config/order-item-types/{commerce_order_item_type}/duplicate",
  *     "delete-form" = "/admin/commerce/config/order-item-types/{commerce_order_item_type}/delete",
  *     "collection" = "/admin/commerce/config/order-item-types"
  *   }

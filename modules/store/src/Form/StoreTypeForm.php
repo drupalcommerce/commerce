@@ -5,9 +5,12 @@ namespace Drupal\commerce_store\Form;
 use Drupal\commerce\Form\CommerceBundleEntityFormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
+use Drupal\entity\Form\EntityDuplicateFormTrait;
 use Drupal\language\Entity\ContentLanguageSettings;
 
 class StoreTypeForm extends CommerceBundleEntityFormBase {
+
+  use EntityDuplicateFormTrait;
 
   /**
    * {@inheritdoc}
@@ -73,6 +76,7 @@ class StoreTypeForm extends CommerceBundleEntityFormBase {
    */
   public function save(array $form, FormStateInterface $form_state) {
     $this->entity->save();
+    $this->postSave($this->entity, $this->operation);
     $this->submitTraitForm($form, $form_state);
 
     $this->messenger()->addMessage($this->t('Saved the %label store type.', [
