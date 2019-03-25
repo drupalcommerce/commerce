@@ -39,6 +39,7 @@ use Drupal\Core\Field\BaseFieldDefinition;
  *       "default" = "Drupal\commerce_store\Form\StoreForm",
  *       "add" = "Drupal\commerce_store\Form\StoreForm",
  *       "edit" = "Drupal\commerce_store\Form\StoreForm",
+ *       "duplicate" = "Drupal\commerce_store\Form\StoreForm",
  *       "delete" = "Drupal\Core\Entity\ContentEntityDeleteForm"
  *     },
  *     "route_provider" = {
@@ -66,6 +67,7 @@ use Drupal\Core\Field\BaseFieldDefinition;
  *     "add-page" = "/store/add",
  *     "add-form" = "/store/add/{commerce_store_type}",
  *     "edit-form" = "/store/{commerce_store}/edit",
+ *     "duplicate-form" = "/store/{commerce_store}/duplicate",
  *     "delete-form" = "/store/{commerce_store}/delete",
  *     "delete-multiple-form" = "/admin/commerce/config/stores/delete",
  *     "collection" = "/admin/commerce/config/stores",

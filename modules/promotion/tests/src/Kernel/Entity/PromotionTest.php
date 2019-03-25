@@ -173,4 +173,26 @@ class PromotionTest extends CommerceKernelTestBase {
     $this->assertEquals(TRUE, $promotion->isEnabled());
   }
 
+  /**
+   * @covers ::createDuplicate
+   */
+  public function testDuplicate() {
+    $coupon = Coupon::create([
+      'code' => $this->randomMachineName(),
+      'status' => TRUE,
+    ]);
+    $coupon->save();
+    $promotion = Promotion::create([
+      'name' => '10% off',
+      'coupons' => [$coupon],
+      'status' => FALSE,
+    ]);
+    $promotion->save();
+    $this->assertNotEmpty($promotion->getCouponIds());
+
+    $duplicate_promotion = $promotion->createDuplicate();
+    $this->assertEquals('10% off', $duplicate_promotion->label());
+    $this->assertFalse($duplicate_promotion->hasCoupons());
+  }
+
 }

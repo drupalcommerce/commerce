@@ -5,11 +5,14 @@ namespace Drupal\commerce_promotion\Form;
 use Drupal\Core\Entity\ContentEntityForm;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Link;
+use Drupal\entity\Form\EntityDuplicateFormTrait;
 
 /**
  * Defines the promotion add/edit form.
  */
 class PromotionForm extends ContentEntityForm {
+
+  use EntityDuplicateFormTrait;
 
   /**
    * {@inheritdoc}
@@ -32,10 +35,8 @@ class PromotionForm extends ContentEntityForm {
    * {@inheritdoc}
    */
   public function form(array $form, FormStateInterface $form_state) {
-    /* @var \Drupal\commerce_promotion\Entity\Promotion $promotion */
-    $promotion = $this->entity;
-
     $form = parent::form($form, $form_state);
+
     $form['#tree'] = TRUE;
     $form['#theme'] = ['commerce_promotion_form'];
     $form['#attached']['library'][] = 'commerce_promotion/form';
@@ -89,7 +90,7 @@ class PromotionForm extends ContentEntityForm {
 
     // By default an offer is preselected on the add form because the field
     // is required. Select an empty value instead, to force the user to choose.
-    if ($this->entity->isNew() && !empty($form['offer']['widget'][0]['target_plugin_id'])) {
+    if ($this->operation == 'add' && !empty($form['offer']['widget'][0]['target_plugin_id'])) {
       $form['offer']['widget'][0]['target_plugin_id']['#empty_value'] = '';
       $form['offer']['widget'][0]['target_plugin_id']['#default_value'] = '';
       if (!$form_state->isRebuilding()) {
@@ -123,6 +124,7 @@ class PromotionForm extends ContentEntityForm {
    */
   public function save(array $form, FormStateInterface $form_state) {
     $this->entity->save();
+    $this->postSave($this->entity, $this->operation);
     $this->messenger()->addMessage($this->t('Saved the %label promotion.', ['%label' => $this->entity->label()]));
 
     if (!empty($form_state->getTriggeringElement()['#continue'])) {

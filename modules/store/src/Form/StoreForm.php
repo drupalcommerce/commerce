@@ -4,8 +4,11 @@ namespace Drupal\commerce_store\Form;
 
 use Drupal\Core\Entity\ContentEntityForm;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\entity\Form\EntityDuplicateFormTrait;
 
 class StoreForm extends ContentEntityForm {
+
+  use EntityDuplicateFormTrait;
 
   /**
    * {@inheritdoc}
@@ -54,6 +57,7 @@ class StoreForm extends ContentEntityForm {
    */
   public function save(array $form, FormStateInterface $form_state) {
     $this->entity->save();
+    $this->postSave($this->entity, $this->operation);
     if ($form_state->getValue('default')) {
       /** @var \Drupal\commerce_store\StoreStorageInterface $store_storage */
       $store_storage = $this->entityTypeManager->getStorage('commerce_store');

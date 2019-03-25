@@ -39,6 +39,7 @@ use Drupal\Core\Field\BaseFieldDefinition;
  *       "default" = "Drupal\commerce_promotion\Form\PromotionForm",
  *       "add" = "Drupal\commerce_promotion\Form\PromotionForm",
  *       "edit" = "Drupal\commerce_promotion\Form\PromotionForm",
+ *       "duplicate" = "Drupal\commerce_promotion\Form\PromotionForm",
  *       "delete" = "Drupal\Core\Entity\ContentEntityDeleteForm"
  *     },
  *     "route_provider" = {
@@ -61,6 +62,7 @@ use Drupal\Core\Field\BaseFieldDefinition;
  *   links = {
  *     "add-form" = "/promotion/add",
  *     "edit-form" = "/promotion/{commerce_promotion}/edit",
+ *     "duplicate-form" = "/promotion/{commerce_promotion}/duplicate",
  *     "delete-form" = "/promotion/{commerce_promotion}/delete",
  *     "delete-multiple-form" = "/admin/commerce/promotions/delete",
  *     "collection" = "/admin/commerce/promotions",
@@ -68,6 +70,17 @@ use Drupal\Core\Field\BaseFieldDefinition;
  * )
  */
 class Promotion extends CommerceContentEntityBase implements PromotionInterface {
+
+  /**
+   * {@inheritdoc}
+   */
+  public function createDuplicate() {
+    $duplicate = parent::createDuplicate();
+    // Coupons cannot be transferred because their codes are unique.
+    $duplicate->set('coupons', []);
+
+    return $duplicate;
+  }
 
   /**
    * {@inheritdoc}
