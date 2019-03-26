@@ -71,12 +71,11 @@ class PaymentGatewayForm extends EntityForm {
     // Pass the plugin configuration only if the plugin hasn't been changed via #ajax.
     $plugin_configuration = $gateway->getPluginId() == $plugin ? $gateway->getPluginConfiguration() : [];
 
-    $wrapper_id = Html::getUniqueId('shipping-method-form');
-    $form['#tree'] = TRUE;
+    $wrapper_id = Html::getUniqueId('payment-gateway-form');
     $form['#prefix'] = '<div id="' . $wrapper_id . '">';
     $form['#suffix'] = '</div>';
-
     $form['#tree'] = TRUE;
+
     $form['label'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Name'),
