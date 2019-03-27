@@ -27,10 +27,11 @@ use Drupal\Core\Config\Entity\ConfigEntityBase;
  *     "form" = {
  *       "add" = "Drupal\commerce_payment\Form\PaymentGatewayForm",
  *       "edit" = "Drupal\commerce_payment\Form\PaymentGatewayForm",
+ *       "duplicate" = "Drupal\commerce_payment\Form\PaymentGatewayForm",
  *       "delete" = "Drupal\Core\Entity\EntityDeleteForm"
  *     },
  *     "route_provider" = {
- *       "default" = "Drupal\Core\Entity\Routing\DefaultHtmlRouteProvider",
+ *       "default" = "Drupal\entity\Routing\DefaultHtmlRouteProvider",
  *     },
  *   },
  *   admin_permission = "administer commerce_payment_gateway",
@@ -55,6 +56,7 @@ use Drupal\Core\Config\Entity\ConfigEntityBase;
  *   links = {
  *     "add-form" = "/admin/commerce/config/payment-gateways/add",
  *     "edit-form" = "/admin/commerce/config/payment-gateways/manage/{commerce_payment_gateway}",
+ *     "duplicate-form" = "/admin/commerce/config/payment-gateways/manage/{commerce_payment_gateway}/duplicate",
  *     "delete-form" = "/admin/commerce/config/payment-gateways/manage/{commerce_payment_gateway}/delete",
  *     "collection" =  "/admin/commerce/config/payment-gateways"
  *   }

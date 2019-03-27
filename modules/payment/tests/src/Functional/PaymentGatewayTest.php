@@ -29,14 +29,14 @@ class PaymentGatewayTest extends CommerceBrowserTestBase {
   }
 
   /**
-   * Tests creating a payment gateway.
+   * Tests adding a payment gateway.
    */
-  public function testPaymentGatewayCreation() {
+  public function testAdd() {
     $this->drupalGet('admin/commerce/config/payment-gateways');
     $this->getSession()->getPage()->clickLink('Add payment gateway');
     $this->assertSession()->addressEquals('admin/commerce/config/payment-gateways/add');
 
-    $values = [
+    $edit = [
       'label' => 'Example',
       'plugin' => 'example_offsite_redirect',
       'configuration[example_offsite_redirect][redirect_method]' => 'post',
@@ -46,10 +46,9 @@ class PaymentGatewayTest extends CommerceBrowserTestBase {
       // This is a bug in the machine name JS that can be reproduced manually.
       'id' => 'example',
     ];
-    $this->submitForm($values, 'Save');
+    $this->submitForm($edit, 'Save');
+    $this->assertSession()->pageTextContains('Saved the Example payment gateway.');
     $this->assertSession()->addressEquals('admin/commerce/config/payment-gateways');
-    $this->assertSession()->responseContains('Example');
-    $this->assertSession()->responseContains('Test');
 
     $payment_gateway = PaymentGateway::load('example');
     $this->assertEquals('example', $payment_gateway->id());
@@ -67,7 +66,7 @@ class PaymentGatewayTest extends CommerceBrowserTestBase {
   /**
    * Tests editing a payment gateway.
    */
-  public function testPaymentGatewayEditing() {
+  public function testEdit() {
     $values = [
       'id' => 'edit_example',
       'label' => 'Edit example',
@@ -76,13 +75,14 @@ class PaymentGatewayTest extends CommerceBrowserTestBase {
     ];
     $payment_gateway = $this->createEntity('commerce_payment_gateway', $values);
 
-    $this->drupalGet('admin/commerce/config/payment-gateways/manage/' . $payment_gateway->id());
-    $values += [
+    $this->drupalGet($payment_gateway->toUrl('edit-form'));
+    $edit = $values + [
       'configuration[example_offsite_redirect][redirect_method]' => 'get',
       'configuration[example_offsite_redirect][mode]' => 'live',
       'conditionOperator' => 'OR',
     ];
-    $this->submitForm($values, 'Save');
+    $this->submitForm($edit, 'Save');
+    $this->assertSession()->pageTextContains('Saved the Edit example payment gateway.');
 
     \Drupal::entityTypeManager()->getStorage('commerce_payment_gateway')->resetCache();
     $payment_gateway = PaymentGateway::load('edit_example');
@@ -99,15 +99,63 @@ class PaymentGatewayTest extends CommerceBrowserTestBase {
   }
 
   /**
+   * Tests duplicating a payment gateway.
+   */
+  public function testDuplicate() {
+    $values = [
+      'id' => 'foo',
+      'label' => 'Foo',
+      'plugin' => 'example_offsite_redirect',
+      'configuration' => [
+        'redirect_method' => 'get',
+        'mode' => 'live',
+      ],
+      'status' => 0,
+    ];
+    $payment_gateway = $this->createEntity('commerce_payment_gateway', $values);
+
+    $this->drupalGet($payment_gateway->toUrl('duplicate-form'));
+    $this->assertSession()->fieldValueEquals('label', 'Foo');
+    $this->assertSession()->fieldValueEquals('plugin', 'example_offsite_redirect');
+    $this->assertSession()->fieldValueEquals('configuration[example_offsite_redirect][redirect_method]', 'get');
+    $this->assertSession()->fieldValueEquals('configuration[example_offsite_redirect][mode]', 'live');
+
+    $edit = [
+      'id' => 'foo2',
+      'label' => 'Foo2',
+      'status' => 1,
+      'configuration[example_offsite_redirect][mode]' => 'test',
+    ];
+    $this->submitForm($edit, 'Save');
+    $this->assertSession()->pageTextContains('Saved the Foo2 payment gateway.');
+
+    // Confirm that the original payment gateway is unchanged.
+    /** @var \Drupal\commerce_payment\Entity\PaymentGatewayInterface $payment_gateway */
+    $payment_gateway = $this->reloadEntity($payment_gateway);
+    $this->assertNotEmpty($payment_gateway);
+    $this->assertEquals('Foo', $payment_gateway->label());
+    $this->assertEquals('live', $payment_gateway->getPlugin()->getMode());
+    $this->assertFalse($payment_gateway->status());
+
+    // Confirm that the new payment gateway has the expected data.
+    /** @var \Drupal\commerce_payment\Entity\PaymentGatewayInterface $payment_gateway */
+    $payment_gateway = PaymentGateway::load('foo2');
+    $this->assertNotEmpty($payment_gateway);
+    $this->assertEquals('Foo2', $payment_gateway->label());
+    $this->assertEquals('test', $payment_gateway->getPlugin()->getMode());
+    $this->assertTrue($payment_gateway->status());
+  }
+
+  /**
    * Tests deleting a payment gateway.
    */
-  public function testPaymentGatewayDeletion() {
+  public function testDelete() {
     $payment_gateway = $this->createEntity('commerce_payment_gateway', [
       'id' => 'for_deletion',
       'label' => 'For deletion',
       'plugin' => 'example_offsite_redirect',
     ]);
-    $this->drupalGet('admin/commerce/config/payment-gateways/manage/' . $payment_gateway->id() . '/delete');
+    $this->drupalGet($payment_gateway->toUrl('delete-form'));
     $this->submitForm([], 'Delete');
     $this->assertSession()->addressEquals('admin/commerce/config/payment-gateways');
 
