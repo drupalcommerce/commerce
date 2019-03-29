@@ -23,6 +23,9 @@ use Drupal\Core\Config\Entity\ConfigEntityBase;
  *       "edit" = "Drupal\commerce_price\Form\CurrencyForm",
  *       "delete" = "Drupal\Core\Entity\EntityDeleteForm"
  *     },
+ *     "local_task_provider" = {
+ *       "default" = "Drupal\entity\Menu\DefaultEntityLocalTaskProvider",
+ *     },
  *     "route_provider" = {
  *       "default" = "Drupal\commerce_price\CurrencyRouteProvider",
  *     },

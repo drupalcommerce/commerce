@@ -2,23 +2,3 @@ entity.commerce_order.collection:
   route_name: entity.commerce_order.collection
   base_route: entity.commerce_order.collection
   title: 'Orders'
-
-entity.commerce_order.canonical:
-  route_name: 'entity.commerce_order.canonical'
-  base_route: 'entity.commerce_order.canonical'
-  title: 'View'
-
-entity.commerce_order.edit_form:
-  route_name: 'entity.commerce_order.edit_form'
-  base_route: 'entity.commerce_order.canonical'
-  title: 'Edit'
-
-entity.commerce_order_type.edit_form:
-  route_name: 'entity.commerce_order_type.edit_form'
-  base_route: 'entity.commerce_order_type.edit_form'
-  title: 'Edit'
-
-entity.commerce_order_item_type.edit_form:
-  route_name: entity.commerce_order_item_type.edit_form
-  base_route: entity.commerce_order_item_type.edit_form
-  title: 'Edit'

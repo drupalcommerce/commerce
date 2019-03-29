@@ -31,6 +31,9 @@ use Drupal\Core\Entity\EntityTypeInterface;
  *       "edit" = "Drupal\commerce_promotion\Form\CouponForm",
  *       "delete" = "Drupal\Core\Entity\ContentEntityDeleteForm"
  *     },
+ *    "local_task_provider" = {
+ *       "default" = "Drupal\entity\Menu\DefaultEntityLocalTaskProvider",
+ *     },
  *     "route_provider" = {
  *       "default" = "Drupal\commerce_promotion\CouponRouteProvider",
  *     },

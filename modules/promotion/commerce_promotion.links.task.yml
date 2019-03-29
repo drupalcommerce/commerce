@@ -1,13 +1,3 @@
-entity.commerce_promotion.collection:
-  route_name: entity.commerce_promotion.collection
-  base_route: entity.commerce_promotion.collection
-  title: List
-
-entity.commerce_promotion.edit_form:
-  route_name: entity.commerce_promotion.edit_form
-  base_route: entity.commerce_promotion.edit_form
-  title: Edit
-
 entity.commerce_promotion_coupon.collection:
   route_name: entity.commerce_promotion_coupon.collection
   base_route: entity.commerce_promotion.edit_form

@@ -42,6 +42,9 @@ use Drupal\Core\Field\BaseFieldDefinition;
  *       "duplicate" = "Drupal\commerce_promotion\Form\PromotionForm",
  *       "delete" = "Drupal\Core\Entity\ContentEntityDeleteForm"
  *     },
+ *     "local_task_provider" = {
+ *       "default" = "Drupal\entity\Menu\DefaultEntityLocalTaskProvider",
+ *     },
  *     "route_provider" = {
  *       "default" = "Drupal\entity\Routing\AdminHtmlRouteProvider",
  *       "delete-multiple" = "Drupal\entity\Routing\DeleteMultipleRouteProvider",

@@ -1,9 +1,0 @@
-entity.commerce_currency.edit_form:
-  route_name: 'entity.commerce_currency.edit_form'
-  base_route: 'entity.commerce_currency.edit_form'
-  title: 'Edit'
-
-entity.commerce_currency.collection:
-  route_name: 'entity.commerce_currency.collection'
-  base_route: 'entity.commerce_currency.collection'
-  title: 'List'

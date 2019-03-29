@@ -44,6 +44,9 @@ use Drupal\profile\Entity\ProfileInterface;
  *       "unlock" = "Drupal\commerce_order\Form\OrderUnlockForm",
  *       "resend-receipt" = "Drupal\commerce_order\Form\OrderReceiptResendForm",
  *     },
+ *     "local_task_provider" = {
+ *       "default" = "Drupal\entity\Menu\DefaultEntityLocalTaskProvider",
+ *     },
  *     "route_provider" = {
  *       "default" = "Drupal\commerce_order\OrderRouteProvider",
  *       "delete-multiple" = "Drupal\entity\Routing\DeleteMultipleRouteProvider",

@@ -27,6 +27,9 @@ use Drupal\Core\Entity\EntityStorageInterface;
  *       "edit" = "Drupal\commerce_product\Form\ProductAttributeForm",
  *       "delete" = "Drupal\commerce_product\Form\ProductAttributeDeleteForm",
  *     },
+ *     "local_task_provider" = {
+ *       "default" = "Drupal\entity\Menu\DefaultEntityLocalTaskProvider",
+ *     },
  *     "route_provider" = {
  *       "default" = "Drupal\entity\Routing\DefaultHtmlRouteProvider",
  *     },

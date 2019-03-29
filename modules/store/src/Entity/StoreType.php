@@ -26,6 +26,9 @@ use Drupal\commerce\Entity\CommerceBundleEntityBase;
  *       "duplicate" = "Drupal\commerce_store\Form\StoreTypeForm",
  *       "delete" = "Drupal\commerce\Form\CommerceBundleEntityDeleteFormBase"
  *     },
+ *     "local_task_provider" = {
+ *       "default" = "Drupal\entity\Menu\DefaultEntityLocalTaskProvider",
+ *     },
  *     "route_provider" = {
  *       "default" = "Drupal\entity\Routing\DefaultHtmlRouteProvider",
  *     },

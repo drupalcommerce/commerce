@@ -42,6 +42,9 @@ use Drupal\user\UserInterface;
  *       "duplicate" = "Drupal\commerce_product\Form\ProductVariationForm",
  *       "delete" = "Drupal\commerce_product\Form\ProductVariationDeleteForm",
  *     },
+ *     "local_task_provider" = {
+ *       "default" = "Drupal\entity\Menu\DefaultEntityLocalTaskProvider",
+ *     },
  *     "route_provider" = {
  *       "default" = "Drupal\commerce_product\ProductVariationRouteProvider",
  *     },

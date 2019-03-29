@@ -30,6 +30,9 @@ use Drupal\Core\Config\Entity\ConfigEntityBase;
  *       "duplicate" = "Drupal\commerce_payment\Form\PaymentGatewayForm",
  *       "delete" = "Drupal\Core\Entity\EntityDeleteForm"
  *     },
+ *     "local_task_provider" = {
+ *       "default" = "Drupal\entity\Menu\DefaultEntityLocalTaskProvider",
+ *     },
  *     "route_provider" = {
  *       "default" = "Drupal\entity\Routing\DefaultHtmlRouteProvider",
  *     },

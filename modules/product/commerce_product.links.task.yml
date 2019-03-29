@@ -1,29 +1,5 @@
-entity.commerce_product.canonical:
-  route_name: entity.commerce_product.canonical
-  base_route: entity.commerce_product.canonical
-  title: 'View'
-
-entity.commerce_product.page_edit:
-  route_name: entity.commerce_product.edit_form
-  base_route: entity.commerce_product.canonical
-  title: Edit
-
-entity.commerce_product_attribute.edit_form:
-  route_name: entity.commerce_product_attribute.edit_form
-  base_route: entity.commerce_product_attribute.edit_form
-  title: 'Edit'
-
-entity.commerce_product_type.edit_form:
-  route_name: entity.commerce_product_type.edit_form
-  base_route: entity.commerce_product_type.edit_form
-  title: Edit
-
-entity.commerce_product_variation_type.edit_form:
-  route_name: entity.commerce_product_variation_type.edit_form
-  base_route: entity.commerce_product_variation_type.edit_form
-  title: Edit
-
 entity.commerce_product_variation.collection:
   route_name: entity.commerce_product_variation.collection
   base_route: entity.commerce_product.canonical
   title: Variations
+  weight: 15

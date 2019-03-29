@@ -25,6 +25,9 @@ use Drupal\Core\Config\Entity\ConfigEntityBase;
  *       "edit" = "Drupal\commerce_checkout\Form\CheckoutFlowForm",
  *       "delete" = "Drupal\Core\Entity\EntityDeleteForm"
  *     },
+ *     "local_task_provider" = {
+ *       "default" = "Drupal\entity\Menu\DefaultEntityLocalTaskProvider",
+ *     },
  *     "route_provider" = {
  *       "default" = "Drupal\Core\Entity\Routing\DefaultHtmlRouteProvider",
  *     },
