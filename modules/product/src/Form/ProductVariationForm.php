@@ -5,11 +5,14 @@ namespace Drupal\commerce_product\Form;
 use Drupal\Core\Entity\ContentEntityForm;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\entity\Form\EntityDuplicateFormTrait;
 
 /**
  * Defines the add/edit/duplicate form for product variations.
  */
 class ProductVariationForm extends ContentEntityForm {
+
+  use EntityDuplicateFormTrait;
 
   /**
    * {@inheritdoc}
@@ -36,19 +39,9 @@ class ProductVariationForm extends ContentEntityForm {
   /**
    * {@inheritdoc}
    */
-  protected function prepareEntity() {
-    parent::prepareEntity();
-
-    if ($this->operation == 'duplicate') {
-      $this->entity = $this->entity->createDuplicate();
-    }
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function save(array $form, FormStateInterface $form_state) {
     $this->entity->save();
+    $this->postSave($this->entity, $this->operation);
     $this->messenger()->addMessage($this->t('Saved the %label variation.', ['%label' => $this->entity->label()]));
     $form_state->setRedirectUrl($this->entity->toUrl('collection'));
   }

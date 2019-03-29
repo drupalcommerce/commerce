@@ -89,22 +89,6 @@ class ProductVariationController implements ContainerInjectionInterface {
   }
 
   /**
-   * Provides the duplicate title callback for product variations.
-   *
-   * @param \Drupal\Core\Routing\RouteMatchInterface $route_match
-   *   The route match.
-   *
-   * @return string
-   *   The title for the product variation delete page.
-   */
-  public function duplicateTitle(RouteMatchInterface $route_match) {
-    $product_variation = $route_match->getParameter('commerce_product_variation');
-    $product_variation = $this->entityRepository->getTranslationFromContext($product_variation);
-
-    return $this->t('Duplicate %label', ['%label' => $product_variation->label()]);
-  }
-
-  /**
    * Provides the collection title callback for product variations.
    *
    * @return string

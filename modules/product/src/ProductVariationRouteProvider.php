@@ -4,10 +4,10 @@ namespace Drupal\commerce_product;
 
 use Drupal\commerce_product\Controller\ProductVariationController;
 use Drupal\commerce_product\Controller\ProductVariationTranslationController;
+use Drupal\entity\Routing\AdminHtmlRouteProvider;
 use Drupal\Core\Entity\EntityFieldManagerInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
-use Drupal\Core\Entity\Routing\DefaultHtmlRouteProvider;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Routing\Route;
@@ -15,7 +15,7 @@ use Symfony\Component\Routing\Route;
 /**
  * Provides routes for the product variation entity.
  */
-class ProductVariationRouteProvider extends DefaultHtmlRouteProvider {
+class ProductVariationRouteProvider extends AdminHtmlRouteProvider {
 
   /**
    * The module handler.
@@ -56,9 +56,6 @@ class ProductVariationRouteProvider extends DefaultHtmlRouteProvider {
    */
   public function getRoutes(EntityTypeInterface $entity_type) {
     $collection = parent::getRoutes($entity_type);
-    if ($duplicate_route = $this->getDuplicateFormRoute($entity_type)) {
-      $collection->add('entity.commerce_product_variation.duplicate_form', $duplicate_route);
-    }
 
     // Core can't generate the translation routes until #3004038 gets fixed.
     if ($this->moduleHandler->moduleExists('content_translation')) {
@@ -224,42 +221,6 @@ class ProductVariationRouteProvider extends DefaultHtmlRouteProvider {
       ->setOption('parameters', [
         'commerce_product' => [
           'type' => 'entity:commerce_product',
-        ],
-      ])
-      ->setOption('_admin_route', TRUE);
-
-    return $route;
-  }
-
-  /**
-   * Gets the duplicate-form route.
-   *
-   * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
-   *   The entity type.
-   *
-   * @return \Symfony\Component\Routing\Route|null
-   *   The generated route, if available.
-   */
-  protected function getDuplicateFormRoute(EntityTypeInterface $entity_type) {
-    if (!$entity_type->hasLinkTemplate('duplicate-form')) {
-      return NULL;
-    }
-
-    $route = new Route($entity_type->getLinkTemplate('duplicate-form'));
-    $route
-      ->addDefaults([
-        '_entity_form' => "commerce_product_variation.duplicate",
-        '_title_callback' => ProductVariationController::class . '::duplicateTitle',
-      ])
-      ->setRequirement('_product_variation_create_access', 'TRUE')
-      ->setRequirement('commerce_product', '\d+')
-      ->setRequirement('commerce_product_variation', '\d+')
-      ->setOption('parameters', [
-        'commerce_product' => [
-          'type' => 'entity:commerce_product',
-        ],
-        'commerce_product_variation' => [
-          'type' => 'entity:commerce_product_variation',
         ],
       ])
       ->setOption('_admin_route', TRUE);
