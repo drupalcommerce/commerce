@@ -79,7 +79,7 @@ class OrderItemAccessTest extends CommerceKernelTestBase {
     $this->assertFalse($order_item->access('update', $account));
     $this->assertFalse($order_item->access('delete', $account));
 
-    $account = $this->createUser([], ['update commerce_order']);
+    $account = $this->createUser([], ['update default commerce_order']);
     $this->assertFalse($order_item->access('view', $account));
     $this->assertFalse($order_item->access('update', $account));
     $this->assertFalse($order_item->access('delete', $account));

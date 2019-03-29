@@ -79,7 +79,7 @@ class ProductVariationAccessTest extends CommerceKernelTestBase {
     $this->assertFalse($variation->access('update', $account));
     $this->assertFalse($variation->access('delete', $account));
 
-    $account = $this->createUser([], ['update commerce_product']);
+    $account = $this->createUser([], ['update any default commerce_product']);
     $this->assertFalse($variation->access('view', $account));
     $this->assertFalse($variation->access('update', $account));
     $this->assertFalse($variation->access('delete', $account));

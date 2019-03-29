@@ -73,7 +73,7 @@ class LogAccessTest extends CommerceKernelTestBase {
     $this->assertFalse($log->access('update', $account));
     $this->assertFalse($log->access('delete', $account));
 
-    $account = $this->createUser([], ['update commerce_order']);
+    $account = $this->createUser([], ['update default commerce_order']);
     $this->assertFalse($log->access('view', $account));
     $this->assertTrue($log->access('update', $account));
     $this->assertTrue($log->access('delete', $account));
@@ -85,7 +85,7 @@ class LogAccessTest extends CommerceKernelTestBase {
 
     // Broken source reference.
     $log->set('source_entity_id', '999');
-    $account = $this->createUser([], ['update commerce_order']);
+    $account = $this->createUser([], ['update default commerce_order']);
     $this->assertFalse($log->access('view', $account));
     $this->assertFalse($log->access('update', $account));
     $this->assertFalse($log->access('delete', $account));

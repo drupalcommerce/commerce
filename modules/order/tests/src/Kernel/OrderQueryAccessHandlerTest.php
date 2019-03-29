@@ -135,13 +135,6 @@ class OrderQueryAccessHandlerTest extends CommerceKernelTestBase {
    */
   public function testUpdateDelete() {
     foreach (['update', 'delete'] as $operation) {
-      // Entity type permission.
-      $user = $this->createUser([], ["$operation commerce_order"]);
-      $conditions = $this->handler->getConditions($operation, $user);
-      $this->assertEquals(0, $conditions->count());
-      $this->assertEquals(['user.permissions'], $conditions->getCacheContexts());
-      $this->assertFalse($conditions->isAlwaysFalse());
-
       // Bundle permission.
       $user = $this->createUser([], [
         "$operation first commerce_order",
