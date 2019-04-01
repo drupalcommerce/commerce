@@ -201,6 +201,31 @@ final class Calculator {
   }
 
   /**
+   * Rounds the given number down to the given precision.
+   *
+   * @param string $number
+   *   The number.
+   * @param int $precision
+   *   The number of decimals to round to.
+   *
+   * @return string
+   *   The rounded number.
+   *
+   * @throws \InvalidArgumentException
+   *   Thrown when an invalid (non-numeric or negative) precision is given.
+   */
+  public static function roundDown($number, $precision = 0) {
+    self::assertNumberFormat($number);
+    if (!is_numeric($precision) || $precision < 0) {
+      throw new \InvalidArgumentException('The provided precision should be a positive number');
+    }
+
+    $base = bcpow(10, $precision);
+    return self::divide(self::floor(self::multiply($number, $base, self::getPrecision($number))), $base, $precision);
+
+  }
+
+  /**
    * Compares the first number to the second number.
    *
    * @param string $first_number
@@ -242,6 +267,23 @@ final class Calculator {
     }
 
     return $number;
+  }
+
+  /**
+   * Get the precision of a number.
+   *
+   * @param string $number
+   *   The number to determine precision.
+   *
+   * @return int
+   *   The numbers precision.
+   */
+  public static function getPrecision($number) {
+    $check = explode('.', $number);
+    if (!empty($check[1])) {
+      return strlen($check[1]);
+    }
+    return 0;
   }
 
   /**
