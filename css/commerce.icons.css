@@ -15,6 +15,7 @@
 .toolbar-tray .toolbar-icon.toolbar-icon-commerce-admin-commerce:before {
   background-image: url("../icons/787878/drupal-cart.svg");
 }
-.toolbar-tray .toolbar-icon.toolbar-icon-commerce-admin-commerce:active:before {
+.toolbar-tray .toolbar-icon.toolbar-icon-commerce-admin-commerce:active:before,
+.toolbar-tray .toolbar-icon.toolbar-icon-commerce-admin-commerce.is-active:before {
   background-image: url("../icons/000000/drupal-cart.svg");
 }
