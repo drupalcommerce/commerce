@@ -10,7 +10,6 @@ use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Cache\MemoryCache\MemoryCacheInterface;
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Entity\EntityManagerInterface;
-use Drupal\Core\Entity\EntityStorageException;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\user\UserInterface;
@@ -117,17 +116,6 @@ class PaymentMethodStorage extends CommerceContentEntityStorage implements Payme
     }
 
     return $payment_methods;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  protected function doCreate(array $values) {
-    if (!isset($values['payment_gateway'])) {
-      throw new EntityStorageException('Missing "payment_gateway" property when creating a payment method.');
-    }
-
-    return parent::doCreate($values);
   }
 
 }
