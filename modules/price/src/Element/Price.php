@@ -146,12 +146,13 @@ class Price extends FormElement {
     }
     // Add the help text if specified.
     if (!empty($element['#description'])) {
-      $element[$last_visible_element]['#field_suffix'] .= '<div class="description">' . $element['#description'] . '</div>';
+      $element[$last_visible_element]['#description'] = $element['#description'];
     }
     // Remove the keys that were transferred to child elements.
     unset($element['#size']);
     unset($element['#maxlength']);
     unset($element['#ajax']);
+    unset($element['#description']);
 
     return $element;
   }
