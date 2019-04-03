@@ -93,20 +93,6 @@ class StoreTest extends CommerceWebDriverTestBase {
     $edit = [
       'name[0][value]' => 'Test2',
     ];
-    // The original address is not present on the form due to an Address bug.
-    // @todo Remove when #2838457 is fixed.
-    $address = [
-      'address_line1' => '1098 Alta Ave',
-      'locality' => 'Mountain View',
-      'administrative_area' => 'CA',
-      'postal_code' => '94043',
-    ];
-    $this->getSession()->getPage()->fillField('address[0][address][country_code]', 'US');
-    $this->getSession()->wait(4000, 'jQuery(\'select[name="address[0][address][administrative_area]"]\').length > 0 && jQuery.active == 0;');
-    foreach ($address as $property => $value) {
-      $path = 'address[0][address][' . $property . ']';
-      $edit[$path] = $value;
-    }
     $this->submitForm($edit, 'Save');
     $this->assertSession()->pageTextContains('Saved the Test2 store.');
 

@@ -12,8 +12,7 @@ mode: default
 content:
   address:
     type: address_default
-    settings:
-      default_country: site_default
+    settings: {  }
     weight: 3
     region: content
     third_party_settings: {  }

@@ -301,9 +301,6 @@ class Store extends ContentEntityBase implements StoreInterface {
       ])
       ->setDisplayOptions('form', [
         'type' => 'address_default',
-        'settings' => [
-          'default_country' => 'site_default',
-        ],
         'weight' => 3,
       ])
       ->setDisplayConfigurable('view', TRUE)
