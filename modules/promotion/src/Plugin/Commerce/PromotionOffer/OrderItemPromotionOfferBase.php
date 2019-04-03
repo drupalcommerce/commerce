@@ -89,4 +89,11 @@ abstract class OrderItemPromotionOfferBase extends PromotionOfferBase implements
     return $this;
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function getConditionOperator() {
+    return 'OR';
+  }
+
 }

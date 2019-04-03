@@ -90,8 +90,7 @@ class OrderItemQuantity extends ConditionBase implements ParentEntityAwareInterf
     foreach ($order->getItems() as $order_item) {
       // If the offer has conditions, skip order items that don't match.
       if ($offer instanceof OrderItemPromotionOfferInterface) {
-        $conditions = $offer->getConditions();
-        $condition_group = new ConditionGroup($conditions, 'OR');
+        $condition_group = new ConditionGroup($offer->getConditions(), $offer->getConditionOperator());
         if (!$condition_group->evaluate($order_item)) {
           continue;
         }

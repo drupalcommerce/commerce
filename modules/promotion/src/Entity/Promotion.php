@@ -495,7 +495,7 @@ class Promotion extends CommerceContentEntityBase implements PromotionInterface 
   public function apply(OrderInterface $order) {
     $offer = $this->getOffer();
     if ($offer instanceof OrderItemPromotionOfferInterface) {
-      $offer_conditions = new ConditionGroup($offer->getConditions(), 'OR');
+      $offer_conditions = new ConditionGroup($offer->getConditions(), $offer->getConditionOperator());
       // Apply the offer to order items that pass the conditions.
       foreach ($order->getItems() as $order_item) {
         if ($offer_conditions->evaluate($order_item)) {

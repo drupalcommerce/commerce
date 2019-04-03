@@ -39,6 +39,7 @@ class OrderItemQuantityTest extends UnitTestCase {
 
     $offer = $this->prophesize(OrderItemPromotionOfferInterface::class);
     $offer->getConditions()->willReturn([$condition]);
+    $offer->getConditionOperator()->willReturn('OR');
     $offer = $offer->reveal();
 
     $parent_entity = $this->prophesize(PromotionInterface::class);
