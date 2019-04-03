@@ -175,10 +175,10 @@ function commerce_cart_form_commerce_order_form_alter(array &$form, FormStateInt
  * Implements hook_form_BASE_FORM_ID_alter() for 'commerce_order_type_form'.
  */
 function commerce_cart_form_commerce_order_type_form_alter(array &$form, FormStateInterface $form_state) {
+  /** @var \Drupal\commerce_order\Entity\OrderTypeInterface $order_type */
   $order_type = $form_state->getFormObject()->getEntity();
   $cart_form_view = $order_type->getThirdPartySetting('commerce_cart', 'cart_form_view', 'commerce_cart_form');
   $cart_block_view = $order_type->getThirdPartySetting('commerce_cart', 'cart_block_view', 'commerce_cart_block');
-  // Prepare a list of views tagged 'commerce_cart_form'.
   $view_storage = \Drupal::entityTypeManager()->getStorage('view');
   $available_form_views = [];
   $available_block_views = [];
@@ -186,7 +186,7 @@ function commerce_cart_form_commerce_order_type_form_alter(array &$form, FormSta
     if (strpos($view->get('tag'), 'commerce_cart_form') !== FALSE) {
       $available_form_views[$view->id()] = $view->label();
     }
-    elseif (strpos($view->get('tag'), 'commerce_cart_block') !== FALSE) {
+    if (strpos($view->get('tag'), 'commerce_cart_block') !== FALSE) {
       $available_block_views[$view->id()] = $view->label();
     }
   }
