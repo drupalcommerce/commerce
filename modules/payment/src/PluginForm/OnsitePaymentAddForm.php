@@ -17,12 +17,14 @@ class OnsitePaymentAddForm extends PaymentGatewayFormBase {
     if (!$order) {
       throw new \InvalidArgumentException('Payment entity with no order reference given to PaymentAddForm.');
     }
+    // The payment amount should not exceed the remaining order balance.
+    $balance = $order->getBalance();
+    $amount = $balance->isPositive() ? $balance : $balance->multiply(0);
 
-    // @todo Implement a balance method (unpaid portion of the total).
     $form['amount'] = [
       '#type' => 'commerce_price',
       '#title' => t('Amount'),
-      '#default_value' => $order->getTotalPrice()->toArray(),
+      '#default_value' => $amount->toArray(),
       '#required' => TRUE,
     ];
     $form['transaction_type'] = [
