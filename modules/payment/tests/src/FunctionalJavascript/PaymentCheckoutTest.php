@@ -83,7 +83,7 @@ class PaymentCheckoutTest extends CommerceWebDriverTestBase {
       'stores' => [$this->store],
     ]);
 
-    /** @var \Drupal\commerce_payment\Entity\PaymentGateway $gateway */
+    /** @var \Drupal\commerce_payment\Entity\PaymentGateway $skipped_gateway */
     $skipped_gateway = PaymentGateway::create([
       'id' => 'onsite_skipped',
       'label' => 'On-site Skipped',
@@ -310,6 +310,8 @@ class PaymentCheckoutTest extends CommerceWebDriverTestBase {
     ]);
     $payment->save();
     $order = Order::load(1);
+    // Save the order to recalculate the balance.
+    $order->save();
     $this->assertEquals(new Price('20', 'USD'), $order->getTotalPaid());
     $this->assertEquals(new Price('19.99', 'USD'), $order->getBalance());
 
@@ -602,6 +604,8 @@ class PaymentCheckoutTest extends CommerceWebDriverTestBase {
     ]);
     $payment->save();
     $order = Order::load(1);
+    // Save the order to recalculate the balance.
+    $order->save();
     $this->assertTrue($order->isPaid());
     $this->assertFalse($order->isLocked());
 
@@ -636,6 +640,8 @@ class PaymentCheckoutTest extends CommerceWebDriverTestBase {
     ]);
     $payment->save();
     $order = Order::load(1);
+    // Save the order to recalculate the balance.
+    $order->save();
     $this->assertEquals(new Price('20', 'USD'), $order->getTotalPaid());
     $this->assertEquals(new Price('19.99', 'USD'), $order->getBalance());
 
@@ -671,13 +677,6 @@ class PaymentCheckoutTest extends CommerceWebDriverTestBase {
     $this->assertEquals(new Price('19.99', 'USD'), $payment->getAmount());
     $this->assertEquals(new Price('20', 'USD'), $order->getTotalPaid());
     $this->assertEquals(new Price('19.99', 'USD'), $order->getBalance());
-    // Complete the payment and confirm the updated totals.
-    $payment->setState('completed');
-    $payment->save();
-    \Drupal::entityTypeManager()->getStorage('commerce_order')->resetCache([1]);
-    $order = Order::load(1);
-    $this->assertEquals(new Price('39.99', 'USD'), $order->getTotalPaid());
-    $this->assertEquals(new Price('0', 'USD'), $order->getBalance());
   }
 
   /**

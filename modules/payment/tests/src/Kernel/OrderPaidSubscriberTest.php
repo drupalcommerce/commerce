@@ -105,8 +105,8 @@ class OrderPaidSubscriberTest extends CommerceKernelTestBase {
       'state' => 'completed',
     ]);
     $payment->save();
+    $this->order->save();
 
-    $this->order = $this->reloadEntity($this->order);
     $this->assertEquals('draft', $this->order->getState()->getId());
     $this->assertEmpty($this->order->getOrderNumber());
     $this->assertEmpty($this->order->getPlacedTime());
@@ -140,8 +140,8 @@ class OrderPaidSubscriberTest extends CommerceKernelTestBase {
       'state' => 'completed',
     ]);
     $payment->save();
+    $this->order->save();
 
-    $this->order = $this->reloadEntity($this->order);
     $this->assertEquals('completed', $this->order->getState()->getId());
     $this->assertFalse($this->order->isLocked());
     $this->assertNotEmpty($this->order->getOrderNumber());

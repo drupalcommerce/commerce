@@ -26,6 +26,12 @@ services:
     tags:
       - { name: event_subscriber }
 
+  commerce_payment.kernel_subscriber:
+    class: Drupal\commerce_payment\EventSubscriber\KernelSubscriber
+    arguments: ['@commerce_payment.order_updater']
+    tags:
+    - { name: event_subscriber }
+
   commerce_payment.order_assign_subscriber:
     class: Drupal\commerce_payment\EventSubscriber\OrderAssignSubscriber
     tags:
@@ -40,6 +46,12 @@ services:
     class: Drupal\commerce_payment\PaymentOptionsBuilder
     arguments: ['@entity_type.manager', '@string_translation']
 
-  commerce_payment.order_manager:
-    class: Drupal\commerce_payment\PaymentOrderManager
+  commerce_payment.order_processor:
+    class: Drupal\commerce_payment\PaymentOrderProcessor
+    arguments: ['@commerce_payment.order_updater']
+    tags:
+    - { name: commerce_order.order_processor, priority: 400, adjustment_type: tax }
+
+  commerce_payment.order_updater:
+    class: Drupal\commerce_payment\PaymentOrderUpdater
     arguments: ['@entity_type.manager']

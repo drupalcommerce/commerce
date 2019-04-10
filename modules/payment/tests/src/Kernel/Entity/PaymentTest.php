@@ -10,6 +10,7 @@ use Drupal\commerce_payment\Entity\Payment;
 use Drupal\commerce_payment\Plugin\Commerce\PaymentType\PaymentDefault;
 use Drupal\commerce_price\Price;
 use Drupal\Tests\commerce\Kernel\CommerceKernelTestBase;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Tests the payment entity.
@@ -197,18 +198,23 @@ class PaymentTest extends CommerceKernelTestBase {
       'state' => 'completed',
     ]);
     $payment->save();
-    $this->order = $this->reloadEntity($this->order);
+    $this->order->save();
     $this->assertEquals(new Price('30', 'USD'), $this->order->getTotalPaid());
     $this->assertEquals(new Price('0', 'USD'), $this->order->getBalance());
 
     $payment->setRefundedAmount(new Price('15', 'USD'));
     $payment->setState('partially_refunded');
     $payment->save();
-    $this->order = $this->reloadEntity($this->order);
+    $this->order->save();
     $this->assertEquals(new Price('15', 'USD'), $this->order->getTotalPaid());
     $this->assertEquals(new Price('15', 'USD'), $this->order->getBalance());
 
     $payment->delete();
+    // Confirm that if the order isn't explicitly saved, it will be saved
+    // at the end of the request.
+    $request = $this->container->get('request_stack')->getCurrentRequest();
+    $kernel = $this->container->get('kernel');
+    $kernel->terminate($request, new Response());
     $this->order = $this->reloadEntity($this->order);
     $this->assertEquals(new Price('0', 'USD'), $this->order->getTotalPaid());
     $this->assertEquals(new Price('30', 'USD'), $this->order->getBalance());

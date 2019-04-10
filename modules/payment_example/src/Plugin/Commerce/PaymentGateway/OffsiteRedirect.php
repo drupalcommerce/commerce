@@ -74,7 +74,7 @@ class OffsiteRedirect extends OffsitePaymentGatewayBase {
     // @todo Add examples of request validation.
     $payment_storage = $this->entityTypeManager->getStorage('commerce_payment');
     $payment = $payment_storage->create([
-      'state' => 'authorization',
+      'state' => 'completed',
       'amount' => $order->getBalance(),
       'payment_gateway' => $this->entityId,
       'order_id' => $order->id(),

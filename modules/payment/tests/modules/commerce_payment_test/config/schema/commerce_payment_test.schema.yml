@@ -1,3 +1,10 @@
+commerce_payment.commerce_payment_gateway.plugin.test_offsite:
+  type: commerce_payment_gateway_configuration
+  mapping:
+    redirect_method:
+      type: string
+      label: 'Redirect method'
+
 commerce_payment.commerce_payment_gateway.plugin.test_onsite:
   type: commerce_payment_gateway_configuration
   mapping:
