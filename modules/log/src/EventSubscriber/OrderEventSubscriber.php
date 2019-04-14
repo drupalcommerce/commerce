@@ -97,7 +97,7 @@ class OrderEventSubscriber implements EventSubscriberInterface {
   public function onOrderAssign(OrderAssignEvent $event) {
     $order = $event->getOrder();
     $this->logStorage->generate($order, 'order_assigned', [
-      'user' => $event->getAccount()->getDisplayName(),
+      'user' => $event->getCustomer()->getDisplayName(),
     ])->save();
   }
 

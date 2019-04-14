@@ -5,7 +5,16 @@ namespace Drupal\commerce_order\Event;
 final class OrderEvents {
 
   /**
-   * Name of the event fired after assigning an anonymous order to a user.
+   * Name of the event fired when assigning an order to a customer.
+   *
+   * Fired when assigning an anonymous order to a customer (e.g. after the
+   * customer logged in / registered at the end of checkout), and when
+   * reassigning an order to a different customer in the admin UI.
+   *
+   * Note:
+   * At this point the order still has the original data (customer, email).
+   * Use $event->getOrder()-getCustomer()->isAnonymous() to check whether the
+   * original customer was anonymous.
    *
    * Fired before the order is saved.
    *

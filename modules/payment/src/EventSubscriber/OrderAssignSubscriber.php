@@ -32,7 +32,7 @@ class OrderAssignSubscriber implements EventSubscriberInterface {
     /** @var \Drupal\commerce_payment\Entity\PaymentMethodInterface $payment_method */
     $payment_method = $order->get('payment_method')->entity;
     if ($payment_method && empty($payment_method->getOwnerId())) {
-      $payment_method->setOwner($event->getAccount());
+      $payment_method->setOwner($event->getCustomer());
       $payment_method->save();
     }
   }

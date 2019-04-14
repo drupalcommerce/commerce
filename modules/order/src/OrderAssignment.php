@@ -41,28 +41,29 @@ class OrderAssignment implements OrderAssignmentInterface {
   /**
    * {@inheritdoc}
    */
-  public function assign(OrderInterface $order, UserInterface $account) {
-    $order->setCustomer($account);
-    $order->setEmail($account->getEmail());
+  public function assign(OrderInterface $order, UserInterface $customer) {
+    // Notify other modules before the order is modified, so that
+    // subscribers have access to the original data.
+    $event = new OrderAssignEvent($order, $customer);
+    $this->eventDispatcher->dispatch(OrderEvents::ORDER_ASSIGN, $event);
+
+    $order->setCustomer($customer);
+    $order->setEmail($customer->getEmail());
     // Update the referenced billing profile.
     $billing_profile = $order->getBillingProfile();
     if ($billing_profile && empty($billing_profile->getOwnerId())) {
-      $billing_profile->setOwner($account);
+      $billing_profile->setOwner($customer);
       $billing_profile->save();
     }
-    // Notify other modules.
-    $event = new OrderAssignEvent($order, $account);
-    $this->eventDispatcher->dispatch(OrderEvents::ORDER_ASSIGN, $event);
-
     $order->save();
   }
 
   /**
    * {@inheritdoc}
    */
-  public function assignMultiple(array $orders, UserInterface $account) {
+  public function assignMultiple(array $orders, UserInterface $customer) {
     foreach ($orders as $order) {
-      $this->assign($order, $account);
+      $this->assign($order, $customer);
     }
   }
 

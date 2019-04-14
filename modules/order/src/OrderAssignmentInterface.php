@@ -6,28 +6,28 @@ use Drupal\commerce_order\Entity\OrderInterface;
 use Drupal\user\UserInterface;
 
 /**
- * Handles assigning anonymous orders to user accounts.
+ * Handles assigning orders to customers.
  */
 interface OrderAssignmentInterface {
 
   /**
-   * Assigns the anonymous order to the given user account.
+   * Assigns the order to the given customer.
    *
    * @param \Drupal\commerce_order\Entity\OrderInterface $order
    *   The order.
-   * @param \Drupal\user\UserInterface $account
-   *   The user account.
+   * @param \Drupal\user\UserInterface $customer
+   *   The customer.
    */
-  public function assign(OrderInterface $order, UserInterface $account);
+  public function assign(OrderInterface $order, UserInterface $customer);
 
   /**
-   * Assigns multiple anonymous orders to the given user account.
+   * Assigns multiple orders to the given customer.
    *
    * @param \Drupal\commerce_order\Entity\OrderInterface[] $orders
    *   The orders.
-   * @param \Drupal\user\UserInterface $account
-   *   The user account.
+   * @param \Drupal\user\UserInterface $customer
+   *   The customer.
    */
-  public function assignMultiple(array $orders, UserInterface $account);
+  public function assignMultiple(array $orders, UserInterface $customer);
 
 }

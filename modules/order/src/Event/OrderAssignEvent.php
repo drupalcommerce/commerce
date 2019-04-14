@@ -21,23 +21,23 @@ class OrderAssignEvent extends Event {
   protected $order;
 
   /**
-   * The user account.
+   * The customer.
    *
    * @var \Drupal\user\UserInterface
    */
-  protected $account;
+  protected $customer;
 
   /**
    * Constructs a new OrderAssignEvent.
    *
    * @param \Drupal\commerce_order\Entity\OrderInterface $order
    *   The order.
-   * @param \Drupal\user\UserInterface $account
-   *   The user account.
+   * @param \Drupal\user\UserInterface $customer
+   *   The customer.
    */
-  public function __construct(OrderInterface $order, UserInterface $account) {
+  public function __construct(OrderInterface $order, UserInterface $customer) {
     $this->order = $order;
-    $this->account = $account;
+    $this->customer = $customer;
   }
 
   /**
@@ -51,13 +51,25 @@ class OrderAssignEvent extends Event {
   }
 
   /**
+   * Gets the customer.
+   *
+   * @return \Drupal\user\UserInterface
+   *   The customer.
+   */
+  public function getCustomer() {
+    return $this->customer;
+  }
+
+  /**
    * Gets the user account.
+   *
+   * @deprecated Use getCustomer() instead.
    *
    * @return \Drupal\user\UserInterface
    *   The user account.
    */
   public function getAccount() {
-    return $this->account;
+    return $this->getCustomer();
   }
 
 }
