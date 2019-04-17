@@ -5,6 +5,7 @@ namespace Drupal\commerce\Plugin\Field\FieldWidget;
 use Drupal\Core\Datetime\DrupalDateTime;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\datetime\Plugin\Field\FieldType\DateTimeItemInterface;
 use Drupal\datetime\Plugin\Field\FieldWidget\DateTimeDefaultWidget;
 
 /**
@@ -59,8 +60,8 @@ class EndDateWidget extends DateTimeDefaultWidget {
         $date = $item['container']['value'];
         // Adjust the date for storage.
         $date->setDefaultDateTime();
-        $date->setTimezone(new \DateTimezone(DATETIME_STORAGE_TIMEZONE));
-        $item['value'] = $date->format(DATETIME_DATE_STORAGE_FORMAT);
+        $date->setTimezone(new \DateTimezone(DateTimeItemInterface::STORAGE_TIMEZONE));
+        $item['value'] = $date->format(DateTimeItemInterface::DATE_STORAGE_FORMAT);
         unset($item['container']);
       }
     }
