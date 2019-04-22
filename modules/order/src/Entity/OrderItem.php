@@ -291,6 +291,18 @@ class OrderItem extends CommerceContentEntityBase implements OrderItemInterface 
   /**
    * {@inheritdoc}
    */
+  public function unsetData($key) {
+    if (!$this->get('data')->isEmpty()) {
+      $data = $this->get('data')->first()->getValue();
+      unset($data[$key]);
+      $this->set('data', $data);
+    }
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function getCreatedTime() {
     return $this->get('created')->value;
   }

@@ -378,6 +378,16 @@ interface OrderInterface extends ContentEntityInterface, EntityAdjustableInterfa
   public function setData($key, $value);
 
   /**
+   * Unsets an order data value with the given key.
+   *
+   * @param string $key
+   *   The key.
+   *
+   * @return $this
+   */
+  public function unsetData($key);
+
+  /**
    * Gets whether the order is locked.
    *
    * @return bool

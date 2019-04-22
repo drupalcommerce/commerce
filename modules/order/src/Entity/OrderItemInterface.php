@@ -197,6 +197,16 @@ interface OrderItemInterface extends ContentEntityInterface, EntityAdjustableInt
   public function setData($key, $value);
 
   /**
+   * Unsets an order item data value with the given key.
+   *
+   * @param string $key
+   *   The key.
+   *
+   * @return $this
+   */
+  public function unsetData($key);
+
+  /**
    * Gets the order item creation timestamp.
    *
    * @return int

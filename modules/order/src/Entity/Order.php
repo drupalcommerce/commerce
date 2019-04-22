@@ -513,6 +513,18 @@ class Order extends CommerceContentEntityBase implements OrderInterface {
   /**
    * {@inheritdoc}
    */
+  public function unsetData($key) {
+    if (!$this->get('data')->isEmpty()) {
+      $data = $this->get('data')->first()->getValue();
+      unset($data[$key]);
+      $this->set('data', $data);
+    }
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function isLocked() {
     return !empty($this->get('locked')->value);
   }

@@ -107,6 +107,7 @@ class OrderTest extends CommerceKernelTestBase {
    * @covers ::setRefreshState
    * @covers ::getData
    * @covers ::setData
+   * @covers ::unsetData
    * @covers ::isLocked
    * @covers ::lock
    * @covers ::unlock
@@ -278,6 +279,9 @@ class OrderTest extends CommerceKernelTestBase {
     $this->assertEquals('default', $order->getData('test', 'default'));
     $order->setData('test', 'value');
     $this->assertEquals('value', $order->getData('test', 'default'));
+    $order->unsetData('test');
+    $this->assertNull($order->getData('test'));
+    $this->assertEquals('default', $order->getData('test', 'default'));
 
     $this->assertFalse($order->isLocked());
     $order->lock();
