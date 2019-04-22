@@ -444,7 +444,11 @@ class OrderItem extends CommerceContentEntityBase implements OrderItemInterface 
   public static function bundleFieldDefinitions(EntityTypeInterface $entity_type, $bundle, array $base_field_definitions) {
     /** @var \Drupal\commerce_order\Entity\OrderItemTypeInterface $order_item_type */
     $order_item_type = OrderItemType::load($bundle);
+    if (!$order_item_type) {
+      throw new \RuntimeException(sprintf('Could not load the "%s" order item type.', $bundle));
+    }
     $purchasable_entity_type = $order_item_type->getPurchasableEntityTypeId();
+
     $fields = [];
     $fields['purchased_entity'] = clone $base_field_definitions['purchased_entity'];
     if ($purchasable_entity_type) {

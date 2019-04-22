@@ -176,4 +176,20 @@ class OrderItemTest extends CommerceKernelTestBase {
     $this->assertEquals(new Price('23.98', 'USD'), $order_item->getAdjustedTotalPrice(['fee']));
   }
 
+  /**
+   * Tests the handling of invalid bundles.
+   *
+   * @covers ::bundleFieldDefinitions
+   */
+  public function testInvalidBundle() {
+    $this->setExpectedException(\RuntimeException::class, 'Could not load the "invalid" order item type.');
+
+    $order_item = OrderItem::create([
+      'type' => 'invalid',
+      'title' => 'My order item',
+      'quantity' => '2',
+      'unit_price' => new Price('9.99', 'USD'),
+    ]);
+  }
+
 }
