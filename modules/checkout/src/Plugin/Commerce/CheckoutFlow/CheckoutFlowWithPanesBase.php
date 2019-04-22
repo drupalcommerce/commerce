@@ -9,6 +9,7 @@ use Drupal\Component\Utility\NestedArray;
 use Drupal\Component\Utility\SortArray;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Render\Element;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -556,6 +557,8 @@ abstract class CheckoutFlowWithPanesBase extends CheckoutFlowBase implements Che
         '#pane_id' => $pane_id,
       ];
       $form[$pane_id] = $pane->buildPaneForm($form[$pane_id], $form_state, $form);
+      // Avoid rendering an empty container.
+      $form[$pane_id]['#access'] = (bool) Element::getVisibleChildren($form[$pane_id]);
     }
     if ($this->hasSidebar($step_id)) {
       // The base class adds a hardcoded order summary view to the sidebar.

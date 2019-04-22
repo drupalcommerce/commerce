@@ -19,8 +19,10 @@ class CompletionMessage extends CheckoutPaneBase {
    * {@inheritdoc}
    */
   public function buildPaneForm(array $pane_form, FormStateInterface $form_state, array &$complete_form) {
-    $pane_form['#theme'] = 'commerce_checkout_completion_message';
-    $pane_form['#order_entity'] = $this->order;
+    $pane_form['message'] = [
+      '#theme' => 'commerce_checkout_completion_message',
+      '#order_entity' => $this->order,
+    ];
 
     return $pane_form;
   }
