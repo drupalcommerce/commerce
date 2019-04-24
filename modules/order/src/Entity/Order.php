@@ -743,7 +743,6 @@ class Order extends CommerceContentEntityBase implements OrderInterface {
 
     $fields['adjustments'] = BaseFieldDefinition::create('commerce_adjustment')
       ->setLabel(t('Adjustments'))
-      ->setRequired(FALSE)
       ->setCardinality(BaseFieldDefinition::CARDINALITY_UNLIMITED)
       ->setDisplayOptions('form', [
         'type' => 'commerce_adjustment_default',

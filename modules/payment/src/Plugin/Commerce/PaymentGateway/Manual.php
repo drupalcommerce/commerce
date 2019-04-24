@@ -21,6 +21,7 @@ use Drupal\Core\Form\FormStateInterface;
  *     "receive-payment" = "Drupal\commerce_payment\PluginForm\PaymentReceiveForm",
  *   },
  *   payment_type = "payment_manual",
+ *   requires_billing_information = FALSE,
  * )
  */
 class Manual extends PaymentGatewayBase implements ManualPaymentGatewayInterface {

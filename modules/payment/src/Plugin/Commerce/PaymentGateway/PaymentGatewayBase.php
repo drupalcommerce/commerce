@@ -219,6 +219,13 @@ abstract class PaymentGatewayBase extends PluginBase implements PaymentGatewayIn
   /**
    * {@inheritdoc}
    */
+  public function needsBillingInformation() {
+    return $this->configuration['collect_billing_information'];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function calculateDependencies() {
     return [];
   }
@@ -252,6 +259,7 @@ abstract class PaymentGatewayBase extends PluginBase implements PaymentGatewayIn
       'display_label' => $this->pluginDefinition['display_label'],
       'mode' => $modes ? reset($modes) : '',
       'payment_method_types' => [],
+      'collect_billing_information' => TRUE,
     ];
   }
 
@@ -305,6 +313,16 @@ abstract class PaymentGatewayBase extends PluginBase implements PaymentGatewayIn
       ];
     }
 
+    $form['collect_billing_information'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Collect billing information'),
+      '#description' => $this->t('Before disabling, make sure you are not legally required to collect billing information.'),
+      '#default_value' => $this->configuration['collect_billing_information'],
+      // Merchants can disable collecting billing information only if the
+      // payment gateway indicated that it doesn't require it.
+      '#access' => !$this->pluginDefinition['requires_billing_information'],
+    ];
+
     return $form;
   }
 
@@ -325,6 +343,7 @@ abstract class PaymentGatewayBase extends PluginBase implements PaymentGatewayIn
       $this->configuration['display_label'] = $values['display_label'];
       $this->configuration['mode'] = $values['mode'];
       $this->configuration['payment_method_types'] = array_keys($values['payment_method_types']);
+      $this->configuration['collect_billing_information'] = $values['collect_billing_information'];
     }
   }
 

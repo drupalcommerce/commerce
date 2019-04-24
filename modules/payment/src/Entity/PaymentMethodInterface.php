@@ -52,8 +52,13 @@ interface PaymentMethodInterface extends ContentEntityInterface, EntityChangedIn
   /**
    * Gets the billing profile.
    *
-   * @return \Drupal\profile\Entity\ProfileInterface
-   *   The billing profile entity.
+   * Present only if the payment gateway indicated that billing information
+   * should be collected.
+   *
+   * @see \Drupal\commerce_payment\Plugin\Commerce\PaymentGateway\PaymentGatewayInterface::needsBillingInformation()
+   *
+   * @return \Drupal\profile\Entity\ProfileInterface|null
+   *   The billing profile entity, or NULL if none found.
    */
   public function getBillingProfile();
 

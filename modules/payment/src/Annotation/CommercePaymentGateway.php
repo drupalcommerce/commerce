@@ -102,6 +102,16 @@ class CommercePaymentGateway extends Plugin {
   public $credit_card_types = [];
 
   /**
+   * Whether the payment gateway requires billing information to be collected.
+   *
+   * Defaults to TRUE because prior to Commerce 2.14 payment gateways could
+   * assume that billing information is always collected.
+   *
+   * @var bool
+   */
+  public $requires_billing_information = TRUE;
+
+  /**
    * Constructs a new CommercePaymentGateway object.
    *
    * @param array $values

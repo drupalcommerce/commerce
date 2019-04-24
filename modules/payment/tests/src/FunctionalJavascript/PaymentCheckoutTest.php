@@ -624,7 +624,7 @@ class PaymentCheckoutTest extends CommerceWebDriverTestBase {
   /**
    * Tests checkout with a manual gateway.
    */
-  public function testCheckoutWithManual() {
+  public function testManual() {
     $this->drupalGet($this->product->toUrl()->toString());
     $this->submitForm([], 'Add to cart');
     $this->drupalGet('checkout/1');
@@ -658,7 +658,7 @@ class PaymentCheckoutTest extends CommerceWebDriverTestBase {
       'payment_information[billing_information][address][0][address][postal_code]' => '10001',
     ], 'Continue to review');
     $this->assertSession()->pageTextContains('Payment information');
-    $this->assertSession()->pageTextContains('Example');
+    $this->assertSession()->pageTextContains('Cash on delivery');
     $this->assertSession()->pageTextContains('Johnny Appleseed');
     $this->assertSession()->pageTextContains('123 New York Drive');
     $this->submitForm([], 'Pay and complete purchase');
@@ -677,6 +677,41 @@ class PaymentCheckoutTest extends CommerceWebDriverTestBase {
     $this->assertEquals(new Price('19.99', 'USD'), $payment->getAmount());
     $this->assertEquals(new Price('20', 'USD'), $order->getTotalPaid());
     $this->assertEquals(new Price('19.99', 'USD'), $order->getBalance());
+  }
+
+  /**
+   * Tests checkout with a manual gateway, without billing information.
+   */
+  public function testManualWithoutBilling() {
+    $payment_gateway = PaymentGateway::load('manual');
+    $payment_gateway->getPlugin()->setConfiguration([
+      'collect_billing_information' => FALSE,
+      'display_label' => 'Cash on delivery',
+      'instructions' => [
+        'value' => 'Sample payment instructions.',
+        'format' => 'plain_text',
+      ],
+    ]);
+    $payment_gateway->save();
+    $this->drupalGet($this->product->toUrl()->toString());
+    $this->submitForm([], 'Add to cart');
+    $this->drupalGet('checkout/1');
+    $radio_button = $this->getSession()->getPage()->findField('Cash on delivery');
+    $radio_button->click();
+    $this->waitForAjaxToFinish();
+    $this->assertSession()->pageTextNotContains('Country');
+    $this->submitForm([], 'Continue to review');
+    $this->assertSession()->pageTextContains('Payment information');
+    $this->assertSession()->pageTextContains('Cash on delivery');
+    $this->submitForm([], 'Pay and complete purchase');
+    $this->assertSession()->pageTextContains('Your order number is 1. You can view your order on your account page when logged in.');
+    $this->assertSession()->pageTextContains('Sample payment instructions.');
+
+    \Drupal::entityTypeManager()->getStorage('commerce_order')->resetCache([1]);
+    $order = Order::load(1);
+    $this->assertEquals('manual', $order->get('payment_gateway')->target_id);
+    $this->assertNull($order->getBillingProfile());
+    $this->assertFalse($order->isLocked());
   }
 
   /**

@@ -132,6 +132,50 @@ class PaymentMethodTest extends CommerceBrowserTestBase {
   }
 
   /**
+   * Tests creating and updating a payment method without billing information.
+   */
+  public function testPaymentMethodCreationAndUpdateWithoutBilling() {
+    $this->paymentGateway->getPlugin()->setConfiguration([
+      'collect_billing_information' => FALSE,
+    ]);
+    $this->paymentGateway->save();
+
+    /** @var \Drupal\commerce_payment_example\Plugin\Commerce\PaymentGateway\OnsiteInterface $plugin */
+    $this->drupalGet($this->collectionUrl);
+    $this->getSession()->getPage()->clickLink('Add payment method');
+    $this->assertSession()->addressEquals($this->collectionUrl . '/add');
+    $this->assertSession()->pageTextNotContains('Country');
+    $form_values = [
+      'payment_method[payment_details][number]' => '4111111111111111',
+      'payment_method[payment_details][expiration][month]' => '01',
+      'payment_method[payment_details][expiration][year]' => date('Y') + 1,
+      'payment_method[payment_details][security_code]' => '111',
+    ];
+    $this->submitForm($form_values, 'Save');
+    $this->assertSession()->addressEquals($this->collectionUrl);
+    $this->assertSession()->pageTextContains('Visa ending in 1111 saved to your payment methods.');
+
+    $payment_method = PaymentMethod::load(1);
+    $this->assertNull($payment_method->getBillingProfile());
+
+    $this->drupalGet($this->collectionUrl . '/' . $payment_method->id() . '/edit');
+    $this->assertSession()->pageTextNotContains('Country');
+    $form_values = [
+      'payment_method[payment_details][expiration][month]' => '02',
+      'payment_method[payment_details][expiration][year]' => '2026',
+    ];
+    $this->submitForm($form_values, 'Save');
+    $this->assertSession()->addressEquals($this->collectionUrl);
+
+    $this->assertSession()->pageTextContains('2/2026');
+
+    \Drupal::entityTypeManager()->getStorage('commerce_payment_method')->resetCache([1]);
+    $payment_method = PaymentMethod::load(1);
+    $this->assertEquals('2026', $payment_method->get('card_exp_year')->value);
+    $this->assertNull($payment_method->getBillingProfile());
+  }
+
+  /**
    * Tests creating a payment method declined by the remote API.
    */
   public function testPaymentMethodDecline() {

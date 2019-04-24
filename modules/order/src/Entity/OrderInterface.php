@@ -151,8 +151,8 @@ interface OrderInterface extends ContentEntityInterface, EntityAdjustableInterfa
   /**
    * Gets the billing profile.
    *
-   * @return \Drupal\profile\Entity\ProfileInterface
-   *   The billing profile.
+   * @return \Drupal\profile\Entity\ProfileInterface|null
+   *   The billing profile, or NULL if none found.
    */
   public function getBillingProfile();
 

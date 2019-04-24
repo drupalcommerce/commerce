@@ -125,14 +125,16 @@ class PaymentInformation extends CheckoutPaneBase {
       $view_builder = $this->entityTypeManager->getViewBuilder('commerce_payment_method');
       $summary = $view_builder->view($payment_method, 'default');
     }
-    elseif ($billing_profile) {
-      $view_builder = $this->entityTypeManager->getViewBuilder('profile');
+    else {
       $summary = [
         'payment_gateway' => [
           '#markup' => $payment_gateway->getPlugin()->getDisplayLabel(),
         ],
-        'profile' => $view_builder->view($billing_profile, 'default'),
       ];
+      if ($billing_profile) {
+        $view_builder = $this->entityTypeManager->getViewBuilder('profile');
+        $summary['profile'] = $view_builder->view($billing_profile, 'default');
+      }
     }
 
     return $summary;
@@ -206,7 +208,7 @@ class PaymentInformation extends CheckoutPaneBase {
     if ($payment_gateway->getPlugin() instanceof SupportsStoredPaymentMethodsInterface) {
       $pane_form = $this->buildPaymentMethodForm($pane_form, $form_state, $default_option);
     }
-    else {
+    elseif ($payment_gateway->getPlugin()->needsBillingInformation()) {
       $pane_form = $this->buildBillingProfileForm($pane_form, $form_state);
     }
 
@@ -351,11 +353,14 @@ class PaymentInformation extends CheckoutPaneBase {
       /** @var \Drupal\commerce_payment\Entity\PaymentMethodInterface $payment_method */
       $this->order->set('payment_gateway', $payment_method->getPaymentGateway());
       $this->order->set('payment_method', $payment_method);
-      $this->order->setBillingProfile($payment_method->getBillingProfile());
+      $billing_profile = $payment_method->getBillingProfile();
     }
     else {
       $this->order->set('payment_gateway', $payment_gateway);
       $this->order->set('payment_method', NULL);
+    }
+
+    if ($billing_profile) {
       $this->order->setBillingProfile($billing_profile);
     }
   }

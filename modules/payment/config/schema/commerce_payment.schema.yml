@@ -61,6 +61,9 @@ commerce_payment_gateway_configuration:
       orderby: value
       sequence:
         type: string
+    collect_billing_information:
+      type: boolean
+      label: 'Collect billing information'
 
 commerce_checkout.commerce_checkout_pane.payment_process:
   type: commerce_checkout_pane_configuration

@@ -29,6 +29,7 @@ use Drupal\Core\Form\FormStateInterface;
  *   credit_card_types = {
  *     "amex", "dinersclub", "discover", "jcb", "maestro", "mastercard", "visa",
  *   },
+ *   requires_billing_information = FALSE,
  * )
  */
 class Onsite extends OnsitePaymentGatewayBase implements OnsiteInterface {
@@ -91,9 +92,12 @@ class Onsite extends OnsitePaymentGatewayBase implements OnsiteInterface {
     $this->assertPaymentMethod($payment_method);
 
     // Add a built in test for testing decline exceptions.
-    /** @var \Drupal\address\Plugin\Field\FieldType\AddressItem $billing_address */
-    if ($billing_address = $payment_method->getBillingProfile()) {
-      $billing_address = $payment_method->getBillingProfile()->get('address')->first();
+    // Note: Since requires_billing_information is FALSE, the payment method
+    // is not guaranteed to have a billing profile. Confirm tha
+    // $payment_method->getBillingProfile() is not NULL before trying to use it.
+    if ($billing_profile = $payment_method->getBillingProfile()) {
+      /** @var \Drupal\address\Plugin\Field\FieldType\AddressItem $billing_address */
+      $billing_address = $billing_profile->get('address')->first();
       if ($billing_address->getPostalCode() == '53140') {
         throw new HardDeclineException('The payment was declined');
       }
@@ -185,11 +189,13 @@ class Onsite extends OnsitePaymentGatewayBase implements OnsiteInterface {
         throw new \InvalidArgumentException(sprintf('$payment_details must contain the %s key.', $required_key));
       }
     }
-
     // Add a built in test for testing decline exceptions.
-    /** @var \Drupal\address\Plugin\Field\FieldType\AddressItem $billing_address */
-    if ($billing_address = $payment_method->getBillingProfile()) {
-      $billing_address = $payment_method->getBillingProfile()->get('address')->first();
+    // Note: Since requires_billing_information is FALSE, the payment method
+    // is not guaranteed to have a billing profile. Confirm tha
+    // $payment_method->getBillingProfile() is not NULL before trying to use it.
+    if ($billing_profile = $payment_method->getBillingProfile()) {
+      /** @var \Drupal\address\Plugin\Field\FieldType\AddressItem $billing_address */
+      $billing_address = $billing_profile->get('address')->first();
       if ($billing_address->getPostalCode() == '53141') {
         throw new HardDeclineException('The payment method was declined');
       }
@@ -237,9 +243,10 @@ class Onsite extends OnsitePaymentGatewayBase implements OnsiteInterface {
    * {@inheritdoc}
    */
   public function updatePaymentMethod(PaymentMethodInterface $payment_method) {
-    // The default payment method edit form only supports updating billing info.
-    $billing_profile = $payment_method->getBillingProfile();
-
+    // Note: Since requires_billing_information is FALSE, the payment method
+    // is not guaranteed to have a billing profile. Confirm that
+    // $payment_method->getBillingProfile() is not NULL before trying to use it.
+    //
     // Perform the update request here, throw an exception if it fails.
     // See \Drupal\commerce_payment\Exception for the available exceptions.
   }
