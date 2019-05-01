@@ -25,9 +25,9 @@ class CommercePaymentMethodType extends Plugin {
   /**
    * The payment method type label.
    *
-   * @ingroup plugin_translatable
-   *
    * @var \Drupal\Core\Annotation\Translation
+   *
+   * @ingroup plugin_translatable
    */
   public $label;
 
@@ -36,9 +36,9 @@ class CommercePaymentMethodType extends Plugin {
    *
    * Defaults to the main label.
    *
-   * @ingroup plugin_translatable
-   *
    * @var \Drupal\Core\Annotation\Translation
+   *
+   * @ingroup plugin_translatable
    */
   public $create_label;
 

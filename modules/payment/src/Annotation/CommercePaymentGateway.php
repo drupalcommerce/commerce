@@ -26,18 +26,18 @@ class CommercePaymentGateway extends Plugin {
   /**
    * The payment gateway label.
    *
-   * @ingroup plugin_translatable
-   *
    * @var \Drupal\Core\Annotation\Translation
+   *
+   * @ingroup plugin_translatable
    */
   public $label;
 
   /**
    * The payment gateway display label.
    *
-   * @ingroup plugin_translatable
-   *
    * @var \Drupal\Core\Annotation\Translation
+   *
+   * @ingroup plugin_translatable
    */
   public $display_label;
 

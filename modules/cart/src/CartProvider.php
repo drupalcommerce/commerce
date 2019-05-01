@@ -49,13 +49,6 @@ class CartProvider implements CartProviderInterface {
    * - type: The order type.
    * - store_id: The store ID.
    *
-   * Example:
-   * @code
-   * 1 => [
-   *   10 => ['type' => 'default', 'store_id' => '1'],
-   * ]
-   * @endcode
-   *
    * @var array
    */
   protected $cartData = [];

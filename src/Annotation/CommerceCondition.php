@@ -23,9 +23,9 @@ class CommerceCondition extends Plugin {
   /**
    * The condition label.
    *
-   * @ingroup plugin_translatable
-   *
    * @var \Drupal\Core\Annotation\Translation
+   *
+   * @ingroup plugin_translatable
    */
   public $label;
 
@@ -35,18 +35,18 @@ class CommerceCondition extends Plugin {
    * Shown in the condition UI when enabling/disabling a condition.
    * Defaults to the main label.
    *
-   * @ingroup plugin_translatable
-   *
    * @var \Drupal\Core\Annotation\Translation
+   *
+   * @ingroup plugin_translatable
    */
   public $display_label;
 
   /**
    * The condition category.
    *
-   * @ingroup plugin_translatable
-   *
    * @var \Drupal\Core\Annotation\Translation
+   *
+   * @ingroup plugin_translatable
    */
   public $category;
 

@@ -10,11 +10,11 @@ final class PriceEvents {
   /**
    * Name of the event fired when loading a number format.
    *
-   * @deprecated No longer fired. Subscribe to NUMBER_FORMAT instead.
-   *
    * @Event
    *
    * @see \Drupal\commerce_price\Event\NumberFormatEvent
+   *
+   * @deprecated No longer fired. Subscribe to NUMBER_FORMAT instead.
    */
   const NUMBER_FORMAT_LOAD = 'commerce_price.number_format.load';
 

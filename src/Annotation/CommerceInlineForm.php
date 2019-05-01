@@ -25,9 +25,9 @@ class CommerceInlineForm extends Plugin {
   /**
    * The plugin label.
    *
-   * @ingroup plugin_translatable
-   *
    * @var \Drupal\Core\Annotation\Translation
+   *
+   * @ingroup plugin_translatable
    */
   public $label;
 

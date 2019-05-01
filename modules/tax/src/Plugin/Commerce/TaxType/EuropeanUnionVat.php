@@ -23,9 +23,9 @@ class EuropeanUnionVat extends LocalTaxTypeBase {
    *
    * Allows child classes to enable B2B logic without overriding resolveZones().
    *
-   * @todo Default to "tax_number" once implemented.
-   *
    * @var string
+   *
+   * @todo Default to "tax_number" once implemented.
    */
   protected $taxNumberFieldName;
 

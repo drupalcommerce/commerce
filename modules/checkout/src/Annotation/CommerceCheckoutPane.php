@@ -23,9 +23,9 @@ class CommerceCheckoutPane extends Plugin {
   /**
    * The checkout pane label.
    *
-   * @ingroup plugin_translatable
-   *
    * @var \Drupal\Core\Annotation\Translation
+   *
+   * @ingroup plugin_translatable
    */
   public $label;
 
@@ -34,9 +34,9 @@ class CommerceCheckoutPane extends Plugin {
    *
    * Defaults to the main label.
    *
-   * @ingroup plugin_translatable
-   *
    * @var \Drupal\Core\Annotation\Translation
+   *
+   * @ingroup plugin_translatable
    */
   public $display_label;
 
