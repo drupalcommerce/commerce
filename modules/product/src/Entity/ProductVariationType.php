@@ -101,6 +101,7 @@ class ProductVariationType extends CommerceBundleEntityBase implements ProductVa
    */
   public function setGenerateTitle($generate_title) {
     $this->generateTitle = $generate_title;
+    return $this;
   }
 
 }
