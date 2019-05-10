@@ -498,7 +498,7 @@ abstract class PaymentGatewayBase extends PluginBase implements PaymentGatewayIn
    * @param \Drupal\commerce_payment\Entity\PaymentInterface $payment
    *   The payment.
    * @param \Drupal\commerce_price\Price $refund_amount
-   *   The allowed states.
+   *   The refund amount.
    *
    * @throws \Drupal\commerce_payment\Exception\InvalidRequestException
    *   Thrown when the refund amount is larger than the payment balance.
