@@ -84,11 +84,13 @@ class BillingInformation extends CheckoutPaneBase implements CheckoutPaneInterfa
       $profile_storage = $this->entityTypeManager->getStorage('profile');
       $profile = $profile_storage->create([
         'type' => 'customer',
-        'uid' => $this->order->getCustomerId(),
+        'uid' => 0,
       ]);
     }
     $inline_form = $this->inlineFormManager->createInstance('customer_profile', [
+      'instance_id' => 'billing',
       'available_countries' => $this->order->getStore()->getBillingCountries(),
+      'address_book_uid' => $this->order->getCustomerId(),
     ], $profile);
 
     $pane_form['profile'] = [

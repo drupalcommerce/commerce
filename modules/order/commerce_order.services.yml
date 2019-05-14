@@ -18,6 +18,10 @@ services:
     class: Drupal\commerce_order\AdjustmentTransformer
     arguments: ['@plugin.manager.commerce_adjustment_type', '@commerce_price.rounder']
 
+  commerce_order.address_book_manager:
+    class: Drupal\commerce_order\AddressBookManager
+    arguments: ['@entity_type.bundle.info', '@entity_type.manager']
+
   commerce_order.order_assignment:
     class: Drupal\commerce_order\OrderAssignment
     arguments: ['@entity_type.manager', '@event_dispatcher']
@@ -33,6 +37,12 @@ services:
     arguments: ['@commerce.availability_manager']
     tags:
       - { name: commerce_order.order_processor, priority: 100 }
+
+  commerce_order.address_book_subscriber:
+    class: Drupal\commerce_order\EventSubscriber\AddressBookSubscriber
+    arguments: ['@commerce_order.address_book_manager']
+    tags:
+      - { name: event_subscriber }
 
   commerce_order.profile_label_subscriber:
     class: Drupal\commerce_order\EventSubscriber\ProfileLabelSubscriber

@@ -86,17 +86,20 @@ class BillingProfileWidget extends WidgetBase implements ContainerFactoryPluginI
     /** @var \Drupal\commerce_order\Entity\OrderInterface $order */
     $order = $items[$delta]->getEntity();
     $store = $order->getStore();
+    /** @var \Drupal\profile\Entity\ProfileInterface $profile */
     if (!$items[$delta]->isEmpty() && $items[$delta]->entity) {
       $profile = $items[$delta]->entity;
     }
     else {
       $profile = $this->entityTypeManager->getStorage('profile')->create([
         'type' => 'customer',
-        'uid' => $order->getCustomer(),
+        'uid' => 0,
       ]);
     }
     $inline_form = $this->inlineFormManager->createInstance('customer_profile', [
+      'instance_id' => 'billing',
       'available_countries' => $store->getBillingCountries(),
+      'address_book_uid' => $order->getCustomerId(),
     ], $profile);
 
     $element['#type'] = 'fieldset';
@@ -105,6 +108,11 @@ class BillingProfileWidget extends WidgetBase implements ContainerFactoryPluginI
       '#inline_form' => $inline_form,
     ];
     $element['profile'] = $inline_form->buildInlineForm($element['profile'], $form_state);
+    // The copy to address book checkbox should not be shown in the admin UI
+    // until the full address book UX is implemented in #3053165.
+    $element['profile']['copy_to_address_book']['#access'] = FALSE;
+    $element['profile']['copy_to_address_book']['#default_value'] = FALSE;
+
     // Workaround for massageFormValues() not getting $element.
     $element['array_parents'] = [
       '#type' => 'value',

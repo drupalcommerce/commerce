@@ -87,3 +87,13 @@ function commerce_order_update_8205() {
   $update_manager = \Drupal::entityDefinitionUpdateManager();
   $update_manager->installFieldStorageDefinition('total_paid', 'commerce_order', 'commerce_order', $storage_definition);
 }
+
+/**
+ * Clears the address book for all customers, to avoid duplicates.
+ */
+function commerce_order_update_8206() {
+  // Bypass Entity API for better performance.
+  $database = \Drupal::database();
+  $database->query("UPDATE {profile} SET uid = 0 WHERE type = 'customer'");
+  $database->query("UPDATE {profile_revision} SET uid = 0 WHERE profile_id IN (SELECT profile_id FROM {profile} WHERE type = 'customer')");
+}

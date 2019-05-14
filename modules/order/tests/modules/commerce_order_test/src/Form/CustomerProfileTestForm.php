@@ -76,10 +76,12 @@ class CustomerProfileTestForm extends FormBase {
     $profile_storage = $this->entityTypeManager->getStorage('profile');
     $profile = $profile_storage->create([
       'type' => 'customer',
-      'uid' => $this->currentUser->id(),
+      'uid' => 0,
     ]);
     $inline_form = $this->inlineFormManager->createInstance('customer_profile', [
+      'instance_id' => 'billing',
       'available_countries' => ['FR', 'RS'],
+      'address_book_uid' => $this->currentUser->id(),
     ], $profile);
 
     $form['profile'] = [
@@ -107,9 +109,10 @@ class CustomerProfileTestForm extends FormBase {
     /** @var \Drupal\address\AddressInterface $address */
     $address = $profile->get('address')->first();
 
-    $this->messenger()->addMessage(t('The street is "@street" and the country code is "@country_code".', [
+    $this->messenger()->addMessage(t('The street is "@street" and the country code is @country_code. Address book: @address_book.', [
       '@street' => $address->getAddressLine1(),
       '@country_code' => $address->getCountryCode(),
+      '@address_book' => $profile->getData('copy_to_address_book') ? 'Yes' : 'No',
     ]));
   }
 

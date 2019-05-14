@@ -19,30 +19,39 @@ class OrderAdminTest extends OrderBrowserTestBase {
   use AssertMailTrait;
 
   /**
-   * The profile to test against.
+   * The default profile's address.
    *
-   * @var \Drupal\profile\Entity\Profile
+   * @var array
    */
-  protected $billingProfile;
+  protected $defaultAddress = [
+    'country_code' => 'US',
+    'administrative_area' => 'SC',
+    'locality' => 'Greenville',
+    'postal_code' => '29616',
+    'address_line1' => '9 Drupal Ave',
+    'given_name' => 'Bryan',
+    'family_name' => 'Centarro',
+  ];
 
   /**
    * {@inheritdoc}
    */
   protected function setUp() {
     parent::setUp();
-    $this->container->get('module_installer')->install(['profile']);
 
-    $profile_values = [
+    $this->store->set('billing_countries', ['FR', 'US']);
+    $this->store->save();
+
+    $default_profile = Profile::create([
       'type' => 'customer',
-      'uid' => 1,
-      'status' => 1,
-    ];
-    $this->billingProfile = Profile::create($profile_values);
-    $this->billingProfile->save();
+      'uid' => $this->adminUser,
+      'address' => $this->defaultAddress,
+    ]);
+    $default_profile->save();
   }
 
   /**
-   * Tests creating/editing an Order.
+   * Tests creating an order.
    */
   public function testCreateOrder() {
     // Create an order through the add form.
@@ -55,9 +64,15 @@ class OrderAdminTest extends OrderBrowserTestBase {
     ];
     $this->submitForm($edit, t('Create'));
 
-    // Check the integrity of the edit form.
-    $this->assertSession()->statusCodeEquals(200);
-    $this->assertSession()->fieldExists('billing_profile[0][profile][address][0][address][given_name]');
+    // Confirm that the default profile's address is pre-filled.
+    foreach ($this->defaultAddress as $property => $value) {
+      $prefix = 'billing_profile[0][profile][address][0][address]';
+      $this->assertSession()->fieldValueEquals($prefix . '[' . $property . ']', $value);
+    }
+    // Confirm that the address book checkbox is not shown.
+    $this->assertSession()->fieldNotExists('billing_profile[0][profile][copy_to_address_book]');
+
+    // Check the integrity of the order item edit form.
     $this->assertSession()->fieldExists('order_items[form][inline_entity_form][purchased_entity][0][target_id]');
     $this->assertSession()->fieldExists('order_items[form][inline_entity_form][quantity][0][value]');
     $this->assertSession()->fieldExists('order_items[form][inline_entity_form][unit_price][0][amount][number]');
@@ -126,17 +141,37 @@ class OrderAdminTest extends OrderBrowserTestBase {
     $this->assertEquals(1, count($order->getItems()));
     $this->assertEquals(new Price('5.33', 'USD'), $order->getTotalPrice());
     $this->assertCount(1, $order->getAdjustments());
+    $billing_profile = $order->getBillingProfile();
+    $this->assertEquals('CA', $billing_profile->get('address')->first()->getAdministrativeArea());
+    $this->assertFalse($billing_profile->getData('copy_to_address_book'));
   }
 
   /**
    * Tests editing an order.
    */
   public function testEditOrder() {
+    $address = [
+      'country_code' => 'US',
+      'postal_code' => '53177',
+      'locality' => 'Milwaukee',
+      'address_line1' => 'Pabst Blue Ribbon Dr',
+      'administrative_area' => 'WI',
+      'given_name' => 'Frederick',
+      'family_name' => 'Pabst',
+    ];
+    $profile = Profile::create([
+      'type' => 'customer',
+      'uid' => 0,
+      'address' => $address,
+    ]);
+    $profile->save();
+
     $order = Order::create([
       'type' => 'default',
-      'state' => 'completed',
-      'uid' => $this->loggedInUser,
       'store_id' => $this->store,
+      'uid' => $this->adminUser,
+      'billing_profile' => $profile,
+      'state' => 'completed',
     ]);
     $order->save();
 
@@ -157,6 +192,10 @@ class OrderAdminTest extends OrderBrowserTestBase {
     $order->save();
 
     $this->drupalGet($order->toUrl('edit-form'));
+    foreach ($address as $property => $value) {
+      $prefix = 'billing_profile[0][profile][address][0][address]';
+      $this->assertSession()->fieldValueEquals($prefix . '[' . $property . ']', $value);
+    }
     $this->assertSession()->fieldValueEquals('adjustments[0][definition][label]', '10% off');
     $this->assertSession()->fieldValueEquals('adjustments[1][definition][label]', 'Handling fee');
     $this->assertSession()->optionExists('adjustments[2][type]', 'Custom');
@@ -168,9 +207,9 @@ class OrderAdminTest extends OrderBrowserTestBase {
    */
   public function testEditOrderWithDeletedCustomer() {
     $customer = $this->drupalCreateUser();
-    // The profile is not associated with the customer to avoid #2995300.
     $profile = Profile::create([
       'type' => 'customer',
+      'uid' => 0,
       'address' => [
         'country_code' => 'US',
         'postal_code' => '53177',

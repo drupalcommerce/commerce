@@ -39,6 +39,21 @@ class PaymentCheckoutTest extends CommerceWebDriverTestBase {
   protected $orderPaymentMethod;
 
   /**
+   * The default profile's address.
+   *
+   * @var array
+   */
+  protected $defaultAddress = [
+    'country_code' => 'US',
+    'administrative_area' => 'SC',
+    'locality' => 'Greenville',
+    'postal_code' => '29616',
+    'address_line1' => '9 Drupal Ave',
+    'given_name' => 'Bryan',
+    'family_name' => 'Centarro',
+  ];
+
+  /**
    * Modules to enable.
    *
    * @var array
@@ -65,6 +80,9 @@ class PaymentCheckoutTest extends CommerceWebDriverTestBase {
    */
   protected function setUp() {
     parent::setUp();
+
+    $this->store->set('billing_countries', ['FR', 'US']);
+    $this->store->save();
 
     $variation = $this->createEntity('commerce_product_variation', [
       'type' => 'default',
@@ -146,8 +164,14 @@ class PaymentCheckoutTest extends CommerceWebDriverTestBase {
     ]);
     $gateway->save();
 
+    $default_profile = $this->createEntity('profile', [
+      'type' => 'customer',
+      'uid' => $this->adminUser->id(),
+      'address' => $this->defaultAddress,
+    ]);
     $profile = $this->createEntity('profile', [
       'type' => 'customer',
+      'uid' => 0,
       'address' => [
         'country_code' => 'US',
         'postal_code' => '53177',
@@ -157,7 +181,6 @@ class PaymentCheckoutTest extends CommerceWebDriverTestBase {
         'given_name' => 'Frederick',
         'family_name' => 'Pabst',
       ],
-      'uid' => $this->adminUser->id(),
     ]);
     $payment_method = $this->createEntity('commerce_payment_method', [
       'uid' => $this->adminUser->id(),
@@ -256,6 +279,11 @@ class PaymentCheckoutTest extends CommerceWebDriverTestBase {
     $radio_button = $this->getSession()->getPage()->findField('Credit card');
     $radio_button->click();
     $this->waitForAjaxToFinish();
+    // Confirm that the default profile's address is pre-filled.
+    foreach ($this->defaultAddress as $property => $value) {
+      $prefix = 'payment_information[add_payment_method][billing_information][address][0][address]';
+      $this->assertSession()->fieldValueEquals($prefix . '[' . $property . ']', $value);
+    }
 
     $this->submitForm([
       'payment_information[add_payment_method][payment_details][number]' => '4012888888881881',
@@ -648,6 +676,11 @@ class PaymentCheckoutTest extends CommerceWebDriverTestBase {
     $radio_button = $this->getSession()->getPage()->findField('Cash on delivery');
     $radio_button->click();
     $this->waitForAjaxToFinish();
+    // Confirm that the default profile's address is pre-filled.
+    foreach ($this->defaultAddress as $property => $value) {
+      $prefix = 'payment_information[billing_information][address][0][address]';
+      $this->assertSession()->fieldValueEquals($prefix . '[' . $property . ']', $value);
+    }
 
     $this->submitForm([
       'payment_information[billing_information][address][0][address][given_name]' => 'Johnny',
@@ -734,6 +767,12 @@ class PaymentCheckoutTest extends CommerceWebDriverTestBase {
     $this->drupalGet('checkout/1');
     $this->assertSession()->pageTextContains('Billing information');
     $this->assertSession()->pageTextNotContains('Payment information');
+    // Confirm that the default profile's address is pre-filled.
+    foreach ($this->defaultAddress as $property => $value) {
+      $prefix = 'payment_information[billing_information][address][0][address]';
+      $this->assertSession()->fieldValueEquals($prefix . '[' . $property . ']', $value);
+    }
+
     $this->submitForm([
       'payment_information[billing_information][address][0][address][given_name]' => 'Johnny',
       'payment_information[billing_information][address][0][address][family_name]' => 'Appleseed',
@@ -767,6 +806,12 @@ class PaymentCheckoutTest extends CommerceWebDriverTestBase {
     $this->drupalGet('checkout/1');
     $this->assertSession()->pageTextContains('Billing information');
     $this->assertSession()->pageTextNotContains('Payment information');
+    // Confirm that the default profile's address is pre-filled.
+    foreach ($this->defaultAddress as $property => $value) {
+      $prefix = 'payment_information[billing_information][address][0][address]';
+      $this->assertSession()->fieldValueEquals($prefix . '[' . $property . ']', $value);
+    }
+
     $this->submitForm([
       'payment_information[billing_information][address][0][address][given_name]' => 'Johnny',
       'payment_information[billing_information][address][0][address][family_name]' => 'Appleseed',

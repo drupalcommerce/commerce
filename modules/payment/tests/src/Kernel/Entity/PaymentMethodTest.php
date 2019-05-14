@@ -96,6 +96,15 @@ class PaymentMethodTest extends CommerceKernelTestBase {
     /** @var \Drupal\profile\Entity\ProfileInterface $profile */
     $profile = Profile::create([
       'type' => 'customer',
+      'address' => [
+        'country_code' => 'US',
+        'postal_code' => '53177',
+        'locality' => 'Milwaukee',
+        'address_line1' => 'Pabst Blue Ribbon Dr',
+        'administrative_area' => 'WI',
+        'given_name' => 'Frederick',
+        'family_name' => 'Pabst',
+      ],
     ]);
     $profile->save();
     $profile = $this->reloadEntity($profile);
@@ -141,6 +150,44 @@ class PaymentMethodTest extends CommerceKernelTestBase {
 
     $payment_method->setCreatedTime(635879700);
     $this->assertEquals(635879700, $payment_method->getCreatedTime());
+  }
+
+  /**
+   * @covers ::preSave
+   */
+  public function testPreSave() {
+    /** @var \Drupal\profile\Entity\ProfileInterface $profile */
+    $profile = Profile::create([
+      'type' => 'customer',
+      'uid' => $this->user->id(),
+      'address' => [
+        'country_code' => 'US',
+        'postal_code' => '53177',
+        'locality' => 'Milwaukee',
+        'address_line1' => 'Pabst Blue Ribbon Dr',
+        'administrative_area' => 'WI',
+        'given_name' => 'Frederick',
+        'family_name' => 'Pabst',
+      ],
+    ]);
+    $profile->save();
+    $profile = $this->reloadEntity($profile);
+
+    /** @var \Drupal\commerce_payment\Entity\PaymentMethodInterface $payment_method */
+    $payment_method = PaymentMethod::create([
+      'type' => 'credit_card',
+      'payment_gateway' => 'example',
+      'billing_profile' => $profile,
+    ]);
+    $payment_method->save();
+
+    // Confirm that the payment_gateway_mode field is populated.
+    $this->assertEquals('test', $payment_method->getPaymentGatewayMode());
+
+    // Confirm that saving the payment method reassigns the billing profile.
+    $payment_method->save();
+    $this->assertEquals(0, $payment_method->getBillingProfile()->getOwnerId());
+    $this->assertEquals($profile->id(), $payment_method->getBillingProfile()->id());
   }
 
 }

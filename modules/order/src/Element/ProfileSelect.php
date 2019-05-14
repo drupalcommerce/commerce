@@ -85,6 +85,8 @@ class ProfileSelect extends RenderElement {
     $inline_form_manager = \Drupal::service('plugin.manager.commerce_inline_form');
     $inline_form = $inline_form_manager->createInstance('customer_profile', [
       'available_countries' => $element['#available_countries'],
+      // The address book form is buggy when used inside a form element.
+      'use_address_book' => FALSE,
     ], $element['#default_value']);
 
     $element['#inline_form'] = $inline_form;

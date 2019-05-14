@@ -167,7 +167,7 @@ class OrderAssignmentTest extends CommerceKernelTestBase {
     $this->order = $this->reloadEntity($this->order);
     $this->assertEquals($second_user->id(), $this->order->getCustomerId());
     $this->assertEquals($second_user->getEmail(), $this->order->getEmail());
-    $this->assertEquals($second_user->id(), $this->order->getBillingProfile()->getOwnerId());
+    $this->assertEquals(0, $this->order->getBillingProfile()->getOwnerId());
     $this->assertEquals($second_user->id(), $this->order->get('payment_method')->entity->getOwnerId());
 
     $third_user = $this->createUser(['mail' => $this->randomString() . '@example.com']);
@@ -177,7 +177,7 @@ class OrderAssignmentTest extends CommerceKernelTestBase {
     $this->assertEquals($third_user->id(), $this->order->getCustomerId());
     $this->assertEquals($third_user->getEmail(), $this->order->getEmail());
     // Confirm that the billing profile and payment method were not reassigned.
-    $this->assertEquals($second_user->id(), $this->order->getBillingProfile()->getOwnerId());
+    $this->assertEquals(0, $this->order->getBillingProfile()->getOwnerId());
     $this->assertEquals($second_user->id(), $this->order->get('payment_method')->entity->getOwnerId());
   }
 

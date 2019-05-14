@@ -119,8 +119,18 @@ class OrderTest extends CommerceKernelTestBase {
    * @covers ::setCompletedTime
    */
   public function testOrder() {
+    /** @var \Drupal\profile\Entity\ProfileInterface $profile */
     $profile = Profile::create([
       'type' => 'customer',
+      'address' => [
+        'country_code' => 'US',
+        'postal_code' => '53177',
+        'locality' => 'Milwaukee',
+        'address_line1' => 'Pabst Blue Ribbon Dr',
+        'administrative_area' => 'WI',
+        'given_name' => 'Frederick',
+        'family_name' => 'Pabst',
+      ],
     ]);
     $profile->save();
     $profile = $this->reloadEntity($profile);
@@ -297,11 +307,70 @@ class OrderTest extends CommerceKernelTestBase {
 
     $order->setCompletedTime(635879900);
     $this->assertEquals(635879900, $order->getCompletedTime());
+  }
+
+  /**
+   * @covers ::preSave
+   */
+  public function testPreSave() {
+    /** @var \Drupal\profile\Entity\ProfileInterface $profile */
+    $profile = Profile::create([
+      'type' => 'customer',
+      'uid' => $this->user->id(),
+      'address' => [
+        'country_code' => 'US',
+        'postal_code' => '53177',
+        'locality' => 'Milwaukee',
+        'address_line1' => 'Pabst Blue Ribbon Dr',
+        'administrative_area' => 'WI',
+        'given_name' => 'Frederick',
+        'family_name' => 'Pabst',
+      ],
+    ]);
+    $profile->save();
+    $profile = $this->reloadEntity($profile);
+
+    /** @var \Drupal\commerce_order\Entity\OrderInterface $order */
+    $order = Order::create([
+      'type' => 'default',
+      'store_id' => $this->store->id(),
+      'uid' => '888',
+      'billing_profile' => $profile,
+      'state' => 'completed',
+    ]);
+    $order->save();
 
     // Confirm that saving the order clears an invalid customer ID.
-    $order->setCustomerId(888);
-    $order->save();
     $this->assertEquals(0, $order->getCustomerId());
+
+    // Confirm that saving the order reassigns the billing profile.
+    $order->save();
+    $this->assertEquals(0, $order->getBillingProfile()->getOwnerId());
+    $this->assertEquals($profile->id(), $order->getBillingProfile()->id());
+  }
+
+  /**
+   * Tests that an order's email updates with the customer.
+   */
+  public function testOrderEmail() {
+    $customer = $this->createUser(['mail' => 'test@example.com']);
+    $order_with_customer = Order::create([
+      'type' => 'default',
+      'state' => 'completed',
+      'uid' => $customer,
+    ]);
+    $order_with_customer->save();
+    $this->assertEquals($customer->getEmail(), $order_with_customer->getEmail());
+
+    $order_without_customer = Order::create([
+      'type' => 'default',
+      'state' => 'completed',
+    ]);
+    $order_without_customer->save();
+    $this->assertEquals('', $order_without_customer->getEmail());
+    $order_without_customer->setCustomer($customer);
+    $order_without_customer->save();
+    $this->assertEquals($customer->getEmail(), $order_without_customer->getEmail());
   }
 
   /**
@@ -514,30 +583,6 @@ class OrderTest extends CommerceKernelTestBase {
       $currency_mismatch = TRUE;
     }
     $this->assertTrue($currency_mismatch);
-  }
-
-  /**
-   * Tests that an order's email updates with the customer.
-   */
-  public function testOrderEmail() {
-    $customer = $this->createUser(['mail' => 'test@example.com']);
-    $order_with_customer = Order::create([
-      'type' => 'default',
-      'state' => 'completed',
-      'uid' => $customer,
-    ]);
-    $order_with_customer->save();
-    $this->assertEquals($customer->getEmail(), $order_with_customer->getEmail());
-
-    $order_without_customer = Order::create([
-      'type' => 'default',
-      'state' => 'completed',
-    ]);
-    $order_without_customer->save();
-    $this->assertEquals('', $order_without_customer->getEmail());
-    $order_without_customer->setCustomer($customer);
-    $order_without_customer->save();
-    $this->assertEquals($customer->getEmail(), $order_without_customer->getEmail());
   }
 
   /**

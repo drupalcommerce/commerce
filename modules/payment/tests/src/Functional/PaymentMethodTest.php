@@ -53,6 +53,9 @@ class PaymentMethodTest extends CommerceBrowserTestBase {
     $this->user = $this->drupalCreateUser($permissions);
     $this->drupalLogin($this->user);
 
+    $this->store->set('billing_countries', ['FR', 'US']);
+    $this->store->save();
+
     $this->collectionUrl = 'user/' . $this->user->id() . '/payment-methods';
 
     /** @var \Drupal\commerce_payment\Entity\PaymentGateway $payment_gateway */
@@ -78,10 +81,32 @@ class PaymentMethodTest extends CommerceBrowserTestBase {
    * Tests creating and updating a payment method.
    */
   public function testPaymentMethodCreationAndUpdate() {
+    $default_address = [
+      'country_code' => 'US',
+      'administrative_area' => 'SC',
+      'locality' => 'Greenville',
+      'postal_code' => '29616',
+      'address_line1' => '9 Drupal Ave',
+      'given_name' => 'Bryan',
+      'family_name' => 'Centarro',
+    ];
+    $default_profile = $this->createEntity('profile', [
+      'type' => 'customer',
+      'uid' => $this->user->id(),
+      'address' => $default_address,
+    ]);
+
     /** @var \Drupal\commerce_payment_example\Plugin\Commerce\PaymentGateway\OnsiteInterface $plugin */
     $this->drupalGet($this->collectionUrl);
     $this->getSession()->getPage()->clickLink('Add payment method');
     $this->assertSession()->addressEquals($this->collectionUrl . '/add');
+    // Confirm that the default profile's address is pre-filled.
+    foreach ($default_address as $property => $value) {
+      $prefix = 'payment_method[billing_information][address][0][address]';
+      $this->assertSession()->fieldValueEquals($prefix . '[' . $property . ']', $value);
+    }
+    // Confirm that the address book checkbox is not shown.
+    $this->assertSession()->fieldNotExists('payment_method[billing_information][copy_to_address_book]');
 
     $form_values = [
       'payment_method[payment_details][number]' => '4111111111111111',
@@ -103,9 +128,13 @@ class PaymentMethodTest extends CommerceBrowserTestBase {
     $billing_profile = $payment_method->getBillingProfile();
     $this->assertEquals($this->user->id(), $payment_method->getOwnerId());
     $this->assertEquals('NY', $billing_profile->get('address')->first()->getAdministrativeArea());
-    $this->assertEquals(1, $payment_method->getBillingProfile()->id());
+    $this->assertFalse($billing_profile->getData('copy_to_address_book'));
+    $this->assertEquals(2, $payment_method->getBillingProfile()->id());
 
     $this->drupalGet($this->collectionUrl . '/' . $payment_method->id() . '/edit');
+    // Confirm that the address book checkbox is not shown.
+    $this->assertSession()->fieldNotExists('payment_method[billing_information][copy_to_address_book]');
+
     $form_values = [
       'payment_method[payment_details][expiration][month]' => '02',
       'payment_method[payment_details][expiration][year]' => '2026',
@@ -118,17 +147,17 @@ class PaymentMethodTest extends CommerceBrowserTestBase {
     ];
     $this->submitForm($form_values, 'Save');
     $this->assertSession()->addressEquals($this->collectionUrl);
-
     $this->assertSession()->pageTextContains('2/2026');
 
     \Drupal::entityTypeManager()->getStorage('commerce_payment_method')->resetCache([1]);
-    \Drupal::entityTypeManager()->getStorage('profile')->resetCache([1]);
+    \Drupal::entityTypeManager()->getStorage('profile')->resetCache([2]);
     $payment_method = PaymentMethod::load(1);
     $this->assertEquals('2026', $payment_method->get('card_exp_year')->value);
     $billing_profile = $payment_method->getBillingProfile();
     $this->assertEquals($this->user->id(), $payment_method->getOwnerId());
     $this->assertEquals('SC', $billing_profile->get('address')->first()->getAdministrativeArea());
-    $this->assertEquals(1, $payment_method->getBillingProfile()->id());
+    $this->assertFalse($billing_profile->getData('copy_to_address_book'));
+    $this->assertEquals(2, $payment_method->getBillingProfile()->id());
   }
 
   /**

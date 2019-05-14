@@ -2,6 +2,7 @@
 
 namespace Drupal\Tests\commerce_checkout\Functional;
 
+use Drupal\commerce_order\Entity\Order;
 use Drupal\Core\Url;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
@@ -135,9 +136,9 @@ class CheckoutOrderTest extends CommerceBrowserTestBase {
   }
 
   /**
-   * Tests than an order can go through checkout steps.
+   * Tests anonymous and authenticated checkout.
    */
-  public function testGuestOrderCheckout() {
+  public function testCheckout() {
     $this->drupalLogout();
     $this->drupalGet($this->product->toUrl());
     $this->submitForm([], 'Add to cart');
@@ -153,8 +154,8 @@ class CheckoutOrderTest extends CommerceBrowserTestBase {
     $this->submitForm([
       'contact_information[email]' => 'guest@example.com',
       'contact_information[email_confirm]' => 'guest@example.com',
-      'billing_information[profile][address][0][address][given_name]' => $this->randomString(),
-      'billing_information[profile][address][0][address][family_name]' => $this->randomString(),
+      'billing_information[profile][address][0][address][given_name]' => 'John',
+      'billing_information[profile][address][0][address][family_name]' => 'Smith',
       'billing_information[profile][address][0][address][organization]' => $this->randomString(),
       'billing_information[profile][address][0][address][address_line1]' => $this->randomString(),
       'billing_information[profile][address][0][address][postal_code]' => '94043',
@@ -168,20 +169,36 @@ class CheckoutOrderTest extends CommerceBrowserTestBase {
     $this->submitForm([], 'Complete checkout');
     $this->assertSession()->pageTextContains('Your order number is 1. You can view your order on your account page when logged in.');
     $this->assertSession()->pageTextContains('0 items');
+
+    $order = Order::load(1);
+    // Confirm that the profile hasn't been copied to the address book yet.
+    $billing_profile = $order->getBillingProfile();
+    $this->assertTrue($billing_profile->getData('copy_to_address_book'));
+    $this->assertEmpty($billing_profile->getData('address_book_profile_id'));
+
+    // Confirm that the profile has been copied after the order was assigned.
+    $order_assignment = $this->container->get('commerce_order.order_assignment');
+    $order_assignment->assign($order, $this->adminUser);
+    $billing_profile = $this->reloadEntity($billing_profile);
+    $this->assertEmpty($billing_profile->getData('copy_to_address_book'));
+    $this->assertNotEmpty($billing_profile->getData('address_book_profile_id'));
+    $address_book_profile_id = $billing_profile->getData('address_book_profile_id');
+
     // Test second order.
+    $this->drupalLogin($this->adminUser);
     $this->drupalGet($this->product->toUrl());
     $this->submitForm([], 'Add to cart');
     $this->assertSession()->pageTextContains('1 item');
     $cart_link = $this->getSession()->getPage()->findLink('your cart');
     $cart_link->click();
     $this->submitForm([], 'Checkout');
-    $this->assertCheckoutProgressStep('Login');
-    $this->assertSession()->pageTextNotContains('Order Summary');
-    $this->submitForm([], 'Continue as Guest');
     $this->assertCheckoutProgressStep('Order information');
+    // Confirm that the information from the address book profile is pre-filled.
+    $prefix = 'billing_information[profile][address][0][address]';
+    $this->assertSession()->fieldValueEquals($prefix . '[given_name]', 'John');
+    $this->assertSession()->fieldValueEquals($prefix . '[family_name]', 'Smith');
+
     $this->submitForm([
-      'contact_information[email]' => 'guest@example.com',
-      'contact_information[email_confirm]' => 'guest@example.com',
       'billing_information[profile][address][0][address][given_name]' => $this->randomString(),
       'billing_information[profile][address][0][address][family_name]' => $this->randomString(),
       'billing_information[profile][address][0][address][organization]' => $this->randomString(),
@@ -189,8 +206,8 @@ class CheckoutOrderTest extends CommerceBrowserTestBase {
       'billing_information[profile][address][0][address][postal_code]' => '94043',
       'billing_information[profile][address][0][address][locality]' => 'Mountain View',
       'billing_information[profile][address][0][address][administrative_area]' => 'CA',
+      'billing_information[profile][copy_to_address_book]' => TRUE,
     ], 'Continue to review');
-    $this->assertSession()->pageTextContains('Contact information');
     $this->assertSession()->pageTextContains('Billing information');
     $this->assertSession()->pageTextContains('Order Summary');
     $this->assertCheckoutProgressStep('Review');
@@ -204,6 +221,15 @@ class CheckoutOrderTest extends CommerceBrowserTestBase {
     $this->submitForm([], 'Complete checkout');
     $this->assertSession()->pageTextContains('Your order number is 2. You can view your order on your account page when logged in.');
     $this->assertSession()->pageTextContains('0 items');
+
+    $order = Order::load(2);
+    // Confirm that the profile has been copied to the address book.
+    $billing_profile = $order->getBillingProfile();
+    $this->assertEmpty($billing_profile->getData('copy_to_address_book'));
+    $this->assertNotEmpty($billing_profile->getData('address_book_profile_id'));
+    // Confirm that the created profile is not the same as the one for the
+    // previous order.
+    $this->assertNotEquals($address_book_profile_id, $billing_profile->getData('address_book_profile_id'));
   }
 
   /**

@@ -49,12 +49,6 @@ class OrderAssignment implements OrderAssignmentInterface {
 
     $order->setCustomer($customer);
     $order->setEmail($customer->getEmail());
-    // Update the referenced billing profile.
-    $billing_profile = $order->getBillingProfile();
-    if ($billing_profile && empty($billing_profile->getOwnerId())) {
-      $billing_profile->setOwner($customer);
-      $billing_profile->save();
-    }
     $order->save();
   }
 

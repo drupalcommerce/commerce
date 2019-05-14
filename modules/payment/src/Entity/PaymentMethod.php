@@ -246,6 +246,12 @@ class PaymentMethod extends ContentEntityBase implements PaymentMethodInterface 
     if ($this->get('payment_gateway_mode')->isEmpty()) {
       $this->set('payment_gateway_mode', $payment_gateway->getPlugin()->getMode());
     }
+    // Make sure the billing profile is owned by the payment method.
+    $billing_profile = $this->getBillingProfile();
+    if ($billing_profile && $billing_profile->getOwnerId()) {
+      $billing_profile->setOwnerId(0);
+      $billing_profile->save();
+    }
   }
 
   /**

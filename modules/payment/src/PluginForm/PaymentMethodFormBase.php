@@ -88,12 +88,14 @@ class PaymentMethodFormBase extends PaymentGatewayFormBase implements ContainerI
         $profile_storage = $this->entityTypeManager->getStorage('profile');
         $billing_profile = $profile_storage->create([
           'type' => 'customer',
-          'uid' => $payment_method->getOwnerId(),
+          'uid' => 0,
         ]);
       }
       $store = $this->currentStore->getStore();
       $inline_form = $this->inlineFormManager->createInstance('customer_profile', [
+        'instance_id' => 'billing',
         'available_countries' => $store ? $store->getBillingCountries() : [],
+        'address_book_uid' => $payment_method->getOwnerId(),
       ], $billing_profile);
 
       $form['billing_information'] = [

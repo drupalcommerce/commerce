@@ -189,7 +189,7 @@ class TaxOrderProcessor implements OrderProcessorInterface {
       $profile_storage = $this->entityTypeManager->getStorage('profile');
       $this->storeProfiles[$store_id] = $profile_storage->create([
         'type' => 'customer',
-        'uid' => $store->getOwnerId(),
+        'uid' => 0,
         'address' => $store->getAddress(),
       ]);
     }

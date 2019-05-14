@@ -6,11 +6,11 @@
     "license": "GPL-2.0+",
     "require": {
         "drupal/core": "^8.6",
-        "drupal/address": "^1.6",
+        "drupal/address": "1.x-dev",
         "drupal/entity": "^1.0-rc2",
         "drupal/entity_reference_revisions": "~1.0",
         "drupal/inline_entity_form": "^1.0-rc1",
-        "drupal/profile": "~1.0",
+        "drupal/profile": "1.x-dev",
         "drupal/state_machine": "^1.0-rc1",
         "commerceguys/intl": "^1.0.0"
     },

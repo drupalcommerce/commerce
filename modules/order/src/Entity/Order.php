@@ -602,11 +602,17 @@ class Order extends CommerceContentEntityBase implements OrderInterface {
     $customer = $this->getCustomer();
     // The customer has been deleted, clear the reference.
     if ($this->getCustomerId() && $customer->isAnonymous()) {
-      $this->set('uid', 0);
+      $this->setCustomerId(0);
     }
     // Maintain the order email.
     if (!$this->getEmail() && $customer->isAuthenticated()) {
       $this->setEmail($customer->getEmail());
+    }
+    // Make sure the billing profile is owned by the order, not the customer.
+    $billing_profile = $this->getBillingProfile();
+    if ($billing_profile && $billing_profile->getOwnerId()) {
+      $billing_profile->setOwnerId(0);
+      $billing_profile->save();
     }
 
     if ($this->getState()->getId() == 'draft') {
