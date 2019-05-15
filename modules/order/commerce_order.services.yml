@@ -18,8 +18,8 @@ services:
     class: Drupal\commerce_order\AdjustmentTransformer
     arguments: ['@plugin.manager.commerce_adjustment_type', '@commerce_price.rounder']
 
-  commerce_order.address_book_manager:
-    class: Drupal\commerce_order\AddressBookManager
+  commerce_order.address_book:
+    class: Drupal\commerce_order\AddressBook
     arguments: ['@entity_type.bundle.info', '@entity_type.manager']
 
   commerce_order.order_assignment:
@@ -40,7 +40,7 @@ services:
 
   commerce_order.address_book_subscriber:
     class: Drupal\commerce_order\EventSubscriber\AddressBookSubscriber
-    arguments: ['@commerce_order.address_book_manager']
+    arguments: ['@commerce_order.address_book']
     tags:
       - { name: event_subscriber }
 

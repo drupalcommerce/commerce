@@ -8,20 +8,20 @@ use Drupal\Tests\commerce\Kernel\CommerceKernelTestBase;
 use Drupal\user\Entity\User;
 
 /**
- * Tests the address book manager.
+ * Tests the address book.
  *
- * @coversDefaultClass \Drupal\commerce_order\AddressBookManager
+ * @coversDefaultClass \Drupal\commerce_order\AddressBook
  *
  * @group commerce
  */
-class AddressBookManagerTest extends CommerceKernelTestBase {
+class AddressBookTest extends CommerceKernelTestBase {
 
   /**
-   * The address book manager.
+   * The address book.
    *
-   * @var \Drupal\commerce_order\AddressBookManagerInterface
+   * @var \Drupal\commerce_order\AddressBookInterface
    */
-  protected $addressBookManager;
+  protected $addressBook;
 
   /**
    * The test user.
@@ -66,7 +66,7 @@ class AddressBookManagerTest extends CommerceKernelTestBase {
     $this->installEntitySchema('profile');
     $this->installConfig('commerce_order');
 
-    $this->addressBookManager = $this->container->get('commerce_order.address_book_manager');
+    $this->addressBook = $this->container->get('commerce_order.address_book');
     $this->user = $this->createUser(['mail' => 'user1@example.com']);
 
     // Create a default profile for the current user.
@@ -85,6 +85,7 @@ class AddressBookManagerTest extends CommerceKernelTestBase {
       ],
     ]);
     $this->defaultProfile->save();
+    $this->defaultProfile = $this->reloadEntity($this->defaultProfile);
 
     $this->orderProfile = Profile::create([
       'type' => 'customer',
@@ -103,6 +104,35 @@ class AddressBookManagerTest extends CommerceKernelTestBase {
       ],
     ]);
     $this->orderProfile->save();
+    $this->orderProfile = $this->reloadEntity($this->orderProfile);
+  }
+
+  /**
+   * @covers ::loadAll
+   * @covers ::loadDefault
+   */
+  public function testLoad() {
+    $second_profile = Profile::create([
+      'type' => 'customer',
+      'uid' => $this->user->id(),
+      'address' => [
+        'country_code' => 'RS',
+        'postal_code' => '11000',
+        'locality' => 'Belgrade',
+        'address_line1' => 'Cetinjska 15',
+        'given_name' => 'John',
+        'family_name' => 'Smith',
+      ],
+    ]);
+    $second_profile->save();
+    $second_profile = $this->reloadEntity($second_profile);
+
+    $this->assertEquals([3 => $second_profile, 1 => $this->defaultProfile], $this->addressBook->loadAll($this->user, 'customer'));
+    $this->assertEquals([1 => $this->defaultProfile], $this->addressBook->loadAll($this->user, 'customer', ['US']));
+    $this->assertEquals([3 => $second_profile], $this->addressBook->loadAll($this->user, 'customer', ['RS']));
+
+    $this->assertEquals($this->defaultProfile, $this->addressBook->loadDefault($this->user, 'customer'));
+    $this->assertNull($this->addressBook->loadDefault($this->user, 'customer', ['RS']));
   }
 
   /**
@@ -113,7 +143,7 @@ class AddressBookManagerTest extends CommerceKernelTestBase {
       'type' => 'customer',
     ]);
     $profile->save();
-    $this->assertFalse($this->addressBookManager->needsCopy($profile));
+    $this->assertFalse($this->addressBook->needsCopy($profile));
 
     $profile = Profile::create([
       'type' => 'customer',
@@ -122,23 +152,24 @@ class AddressBookManagerTest extends CommerceKernelTestBase {
       ],
     ]);
     $profile->save();
-    $this->assertTrue($this->addressBookManager->needsCopy($profile));
+    $this->assertTrue($this->addressBook->needsCopy($profile));
   }
 
   /**
    * Test copying when multiple profiles are allowed per customer.
    *
    * @covers ::copy
+   * @covers ::allowsMultiple
    */
   public function testCopyMultiple() {
     $order_address = array_filter($this->orderProfile->get('address')->first()->getValue());
     // Confirm that trying to copy to an anonymous user doesn't explode, or
     // create ghost profiles.
-    $this->addressBookManager->copy($this->orderProfile, User::getAnonymousUser());
+    $this->addressBook->copy($this->orderProfile, User::getAnonymousUser());
     $new_profile = Profile::load(3);
     $this->assertEmpty($new_profile);
 
-    $this->addressBookManager->copy($this->orderProfile, $this->user);
+    $this->addressBook->copy($this->orderProfile, $this->user);
     // Confirm that a new profile was created with the original field data.
     $new_profile = Profile::load(3);
     $this->assertNotEmpty($new_profile);
@@ -156,6 +187,7 @@ class AddressBookManagerTest extends CommerceKernelTestBase {
    * Test copying when a single profile is allowed per customer.
    *
    * @covers ::copy
+   * @covers ::allowsMultiple
    */
   public function testCopySingle() {
     $order_address = array_filter($this->orderProfile->get('address')->first()->getValue());
@@ -166,7 +198,7 @@ class AddressBookManagerTest extends CommerceKernelTestBase {
     \Drupal::service('entity_type.bundle.info')->clearCachedBundles();
 
     // Confirm that the default profile was updated.
-    $this->addressBookManager->copy($this->orderProfile, $this->user);
+    $this->addressBook->copy($this->orderProfile, $this->user);
     $new_profile = Profile::load(3);
     $this->assertEmpty($new_profile);
     $this->defaultProfile = $this->reloadEntity($this->defaultProfile);
@@ -178,7 +210,7 @@ class AddressBookManagerTest extends CommerceKernelTestBase {
 
     // Confirm that a default profile will be created, if missing.
     $this->defaultProfile->delete();
-    $this->addressBookManager->copy($this->orderProfile, $this->user);
+    $this->addressBook->copy($this->orderProfile, $this->user);
     $new_default_profile = Profile::load(3);
     $this->assertNotEmpty($new_default_profile);
     $this->assertTrue($new_default_profile->isDefault());

@@ -4,11 +4,12 @@ namespace Drupal\commerce_order\Plugin\Commerce\InlineForm;
 
 use Drupal\commerce\CurrentCountryInterface;
 use Drupal\commerce\Plugin\Commerce\InlineForm\EntityInlineFormBase;
+use Drupal\commerce_order\AddressBookInterface;
 use Drupal\Core\Entity\Entity\EntityFormDisplay;
-use Drupal\Core\Entity\EntityTypeBundleInfo;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\profile\Entity\ProfileInterface;
+use Drupal\user\Entity\User;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -22,18 +23,18 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class CustomerProfile extends EntityInlineFormBase {
 
   /**
+   * The address book.
+   *
+   * @var \Drupal\commerce_order\AddressBookInterface
+   */
+  protected $addressBook;
+
+  /**
    * The current country.
    *
    * @var \Drupal\commerce\CurrentCountryInterface
    */
   protected $currentCountry;
-
-  /**
-   * The entity type bundle info.
-   *
-   * @var \Drupal\Core\Entity\EntityTypeBundleInfo
-   */
-  protected $entityTypeBundleInfo;
 
   /**
    * The entity type manager.
@@ -51,18 +52,18 @@ class CustomerProfile extends EntityInlineFormBase {
    *   The plugin_id for the plugin instance.
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
+   * @param \Drupal\commerce_order\AddressBookInterface $address_book
+   *   The address book.
    * @param \Drupal\commerce\CurrentCountryInterface $current_country
    *   The current country.
-   * @param \Drupal\Core\Entity\EntityTypeBundleInfo $entity_type_bundle_info
-   *   The entity type bundle info.
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, CurrentCountryInterface $current_country, EntityTypeBundleInfo $entity_type_bundle_info, EntityTypeManagerInterface $entity_type_manager) {
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, AddressBookInterface $address_book, CurrentCountryInterface $current_country, EntityTypeManagerInterface $entity_type_manager) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
 
+    $this->addressBook = $address_book;
     $this->currentCountry = $current_country;
-    $this->entityTypeBundleInfo = $entity_type_bundle_info;
     $this->entityTypeManager = $entity_type_manager;
   }
 
@@ -74,8 +75,8 @@ class CustomerProfile extends EntityInlineFormBase {
       $configuration,
       $plugin_id,
       $plugin_definition,
+      $container->get('commerce_order.address_book'),
       $container->get('commerce.current_country'),
-      $container->get('entity_type.bundle.info'),
       $container->get('entity_type.manager')
     );
   }
@@ -92,7 +93,7 @@ class CustomerProfile extends EntityInlineFormBase {
       'available_countries' => [],
 
       'use_address_book' => TRUE,
-      // The uid of the account whose address book will be used.
+      // The uid of the customer whose address book will be used.
       'address_book_uid' => 0,
     ];
   }
@@ -128,9 +129,12 @@ class CustomerProfile extends EntityInlineFormBase {
     $inline_form['#instance_id'] = $this->configuration['instance_id'];
 
     assert($this->entity instanceof ProfileInterface);
+    $profile_type_id = $this->entity->bundle();
+    $available_countries = $this->configuration['available_countries'];
     if ($this->entity->isNew()) {
       if ($this->configuration['use_address_book'] && $this->configuration['address_book_uid']) {
-        $default_profile = $this->loadDefaultProfile($this->configuration['address_book_uid']);
+        $customer = $this->loadUser($this->configuration['address_book_uid']);
+        $default_profile = $this->addressBook->loadDefault($customer, $profile_type_id, $available_countries);
         if (!empty($default_profile)) {
           $this->entity->populateFromProfile($default_profile);
         }
@@ -144,7 +148,7 @@ class CustomerProfile extends EntityInlineFormBase {
     if ($this->configuration['use_address_book']) {
       $inline_form['copy_to_address_book'] = [
         '#type' => 'checkbox',
-        '#title' => $this->getCopyLabel(),
+        '#title' => $this->getCopyLabel($profile_type_id),
         '#default_value' => (bool) $this->entity->getData('copy_to_address_book', TRUE),
         // The checkbox is not shown to anonymous customers, to avoid confusion.
         // The flag itself defaults to TRUE, cause the address should still
@@ -224,37 +228,40 @@ class CustomerProfile extends EntityInlineFormBase {
   }
 
   /**
-   * Loads the default profile for the given user ID.
+   * Loads a user entity for the given user ID.
    *
-   * @param int $uid
+   * Falls back to the anonymous user if the user ID is empty or unknown.
+   *
+   * @param string $uid
    *   The user ID.
    *
-   * @return \Drupal\profile\Entity\ProfileInterface|null
-   *   The default profile, or NULL if none found.
+   * @return \Drupal\user\UserInterface
+   *   The user entity.
    */
-  protected function loadDefaultProfile($uid) {
-    $user_storage = $this->entityTypeManager->getStorage('user');
-    /** @var \Drupal\user\UserInterface $user */
-    $user = $user_storage->load($uid);
-    if (!$user) {
-      return NULL;
+  protected function loadUser($uid) {
+    $customer = User::getAnonymousUser();
+    if (!empty($uid)) {
+      $user_storage = $this->entityTypeManager->getStorage('user');
+      /** @var \Drupal\user\UserInterface $user */
+      $user = $user_storage->load($uid);
+      if ($user) {
+        $customer = $user;
+      }
     }
-    /** @var \Drupal\profile\ProfileStorageInterface $profile_storage */
-    $profile_storage = $this->entityTypeManager->getStorage('profile');
-    $default_profile = $profile_storage->loadDefaultByUser($user, $this->entity->bundle());
-
-    return $default_profile;
+    return $customer;
   }
 
   /**
-   * Gets the copy label.
+   * Gets the copy label for the given profile type.
+   *
+   * @param string $profile_type_id
+   *   The profile type ID.
    *
    * @return string
    *   The copy label.
    */
-  protected function getCopyLabel() {
-    $bundles = $this->entityTypeBundleInfo->getBundleInfo('profile');
-    if (!empty($bundles[$this->entity->bundle()]['multiple'])) {
+  protected function getCopyLabel($profile_type_id) {
+    if ($this->addressBook->allowsMultiple($profile_type_id)) {
       $copy_label = $this->t('Save to my address book');
     }
     else {

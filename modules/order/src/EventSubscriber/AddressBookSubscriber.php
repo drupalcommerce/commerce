@@ -2,7 +2,7 @@
 
 namespace Drupal\commerce_order\EventSubscriber;
 
-use Drupal\commerce_order\AddressBookManagerInterface;
+use Drupal\commerce_order\AddressBookInterface;
 use Drupal\commerce_order\Event\OrderAssignEvent;
 use Drupal\state_machine\Event\WorkflowTransitionEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -13,20 +13,20 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 class AddressBookSubscriber implements EventSubscriberInterface {
 
   /**
-   * The address book manager.
+   * The address book.
    *
-   * @var \Drupal\commerce_order\AddressBookManagerInterface
+   * @var \Drupal\commerce_order\AddressBookInterface
    */
-  protected $addressBookManager;
+  protected $addressBook;
 
   /**
    * Constructs a new AddressBookSubscriber object.
    *
-   * @param \Drupal\commerce_order\AddressBookManagerInterface $address_book_manager
-   *   The address book manager.
+   * @param \Drupal\commerce_order\AddressBookInterface $address_book
+   *   The address book.
    */
-  public function __construct(AddressBookManagerInterface $address_book_manager) {
-    $this->addressBookManager = $address_book_manager;
+  public function __construct(AddressBookInterface $address_book) {
+    $this->addressBook = $address_book;
   }
 
   /**
@@ -50,8 +50,8 @@ class AddressBookSubscriber implements EventSubscriberInterface {
     $order = $event->getEntity();
     $profile = $order->getBillingProfile();
     $customer = $order->getCustomer();
-    if ($profile && $this->addressBookManager->needsCopy($profile)) {
-      $this->addressBookManager->copy($profile, $customer);
+    if ($profile && $this->addressBook->needsCopy($profile)) {
+      $this->addressBook->copy($profile, $customer);
     }
   }
 
@@ -66,8 +66,8 @@ class AddressBookSubscriber implements EventSubscriberInterface {
     $order = $event->getOrder();
     $profile = $order->getBillingProfile();
     $customer = $event->getCustomer();
-    if ($profile && $this->addressBookManager->needsCopy($profile)) {
-      $this->addressBookManager->copy($profile, $customer);
+    if ($profile && $this->addressBook->needsCopy($profile)) {
+      $this->addressBook->copy($profile, $customer);
     }
   }
 
