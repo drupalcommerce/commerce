@@ -83,7 +83,7 @@ class OrderPaidSubscriberTest extends CommerceKernelTestBase {
    * Confirms that on-site payments do not affect the order status.
    */
   public function testOnsiteGateway() {
-    /** @var \Drupal\commerce_payment\Entity\PaymentGateway $onsite_gateway */
+    /** @var \Drupal\commerce_payment\Entity\PaymentGatewayInterface $onsite_gateway */
     $onsite_gateway = PaymentGateway::create([
       'id' => 'onsite',
       'label' => 'On-site',
@@ -117,7 +117,7 @@ class OrderPaidSubscriberTest extends CommerceKernelTestBase {
    * Confirms that off-site payments result in the order getting placed.
    */
   public function testOffsiteGateway() {
-    /** @var \Drupal\commerce_payment\Entity\PaymentGateway $gateway */
+    /** @var \Drupal\commerce_payment\Entity\PaymentGatewayInterface $offsite_gateway */
     $offsite_gateway = PaymentGateway::create([
       'id' => 'offsite',
       'label' => 'Off-site',

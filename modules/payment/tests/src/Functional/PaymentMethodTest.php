@@ -58,7 +58,7 @@ class PaymentMethodTest extends CommerceBrowserTestBase {
 
     $this->collectionUrl = 'user/' . $this->user->id() . '/payment-methods';
 
-    /** @var \Drupal\commerce_payment\Entity\PaymentGateway $payment_gateway */
+    /** @var \Drupal\commerce_payment\Entity\PaymentGatewayInterface $payment_gateway */
     $this->paymentGateway = $this->createEntity('commerce_payment_gateway', [
       'id' => 'example',
       'label' => 'Example',
@@ -164,7 +164,7 @@ class PaymentMethodTest extends CommerceBrowserTestBase {
    * Tests creating and updating a payment method without billing information.
    */
   public function testPaymentMethodCreationAndUpdateWithoutBilling() {
-    $this->paymentGateway->getPlugin()->setConfiguration([
+    $this->paymentGateway->setPluginConfiguration([
       'collect_billing_information' => FALSE,
     ]);
     $this->paymentGateway->save();

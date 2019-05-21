@@ -101,7 +101,7 @@ class PaymentCheckoutTest extends CommerceWebDriverTestBase {
       'stores' => [$this->store],
     ]);
 
-    /** @var \Drupal\commerce_payment\Entity\PaymentGateway $skipped_gateway */
+    /** @var \Drupal\commerce_payment\Entity\PaymentGatewayInterface $skipped_gateway */
     $skipped_gateway = PaymentGateway::create([
       'id' => 'onsite_skipped',
       'label' => 'On-site Skipped',
@@ -125,8 +125,8 @@ class PaymentCheckoutTest extends CommerceWebDriverTestBase {
     ]);
     $skipped_gateway->save();
 
-    /** @var \Drupal\commerce_payment\Entity\PaymentGateway $gateway */
-    $gateway = PaymentGateway::create([
+    /** @var \Drupal\commerce_payment\Entity\PaymentGatewayInterface $payment_gateway */
+    $payment_gateway = PaymentGateway::create([
       'id' => 'onsite',
       'label' => 'On-site',
       'plugin' => 'example_onsite',
@@ -135,10 +135,10 @@ class PaymentCheckoutTest extends CommerceWebDriverTestBase {
         'payment_method_types' => ['credit_card'],
       ],
     ]);
-    $gateway->save();
+    $payment_gateway->save();
 
-    /** @var \Drupal\commerce_payment\Entity\PaymentGateway $gateway */
-    $gateway = PaymentGateway::create([
+    /** @var \Drupal\commerce_payment\Entity\PaymentGatewayInterface $payment_gateway */
+    $payment_gateway = PaymentGateway::create([
       'id' => 'offsite',
       'label' => 'Off-site',
       'plugin' => 'example_offsite_redirect',
@@ -147,10 +147,10 @@ class PaymentCheckoutTest extends CommerceWebDriverTestBase {
         'payment_method_types' => ['credit_card'],
       ],
     ]);
-    $gateway->save();
+    $payment_gateway->save();
 
-    /** @var \Drupal\commerce_payment\Entity\PaymentGateway $gateway */
-    $gateway = PaymentGateway::create([
+    /** @var \Drupal\commerce_payment\Entity\PaymentGatewayInterface $payment_gateway */
+    $payment_gateway = PaymentGateway::create([
       'id' => 'manual',
       'label' => 'Manual',
       'plugin' => 'manual',
@@ -162,7 +162,7 @@ class PaymentCheckoutTest extends CommerceWebDriverTestBase {
         ],
       ],
     ]);
-    $gateway->save();
+    $payment_gateway->save();
 
     $default_profile = $this->createEntity('profile', [
       'type' => 'customer',
@@ -231,17 +231,17 @@ class PaymentCheckoutTest extends CommerceWebDriverTestBase {
     $default_radio_button = $page->findField('Visa ending in 9999');
     $this->assertTrue($default_radio_button->getAttribute('checked'));
 
-    /** @var \Drupal\commerce_payment\Entity\PaymentGateway $gateway */
-    $gateway = PaymentGateway::create([
+    /** @var \Drupal\commerce_payment\Entity\PaymentGatewayInterface $payment_gateway */
+    $payment_gateway = PaymentGateway::create([
       'id' => 'onsite2',
       'label' => 'On-site 2',
       'plugin' => 'example_onsite',
     ]);
-    $gateway->getPlugin()->setConfiguration([
+    $payment_gateway->setPluginConfiguration([
       'api_key' => '2342fewfsfs',
       'payment_method_types' => ['credit_card'],
     ]);
-    $gateway->save();
+    $payment_gateway->save();
 
     $first_onsite_gateway = PaymentGateway::load('onsite');
     $first_onsite_gateway->setStatus(FALSE);
@@ -449,7 +449,7 @@ class PaymentCheckoutTest extends CommerceWebDriverTestBase {
    */
   public function testCheckoutWithOffsiteRedirectPostManual() {
     $payment_gateway = PaymentGateway::load('offsite');
-    $payment_gateway->getPlugin()->setConfiguration([
+    $payment_gateway->setPluginConfiguration([
       'redirect_method' => 'post_manual',
       'payment_method_types' => ['credit_card'],
     ]);
@@ -508,7 +508,7 @@ class PaymentCheckoutTest extends CommerceWebDriverTestBase {
     $manual_gateway->save();
 
     $payment_gateway = PaymentGateway::load('offsite');
-    $payment_gateway->getPlugin()->setConfiguration([
+    $payment_gateway->setPluginConfiguration([
       'redirect_method' => 'get',
       'payment_method_types' => ['credit_card'],
     ]);
@@ -549,7 +549,7 @@ class PaymentCheckoutTest extends CommerceWebDriverTestBase {
    */
   public function testFailedCheckoutWithOffsiteRedirectGet() {
     $payment_gateway = PaymentGateway::load('offsite');
-    $payment_gateway->getPlugin()->setConfiguration([
+    $payment_gateway->setPluginConfiguration([
       'redirect_method' => 'get',
       'payment_method_types' => ['credit_card'],
     ]);
@@ -594,7 +594,7 @@ class PaymentCheckoutTest extends CommerceWebDriverTestBase {
    */
   public function testCheckoutWithOffsitePaymentNotify() {
     $payment_gateway = PaymentGateway::load('offsite');
-    $payment_gateway->getPlugin()->setConfiguration([
+    $payment_gateway->setPluginConfiguration([
       'redirect_method' => 'post_manual',
       'payment_method_types' => ['credit_card'],
     ]);
@@ -717,7 +717,7 @@ class PaymentCheckoutTest extends CommerceWebDriverTestBase {
    */
   public function testManualWithoutBilling() {
     $payment_gateway = PaymentGateway::load('manual');
-    $payment_gateway->getPlugin()->setConfiguration([
+    $payment_gateway->setPluginConfiguration([
       'collect_billing_information' => FALSE,
       'display_label' => 'Cash on delivery',
       'instructions' => [

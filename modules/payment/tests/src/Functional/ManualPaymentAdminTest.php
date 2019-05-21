@@ -67,7 +67,7 @@ class ManualPaymentAdminTest extends CommerceBrowserTestBase {
       'label' => 'Manual example',
       'plugin' => 'manual',
     ]);
-    $this->paymentGateway->getPlugin()->setConfiguration([
+    $this->paymentGateway->setPluginConfiguration([
       'display_label' => 'Cash on delivery',
       'instructions' => [
         'value' => 'Test instructions.',

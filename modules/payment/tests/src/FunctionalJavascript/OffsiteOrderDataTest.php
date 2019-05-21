@@ -59,8 +59,8 @@ class OffsiteOrderDataTest extends CommerceWebDriverTestBase {
       'stores' => [$this->store],
     ]);
 
-    /** @var \Drupal\commerce_payment\Entity\PaymentGateway $gateway */
-    $gateway = PaymentGateway::create([
+    /** @var \Drupal\commerce_payment\Entity\PaymentGatewayInterface $payment_gateway */
+    $payment_gateway = PaymentGateway::create([
       'id' => 'offsite',
       'label' => 'Off-site',
       'plugin' => 'test_offsite',
@@ -70,7 +70,7 @@ class OffsiteOrderDataTest extends CommerceWebDriverTestBase {
         'payment_method_types' => ['credit_card'],
       ],
     ]);
-    $gateway->save();
+    $payment_gateway->save();
   }
 
   /**

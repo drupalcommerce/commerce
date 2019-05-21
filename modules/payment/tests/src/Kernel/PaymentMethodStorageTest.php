@@ -79,7 +79,7 @@ class PaymentMethodStorageTest extends CommerceKernelTestBase {
       'label' => 'Example',
       'plugin' => 'example_onsite',
     ]);
-    $payment_gateway->getPlugin()->setConfiguration([
+    $payment_gateway->setPluginConfiguration([
       'api_key' => '2342fewfsfs',
       'mode' => 'test',
       'payment_method_types' => ['credit_card'],
@@ -142,7 +142,7 @@ class PaymentMethodStorageTest extends CommerceKernelTestBase {
     // payment methods to be ignored.
     $payment_gateway_configuration = $this->paymentGateway->getPluginConfiguration();
     $payment_gateway_configuration['mode'] = 'live';
-    $this->paymentGateway->getPlugin()->setConfiguration($payment_gateway_configuration);
+    $this->paymentGateway->setPluginConfiguration($payment_gateway_configuration);
     $this->paymentGateway->save();
     $reusable_payment_methods = $this->storage->loadReusable($this->user, $this->paymentGateway);
     $this->assertEmpty($reusable_payment_methods);

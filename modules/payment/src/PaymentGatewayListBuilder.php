@@ -37,9 +37,9 @@ class PaymentGatewayListBuilder extends DraggableListBuilder {
    */
   public function buildRow(EntityInterface $entity) {
     /** @var \Drupal\commerce_payment\Entity\PaymentGatewayInterface $entity */
-    $gateway_plugin = $entity->getPlugin();
-    $modes = $gateway_plugin->getSupportedModes();
-    $mode = $modes ? $modes[$gateway_plugin->getMode()] : $this->t('N/A');
+    $payment_gateway_plugin = $entity->getPlugin();
+    $modes = $payment_gateway_plugin->getSupportedModes();
+    $mode = $modes ? $modes[$payment_gateway_plugin->getMode()] : $this->t('N/A');
     $status = $entity->status() ? $this->t('Enabled') : $this->t('Disabled');
     $row['label'] = $entity->label();
     // $this->weightKey determines whether the table will be rendered as a form.

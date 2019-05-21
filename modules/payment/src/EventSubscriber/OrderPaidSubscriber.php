@@ -44,7 +44,7 @@ class OrderPaidSubscriber implements EventSubscriberInterface {
       // The order has already been placed.
       return;
     }
-    /** @var \Drupal\commerce_payment\Entity\PaymentGateway $payment_gateway */
+    /** @var \Drupal\commerce_payment\Entity\PaymentGatewayInterface $payment_gateway */
     $payment_gateway = $order->get('payment_gateway')->entity;
     if (!$payment_gateway) {
       // The payment gateway is unknown.

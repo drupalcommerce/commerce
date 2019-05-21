@@ -115,7 +115,7 @@ class OrderAssignmentTest extends CommerceKernelTestBase {
       'label' => 'Example',
       'plugin' => 'example_onsite',
     ]);
-    $payment_gateway->getPlugin()->setConfiguration([
+    $payment_gateway->setPluginConfiguration([
       'api_key' => '2342fewfsfs',
       'mode' => 'test',
       'payment_method_types' => ['credit_card'],

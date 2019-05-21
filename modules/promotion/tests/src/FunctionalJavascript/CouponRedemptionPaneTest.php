@@ -99,7 +99,7 @@ class CouponRedemptionPaneTest extends CommerceWebDriverTestBase {
     $this->promotion->addCoupon($coupon);
     $this->promotion->save();
 
-    /** @var \Drupal\commerce_payment\Entity\PaymentGateway $gateway */
+    /** @var \Drupal\commerce_payment\Entity\PaymentGatewayInterface $offsite_gateway */
     $offsite_gateway = PaymentGateway::create([
       'id' => 'offsite',
       'label' => 'Off-site',
@@ -111,7 +111,7 @@ class CouponRedemptionPaneTest extends CommerceWebDriverTestBase {
     ]);
     $offsite_gateway->save();
 
-    /** @var \Drupal\commerce_payment\Entity\PaymentGateway $gateway */
+    /** @var \Drupal\commerce_payment\Entity\PaymentGatewayInterface $onsite_gateway */
     $onsite_gateway = PaymentGateway::create([
       'id' => 'onsite',
       'label' => 'On-site',
