@@ -73,6 +73,7 @@ class OrderIntegrationTest extends CommerceKernelTestBase {
         ],
       ],
     ])->save();
+
     OrderItemType::create([
       'id' => 'test',
       'label' => 'Test',
@@ -92,9 +93,9 @@ class OrderIntegrationTest extends CommerceKernelTestBase {
   }
 
   /**
-   * Tests that the store address is used as a default for new orders.
+   * Tests the handling of orders without a billing profile.
    */
-  public function testDefaultProfile() {
+  public function testNoProfile() {
     $order_item = OrderItem::create([
       'type' => 'test',
       'quantity' => '1',
@@ -103,6 +104,8 @@ class OrderIntegrationTest extends CommerceKernelTestBase {
     $order_item->save();
     $this->order->addItem($order_item);
     $this->order->save();
+
+    // Confirm that the store address was used.
     $adjustments = $this->order->collectAdjustments();
     $adjustment = reset($adjustments);
     $this->assertCount(1, $adjustments);
@@ -111,9 +114,36 @@ class OrderIntegrationTest extends CommerceKernelTestBase {
   }
 
   /**
-   * Tests the usage of default billing profile.
+   * Tests the handling of orders with a broken billing profile.
    */
-  public function testBillingProfile() {
+  public function testBrokenProfile() {
+    $profile = Profile::create([
+      'type' => 'customer',
+      'address' => [],
+    ]);
+    $profile->save();
+    $order_item = OrderItem::create([
+      'type' => 'test',
+      'quantity' => '1',
+      'unit_price' => new Price('12.00', 'USD'),
+    ]);
+    $order_item->save();
+    $this->order->addItem($order_item);
+    $this->order->setBillingProfile($profile);
+    $this->order->save();
+
+    // Confirm that the store address was used.
+    $adjustments = $this->order->collectAdjustments();
+    $adjustment = reset($adjustments);
+    $this->assertCount(1, $adjustments);
+    $this->assertEquals(new Price('2.00', 'USD'), $adjustment->getAmount());
+    $this->assertEquals('us_vat|default|standard', $adjustment->getSourceId());
+  }
+
+  /**
+   * Tests the handling of orders with a valid billing profile.
+   */
+  public function testValidProfile() {
     $profile = Profile::create([
       'type' => 'customer',
       'address' => [
@@ -131,6 +161,7 @@ class OrderIntegrationTest extends CommerceKernelTestBase {
     $this->order->addItem($order_item);
     $this->order->setBillingProfile($profile);
     $this->order->save();
+
     $adjustments = $this->order->collectAdjustments();
     $adjustment = reset($adjustments);
     $this->assertCount(1, $adjustments);
