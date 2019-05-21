@@ -155,6 +155,7 @@ class PaymentMethodStorageTest extends CommerceKernelTestBase {
     /** @var \Drupal\profile\Entity\Profile $profile_fr */
     $profile_fr = Profile::create([
       'type' => 'customer',
+      'uid' => 0,
       'address' => [
         'organization' => '',
         'country_code' => 'FR',
@@ -164,7 +165,6 @@ class PaymentMethodStorageTest extends CommerceKernelTestBase {
         'given_name' => 'John',
         'family_name' => 'LeSmith',
       ],
-      'uid' => $this->user->id(),
     ]);
     $profile_fr->save();
     /** @var \Drupal\commerce_payment\Entity\PaymentMethodInterface $payment_method_fr */
@@ -176,11 +176,11 @@ class PaymentMethodStorageTest extends CommerceKernelTestBase {
       'billing_profile' => $profile_fr,
     ]);
     $payment_method_fr->save();
-
-    $this->assertEmpty($this->storage->loadReusable($this->user, $this->paymentGateway, ['US']));
+    $payment_method_fr = $this->reloadEntity($payment_method_fr);
 
     $profile_us = Profile::create([
       'type' => 'customer',
+      'uid' => 0,
       'address' => [
         'country_code' => 'US',
         'postal_code' => '53177',
@@ -190,7 +190,6 @@ class PaymentMethodStorageTest extends CommerceKernelTestBase {
         'given_name' => 'Frederick',
         'family_name' => 'Pabst',
       ],
-      'uid' => $this->user->id(),
     ]);
     $profile_us->save();
     /** @var \Drupal\commerce_payment\Entity\PaymentMethodInterface $payment_method_fr */
@@ -202,8 +201,27 @@ class PaymentMethodStorageTest extends CommerceKernelTestBase {
       'billing_profile' => $profile_us,
     ]);
     $payment_method_us->save();
+    $payment_method_us = $this->reloadEntity($payment_method_us);
 
-    $this->assertTrue($this->storage->loadReusable($this->user, $this->paymentGateway, ['US']));
+    $payment_methods = $this->storage->loadReusable($this->user, $this->paymentGateway, ['US']);
+    $this->assertCount(1, $payment_methods);
+    $this->assertEquals([$payment_method_us], array_values($payment_methods));
+
+    $payment_methods = $this->storage->loadReusable($this->user, $this->paymentGateway, ['FR']);
+    $this->assertCount(1, $payment_methods);
+    $this->assertEquals([$payment_method_fr], array_values($payment_methods));
+
+    // Disable the collection of billing information.
+    $this->paymentGateway->setPluginConfiguration([
+      'collect_billing_information' => FALSE,
+      'api_key' => '2342fewfsfs',
+      'mode' => 'test',
+      'payment_method_types' => ['credit_card'],
+    ]);
+    // Confirm that no filtering is done.
+    $payment_methods = $this->storage->loadReusable($this->user, $this->paymentGateway, ['FR']);
+    $this->assertCount(2, $payment_methods);
+    $this->assertEquals([$payment_method_us, $payment_method_fr], array_values($payment_methods));
   }
 
 }

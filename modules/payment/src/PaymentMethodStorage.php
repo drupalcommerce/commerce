@@ -99,9 +99,8 @@ class PaymentMethodStorage extends CommerceContentEntityStorage implements Payme
 
     /** @var \Drupal\commerce_payment\Entity\PaymentMethodInterface[] $payment_methods */
     $payment_methods = $this->loadMultiple($result);
-    if (!empty($billing_countries)) {
+    if (!empty($billing_countries) && $payment_gateway->getPlugin()->needsBillingInformation()) {
       // Filter out payment methods that don't match the billing countries.
-      // Payment methods without a billing profile should also be filtered out.
       // @todo Use a query condition once #2822359 is fixed.
       foreach ($payment_methods as $id => $payment_method) {
         $country_code = 'ZZ';

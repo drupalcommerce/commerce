@@ -22,6 +22,8 @@ interface PaymentMethodStorageInterface extends ContentEntityStorageInterface {
    *   (Optional) A list of billing countries to filter by.
    *   For example, if ['US', 'FR'] is given, only payment methods
    *   with billing profiles from those countries will be returned.
+   *   Filtering is skipped if the payment gateway doesn't collect
+   *   billing information.
    *
    * @return \Drupal\commerce_payment\Entity\PaymentMethodInterface[]
    *   The reusable payment methods.
