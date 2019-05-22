@@ -219,7 +219,7 @@ abstract class PaymentGatewayBase extends PluginBase implements PaymentGatewayIn
   /**
    * {@inheritdoc}
    */
-  public function needsBillingInformation() {
+  public function collectsBillingInformation() {
     return $this->configuration['collect_billing_information'];
   }
 

@@ -82,7 +82,7 @@ class PaymentMethodFormBase extends PaymentGatewayFormBase implements ContainerI
 
     $form['#attached']['library'][] = 'commerce_payment/payment_method_form';
     $form['#tree'] = TRUE;
-    if ($payment_gateway_plugin->needsBillingInformation()) {
+    if ($payment_gateway_plugin->collectsBillingInformation()) {
       $billing_profile = $payment_method->getBillingProfile();
       if (!$billing_profile) {
         $profile_storage = $this->entityTypeManager->getStorage('profile');
@@ -122,7 +122,7 @@ class PaymentMethodFormBase extends PaymentGatewayFormBase implements ContainerI
     /** @var \Drupal\commerce_payment\Entity\PaymentMethodInterface $payment_method */
     $payment_method = $this->entity;
 
-    if ($payment_gateway_plugin->needsBillingInformation()) {
+    if ($payment_gateway_plugin->collectsBillingInformation()) {
       /** @var \Drupal\commerce\Plugin\Commerce\InlineForm\EntityInlineFormInterface $inline_form */
       $inline_form = $form['billing_information']['#inline_form'];
       /** @var \Drupal\profile\Entity\ProfileInterface $billing_profile */

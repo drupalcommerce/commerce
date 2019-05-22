@@ -97,12 +97,13 @@ interface PaymentGatewayInterface extends PluginWithFormsInterface, Configurable
   public function getCreditCardTypes();
 
   /**
-   * Gets whether the payment gateway needs billing information.
+   * Gets whether the payment gateway collects billing information.
    *
    * @return bool
-   *   TRUE if the payment gateway needs billing information, FALSE otherwise.
+   *   TRUE if the payment gateway collects billing information,
+   *   FALSE otherwise.
    */
-  public function needsBillingInformation();
+  public function collectsBillingInformation();
 
   /**
    * Builds the available operations for the given payment.

@@ -208,7 +208,7 @@ class PaymentInformation extends CheckoutPaneBase {
     if ($payment_gateway->getPlugin() instanceof SupportsStoredPaymentMethodsInterface) {
       $pane_form = $this->buildPaymentMethodForm($pane_form, $form_state, $default_option);
     }
-    elseif ($payment_gateway->getPlugin()->needsBillingInformation()) {
+    elseif ($payment_gateway->getPlugin()->collectsBillingInformation()) {
       $pane_form = $this->buildBillingProfileForm($pane_form, $form_state);
     }
 
