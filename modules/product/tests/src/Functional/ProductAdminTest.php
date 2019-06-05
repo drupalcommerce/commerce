@@ -6,6 +6,10 @@ use Drupal\commerce\EntityHelper;
 use Drupal\commerce_price\Price;
 use Drupal\commerce_product\Entity\Product;
 use Drupal\commerce_product\Entity\ProductVariation;
+use Drupal\Core\Entity\Entity\EntityFormDisplay;
+use Drupal\field\Entity\FieldConfig;
+use Drupal\field\Entity\FieldStorageConfig;
+use Drupal\Tests\TestFileCreationTrait;
 
 /**
  * Create, view, edit, delete, and change products.
@@ -13,6 +17,56 @@ use Drupal\commerce_product\Entity\ProductVariation;
  * @group commerce
  */
 class ProductAdminTest extends ProductBrowserTestBase {
+
+  use TestFileCreationTrait;
+
+  /**
+   * A test image.
+   *
+   * @var \stdClass
+   */
+  protected $testImage;
+
+  /**
+   * Modules to enable.
+   *
+   * @var array
+   */
+  public static $modules = [
+    'file',
+    'image',
+  ];
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function setUp() {
+    parent::setUp();
+
+    FieldStorageConfig::create([
+      'field_name' => 'field_image',
+      'type' => 'image',
+      'entity_type' => 'commerce_product_variation',
+    ])->save();
+    FieldConfig::create([
+      'field_name' => 'field_image',
+      'entity_type' => 'commerce_product_variation',
+      'bundle' => 'default',
+      'label' => 'Image',
+      'settings' => [
+        'alt_field_required' => FALSE,
+      ],
+    ])->save();
+    $form_display = EntityFormDisplay::load('commerce_product_variation.default.default');
+    $form_display->setComponent('field_image', [
+      'type' => 'image_image',
+    ]);
+    $form_display->save();
+
+    $file_system = \Drupal::service('file_system');
+    $this->testImage = current($this->getTestFiles('image'));
+    $this->testImage->realpath = $file_system->realpath($this->testImage->uri);
+  }
 
   /**
    * Tests creating a product.
@@ -236,20 +290,20 @@ class ProductAdminTest extends ProductBrowserTestBase {
 
     $this->assertSession()->pageTextContains(t('The product @title has been successfully saved', ['@title' => $title]));
     $this->assertSession()->pageTextContains(t('There are no product variations yet.'));
-    $this->assertNotEmpty($this->getSession()->getPage()->hasLink('Add variation'));
+    $this->getSession()->getPage()->clickLink('Add variation');
 
     // Create a variation.
-    $this->getSession()->getPage()->clickLink('Add variation');
-    $this->assertSession()->pageTextContains(t('Add variation'));
-    $this->assertSession()->fieldExists('sku[0][value]');
-    $this->assertSession()->fieldExists('price[0][number]');
-    $this->assertSession()->fieldExists('status[value]');
-    $this->assertSession()->buttonExists('Save');
-
     $variation_sku = $this->randomMachineName();
+    // Fill all needed fields except the image.
     $this->getSession()->getPage()->fillField('sku[0][value]', $variation_sku);
     $this->getSession()->getPage()->fillField('price[0][number]', '9.99');
-    $this->submitForm([], t('Save'));
+    // Upload the image.
+    $this->submitForm([
+      'files[field_image_0]' => $this->testImage->realpath,
+    ], 'field_image_0_upload_button');
+    $this->assertSession()->buttonExists('field_image_0_remove_button');
+    // Submit the form.
+    $this->submitForm([], 'Save');
     $this->assertSession()->pageTextContains("Saved the $title variation.");
     $variation_in_table = $this->getSession()->getPage()->find('xpath', '//table/tbody/tr/td[text()="' . $variation_sku . '"]');
     $this->assertNotEmpty($variation_in_table);
@@ -258,6 +312,7 @@ class ProductAdminTest extends ProductBrowserTestBase {
     $variation = ProductVariation::load(1);
     $this->assertEquals($product->id(), $variation->getProductId());
     $this->assertEquals($variation_sku, $variation->getSku());
+    $this->assertFalse($variation->get('field_image')->isEmpty());
 
     $this->container->get('entity_type.manager')->getStorage('commerce_product')->resetCache([$product->id()]);
     $product = Product::load($product->id());
@@ -377,26 +432,37 @@ class ProductAdminTest extends ProductBrowserTestBase {
    */
   public function testSingleVariationMode() {
     $this->drupalGet('admin/commerce/config/product-types/default/edit');
-    $edit = [
+    $this->submitForm([
       'multipleVariations' => FALSE,
-    ];
-    $this->submitForm($edit, t('Save'));
+    ], 'Save');
 
     $this->drupalGet('admin/commerce/products');
     $this->getSession()->getPage()->clickLink('Add product');
     $this->assertSession()->buttonNotExists('Save and add variations');
     $this->assertSession()->fieldExists('variations[entity][sku][0][value]');
 
+    $title = 'Mug';
     $store_id = $this->stores[0]->id();
-    $title = $this->randomMachineName();
     $sku = strtolower($this->randomMachineName());
-    $edit = [
-      'title[0][value]' => $title,
-      'stores[target_id][value][' . $store_id . ']' => $store_id,
-      'variations[entity][sku][0][value]' => $sku,
-      'variations[entity][price][0][number]' => '99.99',
-    ];
-    $this->submitForm($edit, 'Save');
+    // Fill all needed fields except the image.
+    $page = $this->getSession()->getPage();
+    $page->fillField('title[0][value]', $title);
+    $page->fillField('stores[target_id][value][' . $store_id . ']', $store_id);
+    $page->fillField('variations[entity][sku][0][value]', $sku);
+    $page->fillField('variations[entity][price][0][number]', '99.99');
+    // Upload the image.
+    $this->submitForm([
+      'files[variations_entity_field_image_0]' => $this->testImage->realpath,
+    ], 'variations_entity_field_image_0_upload_button');
+    $this->assertSession()->buttonExists('variations_entity_field_image_0_remove_button');
+    // Submit the form.
+    $this->submitForm([], 'Save');
+
+    // Confirm that we've avoided the #commerce_element_submit bug where
+    // uploading a file saves the variation in the background, causing the
+    // later submit to fail due to the SKU already existing in the database.
+    $this->assertSession()->pageTextNotContains(sprintf('The SKU "%s" is already in use and must be unique.', $sku));
+    $this->assertSession()->pageTextContains('The product Mug has been successfully saved');
 
     $product = Product::load(1);
     $this->assertNotEmpty($product);
@@ -406,6 +472,7 @@ class ProductAdminTest extends ProductBrowserTestBase {
     $this->assertNotEmpty($variation);
     $this->assertEquals($sku, $variation->getSku());
     $this->assertEquals(new Price('99.99', 'USD'), $variation->getPrice());
+    $this->assertFalse($variation->get('field_image')->isEmpty());
 
     $this->drupalGet($product->toUrl('edit-form'));
     $edit = [

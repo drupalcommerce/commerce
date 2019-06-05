@@ -2,18 +2,22 @@
 
 namespace Drupal\commerce\Element;
 
-use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\Element;
 
 /**
- * Provides a trait for Commerce form elements.
+ * Allows form elements to use #commerce_element_submit.
  *
- * Allows form elements to use #commerce_element_submit, a substitute
- * for the #element_submit that's missing from Drupal core.
+ * This is a substitute for the #element_submit that's missing from Drupal core.
  *
  * Each form element using this trait should add the attachElementSubmit and
  * validateElementSubmit callbacks to their getInfo() methods.
+ *
+ * If the parent form has multiple submit buttons, the element submit
+ * callbacks will only be invoked when the form is submitted via the
+ * primary submit button (#button_type => primary).
+ * This prevents irreversible changes from being applied for submit buttons
+ * which only rebuild the form (e.g. "Upload file" or "Add another item").
  */
 trait CommerceElementTrait {
 
@@ -82,30 +86,15 @@ trait CommerceElementTrait {
       // The form wasn't submitted (#ajax in progress) or failed validation.
       return;
     }
-    // A submit button might need to process only a part of the form.
-    // For example, the "Apply coupon" button at checkout should apply coupons,
-    // but not save the payment information. Use #limit_validation_errors
-    // as a guideline for which parts of the form to submit.
     $triggering_element = $form_state->getTriggeringElement();
-    if (isset($triggering_element['#limit_validation_errors']) && $triggering_element['#limit_validation_errors'] !== FALSE) {
-      // #limit_validation_errors => [], the button cares about nothing.
-      if (empty($triggering_element['#limit_validation_errors'])) {
-        return;
-      }
+    $button_type = isset($triggering_element['#button_type']) ? $triggering_element['#button_type'] : '';
+    if ($button_type != 'primary' && count($form_state->getButtons()) > 1) {
+      // The form was submitted, but not via the primary button, which
+      // indicates that it will probably be rebuilt.
+      return;
+    }
 
-      foreach ($triggering_element['#limit_validation_errors'] as $limit_validation_errors) {
-        $element = NestedArray::getValue($form, $limit_validation_errors);
-        if (!$element) {
-          // The element will be empty if #parents don't match #array_parents,
-          // the case for IEF widgets. In that case just submit everything.
-          $element = &$form;
-        }
-        self::doExecuteSubmitHandlers($element, $form_state);
-      }
-    }
-    else {
-      self::doExecuteSubmitHandlers($form, $form_state);
-    }
+    self::doExecuteSubmitHandlers($form, $form_state);
   }
 
   /**

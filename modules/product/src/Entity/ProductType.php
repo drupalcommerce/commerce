@@ -132,6 +132,7 @@ class ProductType extends CommerceBundleEntityBase implements ProductTypeInterfa
    */
   public function setMultipleVariations($multiple_variations) {
     $this->multipleVariations = $multiple_variations;
+    return $this;
   }
 
   /**
