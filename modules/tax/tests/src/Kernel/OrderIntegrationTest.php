@@ -184,6 +184,7 @@ class OrderIntegrationTest extends CommerceKernelTestBase {
       'type' => 'test',
       'quantity' => '1',
       'unit_price' => new Price('12.00', 'USD'),
+      'overridden_unit_price' => TRUE,
     ]);
     $order_item->save();
     $this->order->addItem($order_item);
@@ -194,6 +195,8 @@ class OrderIntegrationTest extends CommerceKernelTestBase {
     $order_items = $this->order->getItems();
     $order_item = reset($order_items);
     $this->assertEquals(new Price('10.00', 'USD'), $order_item->getUnitPrice());
+    // Confirm that the overridden_unit_price flag is preserved.
+    $this->assertTrue($order_item->isUnitPriceOverridden());
   }
 
 }
