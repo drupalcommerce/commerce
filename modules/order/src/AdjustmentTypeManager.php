@@ -44,6 +44,7 @@ class AdjustmentTypeManager extends DefaultPluginManager {
   public function __construct(ModuleHandlerInterface $module_handler, CacheBackendInterface $cache_backend) {
     $this->moduleHandler = $module_handler;
     $this->setCacheBackend($cache_backend, 'commerce_adjustment_type', ['commerce_adjustment_type']);
+    $this->alterInfo('commerce_adjustment_type_info');
   }
 
   /**
