@@ -16,6 +16,25 @@ class OrderTotalPriceTest extends UnitTestCase {
   /**
    * ::covers evaluate.
    */
+  public function testEmptyOrder() {
+    $condition = new OrderTotalPrice([
+      'operator' => '==',
+      'amount' => [
+        'number' => '10.00',
+        'currency_code' => 'EUR',
+      ],
+    ], 'order_total_price', ['entity_type' => 'commerce_order']);
+    $order = $this->prophesize(OrderInterface::class);
+    $order->getEntityTypeId()->willReturn('commerce_order');
+    $order->getTotalPrice()->willReturn(NULL);
+    $order = $order->reveal();
+
+    $this->assertFalse($condition->evaluate($order));
+  }
+
+  /**
+   * ::covers evaluate.
+   */
   public function testMismatchedCurrencies() {
     $condition = new OrderTotalPrice([
       'operator' => '==',
