@@ -181,6 +181,24 @@ class AddressBookTest extends CommerceKernelTestBase {
     $this->orderProfile = $this->reloadEntity($this->orderProfile);
     $this->assertNull($this->orderProfile->getData('copy_to_address_book'));
     $this->assertEquals($new_profile->id(), $this->orderProfile->getData('address_book_profile_id'));
+
+    // Confirm that copying the profile again updates the address book profile.
+    $order_address = [
+      'country_code' => 'US',
+      'postal_code' => '53177',
+      'locality' => 'Milwaukee',
+      'address_line1' => 'Pabst Blue Ribbon Dr',
+      'administrative_area' => 'WI',
+      'given_name' => 'Frederick',
+      'family_name' => 'Pabst Jr.',
+    ];
+    $this->orderProfile->set('address', $order_address);
+    $this->orderProfile->save();
+    $this->addressBook->copy($this->orderProfile, $this->user);
+    $new_profile = $this->reloadEntity($new_profile);
+    $this->assertEquals($order_address, array_filter($new_profile->get('address')->first()->getValue()));
+    $non_expected_profile = Profile::load(4);
+    $this->assertEmpty($non_expected_profile);
   }
 
   /**

@@ -88,9 +88,12 @@ interface AddressBookInterface {
    * Copies the profile to the customer's address book.
    *
    * If the customer is allowed to have multiple profiles of this type,
-   * the given profile is duplicated and assigned to them.
-   * Otherwise, the default profile is loaded (created if missing),
-   * and then updated with values from the given profile.
+   * the given profile will be duplicated and assigned to them.
+   * If the given profile was already copied to the customer's address book
+   * once, the matching address book profile will be updated instead.
+   *
+   * If the customer is only allowed to have a single profile of this type,
+   * the default profile will be loaded (created if missing) and updated.
    *
    * @param \Drupal\profile\Entity\ProfileInterface $profile
    *   The profile.

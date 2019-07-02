@@ -97,21 +97,28 @@ class AddressBook implements AddressBookInterface {
       return;
     }
 
-    if ($this->allowsMultiple($profile->bundle())) {
-      $address_book_profile = $profile->createDuplicate();
-      $address_book_profile->setOwnerId($customer->id());
-      $address_book_profile->unsetData('copy_to_address_book');
+    // Check if there is an existing address book profile to update.
+    // This can happen in two scenarios:
+    // 1) The profile was already copied to the address book once.
+    // 2) The customer is only allowed to have a single address book profile.
+    $address_book_profile = NULL;
+    $address_book_profile_id = $profile->getData('address_book_profile_id');
+    if ($address_book_profile_id) {
+      /** @var \Drupal\profile\Entity\ProfileInterface $address_book_profile */
+      $address_book_profile = $this->profileStorage->load($address_book_profile_id);
+    }
+    if (!$address_book_profile && !$this->allowsMultiple($profile->bundle())) {
+      $address_book_profile = $this->profileStorage->loadDefaultByUser($customer, $profile->bundle());
+    }
+
+    if ($address_book_profile) {
+      $address_book_profile->populateFromProfile($profile);
       $address_book_profile->save();
     }
     else {
-      $address_book_profile = $this->profileStorage->loadDefaultByUser($customer, $profile->bundle());
-      if (!$address_book_profile) {
-        $address_book_profile = $this->profileStorage->create([
-          'type' => $profile->bundle(),
-          'uid' => $customer->id(),
-        ]);
-      }
-      $address_book_profile->populateFromProfile($profile);
+      $address_book_profile = $profile->createDuplicate();
+      $address_book_profile->setOwnerId($customer->id());
+      $address_book_profile->unsetData('copy_to_address_book');
       $address_book_profile->save();
     }
 
