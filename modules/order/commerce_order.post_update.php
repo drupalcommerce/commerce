@@ -182,7 +182,7 @@ function commerce_order_post_update_7() {
   $views = [
     'views.view.commerce_order_item_table',
   ];
-  $result = $config_updater->revert($views);
+  $result = $config_updater->revert($views, FALSE);
 
   $success_results = $result->getSucceeded();
   $failure_results = $result->getFailed();

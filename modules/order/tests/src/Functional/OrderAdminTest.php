@@ -377,7 +377,6 @@ class OrderAdminTest extends OrderBrowserTestBase {
     ]);
     $order->setItems([$order_item]);
     $order->save();
-
     $this->drupalGet($order->toUrl()->toString());
     $this->assertSession()->statusCodeEquals(200);
     $this->assertSession()->pageTextNotContains('There are no order items yet.');

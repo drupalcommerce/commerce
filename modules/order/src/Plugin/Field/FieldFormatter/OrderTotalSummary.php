@@ -74,6 +74,17 @@ class OrderTotalSummary extends FormatterBase implements ContainerFactoryPluginI
   /**
    * {@inheritdoc}
    */
+  public function view(FieldItemListInterface $items, $langcode = NULL) {
+    // Check first if the total price is not empty.
+    if ($items->isEmpty()) {
+      return [];
+    }
+    return parent::view($items, $langcode);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function viewElements(FieldItemListInterface $items, $langcode) {
     /** @var \Drupal\commerce_order\Entity\OrderInterface $order */
     $order = $items->getEntity();
