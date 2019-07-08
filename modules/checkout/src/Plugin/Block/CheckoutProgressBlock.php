@@ -3,6 +3,7 @@
 namespace Drupal\commerce_checkout\Plugin\Block;
 
 use Drupal\commerce_checkout\CheckoutOrderManagerInterface;
+use Drupal\commerce_order\Entity\OrderInterface;
 use Drupal\Core\Block\BlockBase;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
@@ -79,6 +80,18 @@ class CheckoutProgressBlock extends BlockBase implements ContainerFactoryPluginI
       // The block is being rendered outside of the checkout page.
       return [];
     }
+    
+    $requested_step_id = $this->routeMatch->getParameter('step');
+    return $this->render($order, $requested_step_id);
+  }
+
+  /**
+   * Builds the checkout progress block.
+   *
+   * @return array
+   *   A render array.
+   */
+  public function render(OrderInterface $order, string $requested_step_id) {
     $checkout_flow = $this->checkoutOrderManager->getCheckoutFlow($order);
     $checkout_flow_plugin = $checkout_flow->getPlugin();
     $configuration = $checkout_flow_plugin->getConfiguration();
@@ -89,7 +102,6 @@ class CheckoutProgressBlock extends BlockBase implements ContainerFactoryPluginI
     // Prepare the steps as expected by the template.
     $steps = [];
     $visible_steps = $checkout_flow_plugin->getVisibleSteps();
-    $requested_step_id = $this->routeMatch->getParameter('step');
     $current_step_id = $this->checkoutOrderManager->getCheckoutStepId($order, $requested_step_id);
     $current_step_index = array_search($current_step_id, array_keys($visible_steps));
     $index = 0;
