@@ -2,7 +2,6 @@
 
 namespace Drupal\commerce_order\Form;
 
-use Drupal\Component\Utility\Html;
 use Drupal\Core\Datetime\DateFormatterInterface;
 use Drupal\Component\Datetime\TimeInterface;
 use Drupal\Core\Entity\ContentEntityForm;
@@ -152,9 +151,10 @@ class OrderForm extends ContentEntityForm {
     return [
       '#type' => 'item',
       '#wrapper_attributes' => [
-        'class' => [Html::cleanCssIdentifier(strtolower($label)), 'container-inline'],
+        'class' => ['container-inline'],
       ],
-      '#markup' => '<h4 class="label inline">' . $label . '</h4> ' . $value,
+      '#title' => $label,
+      '#markup' => $value,
     ];
   }
 
