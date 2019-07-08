@@ -4,7 +4,6 @@ dependencies:
   module:
     - commerce
     - commerce_product
-    - system
     - user
 id: commerce_products
 label: Products

@@ -3,24 +3,26 @@ status: true
 dependencies:
   config:
     - commerce_order.commerce_order_item_type.default
-  module:
-    - commerce_price
   enforced:
     module:
       - commerce_product
+  module:
+    - commerce_price
 id: commerce_order_item.default.default
 targetEntityType: commerce_order_item
 bundle: default
 mode: default
 content:
-  total_price:
-    type: commerce_price_default
-    weight: 3
+  created:
+    label: hidden
+    type: timestamp
+    weight: 0
+    region: content
     settings:
-      strip_trailing_zeroes: false
-      currency_display: symbol
+      date_format: medium
+      custom_date_format: ''
+      timezone: ''
     third_party_settings: {  }
-    label: above
   purchased_entity:
     type: entity_reference_entity_view
     weight: 0
@@ -29,6 +31,7 @@ content:
       link: false
     third_party_settings: {  }
     label: above
+    region: content
   quantity:
     type: number_decimal
     weight: 1
@@ -39,6 +42,16 @@ content:
       prefix_suffix: true
     third_party_settings: {  }
     label: above
+    region: content
+  total_price:
+    type: commerce_price_default
+    weight: 3
+    settings:
+      strip_trailing_zeroes: false
+      currency_display: symbol
+    third_party_settings: {  }
+    label: above
+    region: content
   unit_price:
     type: commerce_price_default
     weight: 2
@@ -47,4 +60,6 @@ content:
       currency_display: symbol
     third_party_settings: {  }
     label: above
-hidden: {  }
+    region: content
+hidden:
+  adjustments: true

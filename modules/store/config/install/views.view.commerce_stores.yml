@@ -4,7 +4,6 @@ dependencies:
   module:
     - commerce
     - commerce_store
-    - system
     - user
 id: commerce_stores
 label: Stores
@@ -410,6 +409,7 @@ display:
       contexts:
         - 'languages:language_content'
         - 'languages:language_interface'
+        - url
         - url.query_args
         - user.permissions
       cacheable: false
@@ -427,6 +427,7 @@ display:
       contexts:
         - 'languages:language_content'
         - 'languages:language_interface'
+        - url
         - url.query_args
         - user.permissions
       cacheable: false

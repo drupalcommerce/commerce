@@ -17,11 +17,13 @@ content:
     weight: 2
     settings: {  }
     third_party_settings: {  }
+    region: content
   billing_profile:
     type: commerce_billing_profile
     weight: 0
     settings: {  }
     third_party_settings: {  }
+    region: content
   order_items:
     type: inline_entity_form_complex
     weight: 1
@@ -34,6 +36,7 @@ content:
       allow_existing: false
       form_mode: default
     third_party_settings: {  }
+    region: content
 hidden:
   created: true
   ip_address: true

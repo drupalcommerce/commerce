@@ -5,6 +5,7 @@ id: default
 label: Default
 description: ''
 variationType: default
+multipleVariations: true
 injectVariationFields: true
 traits: {  }
 locked: false

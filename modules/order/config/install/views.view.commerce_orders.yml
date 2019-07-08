@@ -8,7 +8,6 @@ dependencies:
     - commerce_store
     - options
     - state_machine
-    - system
     - user
 id: commerce_orders
 label: Orders

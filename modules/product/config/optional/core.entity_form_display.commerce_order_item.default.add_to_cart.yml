@@ -18,8 +18,9 @@ content:
   purchased_entity:
     type: commerce_product_variation_attributes
     weight: 0
-    settings: { }
+    settings: {  }
     third_party_settings: {  }
+    region: content
 hidden:
   created: true
   quantity: true

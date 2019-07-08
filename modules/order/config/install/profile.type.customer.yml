@@ -6,6 +6,8 @@ dependencies:
       - commerce_order
 id: customer
 label: Customer
-registration: false
 multiple: true
-weight: 0
+registration: false
+roles: {  }
+allow_revisions: false
+new_revision: false

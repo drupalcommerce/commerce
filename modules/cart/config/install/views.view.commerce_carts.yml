@@ -9,7 +9,6 @@ dependencies:
     - commerce_order
     - commerce_price
     - commerce_store
-    - system
     - user
 id: commerce_carts
 label: Carts
@@ -747,6 +746,7 @@ display:
       contexts:
         - 'languages:language_content'
         - 'languages:language_interface'
+        - url
         - url.query_args
         - user.permissions
       cacheable: false
@@ -773,6 +773,7 @@ display:
       contexts:
         - 'languages:language_content'
         - 'languages:language_interface'
+        - url
         - url.query_args
         - user.permissions
       cacheable: false

@@ -10,11 +10,18 @@ targetEntityType: commerce_product_variation
 bundle: default
 mode: default
 content:
+  list_price:
+    type: commerce_list_price
+    weight: -1
+    region: content
+    settings: {  }
+    third_party_settings: {  }
   price:
     type: commerce_price_default
     weight: 0
     settings: {  }
     third_party_settings: {  }
+    region: content
   sku:
     type: string_textfield
     weight: -4
@@ -22,12 +29,14 @@ content:
       size: 60
       placeholder: ''
     third_party_settings: {  }
+    region: content
   status:
     type: boolean_checkbox
     weight: 10
     settings:
       display_label: true
     third_party_settings: {  }
+    region: content
 hidden:
   created: true
   uid: true

@@ -5,6 +5,8 @@ dependencies:
     module:
       - commerce_cart
       - commerce_product
+  module:
+    - commerce_product
 id: commerce_product_variation.cart
 label: Cart
 targetEntityType: commerce_product_variation

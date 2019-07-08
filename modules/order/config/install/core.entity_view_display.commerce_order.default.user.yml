@@ -7,7 +7,6 @@ dependencies:
     - field.field.commerce_order.default.order_items
   module:
     - commerce_order
-    - commerce_price
     - entity_reference_revisions
     - options
 id: commerce_order.default.user
@@ -23,6 +22,7 @@ content:
       view_mode: default
       link: ''
     third_party_settings: {  }
+    region: content
   completed:
     label: inline
     type: timestamp
@@ -32,18 +32,21 @@ content:
       custom_date_format: ''
       timezone: ''
     third_party_settings: {  }
+    region: content
   mail:
     label: inline
     type: basic_string
     weight: 1
     settings: {  }
     third_party_settings: {  }
+    region: content
   order_items:
     type: commerce_order_item_table
     weight: 5
     settings: {  }
     third_party_settings: {  }
     label: hidden
+    region: content
   order_number:
     type: string
     weight: 0
@@ -51,6 +54,7 @@ content:
     settings:
       link_to_entity: false
     third_party_settings: {  }
+    region: content
   placed:
     label: inline
     type: timestamp
@@ -60,20 +64,24 @@ content:
       custom_date_format: ''
       timezone: ''
     third_party_settings: {  }
+    region: content
   state:
     type: list_default
     weight: 4
     label: inline
     settings: {  }
     third_party_settings: {  }
+    region: content
   total_price:
     type: commerce_order_total_summary
     weight: 6
     settings: {  }
     third_party_settings: {  }
     label: hidden
+    region: content
 hidden:
   changed: true
   ip_address: true
   store_id: true
+  total_paid: true
   uid: true

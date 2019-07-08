@@ -5,8 +5,10 @@ dependencies:
     module:
       - commerce_order
   module:
+    - commerce_order
     - entity
 id: commerce_order_delete_action
 label: 'Delete order'
 type: commerce_order
 plugin: 'entity_delete_action:commerce_order'
+configuration: {  }

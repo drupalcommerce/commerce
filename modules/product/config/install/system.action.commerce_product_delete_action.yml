@@ -5,6 +5,7 @@ dependencies:
     module:
       - commerce_product
   module:
+    - commerce_product
     - entity
 id: commerce_product_delete_action
 label: 'Delete product'
