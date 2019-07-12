@@ -100,19 +100,41 @@ class PaymentMethodTest extends CommerceBrowserTestBase {
     $this->drupalGet($this->collectionUrl);
     $this->getSession()->getPage()->clickLink('Add payment method');
     $this->assertSession()->addressEquals($this->collectionUrl . '/add');
-    // Confirm that the default profile's address is pre-filled.
+    // Confirm that the default profile's address is rendered.
     foreach ($default_address as $property => $value) {
       $prefix = 'payment_method[billing_information][address][0][address]';
-      $this->assertSession()->fieldValueEquals($prefix . '[' . $property . ']', $value);
+      $this->assertSession()->pageTextContains($value);
+      $this->assertSession()->fieldNotExists($prefix . '[' . $property . ']');
     }
-    // Confirm that the address book checkbox is not shown.
-    $this->assertSession()->fieldNotExists('payment_method[billing_information][copy_to_address_book]');
 
     $form_values = [
       'payment_method[payment_details][number]' => '4111111111111111',
       'payment_method[payment_details][expiration][month]' => '01',
       'payment_method[payment_details][expiration][year]' => date('Y') + 1,
       'payment_method[payment_details][security_code]' => '111',
+    ];
+    $this->submitForm($form_values, 'Save');
+    $this->assertSession()->addressEquals($this->collectionUrl);
+    $this->assertSession()->pageTextContains('Visa ending in 1111 saved to your payment methods.');
+
+    $payment_method = PaymentMethod::load(1);
+    $billing_profile = $payment_method->getBillingProfile();
+    $this->assertEquals($this->user->id(), $payment_method->getOwnerId());
+    $this->assertEquals($default_address, array_filter($billing_profile->get('address')->first()->getValue()));
+    $this->assertEquals(2, $payment_method->getBillingProfile()->id());
+
+    $this->drupalGet($this->collectionUrl . '/' . $payment_method->id() . '/edit');
+    // Confirm that the default profile's address is rendered.
+    foreach ($default_address as $property => $value) {
+      $prefix = 'payment_method[billing_information][address][0][address]';
+      $this->assertSession()->pageTextContains($value);
+      $this->assertSession()->fieldNotExists($prefix . '[' . $property . ']');
+    }
+    $this->getSession()->getPage()->pressButton('billing_edit');
+
+    $form_values = [
+      'payment_method[payment_details][expiration][month]' => '02',
+      'payment_method[payment_details][expiration][year]' => '2026',
       'payment_method[billing_information][address][0][address][given_name]' => 'Johnny',
       'payment_method[billing_information][address][0][address][family_name]' => 'Appleseed',
       'payment_method[billing_information][address][0][address][address_line1]' => '123 New York Drive',
@@ -122,42 +144,20 @@ class PaymentMethodTest extends CommerceBrowserTestBase {
     ];
     $this->submitForm($form_values, 'Save');
     $this->assertSession()->addressEquals($this->collectionUrl);
-    $this->assertSession()->pageTextContains('Visa ending in 1111 saved to your payment methods.');
-
-    $payment_method = PaymentMethod::load(1);
-    $billing_profile = $payment_method->getBillingProfile();
-    $this->assertEquals($this->user->id(), $payment_method->getOwnerId());
-    $this->assertEquals('NY', $billing_profile->get('address')->first()->getAdministrativeArea());
-    $this->assertFalse($billing_profile->getData('copy_to_address_book'));
-    $this->assertEquals(2, $payment_method->getBillingProfile()->id());
-
-    $this->drupalGet($this->collectionUrl . '/' . $payment_method->id() . '/edit');
-    // Confirm that the address book checkbox is not shown.
-    $this->assertSession()->fieldNotExists('payment_method[billing_information][copy_to_address_book]');
-
-    $form_values = [
-      'payment_method[payment_details][expiration][month]' => '02',
-      'payment_method[payment_details][expiration][year]' => '2026',
-      'payment_method[billing_information][address][0][address][given_name]' => 'Johnny',
-      'payment_method[billing_information][address][0][address][family_name]' => 'Appleseed',
-      'payment_method[billing_information][address][0][address][address_line1]' => '123 New York Drive',
-      'payment_method[billing_information][address][0][address][locality]' => 'Greenville',
-      'payment_method[billing_information][address][0][address][administrative_area]' => 'SC',
-      'payment_method[billing_information][address][0][address][postal_code]' => '29615',
-    ];
-    $this->submitForm($form_values, 'Save');
-    $this->assertSession()->addressEquals($this->collectionUrl);
     $this->assertSession()->pageTextContains('2/2026');
 
     \Drupal::entityTypeManager()->getStorage('commerce_payment_method')->resetCache([1]);
     \Drupal::entityTypeManager()->getStorage('profile')->resetCache([2]);
     $payment_method = PaymentMethod::load(1);
     $this->assertEquals('2026', $payment_method->get('card_exp_year')->value);
+    /** @var \Drupal\profile\Entity\ProfileInterface $billing_profile */
     $billing_profile = $payment_method->getBillingProfile();
     $this->assertEquals($this->user->id(), $payment_method->getOwnerId());
-    $this->assertEquals('SC', $billing_profile->get('address')->first()->getAdministrativeArea());
-    $this->assertFalse($billing_profile->getData('copy_to_address_book'));
+    $this->assertEquals('NY', $billing_profile->get('address')->first()->getAdministrativeArea());
     $this->assertEquals(2, $payment_method->getBillingProfile()->id());
+    // Confirm that the address book profile was updated.
+    $default_profile = $this->reloadEntity($default_profile);
+    $this->assertTrue($billing_profile->get('address')->equals($default_profile->get('address')));
   }
 
   /**

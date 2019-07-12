@@ -100,6 +100,7 @@ class BillingProfileWidget extends WidgetBase implements ContainerFactoryPluginI
       'instance_id' => 'billing',
       'available_countries' => $store->getBillingCountries(),
       'address_book_uid' => $order->getCustomerId(),
+      'admin' => TRUE,
     ], $profile);
 
     $element['#type'] = 'fieldset';
@@ -108,10 +109,6 @@ class BillingProfileWidget extends WidgetBase implements ContainerFactoryPluginI
       '#inline_form' => $inline_form,
     ];
     $element['profile'] = $inline_form->buildInlineForm($element['profile'], $form_state);
-    // The copy to address book checkbox should not be shown in the admin UI
-    // until the full address book UX is implemented in #3053165.
-    $element['profile']['copy_to_address_book']['#access'] = FALSE;
-    $element['profile']['copy_to_address_book']['#default_value'] = FALSE;
 
     // Workaround for massageFormValues() not getting $element.
     $element['array_parents'] = [

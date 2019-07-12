@@ -278,6 +278,8 @@ class PaymentInformation extends CheckoutPaneBase {
       'instance_id' => 'billing',
       'available_countries' => $this->order->getStore()->getBillingCountries(),
       'address_book_uid' => $this->order->getCustomerId(),
+      // Don't copy the profile to address book until the order is placed.
+      'copy_on_save' => FALSE,
     ], $billing_profile);
 
     $pane_form['billing_information'] = [

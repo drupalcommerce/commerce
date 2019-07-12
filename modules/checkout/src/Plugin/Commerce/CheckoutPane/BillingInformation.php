@@ -91,6 +91,8 @@ class BillingInformation extends CheckoutPaneBase implements CheckoutPaneInterfa
       'instance_id' => 'billing',
       'available_countries' => $this->order->getStore()->getBillingCountries(),
       'address_book_uid' => $this->order->getCustomerId(),
+      // Don't copy the profile to address book until the order is placed.
+      'copy_on_save' => FALSE,
     ], $profile);
 
     $pane_form['profile'] = [

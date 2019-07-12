@@ -72,16 +72,23 @@ class CustomerProfileTestForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, FormStateInterface $form_state) {
-    $profile_storage = $this->entityTypeManager->getStorage('profile');
-    $profile = $profile_storage->create([
-      'type' => 'customer',
-      'uid' => 0,
-    ]);
+  public function buildForm(array $form, FormStateInterface $form_state, $profile = NULL, $admin = NULL) {
+    if (!$profile) {
+      $profile_storage = $this->entityTypeManager->getStorage('profile');
+      /** @var \Drupal\profile\Entity\ProfileInterface $profile */
+      $profile = $profile_storage->create([
+        'type' => 'customer',
+        'uid' => 0,
+      ]);
+    }
+
     $inline_form = $this->inlineFormManager->createInstance('customer_profile', [
       'instance_id' => 'billing',
-      'available_countries' => ['FR', 'RS'],
+      'available_countries' => ['FR', 'RS', 'US'],
       'address_book_uid' => $this->currentUser->id(),
+      // Turn on copy_on_save for admins to exercise that code path as well.
+      'copy_on_save' => $admin,
+      'admin' => $admin,
     ], $profile);
 
     $form['profile'] = [

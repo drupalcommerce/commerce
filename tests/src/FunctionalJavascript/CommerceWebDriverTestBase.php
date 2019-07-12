@@ -25,6 +25,13 @@ abstract class CommerceWebDriverTestBase extends WebDriverTestBase {
   protected $store;
 
   /**
+   * The country list.
+   *
+   * @var array
+   */
+  protected $countryList;
+
+  /**
    * Modules to enable.
    *
    * Note that when a child class declares its own $modules list, that list
@@ -59,6 +66,9 @@ abstract class CommerceWebDriverTestBase extends WebDriverTestBase {
     $this->placeBlock('local_actions_block');
     $this->placeBlock('page_title_block');
 
+    $country_repository = $this->container->get('address.country_repository');
+    $this->countryList = $country_repository->getList();
+
     $this->adminUser = $this->drupalCreateUser($this->getAdministratorPermissions());
     $this->drupalLogin($this->adminUser);
   }
@@ -78,6 +88,26 @@ abstract class CommerceWebDriverTestBase extends WebDriverTestBase {
       'administer commerce_store',
       'administer commerce_store_type',
     ];
+  }
+
+  /**
+   * Asserts that the given address is rendered on the page.
+   *
+   * @param array $address
+   *   The address.
+   * @param string $container
+   *   The name of the containing profile element. Defaults to 'profile'.
+   */
+  protected function assertRenderedAddress(array $address, $container = 'profile') {
+    $page = $this->getSession()->getPage();
+    foreach ($address as $property => $value) {
+      if ($property == 'country_code') {
+        $value = $this->countryList[$value];
+      }
+      $this->assertContains($value, $page->find('css', 'p.address')->getText());
+      $this->assertSession()->fieldNotExists($container . "[address][0][address][$property]");
+    }
+    $this->assertSession()->fieldNotExists($container . '[copy_to_address_book]');
   }
 
   /**

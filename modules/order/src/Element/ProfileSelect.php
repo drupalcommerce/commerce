@@ -10,7 +10,7 @@ use Drupal\profile\Entity\ProfileInterface;
 /**
  * Provides a form element for selecting a customer profile.
  *
- * @deprecated Use the customer_profile inline form instead.
+ * @deprecated Use the customer_profile or content_entity inline forms instead.
  * @see https://www.drupal.org/node/3015309
  *
  * Usage example:
@@ -83,14 +83,20 @@ class ProfileSelect extends RenderElement {
 
     /** @var \Drupal\commerce\InlineFormManager $inline_form_manager */
     $inline_form_manager = \Drupal::service('plugin.manager.commerce_inline_form');
-    $inline_form = $inline_form_manager->createInstance('customer_profile', [
-      'available_countries' => $element['#available_countries'],
-      // The address book form is buggy when used inside a form element.
-      'use_address_book' => FALSE,
-    ], $element['#default_value']);
-
+    // The customer_profile inline form provides an address book widget
+    // which can be buggy when used inside a form element.
+    // That's why the content_entity inline form is used instead.
+    $inline_form = $inline_form_manager->createInstance('content_entity', $element['#default_value']);
     $element['#inline_form'] = $inline_form;
+
     $element = $inline_form->buildInlineForm($element, $form_state);
+    // Customize the address widget.
+    if (!empty($element['address']['widget'][0])) {
+      $address_widget['#type'] = 'container';
+      if (!empty($element['#available_countries'])) {
+        $address_widget['address']['#available_countries'] = $element['#available_countries'];
+      }
+    }
     // The updateProfile() callback needs to run after the inline form ones.
     $element['#element_validate'][] = [get_called_class(), 'updateProfile'];
     $element['#commerce_element_submit'][] = [get_called_class(), 'updateProfile'];

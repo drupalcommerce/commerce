@@ -52,12 +52,6 @@ class PaymentMethodEditForm extends EntityForm implements ContainerInjectionInte
       '#inline_form' => $inline_form,
     ];
     $form['payment_method'] = $inline_form->buildInlineForm($form['payment_method'], $form_state);
-    // The copy to address book checkbox should not be shown in the admin UI
-    // until the full address book UX is implemented in #3053165.
-    if (isset($form['payment_method']['billing_information']['copy_to_address_book'])) {
-      $form['payment_method']['billing_information']['copy_to_address_book']['#access'] = FALSE;
-      $form['payment_method']['billing_information']['copy_to_address_book']['#default_value'] = FALSE;
-    }
     $form['actions'] = $this->actionsElement($form, $form_state);
 
     return $form;

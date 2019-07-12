@@ -10,7 +10,7 @@
         "drupal/entity": "^1.0-rc2",
         "drupal/entity_reference_revisions": "~1.0",
         "drupal/inline_entity_form": "^1.0-rc1",
-        "drupal/profile": "1.x-dev",
+        "drupal/profile": "^1.0-rc6",
         "drupal/state_machine": "^1.0-rc1",
         "commerceguys/intl": "^1.0.0"
     },
