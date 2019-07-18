@@ -167,7 +167,7 @@ class CustomerProfile extends EntityInlineFormBase {
           // An option was selected, pre-fill the profile form.
           $address_book_profile = $this->getProfileForOption($user_input['select_address']);
         }
-        elseif (empty($triggering_element) && $this->entity->isNew()) {
+        elseif ($this->entity->isNew()) {
           // The customer profile form is being rendered for the first time.
           // Use the default profile to pre-fill the profile form.
           $address_book_profile = $this->selectDefaultProfile($address_book_profiles);
