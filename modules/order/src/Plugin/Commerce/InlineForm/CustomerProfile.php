@@ -60,6 +60,13 @@ class CustomerProfile extends EntityInlineFormBase {
   protected $entityTypeManager;
 
   /**
+   * The customer profile.
+   *
+   * @var \Drupal\profile\Entity\ProfileInterface
+   */
+  protected $entity;
+
+  /**
    * Constructs a new CustomerProfile object.
    *
    * @param array $configuration
@@ -245,7 +252,7 @@ class CustomerProfile extends EntityInlineFormBase {
         $this->entity->unsetData('address_book_profile_id');
       }
 
-      $form_display = EntityFormDisplay::collectRenderDisplay($this->entity, 'default');
+      $form_display = $this->loadFormDisplay();
       $form_display->buildForm($this->entity, $inline_form, $form_state);
       $inline_form = $this->prepareProfileForm($inline_form, $form_state);
 
@@ -308,9 +315,8 @@ class CustomerProfile extends EntityInlineFormBase {
   public function validateInlineForm(array &$inline_form, FormStateInterface $form_state) {
     parent::validateInlineForm($inline_form, $form_state);
 
-    assert($this->entity instanceof ProfileInterface);
     if (!isset($inline_form['rendered'])) {
-      $form_display = EntityFormDisplay::collectRenderDisplay($this->entity, 'default');
+      $form_display = $this->loadFormDisplay();
       $form_display->extractFormValues($this->entity, $inline_form, $form_state);
       $form_display->validateFormValues($this->entity, $inline_form, $form_state);
     }
@@ -322,9 +328,8 @@ class CustomerProfile extends EntityInlineFormBase {
   public function submitInlineForm(array &$inline_form, FormStateInterface $form_state) {
     parent::submitInlineForm($inline_form, $form_state);
 
-    assert($this->entity instanceof ProfileInterface);
     if (!isset($inline_form['rendered'])) {
-      $form_display = EntityFormDisplay::collectRenderDisplay($this->entity, 'default');
+      $form_display = $this->loadFormDisplay();
       $form_display->extractFormValues($this->entity, $inline_form, $form_state);
       $values = $form_state->getValue($inline_form['#parents']);
       if (!empty($values['copy_to_address_book'])) {
@@ -363,7 +368,22 @@ class CustomerProfile extends EntityInlineFormBase {
         $customer = $user;
       }
     }
+
     return $customer;
+  }
+
+  /**
+   * Loads the form display used to build the profile form.
+   *
+   * @return \Drupal\Core\Entity\Display\EntityFormDisplayInterface
+   *   The form display.
+   */
+  protected function loadFormDisplay() {
+    $form_display = EntityFormDisplay::collectRenderDisplay($this->entity, 'default');
+    // The log message field should never be shown to customers.
+    $form_display->removeComponent('revision_log_message');
+
+    return $form_display;
   }
 
   /**
@@ -400,7 +420,6 @@ class CustomerProfile extends EntityInlineFormBase {
     }
     $render = $form_state->get($render_parents);
     if (!isset($render)) {
-      assert($this->entity instanceof ProfileInterface);
       $render = !$this->isProfileIncomplete($this->entity);
       $form_state->set($render_parents, $render);
     }
@@ -456,7 +475,6 @@ class CustomerProfile extends EntityInlineFormBase {
    *   The profile options.
    */
   protected function buildOptions(array $address_book_profiles) {
-    assert($this->entity instanceof ProfileInterface);
     $profile_options = EntityHelper::extractLabels($address_book_profiles);
     // The customer profile is not new, indicating that it is being edited.
     // Add an _original option to allow the customer to revert their changes
@@ -595,7 +613,6 @@ class CustomerProfile extends EntityInlineFormBase {
    *   The copy label.
    */
   protected function getCopyLabel($profile_type_id, $update_on_copy) {
-    assert($this->entity instanceof ProfileInterface);
     $is_owner = FALSE;
     if (!$this->configuration['admin']) {
       $is_owner = $this->currentUser->id() == $this->configuration['address_book_uid'];
