@@ -5,14 +5,13 @@ namespace Drupal\commerce_store\Command;
 // @codingStandardsIgnoreStart
 use CommerceGuys\Addressing\Country\CountryRepositoryInterface;
 use CommerceGuys\Intl\Currency\CurrencyRepository;
-use Drupal\Console\Core\Command\Shared\CommandTrait;
-use Drupal\Console\Core\Style\DrupalStyle;
 use Drupal\Console\Annotations\DrupalCommand;
+use Drupal\Console\Core\Command\Command;
+use Drupal\Console\Core\Style\DrupalStyle;
 use Drupal\commerce_price\CurrencyImporter;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Render\MetadataBubblingUrlGenerator;
 use Egulias\EmailValidator\EmailValidator;
-use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -30,8 +29,6 @@ use Symfony\Component\Console\Question\Question;
  * )
  */
 class CreateStoreCommand extends Command {
-
-  use CommandTrait;
 
   /**
    * The currency importer.
