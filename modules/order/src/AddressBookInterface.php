@@ -36,6 +36,16 @@ interface AddressBookInterface {
   public function allowsMultiple($profile_type_id);
 
   /**
+   * Loads the profile types used by the address book.
+   *
+   * Only customer profile types are included.
+   *
+   * @return \Drupal\profile\Entity\ProfileTypeInterface[]
+   *   The profile types, keyed by profile type ID.
+   */
+  public function loadTypes();
+
+  /**
    * Loads all profiles for the given customer.
    *
    * Ensures that the loaded profiles are available, by filtering

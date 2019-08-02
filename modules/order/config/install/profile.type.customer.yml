@@ -6,8 +6,12 @@ dependencies:
       - commerce_order
 id: customer
 label: Customer
+display_label: 'Customer information'
 multiple: true
 registration: false
 roles: {  }
 allow_revisions: false
 new_revision: false
+third_party_settings:
+  commerce_order:
+    customer_profile_type: true

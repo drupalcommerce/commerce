@@ -5,6 +5,7 @@
  * Post update functions for Order.
  */
 
+use Drupal\profile\Entity\ProfileType;
 use Drupal\Core\Entity\Entity\EntityFormDisplay;
 use Drupal\field\Entity\FieldStorageConfig;
 
@@ -235,5 +236,17 @@ function commerce_order_post_update_9() {
       }
     }
     $role->save();
+  }
+}
+
+/**
+ * Update the customer profile type.
+ */
+function commerce_order_post_update_10() {
+  $profile_type = ProfileType::load('customer');
+  if ($profile_type) {
+    $profile_type->setDisplayLabel('Customer information');
+    $profile_type->setThirdPartySetting('commerce_order', 'customer_profile_type', TRUE);
+    $profile_type->save();
   }
 }

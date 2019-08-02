@@ -14,6 +14,7 @@ use Drupal\Core\Render\Element;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\entity\BundleFieldDefinition;
 use Drupal\field\FieldStorageConfigInterface;
+use Drupal\profile\Entity\ProfileType;
 use Drupal\profile\Entity\ProfileTypeInterface;
 
 /**
@@ -51,16 +52,6 @@ function commerce_order_theme($existing, $type, $theme, $path) {
       ],
     ],
   ];
-}
-
-/**
- * Implements hook_local_tasks_alter().
- */
-function commerce_order_local_tasks_alter(&$definitions) {
-  $id = 'entity.profile.user_profile_form:profile.type.customer';
-  if (isset($definitions[$id])) {
-    $definitions[$id]['title'] = t('Address book');
-  }
 }
 
 /**
@@ -187,17 +178,80 @@ function commerce_order_views_data_alter(array &$data) {
 }
 
 /**
- * Implements hook_ENTITY_TYPE_access().
- *
- * Forbids the profile 'address' field from being deletable.
- * This is an alternative to locking the field which still leaves
- * the field editable.
+ * Implements hook_form_FORM_ID_alter() for 'profile_type_form'.
  */
-function commerce_order_field_storage_config_access(FieldStorageConfigInterface $field_storage, $operation) {
-  if ($field_storage->id() == 'profile.address' && $operation == 'delete') {
-    return AccessResult::forbidden();
+function commerce_order_form_profile_type_form_alter(array &$form, FormStateInterface $form_state) {
+  /** @var \Drupal\profile\Entity\ProfileTypeInterface $profile_type */
+  $profile_type = $form_state->getFormObject()->getEntity();
+  $customer_flag = $profile_type->getThirdPartySetting('commerce_order', 'customer_profile_type');
+  $address_has_data = FALSE;
+  if ($customer_flag && !$profile_type->isNew()) {
+    // Workaround for #3072156.
+    $query = \Drupal::entityTypeManager()->getStorage('profile')->getQuery();
+    $query
+      ->condition('type', $profile_type->id())
+      ->exists('address.country_code')
+      ->range(0, 1);
+    $result = $query->execute();
+    $address_has_data = !empty($result);
   }
-  return AccessResult::neutral();
+
+  $form['#tree'] = TRUE;
+  $form['commerce_order'] = [
+    '#type' => 'container',
+    '#weight' => 1,
+  ];
+  $form['commerce_order']['customer_profile_type'] = [
+    '#type' => 'checkbox',
+    '#title' => t('Profiles of this type represent Commerce customer profiles'),
+    '#description' => t("Used to store the customer's billing or shipping information."),
+    '#default_value' => $customer_flag,
+    // The flag is always TRUE for the profile type provided by Commerce.
+    '#disabled' => $profile_type->id() == 'customer' || $address_has_data,
+  ];
+  $form['actions']['submit']['#submit'][] = 'commerce_order_profile_type_form_submit';
+}
+
+/**
+ * Submission handler for commerce_order_form_profile_type_form_alter().
+ */
+function commerce_order_profile_type_form_submit(array $form, FormStateInterface $form_state) {
+  /** @var \Drupal\profile\Entity\ProfileTypeInterface $profile_type */
+  $profile_type = $form_state->getFormObject()->getEntity();
+  $customer_flag = $form_state->getValue(['commerce_order', 'customer_profile_type']);
+  $previous_customer_flag = $profile_type->getThirdPartySetting('commerce_order', 'customer_profile_type');
+  /** @var \Drupal\commerce\ConfigurableFieldManagerInterface $configurable_field_manager */
+  $configurable_field_manager = \Drupal::service('commerce.configurable_field_manager');
+  $address_field_definition = commerce_order_build_address_field_definition($profile_type->id());
+  if ($customer_flag && !$previous_customer_flag) {
+    $configurable_field_manager->createField($address_field_definition, FALSE);
+  }
+  elseif (!$customer_flag && $previous_customer_flag) {
+    $configurable_field_manager->deleteField($address_field_definition);
+  }
+
+  $profile_type->setThirdPartySetting('commerce_order', 'customer_profile_type', $customer_flag);
+  $profile_type->save();
+}
+
+/**
+ * Builds the $profile->address field definition.
+ *
+ * @param string $profile_type_id
+ *   The profile type ID.
+ *
+ * @return \Drupal\entity\BundleFieldDefinition
+ *   The field definition.
+ */
+function commerce_order_build_address_field_definition($profile_type_id) {
+  $address_field_definition = BundleFieldDefinition::create('address')
+    ->setTargetEntityTypeId('profile')
+    ->setTargetBundle($profile_type_id)
+    ->setName('address')
+    ->setLabel('Address')
+    ->setRequired(TRUE);
+
+  return $address_field_definition;
 }
 
 /**
@@ -213,26 +267,52 @@ function commerce_order_profile_type_access(ProfileTypeInterface $profile_type, 
 }
 
 /**
+ * Implements hook_ENTITY_TYPE_access().
+ *
+ * Forbids the profile "address" field from being deletable.
+ * This is an alternative to locking the field which still leaves
+ * the field editable.
+ */
+function commerce_order_field_storage_config_access(FieldStorageConfigInterface $field_storage, $operation) {
+  if ($field_storage->id() == 'profile.address' && $operation == 'delete') {
+    return AccessResult::forbidden();
+  }
+  return AccessResult::neutral();
+}
+
+/**
  * Implements hook_entity_operation_alter().
  *
- * Hides the "Storage settings" operation for the profile 'address' field.
+ * Hides the "Storage settings" operation for the profile "address" field.
  */
 function commerce_order_entity_operation_alter(array &$operations, EntityInterface $entity) {
-  if ($entity->getEntityTypeId() == 'field_config' && $entity->id() == 'profile.customer.address') {
-    unset($operations['storage-settings']);
+  if ($entity->getEntityTypeId() == 'field_config') {
+    /** @var \Drupal\Core\Field\FieldConfigInterface $entity */
+    if ($entity->getTargetEntityTypeId() == 'profile' && $entity->getName() == 'address') {
+      unset($operations['storage-settings']);
+    }
   }
 }
 
 /**
  * Implements hook_form_FORM_ID_alter() for 'field_config_edit_form'.
  *
- * Hides the 'Available countries' setting for the profile 'address' field.
- * The setting is unused because in Commerce it is taken from the store.
+ * Hides the "Required" and "Available countries" settings for the customer
+ * profile "address" field.
  */
 function commerce_order_form_field_config_edit_form_alter(array &$form, FormStateInterface $form_state) {
   /** @var \Drupal\Core\Field\FieldConfigInterface $entity */
   $entity = $form_state->getFormObject()->getEntity();
-  if ($entity->id() == 'profile.customer.address') {
-    $form['settings']['available_countries']['#access'] = FALSE;
+  if ($entity->getTargetEntityTypeId() == 'profile' && $entity->getName() == 'address') {
+    // Make sure that the profile type is a customer profile type, to avoid
+    // affecting other types which just reuse the address field.
+    $profile_type = ProfileType::load($entity->getTargetBundle());
+    if ($profile_type->getThirdPartySetting('commerce_order', 'customer_profile_type')) {
+      // The field must always be required.
+      $form['required']['#default_value'] = TRUE;
+      $form['required']['#access'] = FALSE;
+      // Available countries are taken from the store.
+      $form['settings']['available_countries']['#access'] = FALSE;
+    }
   }
 }

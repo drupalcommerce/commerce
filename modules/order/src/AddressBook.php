@@ -24,6 +24,13 @@ class AddressBook implements AddressBookInterface {
   protected $profileStorage;
 
   /**
+   * The profile type storage.
+   *
+   * @var \Drupal\Core\Config\Entity\ConfigEntityStorageInterface
+   */
+  protected $profileTypeStorage;
+
+  /**
    * Constructs a new AddressBook object.
    *
    * @param \Drupal\Core\Entity\EntityTypeBundleInfo $entity_type_bundle_info
@@ -34,6 +41,7 @@ class AddressBook implements AddressBookInterface {
   public function __construct(EntityTypeBundleInfo $entity_type_bundle_info, EntityTypeManagerInterface $entity_type_manager) {
     $this->entityTypeBundleInfo = $entity_type_bundle_info;
     $this->profileStorage = $entity_type_manager->getStorage('profile');
+    $this->profileTypeStorage = $entity_type_manager->getStorage('profile_type');
   }
 
   /**
@@ -43,6 +51,17 @@ class AddressBook implements AddressBookInterface {
     $bundle_info = $this->entityTypeBundleInfo->getBundleInfo('profile');
 
     return !empty($bundle_info[$profile_type_id]['multiple']);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function loadTypes() {
+    /** @var \Drupal\profile\Entity\ProfileTypeInterface[] $profile_types */
+    $profile_types = $this->profileTypeStorage->loadByProperties([
+      'third_party_settings.commerce_order.customer_profile_type' => TRUE,
+    ]);
+    return $profile_types;
   }
 
   /**
