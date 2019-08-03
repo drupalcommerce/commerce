@@ -93,7 +93,7 @@ final class Interval {
    *   The new date.
    */
   public function add(DrupalDateTime $date) {
-    /** @var \DateTime $new_date */
+    /** @var \Drupal\Core\Datetime\DrupalDateTime $new_date */
     $new_date = clone $date;
     $new_date->modify('+' . $this->__toString());
     // Jan 31st + 1 month should give Feb 28th, not Mar 3rd.
@@ -114,7 +114,7 @@ final class Interval {
    *   The new date.
    */
   public function subtract(DrupalDateTime $date) {
-    /** @var \DateTime $new_date */
+    /** @var \Drupal\Core\Datetime\DrupalDateTime $new_date */
     $new_date = clone $date;
     $new_date->modify('-' . $this->__toString());
     // Mar 31st - 1 month should Feb 28th, not Mar 3rd.
@@ -138,7 +138,7 @@ final class Interval {
    *   The new date.
    */
   public function floor(DrupalDateTime $date) {
-    /** @var \DateTime $new_date */
+    /** @var \Drupal\Core\Datetime\DrupalDateTime $new_date */
     $new_date = clone $date;
     switch ($this->unit) {
       case 'hour':
