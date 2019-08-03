@@ -5,6 +5,7 @@
     "homepage": "http://drupal.org/project/commerce",
     "license": "GPL-2.0+",
     "require": {
+        "ext-bcmath": "*",
         "drupal/core": "^8.6",
         "drupal/address": "^1.7",
         "drupal/entity": "^1.0-rc2",
