@@ -318,6 +318,8 @@ class Payment extends ContentEntityBase implements PaymentInterface {
    * {@inheritdoc}
    */
   public function postSave(EntityStorageInterface $storage, $update = TRUE) {
+    parent::postSave($storage, $update);
+
     $order = $this->getOrder();
     if ($order && $this->isCompleted()) {
       $payment_order_updater = \Drupal::service('commerce_payment.order_updater');
