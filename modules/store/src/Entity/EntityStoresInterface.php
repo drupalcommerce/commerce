@@ -3,7 +3,7 @@
 namespace Drupal\commerce_store\Entity;
 
 /**
- * Defines a common interface for entities that belong to stores.
+ * Defines a common interface for entities that belong to one or more stores.
  */
 interface EntityStoresInterface {
 

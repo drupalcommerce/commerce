@@ -4,7 +4,7 @@ namespace Drupal\commerce_order\Entity;
 
 use Drupal\commerce_order\EntityAdjustableInterface;
 use Drupal\commerce_price\Price;
-use Drupal\commerce_store\Entity\StoreInterface;
+use Drupal\commerce_store\Entity\EntityStoreInterface;
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\EntityChangedInterface;
 use Drupal\profile\Entity\ProfileInterface;
@@ -13,7 +13,7 @@ use Drupal\user\UserInterface;
 /**
  * Defines the interface for orders.
  */
-interface OrderInterface extends ContentEntityInterface, EntityAdjustableInterface, EntityChangedInterface {
+interface OrderInterface extends ContentEntityInterface, EntityAdjustableInterface, EntityChangedInterface, EntityStoreInterface {
 
   // Refresh states.
   const REFRESH_ON_LOAD = 'refresh_on_load';
@@ -37,42 +37,6 @@ interface OrderInterface extends ContentEntityInterface, EntityAdjustableInterfa
    * @return $this
    */
   public function setOrderNumber($order_number);
-
-  /**
-   * Gets the store.
-   *
-   * @return \Drupal\commerce_store\Entity\StoreInterface|null
-   *   The store entity, or null.
-   */
-  public function getStore();
-
-  /**
-   * Sets the store.
-   *
-   * @param \Drupal\commerce_store\Entity\StoreInterface $store
-   *   The store entity.
-   *
-   * @return $this
-   */
-  public function setStore(StoreInterface $store);
-
-  /**
-   * Gets the store ID.
-   *
-   * @return int
-   *   The store ID.
-   */
-  public function getStoreId();
-
-  /**
-   * Sets the store ID.
-   *
-   * @param int $store_id
-   *   The store ID.
-   *
-   * @return $this
-   */
-  public function setStoreId($store_id);
 
   /**
    * Gets the customer user.
