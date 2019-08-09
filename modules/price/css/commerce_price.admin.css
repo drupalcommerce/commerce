@@ -3,7 +3,8 @@
  * Admin styling.
  */
 
-.form-type-commerce-price .form-type-commerce-number, .form-type-commerce-price .form-type-select {
+.form-type-commerce-price .form-type-commerce-number,
+.form-type-commerce-price .form-type-select {
   display: inline;
 }
 

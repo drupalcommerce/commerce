@@ -9,7 +9,7 @@
 
 /* Narrow screens */
 .layout-region {
-  box-sizing:         border-box;
+  box-sizing: border-box;
 }
 
 /* Wide screens */
@@ -51,7 +51,7 @@
   .layout-region-order-secondary .form-number,
   .layout-region-order-secondary .form-color,
   .layout-region-order-secondary textarea {
-    box-sizing:         border-box;
+    box-sizing: border-box;
     width: 100%;
     max-width: 100%;
   }

@@ -93,7 +93,6 @@ class EuropeanUnionVatTest extends CommerceKernelTestBase {
     // German customer, French store, VAT number provided.
     // French customer, French store, VAT number provided.
     // @todo
-
     // German customer, French store, physical product.
     $order = $this->buildOrder('DE', 'FR');
     $this->assertTrue($this->plugin->applies($order));
@@ -143,7 +142,6 @@ class EuropeanUnionVatTest extends CommerceKernelTestBase {
 
     // German customer with VAT number, US store registered in FR, digital product.
     // @todo
-
     // Serbian customer, French store, physical product.
     $order = $this->buildOrder('RS', 'FR');
     $this->assertTrue($this->plugin->applies($order));

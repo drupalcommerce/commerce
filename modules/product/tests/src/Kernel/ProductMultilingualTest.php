@@ -7,7 +7,6 @@ use Drupal\commerce_product\Entity\ProductAttribute;
 use Drupal\commerce_product\Entity\ProductAttributeValue;
 use Drupal\commerce_product\Entity\ProductVariation;
 use Drupal\commerce_product\Entity\ProductVariationType;
-use Drupal\Core\Language\Language;
 use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\Tests\commerce\Kernel\CommerceKernelTestBase;
 

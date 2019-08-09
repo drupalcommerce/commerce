@@ -12,7 +12,7 @@
 }
 
 .form-wrapper__login-option input:not([type="submit"]):not([type="password"]),
-.form-wrapper__returning-customer input[type="password"]{
+.form-wrapper__returning-customer input[type="password"] {
   width: 100%;
 }
 

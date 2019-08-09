@@ -1,6 +1,9 @@
 <?xml version="1.0"?>
-<ruleset name="Commerce coding standards">
-  <description>Commerce coding standards</description>
+<ruleset name="commerce">
+  <description>Default PHP CodeSniffer configuration for Commerce.</description>
+  <file>.</file>
+  <arg name="extensions" value="php,module,inc,install,test,profile,theme"/>
+  <config name="drupal_core_version" value="8"/>
 
   <exclude-pattern>*/.git/*</exclude-pattern>
   <exclude-pattern>*/config/*</exclude-pattern>
@@ -9,38 +12,26 @@
   <exclude-pattern>*/icons/*</exclude-pattern>
   <exclude-pattern>README.md</exclude-pattern>
 
-  <rule ref="Drupal"/>
-  <!-- The following rules are intentionally disabled. -->
-  <rule ref="Drupal.Commenting.ClassComment.Missing">
-    <severity>0</severity>
-  </rule>
-  <rule ref="Drupal.Files.LineLength.TooLong">
-    <severity>0</severity>
-  </rule>
-  <rule ref="Drupal.Arrays.Array.LongLineDeclaration">
-    <severity>0</severity>
-  </rule>
-  <rule ref="Drupal.Semantics.FunctionT.NotLiteralString">
-    <severity>0</severity>
-  </rule>
-  <!-- Complains about example code. -->
-  <rule ref="Generic.CodeAnalysis.UselessOverridingMethod.Found">
-    <severity>0</severity>
-  </rule>
-  <!-- Complains about '#element_validate callback:' -->
-  <rule ref="Drupal.Commenting.DocComment.ShortNotCapital">
-    <severity>0</severity>
-  </rule>
-  <!-- Complains a lot about tests which don't need short descriptions. -->
-  <rule ref="Drupal.Commenting.DocComment.MissingShort">
-    <severity>0</severity>
-  </rule>
-  <rule ref="Drupal.Commenting.DocComment.ShortSingleLine">
-    <severity>0</severity>
-  </rule>
-  <!-- Complains about annotation classes. -->
-  <rule ref="Drupal.NamingConventions.ValidVariableName.LowerCamelName">
-    <severity>0</severity>
+  <rule ref="Drupal">
+    <!-- Commerce is not yet compliant with the new deprecation format. -->
+    <exclude name="Drupal.Commenting.Deprecated"/>
+    <exclude name="Drupal.Semantics.FunctionTriggerError"/>
+
+    <!-- The following rules are intentionally disabled. -->
+    <exclude name="Drupal.Commenting.ClassComment.Missing"/>
+    <exclude name="Drupal.Files.LineLength.TooLong"/>
+    <exclude name="Drupal.Arrays.Array.LongLineDeclaration"/>
+    <exclude name="Drupal.Semantics.FunctionT.NotLiteralString"/>
+    <!-- Complains about example code. -->
+    <exclude name="Generic.CodeAnalysis.UselessOverridingMethod.Found"/>
+    <!-- Complains about tests which don't need short descriptions. -->
+    <exclude name="Drupal.Commenting.DocComment.MissingShort"/>
+    <exclude name="Drupal.Commenting.DocComment.ShortNotCapital"/>
+    <exclude name="Drupal.Commenting.DocComment.ShortSingleLine"/>
+    <!-- Complains about constraint plugins. -->
+    <exclude name="Drupal.Commenting.VariableComment"/>
+    <!-- Complains about config entity types. -->
+    <exclude name="Drupal.NamingConventions.ValidVariableName.LowerCamelName"/>
   </rule>
 
 </ruleset>

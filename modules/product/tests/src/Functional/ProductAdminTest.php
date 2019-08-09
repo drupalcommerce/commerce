@@ -23,7 +23,7 @@ class ProductAdminTest extends ProductBrowserTestBase {
   /**
    * A test image.
    *
-   * @var \stdClass
+   * @var object
    */
   protected $testImage;
 
