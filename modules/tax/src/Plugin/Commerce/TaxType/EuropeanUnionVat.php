@@ -259,7 +259,7 @@ class EuropeanUnionVat extends LocalTaxTypeBase {
     ]);
     $zones['cz'] = new TaxZone([
       'id' => 'cz',
-      'label' => $this->t('Czech Republic'),
+      'label' => $this->t('Czechia'),
       'display_label' => $labels['vat'],
       'territories' => [
         ['country_code' => 'CZ'],
