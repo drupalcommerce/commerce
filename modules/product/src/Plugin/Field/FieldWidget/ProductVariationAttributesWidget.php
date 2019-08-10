@@ -170,6 +170,8 @@ class ProductVariationAttributesWidget extends ProductVariationWidgetBase implem
         '#ajax' => [
           'callback' => [get_class($this), 'ajaxRefresh'],
           'wrapper' => $form['#wrapper_id'],
+          // Prevent a jump to the top of the page.
+          'disable-refocus' => TRUE,
         ],
       ];
       // Convert the _none option into #empty_value.
