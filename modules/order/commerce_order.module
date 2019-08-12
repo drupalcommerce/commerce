@@ -17,6 +17,7 @@ use Drupal\Core\Session\AccountInterface;
 use Drupal\entity\BundleFieldDefinition;
 use Drupal\field\FieldStorageConfigInterface;
 use Drupal\profile\Entity\ProfileTypeInterface;
+use Drupal\user\Entity\User;
 
 /**
  * Implements hook_theme().
@@ -102,9 +103,9 @@ function commerce_order_field_widget_form_alter(&$element, FormStateInterface $f
  *
  * - Assigns any previous guest orders to new user account.
  *
- * @param \Drupal\Core\Session\AccountInterface $user
+ * @param \Drupal\user\Entity\User $user
  */
-function commerce_order_user_insert(AccountInterface $user) {
+function commerce_order_user_insert(User $user) {
   $order_ids = \Drupal::entityQuery('commerce_order')
     ->condition('mail', $user->getEmail())
     ->execute();
