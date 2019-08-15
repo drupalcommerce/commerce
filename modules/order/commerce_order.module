@@ -249,7 +249,13 @@ function commerce_order_build_address_field_definition($profile_type_id) {
     ->setTargetBundle($profile_type_id)
     ->setName('address')
     ->setLabel('Address')
-    ->setRequired(TRUE);
+    ->setRequired(TRUE)
+    ->setDisplayOptions('view', [
+      'type' => 'address_default',
+    ])
+    ->setDisplayOptions('form', [
+      'type' => 'address_default',
+    ]);
 
   return $address_field_definition;
 }
