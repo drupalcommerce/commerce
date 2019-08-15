@@ -83,7 +83,7 @@ class CustomerProfileTestForm extends FormBase {
     }
 
     $inline_form = $this->inlineFormManager->createInstance('customer_profile', [
-      'instance_id' => 'billing',
+      'profile_scope' => 'billing',
       'available_countries' => ['FR', 'RS', 'US'],
       'address_book_uid' => $this->currentUser->id(),
       // Turn on copy_on_save for admins to exercise that code path as well.

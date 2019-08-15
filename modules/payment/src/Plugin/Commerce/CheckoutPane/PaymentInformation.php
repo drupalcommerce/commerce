@@ -275,7 +275,7 @@ class PaymentInformation extends CheckoutPaneBase {
       ]);
     }
     $inline_form = $this->inlineFormManager->createInstance('customer_profile', [
-      'instance_id' => 'billing',
+      'profile_scope' => 'billing',
       'available_countries' => $this->order->getStore()->getBillingCountries(),
       'address_book_uid' => $this->order->getCustomerId(),
       // Don't copy the profile to address book until the order is placed.

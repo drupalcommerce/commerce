@@ -41,6 +41,15 @@ final class OrderEvents {
   const ORDER_PAID = 'commerce_order.order.paid';
 
   /**
+   * Name of the event fired when collecting order profiles.
+   *
+   * @Event
+   *
+   * @see \Drupal\commerce_order\Event\OrderProfilesEvent
+   */
+  const ORDER_PROFILES = 'commerce_order.profiles';
+
+  /**
    * Name of the event fired after loading an order.
    *
    * @Event

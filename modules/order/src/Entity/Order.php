@@ -4,6 +4,8 @@ namespace Drupal\commerce_order\Entity;
 
 use Drupal\commerce\Entity\CommerceContentEntityBase;
 use Drupal\commerce_order\Adjustment;
+use Drupal\commerce_order\Event\OrderEvents;
+use Drupal\commerce_order\Event\OrderProfilesEvent;
 use Drupal\commerce_price\Price;
 use Drupal\commerce_store\Entity\StoreInterface;
 use Drupal\Core\Entity\EntityChangedTrait;
@@ -202,6 +204,21 @@ class Order extends CommerceContentEntityBase implements OrderInterface {
   public function setBillingProfile(ProfileInterface $profile) {
     $this->set('billing_profile', $profile);
     return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function collectProfiles() {
+    $profiles = [];
+    if ($billing_profile = $this->getBillingProfile()) {
+      $profiles['billing'] = $billing_profile;
+    }
+    // Allow other modules to register their own profiles (e.g. shipping).
+    $event = new OrderProfilesEvent($this, $profiles);
+    \Drupal::service('event_dispatcher')->dispatch(OrderEvents::ORDER_PROFILES, $event);
+
+    return $profiles;
   }
 
   /**

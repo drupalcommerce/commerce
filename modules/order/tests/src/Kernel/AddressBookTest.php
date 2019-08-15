@@ -238,7 +238,6 @@ class AddressBookTest extends CommerceKernelTestBase {
     $profile_type = ProfileType::load('customer');
     $profile_type->setMultiple(FALSE);
     $profile_type->save();
-    \Drupal::service('entity_type.bundle.info')->clearCachedBundles();
 
     // Confirm that the default profile was updated.
     $this->addressBook->copy($this->orderProfile, $this->user);

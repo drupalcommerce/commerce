@@ -113,9 +113,8 @@ class CustomerProfile extends EntityInlineFormBase {
    */
   public function defaultConfiguration() {
     return [
-      // Unique identifier for the current instance of the inline form.
-      // Passed along to field widgets. Examples: 'billing', 'shipping'.
-      'instance_id' => '',
+      // Unique. Passed along to field widgets. Examples: 'billing', 'shipping'.
+      'profile_scope' => '',
       // If empty, all countries will be available.
       'available_countries' => [],
       // The uid of the customer whose address book will be used.
@@ -132,7 +131,7 @@ class CustomerProfile extends EntityInlineFormBase {
    * {@inheritdoc}
    */
   protected function requiredConfiguration() {
-    return ['instance_id'];
+    return ['profile_scope'];
   }
 
   /**
@@ -157,7 +156,7 @@ class CustomerProfile extends EntityInlineFormBase {
     $inline_form = parent::buildInlineForm($inline_form, $form_state);
     // Allows a widget to vary when used for billing versus shipping purposes.
     // Available in hook_field_widget_form_alter() via $context['form'].
-    $inline_form['#instance_id'] = $this->configuration['instance_id'];
+    $inline_form['#profile_scope'] = $this->configuration['profile_scope'];
 
     assert($this->entity instanceof ProfileInterface);
     $profile_type_id = $this->entity->bundle();
@@ -231,7 +230,7 @@ class CustomerProfile extends EntityInlineFormBase {
       $inline_form['rendered'] = $view_builder->view($this->entity);
       $inline_form['edit_button'] = [
         '#type' => 'button',
-        '#name' => $inline_form['#instance_id'] . '_edit',
+        '#name' => $inline_form['#profile_scope'] . '_edit',
         '#value' => $this->t('Edit'),
         '#ajax' => [
           'callback' => [get_called_class(), 'ajaxRefresh'],

@@ -8,7 +8,7 @@ use Drupal\state_machine\Event\WorkflowTransitionEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
- * Copies the order's billing information to the customer's address book.
+ * Copies the order's profiles to the customer's address book.
  */
 class AddressBookSubscriber implements EventSubscriberInterface {
 
@@ -40,7 +40,7 @@ class AddressBookSubscriber implements EventSubscriberInterface {
   }
 
   /**
-   * Copies the order's billing information when the order is placed.
+   * Copies the order's profiles when the order is placed.
    *
    * @param \Drupal\state_machine\Event\WorkflowTransitionEvent $event
    *   The event.
@@ -48,15 +48,17 @@ class AddressBookSubscriber implements EventSubscriberInterface {
   public function onOrderPlace(WorkflowTransitionEvent $event) {
     /** @var \Drupal\commerce_order\Entity\OrderInterface $order */
     $order = $event->getEntity();
-    $profile = $order->getBillingProfile();
     $customer = $order->getCustomer();
-    if ($profile && $this->addressBook->needsCopy($profile)) {
-      $this->addressBook->copy($profile, $customer);
+    $profiles = $order->collectProfiles();
+    foreach ($profiles as $profile) {
+      if ($this->addressBook->needsCopy($profile)) {
+        $this->addressBook->copy($profile, $customer);
+      }
     }
   }
 
   /**
-   * Copies the order's billing information when the order is assigned.
+   * Copies the order's profiles when the order is assigned.
    *
    * @param \Drupal\commerce_order\Event\OrderAssignEvent $event
    *   The event.
@@ -64,10 +66,12 @@ class AddressBookSubscriber implements EventSubscriberInterface {
   public function onOrderAssign(OrderAssignEvent $event) {
     /** @var \Drupal\commerce_order\Entity\OrderInterface $order */
     $order = $event->getOrder();
-    $profile = $order->getBillingProfile();
     $customer = $event->getCustomer();
-    if ($profile && $this->addressBook->needsCopy($profile)) {
-      $this->addressBook->copy($profile, $customer);
+    $profiles = $order->collectProfiles();
+    foreach ($profiles as $profile) {
+      if ($this->addressBook->needsCopy($profile)) {
+        $this->addressBook->copy($profile, $customer);
+      }
     }
   }
 

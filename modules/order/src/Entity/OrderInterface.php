@@ -131,6 +131,17 @@ interface OrderInterface extends ContentEntityInterface, EntityAdjustableInterfa
   public function setBillingProfile(ProfileInterface $profile);
 
   /**
+   * Collects all profiles that belong to the order.
+   *
+   * This includes the billing profile, plus other profiles added
+   * by modules through event subscribers (e.g. the shipping profile).
+   *
+   * @return \Drupal\profile\Entity\ProfileInterface[]
+   *   The order's profiles, keyed by scope (billing, shipping, etc).
+   */
+  public function collectProfiles();
+
+  /**
    * Gets the order items.
    *
    * @return \Drupal\commerce_order\Entity\OrderItemInterface[]

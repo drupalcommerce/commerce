@@ -83,6 +83,7 @@ class OrderTest extends CommerceKernelTestBase {
    * @covers ::setIpAddress
    * @covers ::getBillingProfile
    * @covers ::setBillingProfile
+   * @covers ::collectProfiles
    * @covers ::getItems
    * @covers ::setItems
    * @covers ::hasItems
@@ -197,6 +198,11 @@ class OrderTest extends CommerceKernelTestBase {
 
     $order->setBillingProfile($profile);
     $this->assertEquals($profile, $order->getBillingProfile());
+
+    $profiles = $order->collectProfiles();
+    $this->assertCount(1, $profiles);
+    $this->assertArrayHasKey('billing', $profiles);
+    $this->assertEquals($profile, $profiles['billing']);
 
     $order->setItems([$order_item, $another_order_item]);
     $this->assertEquals([$order_item, $another_order_item], $order->getItems());
