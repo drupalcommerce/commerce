@@ -36,8 +36,8 @@ class AddToCartFormatter extends FormatterBase {
     $form = parent::settingsForm($form, $form_state);
     $form['combine'] = [
       '#type' => 'checkbox',
-      '#title' => t('Combine order items containing the same product variation.'),
-      '#description' => t('The order item type, referenced product variation, and data from fields exposed on the Add to Cart form must all match to combine.'),
+      '#title' => $this->t('Combine order items containing the same product variation.'),
+      '#description' => $this->t('The order item type, referenced product variation, and data from fields exposed on the Add to Cart form must all match to combine.'),
       '#default_value' => $this->getSetting('combine'),
     ];
 
