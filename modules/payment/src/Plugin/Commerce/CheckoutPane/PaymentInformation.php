@@ -318,14 +318,15 @@ class PaymentInformation extends CheckoutPaneBase {
    * {@inheritdoc}
    */
   public function submitPaneForm(array &$pane_form, FormStateInterface $form_state, array &$complete_form) {
-    $billing_profile = NULL;
     if (isset($pane_form['billing_information'])) {
       /** @var \Drupal\commerce\Plugin\Commerce\InlineForm\EntityInlineFormInterface $inline_form */
       $inline_form = $pane_form['billing_information']['#inline_form'];
       /** @var \Drupal\profile\Entity\ProfileInterface $billing_profile */
       $billing_profile = $inline_form->getEntity();
+      $this->order->setBillingProfile($billing_profile);
+      // The billing profile is provided either because the order is free,
+      // or the selected gateway is off-site. If it's the former, stop here.
       if ($this->order->isPaid() || $this->order->getTotalPrice()->isZero()) {
-        $this->order->setBillingProfile($billing_profile);
         return;
       }
     }
@@ -357,15 +358,24 @@ class PaymentInformation extends CheckoutPaneBase {
       /** @var \Drupal\commerce_payment\Entity\PaymentMethodInterface $payment_method */
       $this->order->set('payment_gateway', $payment_method->getPaymentGateway());
       $this->order->set('payment_method', $payment_method);
-      $billing_profile = $payment_method->getBillingProfile();
+      // Copy the billing information to the order.
+      $payment_method_billing_profile = $payment_method->getBillingProfile();
+      if ($payment_method_billing_profile) {
+        $billing_profile = $this->order->getBillingProfile();
+        if (!$billing_profile) {
+          $billing_profile = $this->entityTypeManager->getStorage('profile')->create([
+            'type' => 'customer',
+            'uid' => 0,
+          ]);
+        }
+        $billing_profile->populateFromProfile($payment_method_billing_profile);
+        $billing_profile->save();
+        $this->order->setBillingProfile($billing_profile);
+      }
     }
     else {
       $this->order->set('payment_gateway', $payment_gateway);
       $this->order->set('payment_method', NULL);
-    }
-
-    if ($billing_profile) {
-      $this->order->setBillingProfile($billing_profile);
     }
   }
 

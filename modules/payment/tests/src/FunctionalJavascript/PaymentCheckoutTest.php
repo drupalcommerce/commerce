@@ -313,6 +313,8 @@ class PaymentCheckoutTest extends CommerceWebDriverTestBase {
     $order = Order::load(1);
     $this->assertFalse($order->isLocked());
     $this->assertEquals('onsite', $order->get('payment_gateway')->target_id);
+    /** @var \Drupal\profile\Entity\ProfileInterface $order_billing_profile */
+    $order_billing_profile = $order->getBillingProfile();
     /** @var \Drupal\commerce_payment\Entity\PaymentMethodInterface $payment_method */
     $payment_method = $order->get('payment_method')->entity;
     $this->assertEquals('1881', $payment_method->get('card_number')->value);
@@ -328,6 +330,9 @@ class PaymentCheckoutTest extends CommerceWebDriverTestBase {
     ];
     $billing_profile = $payment_method->getBillingProfile();
     $this->assertEquals($expected_address, array_filter($billing_profile->get('address')->first()->toArray()));
+    // Verify that the billing information was copied to the order.
+    $this->assertEquals($expected_address, array_filter($order_billing_profile->get('address')->first()->toArray()));
+    $this->assertNotEquals($order_billing_profile->id(), $billing_profile->id());
     // Confirm that the address book profile was also updated.
     $this->defaultProfile = $this->reloadEntity($this->defaultProfile);
     $this->assertEquals($expected_address, array_filter($this->defaultProfile->get('address')->first()->toArray()));
@@ -385,6 +390,16 @@ class PaymentCheckoutTest extends CommerceWebDriverTestBase {
     $this->assertEquals(new Price('19.99', 'USD'), $payment->getAmount());
     $this->assertEquals(new Price('39.99', 'USD'), $order->getTotalPaid());
     $this->assertEquals(new Price('0', 'USD'), $order->getBalance());
+
+    /** @var \Drupal\profile\Entity\ProfileInterface $order_billing_profile */
+    $order_billing_profile = $order->getBillingProfile();
+    /** @var \Drupal\commerce_payment\Entity\PaymentMethodInterface $payment_method */
+    $payment_method = $order->get('payment_method')->entity;
+    /** @var \Drupal\profile\Entity\ProfileInterface $payment_method_billing_profile */
+    $payment_method_billing_profile = $payment_method->getBillingProfile();
+    // Verify that the billing information was copied to the order.
+    $this->assertTrue($order_billing_profile->equalToProfile($payment_method_billing_profile));
+    $this->assertNotEquals($order_billing_profile->id(), $payment_method_billing_profile->id());
   }
 
   /**
