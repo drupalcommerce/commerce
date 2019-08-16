@@ -34,6 +34,7 @@ services:
 
   commerce_payment.order_assign_subscriber:
     class: Drupal\commerce_payment\EventSubscriber\OrderAssignSubscriber
+    arguments: ['@commerce_order.address_book']
     tags:
     - { name: event_subscriber }
 

@@ -328,12 +328,16 @@ class PaymentCheckoutTest extends CommerceWebDriverTestBase {
       'postal_code' => '10001',
       'country_code' => 'US',
     ];
-    $billing_profile = $payment_method->getBillingProfile();
-    $this->assertEquals($expected_address, array_filter($billing_profile->get('address')->first()->toArray()));
+    $payment_method_profile = $payment_method->getBillingProfile();
+    $this->assertEquals($expected_address, array_filter($payment_method_profile->get('address')->first()->toArray()));
+    $this->assertNotEmpty($payment_method_profile->getData('address_book_profile_id'));
+    $this->assertEmpty($payment_method_profile->getData('copy_to_address_book'));
     // Verify that the billing information was copied to the order.
     $this->assertEquals($expected_address, array_filter($order_billing_profile->get('address')->first()->toArray()));
-    $this->assertNotEquals($order_billing_profile->id(), $billing_profile->id());
-    // Confirm that the address book profile was also updated.
+    $this->assertNotEquals($order_billing_profile->id(), $payment_method_profile->id());
+    $this->assertNotEmpty($order_billing_profile->getData('address_book_profile_id'));
+    $this->assertEmpty($order_billing_profile->getData('copy_to_address_book'));
+    // Confirm that the address book profile was updated.
     $this->defaultProfile = $this->reloadEntity($this->defaultProfile);
     $this->assertEquals($expected_address, array_filter($this->defaultProfile->get('address')->first()->toArray()));
     // Verify that a payment was created.
@@ -395,11 +399,11 @@ class PaymentCheckoutTest extends CommerceWebDriverTestBase {
     $order_billing_profile = $order->getBillingProfile();
     /** @var \Drupal\commerce_payment\Entity\PaymentMethodInterface $payment_method */
     $payment_method = $order->get('payment_method')->entity;
-    /** @var \Drupal\profile\Entity\ProfileInterface $payment_method_billing_profile */
-    $payment_method_billing_profile = $payment_method->getBillingProfile();
+    /** @var \Drupal\profile\Entity\ProfileInterface $payment_method_profile */
+    $payment_method_profile = $payment_method->getBillingProfile();
     // Verify that the billing information was copied to the order.
-    $this->assertTrue($order_billing_profile->equalToProfile($payment_method_billing_profile));
-    $this->assertNotEquals($order_billing_profile->id(), $payment_method_billing_profile->id());
+    $this->assertTrue($order_billing_profile->equalToProfile($payment_method_profile));
+    $this->assertNotEquals($order_billing_profile->id(), $payment_method_profile->id());
   }
 
   /**

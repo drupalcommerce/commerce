@@ -359,8 +359,8 @@ class PaymentInformation extends CheckoutPaneBase {
       $this->order->set('payment_gateway', $payment_method->getPaymentGateway());
       $this->order->set('payment_method', $payment_method);
       // Copy the billing information to the order.
-      $payment_method_billing_profile = $payment_method->getBillingProfile();
-      if ($payment_method_billing_profile) {
+      $payment_method_profile = $payment_method->getBillingProfile();
+      if ($payment_method_profile) {
         $billing_profile = $this->order->getBillingProfile();
         if (!$billing_profile) {
           $billing_profile = $this->entityTypeManager->getStorage('profile')->create([
@@ -368,7 +368,12 @@ class PaymentInformation extends CheckoutPaneBase {
             'uid' => 0,
           ]);
         }
-        $billing_profile->populateFromProfile($payment_method_billing_profile);
+        $billing_profile->populateFromProfile($payment_method_profile);
+        // The address_book_profile_id flag need to be transferred as well.
+        $address_book_profile_id = $payment_method_profile->getData('address_book_profile_id');
+        if ($address_book_profile_id) {
+          $billing_profile->setData('address_book_profile_id', $address_book_profile_id);
+        }
         $billing_profile->save();
         $this->order->setBillingProfile($billing_profile);
       }

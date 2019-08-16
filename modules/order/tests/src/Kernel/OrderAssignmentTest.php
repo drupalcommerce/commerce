@@ -95,7 +95,7 @@ class OrderAssignmentTest extends CommerceKernelTestBase {
     ]);
     $variation->save();
 
-    $profile = Profile::create([
+    $billing_profile = Profile::create([
       'type' => 'customer',
       'address' => [
         'country_code' => 'US',
@@ -107,8 +107,12 @@ class OrderAssignmentTest extends CommerceKernelTestBase {
         'family_name' => 'Pabst',
       ],
     ]);
-    $profile->save();
-    $profile = $this->reloadEntity($profile);
+    $billing_profile->save();
+    $billing_profile = $this->reloadEntity($billing_profile);
+
+    $payment_method_profile = $billing_profile->createDuplicate();
+    $payment_method_profile->setData('copy_to_address_book', TRUE);
+    $payment_method_profile->save();
 
     $payment_gateway = PaymentGateway::create([
       'id' => 'example',
@@ -127,6 +131,7 @@ class OrderAssignmentTest extends CommerceKernelTestBase {
       'type' => 'credit_card',
       'payment_gateway' => 'example',
       'payment_gateway_mode' => 'test',
+      'billing_profile' => $payment_method_profile,
     ]);
     $payment_method->save();
 
@@ -143,7 +148,7 @@ class OrderAssignmentTest extends CommerceKernelTestBase {
       'uid' => $this->user->id(),
       'mail' => $this->user->getEmail(),
       'ip_address' => '127.0.0.1',
-      'billing_profile' => $profile,
+      'billing_profile' => $billing_profile,
       'payment_method' => $payment_method,
       'order_items' => [$order_item],
       'state' => 'draft',
@@ -167,8 +172,20 @@ class OrderAssignmentTest extends CommerceKernelTestBase {
     $this->order = $this->reloadEntity($this->order);
     $this->assertEquals($second_user->id(), $this->order->getCustomerId());
     $this->assertEquals($second_user->getEmail(), $this->order->getEmail());
-    $this->assertEquals(0, $this->order->getBillingProfile()->getOwnerId());
-    $this->assertEquals($second_user->id(), $this->order->get('payment_method')->entity->getOwnerId());
+
+    $billing_profile = $this->order->getBillingProfile();
+    /** @var \Drupal\commerce_payment\Entity\PaymentMethodInterface $payment_method */
+    $payment_method = $this->order->get('payment_method')->entity;
+    $payment_method_profile = $payment_method->getBillingProfile();
+    // Confirm that the billing profile was not reassigned.
+    $this->assertEquals(0, $billing_profile->getOwnerId());
+    // Confirm that the payment method was reassigned.
+    $this->assertEquals($second_user->id(), $payment_method->getOwnerId());
+    // Confirm that the payment method profile was copied to the address book.
+    $this->assertEmpty($payment_method_profile->getData('copy_to_address_book'));
+    $this->assertNotEmpty($payment_method_profile->getData('address_book_profile_id'));
+    // Confirm that the new ID was also copied to the billing profile.
+    $this->assertNotEmpty($billing_profile->getData('address_book_profile_id'));
 
     $third_user = $this->createUser(['mail' => $this->randomString() . '@example.com']);
     $this->orderAssignment->assignMultiple([$this->order], $third_user);
@@ -176,9 +193,12 @@ class OrderAssignmentTest extends CommerceKernelTestBase {
     $this->order = $this->reloadEntity($this->order);
     $this->assertEquals($third_user->id(), $this->order->getCustomerId());
     $this->assertEquals($third_user->getEmail(), $this->order->getEmail());
+
+    $billing_profile = $this->reloadEntity($billing_profile);
+    $payment_method = $this->reloadEntity($payment_method);
     // Confirm that the billing profile and payment method were not reassigned.
-    $this->assertEquals(0, $this->order->getBillingProfile()->getOwnerId());
-    $this->assertEquals($second_user->id(), $this->order->get('payment_method')->entity->getOwnerId());
+    $this->assertEquals(0, $billing_profile->getOwnerId());
+    $this->assertEquals($second_user->id(), $payment_method->getOwnerId());
   }
 
 }
