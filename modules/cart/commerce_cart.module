@@ -126,7 +126,7 @@ function commerce_cart_user_login($account) {
  * Removes deleted carts from the anonymous user's session.
  */
 function commerce_cart_commerce_order_delete(OrderInterface $order) {
-  if (!empty($order->cart)) {
+  if (!empty($order->cart->value)) {
     \Drupal::service('commerce_cart.cart_session')->deleteCartId($order->id());
   }
 }

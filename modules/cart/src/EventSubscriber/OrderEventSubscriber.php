@@ -43,7 +43,7 @@ class OrderEventSubscriber implements EventSubscriberInterface {
    */
   public function finalizeCart(WorkflowTransitionEvent $event) {
     $order = $event->getEntity();
-    if ($order->cart->value == TRUE) {
+    if (!empty($order->cart->value)) {
       $this->cartProvider->finalizeCart($order, FALSE);
     }
   }
