@@ -31,10 +31,10 @@ class OrderEventSubscriber implements EventSubscriberInterface {
    */
   public static function getSubscribedEvents() {
     $events = [
-      'commerce_order.place.pre_transition' => ['onPlaceTransition', -100],
-      'commerce_order.validate.pre_transition' => ['onValidateTransition', -100],
-      'commerce_order.fulfill.pre_transition' => ['onFulfillTransition', -100],
-      'commerce_order.cancel.pre_transition' => ['onCancelTransition', -100],
+      'commerce_order.place.post_transition' => ['onPlaceTransition'],
+      'commerce_order.validate.post_transition' => ['onValidateTransition'],
+      'commerce_order.fulfill.post_transition' => ['onFulfillTransition'],
+      'commerce_order.cancel.post_transition' => ['onCancelTransition'],
       'commerce_order.order.assign' => ['onOrderAssign', -100],
     ];
     return $events;
