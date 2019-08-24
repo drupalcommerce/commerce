@@ -136,16 +136,13 @@ class ProductVariationTitleWidget extends ProductVariationWidgetBase implements 
   /**
    * Selects a product variation from user input.
    *
-   * If there's no user input (form viewed for the first time), the default
-   * variation is returned.
-   *
    * @param \Drupal\commerce_product\Entity\ProductVariationInterface[] $variations
    *   An array of product variations.
    * @param array $user_input
    *   The user input.
    *
-   * @return \Drupal\commerce_product\Entity\ProductVariationInterface
-   *   The selected variation.
+   * @return \Drupal\commerce_product\Entity\ProductVariationInterface|null
+   *   The selected variation or NULL if there's no user input (form viewed for the first time).
    */
   protected function selectVariationFromUserInput(array $variations, array $user_input) {
     $current_variation = NULL;
