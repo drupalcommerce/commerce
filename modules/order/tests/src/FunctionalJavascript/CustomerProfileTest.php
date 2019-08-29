@@ -133,16 +133,15 @@ class CustomerProfileTest extends OrderWebDriverTestBase {
     ]);
     $french_profile->save();
 
-    // Confirm that the French profile is first, since profiles are ordered
-    // newest-first.
+    // Confirm that the US profile is first and selected, since it is
+    // the default.
     $this->drupalGet('/commerce_order_test/customer_profile_test_form');
     $options = $this->xpath('//select[@name="profile[select_address]"]/option');
     $this->assertCount(3, $options);
-    $this->assertEquals($this->frenchAddress['address_line1'], $options[0]->getText());
-    $this->assertEquals($this->usAddress['address_line1'], $options[1]->getText());
+    $this->assertEquals($this->usAddress['address_line1'], $options[0]->getText());
+    $this->assertEquals($this->frenchAddress['address_line1'], $options[1]->getText());
     $this->assertEquals('+ Enter a new address', $options[2]->getText());
-    // Confirm that the US profile is selected, cause it is the default.
-    $this->assertTrue($options[1]->getAttribute('selected'));
+    $this->assertTrue($options[0]->getAttribute('selected'));
 
     // Confirm that the US profile is shown rendered.
     $this->assertRenderedAddress($this->usAddress);
@@ -297,11 +296,11 @@ class CustomerProfileTest extends OrderWebDriverTestBase {
     // matches the address book profile.
     $options = $this->xpath('//select[@name="profile[select_address]"]/option');
     $this->assertCount(3, $options);
-    $this->assertEquals($this->frenchAddress['address_line1'], $options[0]->getText());
-    $this->assertEquals($this->usAddress['address_line1'], $options[1]->getText());
+    $this->assertEquals($this->usAddress['address_line1'], $options[0]->getText());
+    $this->assertEquals($this->frenchAddress['address_line1'], $options[1]->getText());
     $this->assertEquals('+ Enter a new address', $options[2]->getText());
     // Confirm that the address book profile is selected.
-    $this->assertTrue($options[0]->getAttribute('selected'));
+    $this->assertTrue($options[1]->getAttribute('selected'));
 
     $this->assertRenderedAddress($this->frenchAddress);
     $this->submitForm([], 'Submit');
@@ -345,8 +344,8 @@ class CustomerProfileTest extends OrderWebDriverTestBase {
     // Confirm that the _original option is present and selected.
     $options = $this->xpath('//select[@name="profile[select_address]"]/option');
     $this->assertCount(4, $options);
-    $this->assertEquals($new_french_address['address_line1'], $options[0]->getText());
-    $this->assertEquals($this->usAddress['address_line1'], $options[1]->getText());
+    $this->assertEquals($this->usAddress['address_line1'], $options[0]->getText());
+    $this->assertEquals($new_french_address['address_line1'], $options[1]->getText());
     $this->assertEquals($this->frenchAddress['address_line1'], $options[2]->getText());
     $this->assertEquals('+ Enter a new address', $options[3]->getText());
     $this->assertTrue($options[2]->getAttribute('selected'));
@@ -416,8 +415,8 @@ class CustomerProfileTest extends OrderWebDriverTestBase {
     // has the expected suffix, as does the source address book profile.
     $options = $this->xpath('//select[@name="profile[select_address]"]/option');
     $this->assertCount(4, $options);
-    $this->assertEquals($this->frenchAddress['address_line1'] . ' (updated version)', $options[0]->getText());
-    $this->assertEquals($this->usAddress['address_line1'], $options[1]->getText());
+    $this->assertEquals($this->usAddress['address_line1'], $options[0]->getText());
+    $this->assertEquals($this->frenchAddress['address_line1'] . ' (updated version)', $options[1]->getText());
     $this->assertEquals($this->frenchAddress['address_line1'] . ' (original version)', $options[2]->getText());
     $this->assertEquals('+ Enter a new address', $options[3]->getText());
     $this->assertTrue($options[2]->getAttribute('selected'));
@@ -565,10 +564,10 @@ class CustomerProfileTest extends OrderWebDriverTestBase {
     $this->drupalGet('/commerce_order_test/customer_profile_test_form/' . $profile->id() . '/TRUE');
     $options = $this->xpath('//select[@name="profile[select_address]"]/option');
     $this->assertCount(3, $options);
-    $this->assertEquals('Cetinjska 13', $options[0]->getText());
-    $this->assertEquals('37 Rue du Sentier', $options[1]->getText());
+    $this->assertEquals('37 Rue du Sentier', $options[0]->getText());
+    $this->assertEquals('Cetinjska 13', $options[1]->getText());
     $this->assertEquals('+ Enter a new address', $options[2]->getText());
-    $this->assertTrue($options[0]->getAttribute('selected'));
+    $this->assertTrue($options[1]->getAttribute('selected'));
 
     // Confirm that a deleted address book profile is detected.
     $new_address_book_profile->delete();

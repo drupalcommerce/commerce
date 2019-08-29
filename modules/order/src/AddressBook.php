@@ -100,8 +100,6 @@ class AddressBook implements AddressBookInterface {
         unset($profiles[$profile_id]);
       }
     }
-    // Sort the profiles newest-first.
-    krsort($profiles);
 
     return $profiles;
   }
@@ -114,12 +112,12 @@ class AddressBook implements AddressBookInterface {
       return NULL;
     }
 
-    $default_profile = $this->profileStorage->loadDefaultByUser($customer, $profile_type_id);
-    if ($default_profile && !$this->isAvailable($default_profile, $available_countries)) {
-      $default_profile = NULL;
+    $profile = $this->profileStorage->loadByUser($customer, $profile_type_id);
+    if ($profile && !$this->isAvailable($profile, $available_countries)) {
+      $profile = NULL;
     }
 
-    return $default_profile;
+    return $profile;
   }
 
   /**

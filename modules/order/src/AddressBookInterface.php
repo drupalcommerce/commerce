@@ -70,12 +70,15 @@ interface AddressBookInterface {
    *   List of country codes. If empty, all countries will be available.
    *
    * @return \Drupal\profile\Entity\ProfileInterface[]
-   *   The available profiles, keyed by profile ID, sorted newest-first.
+   *   The available profiles, keyed by profile ID.
    */
   public function loadAll(UserInterface $customer, $profile_type_id, array $available_countries = []);
 
   /**
    * Loads the customer's default profile.
+   *
+   * If no default profile is found, falls back
+   * to the newest published profile.
    *
    * Ensures that the loaded profile is available, by filtering it
    * against $available_countries. If the loaded profile is not

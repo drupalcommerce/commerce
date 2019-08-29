@@ -261,7 +261,7 @@ class AddressBookTest extends OrderWebDriverTestBase {
     // Confirm that a profile can be deleted.
     $delete_links = $this->getSession()->getPage()->findAll('css', '.address-book__delete-link');
     $this->assertCount(2, $delete_links);
-    $delete_link = end($delete_links);
+    $delete_link = reset($delete_links);
     $delete_link->click();
     $this->assertSession()->pageTextContains('Are you sure you want to delete the 39 Rue du Sentier address?');
     $this->submitForm([], 'Delete');

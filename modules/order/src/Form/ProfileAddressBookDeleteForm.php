@@ -6,7 +6,7 @@ use Drupal\Core\Entity\ContentEntityDeleteForm;
 use Drupal\Core\Url;
 
 /**
- * Provides a confirmation form for deleting a profile from the address book
+ * Provides a confirmation form for deleting a profile from the address book.
  */
 class ProfileAddressBookDeleteForm extends ContentEntityDeleteForm {
 
