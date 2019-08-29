@@ -212,7 +212,7 @@ class CustomerProfile extends EntityInlineFormBase {
       // A single address book profile is allowed.
       // The customer profile form is being rendered for the first time.
       // Use the default profile to pre-fill the profile form.
-      $address_book_profile = $this->addressBook->loadDefault($customer, $profile_type_id, $available_countries);
+      $address_book_profile = $this->addressBook->load($customer, $profile_type_id, $available_countries);
     }
 
     // Copy field values from the address book profile to the actual profile.

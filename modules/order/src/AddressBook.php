@@ -107,7 +107,7 @@ class AddressBook implements AddressBookInterface {
   /**
    * {@inheritdoc}
    */
-  public function loadDefault(UserInterface $customer, $profile_type_id, array $available_countries = []) {
+  public function load(UserInterface $customer, $profile_type_id, array $available_countries = []) {
     if ($customer->isAnonymous()) {
       return NULL;
     }

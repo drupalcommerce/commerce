@@ -145,7 +145,7 @@ class AddressBookController implements ContainerInjectionInterface {
         $profiles = $this->addressBook->loadAll($user, $profile_type_id);
       }
       else {
-        $profile = $this->addressBook->loadDefault($user, $profile_type_id);
+        $profile = $this->addressBook->load($user, $profile_type_id);
         $profiles = [];
         if ($profile) {
           $profiles[$profile->id()] = $profile;
@@ -255,7 +255,7 @@ class AddressBookController implements ContainerInjectionInterface {
       // Deny access when the profile type only allows a single profile
       // per user, and such a profile already exists.
       if (!$profile_type->allowsMultiple()) {
-        $profile = $this->addressBook->loadDefault($user, $profile_type->id());
+        $profile = $this->addressBook->load($user, $profile_type->id());
         // The result is marked as non-cacheable because profiles change
         // too often for the result to be cached based on their list tag.
         $other_result = AccessResult::allowedIf(empty($profile))->mergeCacheMaxAge(0);

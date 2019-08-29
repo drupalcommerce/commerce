@@ -162,7 +162,7 @@ class AddressBookTest extends CommerceKernelTestBase {
 
   /**
    * @covers ::loadAll
-   * @covers ::loadDefault
+   * @covers ::load
    */
   public function testLoadProfiles() {
     $second_profile = Profile::create([
@@ -184,8 +184,8 @@ class AddressBookTest extends CommerceKernelTestBase {
     $this->assertEquals([1 => $this->defaultProfile], $this->addressBook->loadAll($this->user, 'customer', ['US']));
     $this->assertEquals([3 => $second_profile], $this->addressBook->loadAll($this->user, 'customer', ['RS']));
 
-    $this->assertEquals($this->defaultProfile, $this->addressBook->loadDefault($this->user, 'customer'));
-    $this->assertNull($this->addressBook->loadDefault($this->user, 'customer', ['RS']));
+    $this->assertEquals($this->defaultProfile, $this->addressBook->load($this->user, 'customer'));
+    $this->assertNull($this->addressBook->load($this->user, 'customer', ['RS']));
   }
 
   /**

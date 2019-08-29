@@ -75,10 +75,13 @@ interface AddressBookInterface {
   public function loadAll(UserInterface $customer, $profile_type_id, array $available_countries = []);
 
   /**
-   * Loads the customer's default profile.
+   * Loads the customer's profile.
    *
-   * If no default profile is found, falls back
-   * to the newest published profile.
+   * Takes the default profile, if found.
+   * Otherwise falls back to the newest published profile.
+   *
+   * Primarily used for profile types which only allow a
+   * single profile per user.
    *
    * Ensures that the loaded profile is available, by filtering it
    * against $available_countries. If the loaded profile is not
@@ -92,9 +95,9 @@ interface AddressBookInterface {
    *   List of country codes. If empty, all countries will be available.
    *
    * @return \Drupal\profile\Entity\ProfileInterface|null
-   *   The default profile, or NULL if none found.
+   *   The profile, or NULL if none found.
    */
-  public function loadDefault(UserInterface $customer, $profile_type_id, array $available_countries = []);
+  public function load(UserInterface $customer, $profile_type_id, array $available_countries = []);
 
   /**
    * Checks if the profile needs to be copied to the customer's address book.
