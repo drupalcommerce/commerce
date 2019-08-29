@@ -188,6 +188,10 @@ class AddressBookController implements ContainerInjectionInterface {
           'profile' => $view_builder->view($profile),
           'operations' => $this->buildOperations($profile, $profile_type),
         ];
+        // Allow default profiles to be styled differently.
+        if ($profile->isDefault()) {
+          $build[$profile_type_id]['profiles'][$profile_id]['#attributes']['class'][] = 'address-book__profile--default';
+        }
       }
       if (empty($profiles)) {
         $build[$profile_type_id]['empty_text'] = [
