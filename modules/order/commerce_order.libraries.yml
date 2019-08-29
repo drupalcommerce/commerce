@@ -1,3 +1,9 @@
+address_book:
+  version: VERSION
+  css:
+    layout:
+      css/commerce_order.address_book.css: {}
+
 form:
   version: VERSION
   css:

@@ -36,6 +36,17 @@ interface AddressBookInterface {
   public function allowsMultiple($profile_type_id);
 
   /**
+   * Gets whether the address book has a UI exposed.
+   *
+   * Usually presented as an "Address book" tab on user pages, replacing
+   * profile module's per-profile-type tabs.
+   *
+   * @return bool
+   *   TRUE if the address book has a UI exposed, FALSE otherwise.
+   */
+  public function hasUi();
+
+  /**
    * Loads the profile types used by the address book.
    *
    * Only customer profile types are included.
@@ -59,7 +70,7 @@ interface AddressBookInterface {
    *   List of country codes. If empty, all countries will be available.
    *
    * @return \Drupal\profile\Entity\ProfileInterface[]
-   *   The available profiles, sorted newest-first.
+   *   The available profiles, keyed by profile ID, sorted newest-first.
    */
   public function loadAll(UserInterface $customer, $profile_type_id, array $available_countries = []);
 

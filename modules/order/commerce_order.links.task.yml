@@ -2,3 +2,8 @@ entity.commerce_order.collection:
   route_name: entity.commerce_order.collection
   base_route: entity.commerce_order.collection
   title: 'Orders'
+
+commerce_order.address_book.overview:
+  route_name: commerce_order.address_book.overview
+  base_route: entity.user.canonical
+  title: 'Address book'

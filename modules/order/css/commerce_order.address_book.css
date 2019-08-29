@@ -1,0 +1,41 @@
+/**
+ * @file
+ * Default styles for the address book.
+ */
+
+.address-book__add-link {
+  margin: 0.75em;
+  display: block;
+  text-decoration: none;
+  border: 0;
+}
+
+.address-book__profiles {
+  display: flex;
+  flex-flow: row wrap;
+  justify-content: space-around;
+}
+
+.address-book__profile {
+  flex: 1;
+  margin-left: 0.75em;
+  margin-right: 0.75em;
+}
+
+.address-book__empty-text {
+  margin: 0.75em;
+}
+
+.address-book__operations {
+  margin-top: 0.75em;
+  margin-bottom: 0.75em;
+}
+
+.address-book__operations a {
+  margin-right: 10px;
+  border: 0;
+}
+
+.address-book__set-default-link {
+  display: block;
+}

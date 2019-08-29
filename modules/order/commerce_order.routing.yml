@@ -45,3 +45,79 @@ entity.commerce_order.user_view:
       entity:
         user: 'entity:user'
         commerce_order: 'entity:order'
+
+commerce_order.address_book.overview:
+  path: '/user/{user}/address-book'
+  defaults:
+    _controller: '\Drupal\commerce_order\Controller\AddressBookController::overviewPage'
+    _title: 'Address book'
+  options:
+    parameters:
+      user:
+        type: 'entity:user'
+  requirements:
+    _address_book_access: 'TRUE'
+    _custom_access: '\Drupal\commerce_order\Controller\AddressBookController::checkOverviewAccess'
+
+commerce_order.address_book.add_form:
+  path: '/user/{user}/address-book/add/{profile_type}'
+  defaults:
+    _entity_form: 'profile.address-book-add'
+    _title: 'Add address'
+  options:
+    parameters:
+      user:
+        type: 'entity:user'
+      profile_type:
+        type: 'entity:profile_type'
+  requirements:
+    _address_book_access: 'TRUE'
+    _custom_access: '\Drupal\commerce_order\Controller\AddressBookController::checkCreateAccess'
+
+commerce_order.address_book.edit_form:
+  path: '/user/{user}/address-book/{profile}/edit'
+  defaults:
+    _entity_form: 'profile.address-book-edit'
+    _title_callback: '\Drupal\commerce_order\Controller\AddressBookController::editTitle'
+  options:
+    parameters:
+      user:
+        type: 'entity:user'
+      profile:
+        type: 'entity:profile'
+  requirements:
+    _address_book_access: 'TRUE'
+    _entity_access: 'profile.update'
+    profile: '\d+'
+
+commerce_order.address_book.delete_form:
+  path: '/user/{user}/address-book/{profile}/delete'
+  defaults:
+    _entity_form: 'profile.address-book-delete'
+    _title_callback: '\Drupal\commerce_order\Controller\AddressBookController::deleteTitle'
+  options:
+    parameters:
+      user:
+        type: 'entity:user'
+      profile:
+        type: 'entity:profile'
+  requirements:
+    _address_book_access: 'TRUE'
+    _entity_access: 'profile.delete'
+    profile: '\d+'
+
+commerce_order.address_book.set_default:
+  path: '/user/{user}/address-book/{profile}/set-default'
+  defaults:
+    _controller: '\Drupal\commerce_order\Controller\AddressBookController::setDefault'
+  options:
+    parameters:
+      user:
+        type: 'entity:user'
+      profile:
+        type: 'entity:profile'
+  requirements:
+    _address_book_access: 'TRUE'
+    _entity_access: 'profile.update'
+    profile: '\d+'
+    _csrf_token: 'TRUE'

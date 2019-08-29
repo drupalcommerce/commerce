@@ -108,6 +108,34 @@ class AddressBookTest extends CommerceKernelTestBase {
   }
 
   /**
+   * @covers ::hasUi
+   */
+  public function testHasUi() {
+    // The address book UI is exposed by default.
+    $this->assertTrue($this->addressBook->hasUi());
+
+    $profile_type = ProfileType::load('customer');
+    $profile_type->setMultiple(FALSE);
+    $profile_type->save();
+    // Confirm that there's no address book when there's only a single profile.
+    $this->assertFalse($this->addressBook->hasUi());
+
+    // Confirm that two single-profile types do get an address book.
+    $bundle_entity_duplicator = $this->container->get('entity.bundle_entity_duplicator');
+    $new_profile_type = $bundle_entity_duplicator->duplicate($profile_type, [
+      'id' => 'shipping',
+      'label' => 'Shipping',
+    ]);
+    $this->assertTrue($this->addressBook->hasUi());
+
+    // Confirm that without any customer profile types, there is no UI exposed.
+    $new_profile_type->delete();
+    $profile_type->setThirdPartySetting('commerce_order', 'customer_profile_type', FALSE);
+    $profile_type->save();
+    $this->assertFalse($this->addressBook->hasUi());
+  }
+
+  /**
    * @covers ::loadTypes
    */
   public function testLoadProfileTypes() {

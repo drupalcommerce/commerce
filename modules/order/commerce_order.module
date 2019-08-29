@@ -178,6 +178,40 @@ function commerce_order_views_data_alter(array &$data) {
 }
 
 /**
+ * Implements hook_entity_type_build().
+ *
+ * Adds the address book form classes to profile entities.
+ * Referenced in commerce_order.routing.yml.
+ */
+function commerce_order_entity_type_build(array &$entity_types) {
+  /** @var \Drupal\Core\Entity\EntityTypeInterface[] $entity_types */
+  $entity_types['profile']->setFormClass('address-book-add', 'Drupal\commerce_order\Form\ProfileAddressBookForm');
+  $entity_types['profile']->setFormClass('address-book-edit', 'Drupal\commerce_order\Form\ProfileAddressBookForm');
+  $entity_types['profile']->setFormClass('address-book-delete', 'Drupal\commerce_order\Form\ProfileAddressBookDeleteForm');
+}
+
+/**
+ * Implements hook_local_tasks_alter().
+ *
+ * Removes profile tabs for profile types managed through the address book tab.
+ */
+function commerce_order_local_tasks_alter(&$definitions) {
+  /** @var \Drupal\commerce_order\AddressBookInterface $address_book */
+  $address_book = \Drupal::service('commerce_order.address_book');
+  if (!$address_book->hasUi()) {
+    return;
+  }
+
+  $profile_types = $address_book->loadTypes();
+  foreach ($profile_types as $profile_type) {
+    $derivative_key = 'profile.user_page:' . $profile_type->id();
+    if (isset($definitions[$derivative_key])) {
+      unset($definitions[$derivative_key]);
+    }
+  }
+}
+
+/**
  * Implements hook_form_FORM_ID_alter() for 'profile_type_form'.
  */
 function commerce_order_form_profile_type_form_alter(array &$form, FormStateInterface $form_state) {
@@ -251,6 +285,7 @@ function commerce_order_build_address_field_definition($profile_type_id) {
     ->setLabel('Address')
     ->setRequired(TRUE)
     ->setDisplayOptions('view', [
+      'label' => 'hidden',
       'type' => 'address_default',
     ])
     ->setDisplayOptions('form', [

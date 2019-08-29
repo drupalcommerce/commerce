@@ -56,6 +56,27 @@ class AddressBook implements AddressBookInterface {
   /**
    * {@inheritdoc}
    */
+  public function hasUi() {
+    $profile_types = $this->loadTypes();
+    if (empty($profile_types)) {
+      // No profile types available.
+      return FALSE;
+    }
+    elseif (count($profile_types) === 1) {
+      $profile_type = reset($profile_types);
+      if (!$profile_type->allowsMultiple()) {
+        // There is only one profile type, and it only allows one profile per
+        // customer. No point in presenting an "address book" for one address.
+        return FALSE;
+      }
+    }
+
+    return TRUE;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function loadTypes() {
     /** @var \Drupal\profile\Entity\ProfileTypeInterface[] $profile_types */
     $profile_types = $this->profileTypeStorage->loadByProperties([

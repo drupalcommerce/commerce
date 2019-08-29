@@ -1,4 +1,10 @@
 services:
+  access_check.address_book:
+    class: Drupal\commerce_order\Access\AddressBookAccessCheck
+    arguments: ['@commerce_order.address_book']
+    tags:
+      - { name: access_check, applies_to: _address_book_access }
+
   plugin.manager.commerce_adjustment_type:
     class: Drupal\commerce_order\AdjustmentTypeManager
     arguments: ['@module_handler', '@cache.discovery']
