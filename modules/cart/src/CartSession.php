@@ -87,7 +87,7 @@ class CartSession implements CartSessionInterface {
       self::COMPLETED => 'commerce_cart_completed_orders',
     ];
     if (!isset($keys[$type])) {
-      throw new \InvalidArgumentException(sprintf('Unknown cart session type "$s".', $type));
+      throw new \InvalidArgumentException(sprintf('Unknown cart session type "%s".', $type));
     }
 
     return $keys[$type];

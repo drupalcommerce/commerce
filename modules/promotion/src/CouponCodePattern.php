@@ -59,7 +59,7 @@ final class CouponCodePattern {
   public function __construct($type, $prefix = '', $suffix = '', $length = 8) {
     $pattern_types = [self::ALPHANUMERIC, self::ALPHABETIC, self::NUMERIC];
     if (!in_array($type, $pattern_types)) {
-      throw new \InvalidArgumentException(sprintf('Unknown pattern type "$s".', $type));
+      throw new \InvalidArgumentException(sprintf('Unknown pattern type "%s".', $type));
     }
 
     $this->type = $type;
