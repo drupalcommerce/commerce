@@ -10,4 +10,4 @@ dependencies:
   - inline_entity_form:inline_entity_form
   - drupal:datetime
   - drupal:views
-  - drupal:system (>=8.6.0)
+  - drupal:system (>=8.7.0)
