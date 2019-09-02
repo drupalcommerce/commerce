@@ -49,13 +49,6 @@ abstract class InlineFormBase extends PluginBase implements InlineFormInterface,
   /**
    * {@inheritdoc}
    */
-  public function calculateDependencies() {
-    return [];
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function getConfiguration() {
     return $this->configuration;
   }

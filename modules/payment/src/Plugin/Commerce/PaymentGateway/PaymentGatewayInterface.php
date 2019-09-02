@@ -3,7 +3,8 @@
 namespace Drupal\commerce_payment\Plugin\Commerce\PaymentGateway;
 
 use Drupal\commerce_payment\Entity\PaymentInterface;
-use Drupal\Component\Plugin\ConfigurablePluginInterface;
+use Drupal\Component\Plugin\ConfigurableInterface;
+use Drupal\Component\Plugin\DependentPluginInterface;
 use Drupal\Component\Plugin\DerivativeInspectionInterface;
 use Drupal\Core\Plugin\PluginFormInterface;
 use Drupal\Core\Plugin\PluginWithFormsInterface;
@@ -11,7 +12,7 @@ use Drupal\Core\Plugin\PluginWithFormsInterface;
 /**
  * Defines the base interface for payment gateways.
  */
-interface PaymentGatewayInterface extends PluginWithFormsInterface, ConfigurablePluginInterface, PluginFormInterface, DerivativeInspectionInterface {
+interface PaymentGatewayInterface extends PluginWithFormsInterface, ConfigurableInterface, DependentPluginInterface, PluginFormInterface, DerivativeInspectionInterface {
 
   /**
    * Gets the payment gateway label.

@@ -56,13 +56,6 @@ abstract class PromotionOfferBase extends PluginBase implements PromotionOfferIn
   /**
    * {@inheritdoc}
    */
-  public function calculateDependencies() {
-    return [];
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function defaultConfiguration() {
     return [];
   }

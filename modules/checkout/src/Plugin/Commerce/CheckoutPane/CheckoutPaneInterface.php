@@ -3,7 +3,8 @@
 namespace Drupal\commerce_checkout\Plugin\Commerce\CheckoutPane;
 
 use Drupal\commerce_order\Entity\OrderInterface;
-use Drupal\Component\Plugin\ConfigurablePluginInterface;
+use Drupal\Component\Plugin\ConfigurableInterface;
+use Drupal\Component\Plugin\DependentPluginInterface;
 use Drupal\Component\Plugin\DerivativeInspectionInterface;
 use Drupal\Component\Plugin\PluginInspectionInterface;
 use Drupal\Core\Form\FormStateInterface;
@@ -14,7 +15,7 @@ use Drupal\Core\Plugin\PluginFormInterface;
  *
  * Checkout panes are configurable forms embedded into the checkout flow form.
  */
-interface CheckoutPaneInterface extends ConfigurablePluginInterface, PluginFormInterface, PluginInspectionInterface, DerivativeInspectionInterface {
+interface CheckoutPaneInterface extends ConfigurableInterface, DependentPluginInterface, PluginFormInterface, PluginInspectionInterface, DerivativeInspectionInterface {
 
   /**
    * Sets the current order.

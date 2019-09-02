@@ -2,7 +2,7 @@
 
 namespace Drupal\commerce\Plugin\Commerce\InlineForm;
 
-use Drupal\Component\Plugin\ConfigurablePluginInterface;
+use Drupal\Component\Plugin\ConfigurableInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Component\Plugin\PluginInspectionInterface;
 
@@ -18,7 +18,7 @@ use Drupal\Component\Plugin\PluginInspectionInterface;
  * Just like form elements, inline forms are automatically validated and
  * submitted when the complete form is validated/submitted.
  */
-interface InlineFormInterface extends ConfigurablePluginInterface, PluginInspectionInterface {
+interface InlineFormInterface extends ConfigurableInterface, PluginInspectionInterface {
 
   /**
    * Gets the inline form label.

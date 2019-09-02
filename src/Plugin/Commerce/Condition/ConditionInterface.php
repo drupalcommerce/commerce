@@ -2,7 +2,8 @@
 
 namespace Drupal\commerce\Plugin\Commerce\Condition;
 
-use Drupal\Component\Plugin\ConfigurablePluginInterface;
+use Drupal\Component\Plugin\ConfigurableInterface;
+use Drupal\Component\Plugin\DependentPluginInterface;
 use Drupal\Component\Plugin\PluginInspectionInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Plugin\PluginFormInterface;
@@ -10,7 +11,7 @@ use Drupal\Core\Plugin\PluginFormInterface;
 /**
  * Defines the interface for conditions.
  */
-interface ConditionInterface extends ConfigurablePluginInterface, PluginFormInterface, PluginInspectionInterface {
+interface ConditionInterface extends ConfigurableInterface, DependentPluginInterface, PluginFormInterface, PluginInspectionInterface {
 
   /**
    * Gets the condition label.

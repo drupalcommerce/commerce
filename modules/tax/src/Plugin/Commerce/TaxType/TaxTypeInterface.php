@@ -3,7 +3,8 @@
 namespace Drupal\commerce_tax\Plugin\Commerce\TaxType;
 
 use Drupal\commerce_order\Entity\OrderInterface;
-use Drupal\Component\Plugin\ConfigurablePluginInterface;
+use Drupal\Component\Plugin\ConfigurableInterface;
+use Drupal\Component\Plugin\DependentPluginInterface;
 use Drupal\Component\Plugin\DerivativeInspectionInterface;
 use Drupal\Component\Plugin\PluginInspectionInterface;
 use Drupal\Core\Plugin\PluginFormInterface;
@@ -17,7 +18,7 @@ use Drupal\Core\Plugin\PluginFormInterface;
  * @see \Drupal\commerce_tax\Plugin\Commerce\TaxType\LocalTaxTypeInterface
  * @see \Drupal\commerce_tax\Plugin\Commerce\TaxType\RemoteTaxTypeInterface
  */
-interface TaxTypeInterface extends ConfigurablePluginInterface, PluginFormInterface, PluginInspectionInterface, DerivativeInspectionInterface {
+interface TaxTypeInterface extends ConfigurableInterface, DependentPluginInterface, PluginFormInterface, PluginInspectionInterface, DerivativeInspectionInterface {
 
   /**
    * Gets the tax type label.

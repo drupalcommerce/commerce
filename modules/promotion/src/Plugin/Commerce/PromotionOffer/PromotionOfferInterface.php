@@ -3,7 +3,7 @@
 namespace Drupal\commerce_promotion\Plugin\Commerce\PromotionOffer;
 
 use Drupal\commerce_promotion\Entity\PromotionInterface;
-use Drupal\Component\Plugin\ConfigurablePluginInterface;
+use Drupal\Component\Plugin\ConfigurableInterface;
 use Drupal\Component\Plugin\PluginInspectionInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Plugin\PluginFormInterface;
@@ -17,7 +17,7 @@ use Drupal\Core\Plugin\PluginFormInterface;
  * @see \Drupal\commerce_promotion\Plugin\Commerce\PromotionOffer\OrderPromotionOfferInterface
  * @see \Drupal\commerce_promotion\Plugin\Commerce\PromotionOffer\OrderItemPromotionOfferInterface
  */
-interface PromotionOfferInterface extends ConfigurablePluginInterface, PluginFormInterface, PluginInspectionInterface {
+interface PromotionOfferInterface extends ConfigurableInterface, PluginFormInterface, PluginInspectionInterface {
 
   /**
    * Gets the offer entity type ID.
