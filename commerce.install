@@ -22,3 +22,10 @@ function commerce_requirements($phase) {
 
   return $requirements;
 }
+
+/**
+ * Install the Token module.
+ */
+function commerce_update_8201() {
+  \Drupal::service('module_installer')->install(['token']);
+}

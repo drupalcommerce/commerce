@@ -14,6 +14,7 @@
         "drupal/inline_entity_form": "^1.0-rc1",
         "drupal/profile": "^1.0",
         "drupal/state_machine": "^1.0-rc1",
+        "drupal/token": "^1.0",
         "commerceguys/intl": "^1.0.0"
     },
     "minimum-stability": "dev"

@@ -8,6 +8,7 @@ dependencies:
   - address:address
   - entity:entity
   - inline_entity_form:inline_entity_form
+  - token:token
   - drupal:datetime
   - drupal:views
   - drupal:system (>=8.7.0)
