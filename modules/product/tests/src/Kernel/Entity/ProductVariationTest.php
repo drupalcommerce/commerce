@@ -103,8 +103,8 @@ class ProductVariationTest extends CommerceKernelTestBase {
     $variation->setPrice($price);
     $this->assertEquals($price, $variation->getPrice());
 
-    $variation->setActive(TRUE);
-    $this->assertEquals(TRUE, $variation->isActive());
+    $variation->setPublished();
+    $this->assertEquals(TRUE, $variation->isPublished());
 
     $variation->setCreatedTime(635879700);
     $this->assertEquals(635879700, $variation->getCreatedTime());

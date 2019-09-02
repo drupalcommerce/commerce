@@ -146,7 +146,7 @@ class AddressBook implements AddressBookInterface {
       $address_book_profile = $this->profileStorage->load($address_book_profile_id);
     }
     if (!$address_book_profile && !$this->allowsMultiple($profile->bundle())) {
-      $address_book_profile = $this->profileStorage->loadDefaultByUser($customer, $profile->bundle());
+      $address_book_profile = $this->load($customer, $profile->bundle());
     }
 
     if ($address_book_profile) {
