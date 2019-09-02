@@ -468,7 +468,7 @@ class BuyXGetYTest extends CommerceKernelTestBase {
     $adjustment = reset($adjustments);
     $this->assertEquals('promotion', $adjustment->getType());
     $this->assertEquals(new Price('-2.5', 'USD'), $adjustment->getAmount());
-    $this->assertEquals($this->promotion->id(), $adjustment->getSourceId());;
+    $this->assertEquals($this->promotion->id(), $adjustment->getSourceId());
   }
 
 }

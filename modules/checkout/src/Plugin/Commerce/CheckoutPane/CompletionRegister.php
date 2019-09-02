@@ -246,7 +246,7 @@ class CompletionRegister extends CheckoutPaneBase implements CheckoutPaneInterfa
     $form_display->extractFormValues($account, $pane_form, $form_state);
     $account->save();
     user_login_finalize($account);
-    $this->credentialsCheckFlood->clearAccount($this->clientIp, $account->getAccountName());;
+    $this->credentialsCheckFlood->clearAccount($this->clientIp, $account->getAccountName());
 
     $this->orderAssignment->assign($this->order, $account);
     // Notify other modules.

@@ -33,7 +33,7 @@ class OrderSummary extends CheckoutPaneBase implements CheckoutPaneInterface {
       $view_storage = $this->entityTypeManager->getStorage('view');
       $view = $view_storage->load($this->configuration['view']);
       if ($view) {
-        return $this->t('View: @view', ['@view' => $view->label()]);;
+        return $this->t('View: @view', ['@view' => $view->label()]);
       }
     }
     else {
