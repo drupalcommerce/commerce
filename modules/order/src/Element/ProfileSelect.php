@@ -86,7 +86,7 @@ class ProfileSelect extends RenderElement {
     // The customer_profile inline form provides an address book widget
     // which can be buggy when used inside a form element.
     // That's why the content_entity inline form is used instead.
-    $inline_form = $inline_form_manager->createInstance('content_entity', $element['#default_value']);
+    $inline_form = $inline_form_manager->createInstance('content_entity', [], $element['#default_value']);
     $element['#inline_form'] = $inline_form;
 
     $element = $inline_form->buildInlineForm($element, $form_state);
