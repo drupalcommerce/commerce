@@ -3,8 +3,14 @@
 namespace Drupal\commerce_payment\Plugin\Commerce\PaymentGateway;
 
 use Drupal\commerce_payment\Entity\PaymentInterface;
+use Drupal\commerce_payment\PaymentMethodTypeManager;
+use Drupal\commerce_payment\PaymentTypeManager;
 use Drupal\commerce_price\Price;
+use Drupal\Component\Datetime\TimeInterface;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Utility\Token;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Provides the Manual payment gateway.
@@ -25,6 +31,55 @@ use Drupal\Core\Form\FormStateInterface;
  * )
  */
 class Manual extends PaymentGatewayBase implements ManualPaymentGatewayInterface {
+
+  /**
+   * The token service.
+   *
+   * @var \Drupal\Core\Utility\Token
+   */
+  protected $token;
+
+  /**
+   * Constructs a new Manual object.
+   *
+   * @param array $configuration
+   *   A configuration array containing information about the plugin instance.
+   * @param string $plugin_id
+   *   The plugin_id for the plugin instance.
+   * @param mixed $plugin_definition
+   *   The plugin implementation definition.
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   *   The entity type manager.
+   * @param \Drupal\commerce_payment\PaymentTypeManager $payment_type_manager
+   *   The payment type manager.
+   * @param \Drupal\commerce_payment\PaymentMethodTypeManager $payment_method_type_manager
+   *   The payment method type manager.
+   * @param \Drupal\Component\Datetime\TimeInterface $time
+   *   The time.
+   * @param \Drupal\Core\Utility\Token $token
+   *   The token service.
+   */
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityTypeManagerInterface $entity_type_manager, PaymentTypeManager $payment_type_manager, PaymentMethodTypeManager $payment_method_type_manager, TimeInterface $time, Token $token) {
+    parent::__construct($configuration, $plugin_id, $plugin_definition, $entity_type_manager, $payment_type_manager, $payment_method_type_manager, $time);
+
+    $this->token = $token;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
+    return new static(
+      $configuration,
+      $plugin_id,
+      $plugin_definition,
+      $container->get('entity_type.manager'),
+      $container->get('plugin.manager.commerce_payment_type'),
+      $container->get('plugin.manager.commerce_payment_method_type'),
+      $container->get('datetime.time'),
+      $container->get('token')
+    );
+  }
 
   /**
    * {@inheritdoc}
@@ -50,6 +105,12 @@ class Manual extends PaymentGatewayBase implements ManualPaymentGatewayInterface
       '#description' => $this->t('Shown the end of checkout, after the customer has placed their order.'),
       '#default_value' => $this->configuration['instructions']['value'],
       '#format' => $this->configuration['instructions']['format'],
+      '#element_validate' => ['token_element_validate'],
+      '#token_types' => ['commerce_order', 'commerce_payment'],
+    ];
+    $form['token_help'] = [
+      '#theme' => 'token_tree_link',
+      '#token_types' => ['commerce_order', 'commerce_payment'],
     ];
 
     return $form;
@@ -73,9 +134,14 @@ class Manual extends PaymentGatewayBase implements ManualPaymentGatewayInterface
   public function buildPaymentInstructions(PaymentInterface $payment) {
     $instructions = [];
     if (!empty($this->configuration['instructions']['value'])) {
+      $instructions_text = $this->token->replace($this->configuration['instructions']['value'], [
+        'commerce_order' => $payment->getOrder(),
+        'commerce_payment' => $payment,
+      ]);
+
       $instructions = [
         '#type' => 'processed_text',
-        '#text' => $this->configuration['instructions']['value'],
+        '#text' => $instructions_text,
         '#format' => $this->configuration['instructions']['format'],
       ];
     }

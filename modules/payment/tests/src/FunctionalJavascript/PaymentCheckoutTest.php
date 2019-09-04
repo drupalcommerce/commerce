@@ -734,7 +734,7 @@ class PaymentCheckoutTest extends CommerceWebDriverTestBase {
       'collect_billing_information' => FALSE,
       'display_label' => 'Cash on delivery',
       'instructions' => [
-        'value' => 'Sample payment instructions.',
+        'value' => 'You will pay for order #[commerce_order:order_id] in [commerce_payment:amount:currency_code].',
         'format' => 'plain_text',
       ],
     ]);
@@ -751,7 +751,8 @@ class PaymentCheckoutTest extends CommerceWebDriverTestBase {
     $this->assertSession()->pageTextContains('Cash on delivery');
     $this->submitForm([], 'Pay and complete purchase');
     $this->assertSession()->pageTextContains('Your order number is 1. You can view your order on your account page when logged in.');
-    $this->assertSession()->pageTextContains('Sample payment instructions.');
+    // Confirm token replacement works.
+    $this->assertSession()->pageTextContains('You will pay for order #1 in USD.');
 
     \Drupal::entityTypeManager()->getStorage('commerce_order')->resetCache([1]);
     $order = Order::load(1);
