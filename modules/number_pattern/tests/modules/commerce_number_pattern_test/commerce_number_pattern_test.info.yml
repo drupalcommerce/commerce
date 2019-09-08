@@ -1,0 +1,8 @@
+name: Commerce Number Pattern Test
+type: module
+description: Contains various non-specific things needed in tests.
+package: Testing
+core: 8.x
+dependencies:
+  - commerce:commerce_store
+  - commerce_number_pattern:commerce_number_pattern

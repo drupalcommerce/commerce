@@ -1,0 +1,16 @@
+<?php
+
+/**
+ * @file
+ * Provides configurable patterns for generating sequential numbers.
+ */
+
+/**
+ * Implements hook_menu_links_discovered_alter().
+ */
+function commerce_number_pattern_menu_links_discovered_alter(&$links) {
+  // Move the number pattern page to the Order configuration group.
+  if (\Drupal::moduleHandler()->moduleExists('commerce_order')) {
+    $links['entity.commerce_number_pattern.collection']['parent'] = 'commerce_order.configuration';
+  }
+}

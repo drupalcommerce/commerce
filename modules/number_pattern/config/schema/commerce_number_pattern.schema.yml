@@ -1,0 +1,50 @@
+commerce_number_pattern.commerce_number_pattern.*:
+  type: config_entity
+  label: 'Number pattern'
+  mapping:
+    id:
+      type: string
+      label: 'Machine-readable name'
+    label:
+      type: label
+      label: 'Label'
+    targetEntityType:
+      type: string
+      label: 'Entity type'
+    plugin:
+      type: string
+      label: 'Plugin'
+    configuration:
+      type: commerce_number_pattern.commerce_number_pattern.plugin.[%parent.plugin]
+
+commerce_number_pattern.commerce_number_pattern.plugin.*:
+  type: commerce_number_pattern_plugin_configuration
+
+commerce_number_pattern.commerce_number_pattern.plugin.infinite:
+  type: commerce_number_pattern_sequential_plugin_configuration
+
+commerce_number_pattern.commerce_number_pattern.plugin.monthly:
+  type: commerce_number_pattern_sequential_plugin_configuration
+
+commerce_number_pattern.commerce_number_pattern.plugin.yearly:
+  type: commerce_number_pattern_sequential_plugin_configuration
+
+commerce_number_pattern_plugin_configuration:
+  type: mapping
+  mapping:
+    pattern:
+      type: string
+      label: 'Pattern'
+
+commerce_number_pattern_sequential_plugin_configuration:
+  type: commerce_number_pattern_plugin_configuration
+  mapping:
+    initial_number:
+      type: integer
+      label: 'Initial number'
+    padding:
+      type: integer
+      label: 'Padding'
+    per_store_sequence:
+      type: boolean
+      label: 'Generate a unique sequence for each store'

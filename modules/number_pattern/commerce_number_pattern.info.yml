@@ -1,0 +1,9 @@
+name: Commerce Number Pattern
+type: module
+description: 'Provides configurable patterns for generating sequential numbers.'
+package: Commerce
+core: 8.x
+configure: entity.commerce_number_pattern.collection
+dependencies:
+  - commerce:commerce
+  - commerce:commerce_store

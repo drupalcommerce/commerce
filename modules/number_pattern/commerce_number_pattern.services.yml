@@ -1,0 +1,4 @@
+services:
+  plugin.manager.commerce_number_pattern:
+    class: Drupal\commerce_number_pattern\NumberPatternManager
+    parent: default_plugin_manager

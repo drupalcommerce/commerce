@@ -1,0 +1,5 @@
+entity.commerce_number_pattern.add_form:
+  route_name: entity.commerce_number_pattern.add_form
+  title: 'Add number pattern'
+  appears_on:
+    - entity.commerce_number_pattern.collection

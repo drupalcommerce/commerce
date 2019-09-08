@@ -1,0 +1,6 @@
+entity.commerce_number_pattern.collection:
+  title: 'Number patterns'
+  route_name: 'entity.commerce_number_pattern.collection'
+  parent: 'commerce.store_configuration'
+  description: 'Manage number patterns.'
+  weight: 10

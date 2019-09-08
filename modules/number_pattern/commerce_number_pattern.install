@@ -1,0 +1,52 @@
+<?php
+
+/**
+ * @file
+ * Install, update and uninstall functions for the Number pattern module.
+ */
+
+/**
+ * Implements hook_schema().
+ */
+function commerce_number_pattern_schema() {
+  $schema['commerce_number_pattern_sequence'] = [
+    'description' => 'Stores sequential numbers for number patterns.',
+    'fields' => [
+      'entity_id' => [
+        'description' => 'The number pattern entity id.',
+        'type' => 'varchar_ascii',
+        'length' => 128,
+        'not null' => TRUE,
+        'default' => '',
+      ],
+      'store_id' => [
+        'description' => 'The store ID.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ],
+      'number' => [
+        'description' => 'The sequential number.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ],
+      'generated' => [
+        'description' => 'The Unix timestamp when the number was generated.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+      ],
+    ],
+    'primary key' => ['entity_id', 'store_id'],
+    'indexes' => [
+      'entity_id' => ['entity_id'],
+    ],
+    'foreign keys' => [
+      'store_id' => ['commerce_store' => 'store_id'],
+    ],
+  ];
+
+  return $schema;
+}

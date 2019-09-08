@@ -74,7 +74,8 @@ use Drupal\profile\Entity\ProfileInterface;
  *     "resend-receipt-form" = "/admin/commerce/orders/{commerce_order}/resend-receipt"
  *   },
  *   bundle_entity_type = "commerce_order_type",
- *   field_ui_base_route = "entity.commerce_order_type.edit_form"
+ *   field_ui_base_route = "entity.commerce_order_type.edit_form",
+ *   allow_number_patterns = TRUE,
  * )
  */
 class Order extends CommerceContentEntityBase implements OrderInterface {

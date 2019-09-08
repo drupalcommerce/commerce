@@ -1,0 +1,3 @@
+'administer commerce_number_pattern':
+  title: 'Administer number patterns'
+  'restrict access': TRUE
