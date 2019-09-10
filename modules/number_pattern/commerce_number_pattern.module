@@ -5,6 +5,8 @@
  * Provides configurable patterns for generating sequential numbers.
  */
 
+use Drupal\Core\Render\BubbleableMetadata;
+
 /**
  * Implements hook_menu_links_discovered_alter().
  */
@@ -13,4 +15,89 @@ function commerce_number_pattern_menu_links_discovered_alter(&$links) {
   if (\Drupal::moduleHandler()->moduleExists('commerce_order')) {
     $links['entity.commerce_number_pattern.collection']['parent'] = 'commerce_order.configuration';
   }
+}
+
+/**
+ * Implements hook_token_info().
+ */
+function commerce_number_pattern_token_info() {
+  $time = \Drupal::time()->getRequestTime();
+  /** @var \Drupal\Core\Datetime\DateFormatterInterface $date_formatter */
+  $date_formatter = \Drupal::service('date.formatter');
+  $year = $date_formatter->format($time, 'custom', 'Y');
+  $month = $date_formatter->format($time, 'custom', 'm');
+  $day = $date_formatter->format($time, 'custom', 'd');
+
+  $info = [];
+  $info['types']['pattern'] = [
+    'name' => t('Pattern'),
+    'needs-data' => 'pattern',
+  ];
+  $info['tokens']['pattern']['day'] = [
+    'name' => t('Day'),
+    'description' => t('The current day, with a leading zero. (%date)', ['%date' => $day]),
+  ];
+  $info['tokens']['pattern']['month'] = [
+    'name' => t('Month'),
+    'description' => t('The current month, with a leading zero. (%date)', ['%date' => $month]),
+  ];
+  $info['tokens']['pattern']['year'] = [
+    'name' => t('Year'),
+    'description' => t('The current year. (%date)', ['%date' => $year]),
+  ];
+  $info['tokens']['pattern']['date'] = [
+    'name' => t('Custom date'),
+    'description' => t('A date in a custom format. See <a href="http://php.net/manual/function.date.php">the PHP documentation</a> for details.'),
+    'dynamic' => TRUE,
+  ];
+  $info['tokens']['pattern']['number'] = [
+    'name' => t('Number'),
+    'description' => t('The generated sequential number.'),
+  ];
+
+  return $info;
+}
+
+/**
+ * Implements hook_tokens().
+ */
+function commerce_number_pattern_tokens($type, $tokens, array $data, array $options, BubbleableMetadata $bubbleable_metadata) {
+  $replacements = [];
+  if ($type == 'pattern') {
+    /** @var \Drupal\Core\Datetime\DateFormatterInterface $date_formatter */
+    $date_formatter = \Drupal::service('date.formatter');
+    $time = \Drupal::time()->getRequestTime();
+    // The tokens must not be cached due to the reliance on the current time.
+    $bubbleable_metadata->setCacheMaxAge(0);
+
+    foreach ($tokens as $name => $original) {
+      switch ($name) {
+        case 'day':
+          $replacements[$original] = $date_formatter->format($time, 'custom', 'd');
+          break;
+
+        case 'month':
+          $replacements[$original] = $date_formatter->format($time, 'custom', 'm');
+          break;
+
+        case 'year':
+          $replacements[$original] = $date_formatter->format($time, 'custom', 'Y');
+          break;
+
+        case 'number':
+          if (!empty($data['pattern']['number'])) {
+            $replacements[$original] = $data['pattern']['number'];
+          }
+          break;
+      }
+    }
+
+    if ($date_tokens = \Drupal::token()->findWithPrefix($tokens, 'date')) {
+      foreach ($date_tokens as $name => $original) {
+        $replacements[$original] = $date_formatter->format($time, 'custom', $name);
+      }
+    }
+  }
+
+  return $replacements;
 }

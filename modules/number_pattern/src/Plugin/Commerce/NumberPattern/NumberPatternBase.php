@@ -94,7 +94,10 @@ abstract class NumberPatternBase extends PluginBase implements NumberPatternInte
    */
   public function buildConfigurationForm(array $form, FormStateInterface $form_state) {
     $entity_type_id = $form_state->getValue('targetEntityType');
-    $token_types = $entity_type_id ? [$entity_type_id] : [];
+    $token_types = ['pattern'];
+    if ($entity_type_id) {
+      $token_types[] = $entity_type_id;
+    }
 
     $form['pattern'] = [
       '#title' => $this->t('Pattern'),
@@ -108,6 +111,7 @@ abstract class NumberPatternBase extends PluginBase implements NumberPatternInte
     $form['pattern_help'] = [
       '#theme' => 'token_tree_link',
       '#token_types' => $token_types,
+      '#global_types' => FALSE,
     ];
 
     return $form;
@@ -134,9 +138,12 @@ abstract class NumberPatternBase extends PluginBase implements NumberPatternInte
    * {@inheritdoc}
    */
   public function generate(ContentEntityInterface $entity) {
-    $pattern = $this->configuration['pattern'];
+    $number = $this->token->replace($this->configuration['pattern'], [
+      'pattern' => [],
+      $entity->getEntityTypeId() => $entity,
+    ]);
 
-    return $this->token->replace($pattern, [$entity->getEntityTypeId() => $entity]);
+    return $number;
   }
 
 }

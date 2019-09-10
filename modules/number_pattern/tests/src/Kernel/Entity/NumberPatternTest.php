@@ -30,7 +30,7 @@ class NumberPatternTest extends NumberPatternKernelTestBase {
       'targetEntityType' => 'entity_test_with_store',
       'plugin' => 'monthly',
       'configuration' => [
-        'pattern' => '[current-date:custom:Y-m]-{number}',
+        'pattern' => '[pattern:date:Y-m]-[pattern:number]',
         'initial_number' => 100,
         'padding' => 0,
         'per_store_sequence' => TRUE,
@@ -49,11 +49,11 @@ class NumberPatternTest extends NumberPatternKernelTestBase {
     $this->assertEquals('monthly', $number_pattern_plugin->getPluginId());
     $this->assertEquals($number_pattern->getPluginConfiguration(), $number_pattern_plugin->getConfiguration());
     $number_pattern->setPluginConfiguration([
-      'pattern' => 'INV-[current-date:custom:Y-m]-{number}',
+      'pattern' => 'INV-[current-date:custom:Y-m]-[pattern:number]',
       'padding' => 5,
     ]);
     $this->assertEquals([
-      'pattern' => 'INV-[current-date:custom:Y-m]-{number}',
+      'pattern' => 'INV-[current-date:custom:Y-m]-[pattern:number]',
       'padding' => 5,
     ], $number_pattern->getPluginConfiguration());
 

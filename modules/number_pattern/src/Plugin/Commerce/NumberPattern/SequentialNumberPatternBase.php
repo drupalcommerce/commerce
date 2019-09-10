@@ -96,7 +96,7 @@ abstract class SequentialNumberPatternBase extends NumberPatternBase implements 
    */
   public function defaultConfiguration() {
     return [
-      'pattern' => '{number}',
+      'pattern' => '[pattern:number]',
       'initial_number' => 1,
       'padding' => 0,
       'per_store_sequence' => TRUE,
@@ -157,8 +157,8 @@ abstract class SequentialNumberPatternBase extends NumberPatternBase implements 
     parent::validateConfigurationForm($form, $form_state);
 
     $values = $form_state->getValue($form['#parents']);
-    if (strpos($values['pattern'], '{number}') === FALSE) {
-      $form_state->setError($form['pattern'], $this->t('Missing the required placeholder {number}.'));
+    if (strpos($values['pattern'], '[pattern:number]') === FALSE) {
+      $form_state->setError($form['pattern'], $this->t('Missing the required token [pattern:number].'));
     }
   }
 
@@ -185,9 +185,12 @@ abstract class SequentialNumberPatternBase extends NumberPatternBase implements 
     if ($this->configuration['padding'] > 0) {
       $number = str_pad($number, $this->configuration['padding'], '0', STR_PAD_LEFT);
     }
-    $pattern = str_replace('{number}', $number, $this->configuration['pattern']);
+    $number = $this->token->replace($this->configuration['pattern'], [
+      'pattern' => ['number' => $number],
+      $entity->getEntityTypeId() => $entity,
+    ]);
 
-    return $this->token->replace($pattern, [$entity->getEntityTypeId() => $entity]);
+    return $number;
   }
 
   /**

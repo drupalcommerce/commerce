@@ -30,7 +30,7 @@ class InfiniteTest extends NumberPatternKernelTestBase {
     $number_pattern_plugin = $this->pluginManager->createInstance('infinite', [
       '_entity_id' => 'test',
       'padding' => 0,
-      'pattern' => 'INV-{number}',
+      'pattern' => 'INV-[pattern:number]',
       'per_store_sequence' => TRUE,
       'initial_number' => 1000,
     ]);
@@ -55,7 +55,7 @@ class InfiniteTest extends NumberPatternKernelTestBase {
 
     // Test the token replacement.
     $configuration = $number_pattern_plugin->getConfiguration();
-    $configuration['pattern'] = 'INV-[entity_test_with_store:store_id:target_id]-{number}';
+    $configuration['pattern'] = 'INV-[entity_test_with_store:store_id:target_id]-[pattern:number]';
     $number_pattern_plugin->setConfiguration($configuration);
     $this->assertEquals('INV-1-1002', $number_pattern_plugin->generate($entity));
 
