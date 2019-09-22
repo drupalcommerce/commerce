@@ -99,11 +99,6 @@ class PluginItem extends FieldItemBase implements PluginItemInterface {
       $values += [
         'target_plugin_configuration' => [],
       ];
-      // Single serialized values on shared tables for base fields are not
-      // always unserialized. https://www.drupal.org/node/2788637
-      if (is_string($values['target_plugin_configuration'])) {
-        $values['target_plugin_configuration'] = unserialize($values['target_plugin_configuration']);
-      }
     }
 
     parent::setValue($values, $notify);

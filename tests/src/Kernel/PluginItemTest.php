@@ -70,12 +70,28 @@ class PluginItemTest extends CommerceKernelTestBase {
     ]);
     $entity->save();
     /** @var \Drupal\commerce\Plugin\Field\FieldType\PluginItem $condition_field */
-    $condition_field = $entity->test_conditions->first();
+    $condition_field = $entity->get('test_conditions')->first();
 
     $condition = $condition_field->getTargetInstance();
     $this->assertInstanceOf(OrderTotalPrice::class, $condition);
-    $this->assertEquals($condition->getConfiguration(), $plugin_configuration);
-    $this->assertEquals($condition->getPluginDefinition(), $condition_field->getTargetDefinition());
+    $this->assertEquals($plugin_configuration, $condition->getConfiguration());
+    $this->assertEquals($condition_field->getTargetDefinition(), $condition->getPluginDefinition());
+
+    // Confirm that it is possible to save a plugin item without configuration.
+    $entity = EntityTest::create([
+      'test_conditions' => [
+        [
+          'target_plugin_id' => 'order_total_price',
+        ],
+      ],
+    ]);
+    $entity->save();
+    /** @var \Drupal\commerce\Plugin\Field\FieldType\PluginItem $condition_field */
+    $condition_field = $entity->get('test_conditions')->first();
+
+    $condition = $condition_field->getTargetInstance();
+    $this->assertInstanceOf(OrderTotalPrice::class, $condition);
+    $this->assertEquals($condition_field->getTargetDefinition(), $condition->getPluginDefinition());
   }
 
 }
