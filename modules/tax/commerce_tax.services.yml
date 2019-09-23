@@ -1,4 +1,8 @@
 services:
+  plugin.manager.commerce_tax_number_type:
+    class: Drupal\commerce_tax\TaxNumberTypeManager
+    parent: default_plugin_manager
+
   plugin.manager.commerce_tax_type:
     class: Drupal\commerce_tax\TaxTypeManager
     parent: default_plugin_manager

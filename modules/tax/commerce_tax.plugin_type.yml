@@ -1,3 +1,9 @@
+commerce_tax.tax_number_type:
+  label: Commerce tax number type
+  provider: commerce_tax
+  plugin_manager_service_id: plugin.manager.commerce_tax_number_type
+  plugin_definition_decorator_class: Drupal\plugin\PluginDefinition\ArrayPluginDefinitionDecorator
+
 commerce_tax.tax_type:
   label: Commerce tax type
   provider: commerce_tax
