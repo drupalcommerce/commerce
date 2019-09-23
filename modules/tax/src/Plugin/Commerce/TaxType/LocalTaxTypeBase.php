@@ -288,7 +288,7 @@ abstract class LocalTaxTypeBase extends TaxTypeBase implements LocalTaxTypeInter
     ];
     foreach ($zones as $zone) {
       if (count($zones) > 1) {
-        $element['table']['zone-' . $zone->getId()] = [
+        $element['table'][$zone->getId()] = [
           '#attributes' => [
             'class' => ['region-title'],
             'no_striping' => TRUE,
@@ -305,7 +305,7 @@ abstract class LocalTaxTypeBase extends TaxTypeBase implements LocalTaxTypeInter
           return $percentage->toString();
         }, $rate->getPercentages());
 
-        $element['table'][] = [
+        $element['table'][$zone->getId() . '|' . $rate->getId()] = [
           'rate' => [
             '#markup' => $rate->getLabel(),
           ],
