@@ -2,6 +2,8 @@
 
 namespace Drupal\Tests\commerce_tax\Kernel\Plugin\Commerce\TaxNumberType;
 
+use Drupal\commerce_tax\Plugin\Commerce\TaxNumberType\EuropeanUnionVat;
+use Drupal\commerce_tax\Plugin\Commerce\TaxNumberType\VerificationResult;
 use Drupal\Tests\commerce\Kernel\CommerceKernelTestBase;
 
 /**
@@ -13,7 +15,7 @@ class EuropeanUnionVatTest extends CommerceKernelTestBase {
   /**
    * The tax number type plugin.
    *
-   * @var \Drupal\commerce_tax\Plugin\Commerce\TaxNumberType\TaxNumberTypeInterface
+   * @var \Drupal\commerce_tax\Plugin\Commerce\TaxNumberType\EuropeanUnionVat
    */
   protected $plugin;
 
@@ -97,6 +99,100 @@ class EuropeanUnionVatTest extends CommerceKernelTestBase {
     // Confirm that numbers are treated as case sensitive.
     $this->assertFalse($this->plugin->validate('atU13585626'));
     $this->assertFalse($this->plugin->validate('ATu13585626'));
+  }
+
+  /**
+   * @covers ::doVerify
+   */
+  public function testVerify() {
+    $request_time = $this->container->get('datetime.time')->getRequestTime();
+    $wsdl = drupal_get_path('module', 'commerce_tax') . '/tests/fixtures/checkVatService.wsdl';
+    $soap_client = $this->getMockFromWsdl($wsdl);
+    // Modify the plugin's protected property to use the mock.
+    $property = new \ReflectionProperty(EuropeanUnionVat::class, 'soapClient');
+    $property->setAccessible(TRUE);
+    $property->setValue($this->plugin, $soap_client);
+
+    $invalid_result = new \stdClass();
+    $invalid_result->valid = FALSE;
+    $invalid_result->name = '---';
+    $invalid_result->address = '---';
+
+    $valid_result = new \stdClass();
+    $valid_result->valid = TRUE;
+    $valid_result->name = 'SLRL ALTEA EXPERTISE COMPTABLE';
+    $valid_result->address = '59 RUE DU MURIER';
+
+    $parameters = [
+      'countryCode' => 'AT',
+      'vatNumber' => 'U13585626',
+    ];
+    $soap_client->expects($this->at(0))
+      ->method('__soapCall')
+      ->with('checkVat', [$parameters])
+      ->will($this->returnValue($invalid_result));
+
+    $parameters = [
+      'countryCode' => 'FR',
+      'vatNumber' => 'K7399859412',
+    ];
+    $soap_client->expects($this->at(1))
+      ->method('__soapCall')
+      ->with('checkVat', [$parameters])
+      ->will($this->returnValue($valid_result));
+
+    $result = $this->plugin->verify('123456');
+    $this->assertTrue($result->isFailure());
+    $this->assertEquals($request_time, $result->getTimestamp());
+    $this->assertEquals(['error' => 'invalid_number'], $result->getData());
+
+    $result = $this->plugin->verify('ATU13585626');
+    $this->assertTrue($result->isFailure());
+    $this->assertEquals($request_time, $result->getTimestamp());
+    $this->assertEquals([], $result->getData());
+
+    $result = $this->plugin->verify('FRK7399859412');
+    $this->assertTrue($result->isSuccess());
+    $this->assertEquals($request_time, $result->getTimestamp());
+    $this->assertEquals([
+      'name' => 'SLRL ALTEA EXPERTISE COMPTABLE',
+      'address' => '59 RUE DU MURIER',
+    ], $result->getData());
+  }
+
+  /**
+   * @covers ::renderVerificationResult
+   */
+  public function testRenderVerificationResult() {
+    $request_time = $this->container->get('datetime.time')->getRequestTime();
+
+    // Pre-defined error.
+    $result = VerificationResult::failure($request_time, ['error' => 'invalid_number']);
+    $element = $this->plugin->renderVerificationResult($result);
+    $this->assertArrayHasKey('error', $element);
+    $this->assertArrayNotHasKey('name', $element);
+    $this->assertArrayNotHasKey('address', $element);
+    $this->assertEquals('The tax number is not in the right format.', (string) $element['error']['#plain_text']);
+
+    // Unknown error.
+    $result = VerificationResult::failure($request_time, ['error' => 'An unknown error occurred.']);
+    $element = $this->plugin->renderVerificationResult($result);
+    $this->assertArrayHasKey('error', $element);
+    $this->assertArrayNotHasKey('name', $element);
+    $this->assertArrayNotHasKey('address', $element);
+    $this->assertEquals('An unknown error occurred.', $element['error']['#plain_text']);
+
+    // Name and address.
+    $result = VerificationResult::success($request_time, [
+      'name' => 'John Smith',
+      'address' => '9 Drupal Ave',
+    ]);
+    $element = $this->plugin->renderVerificationResult($result);
+    $this->assertArrayNotHasKey('error', $element);
+    $this->assertArrayHasKey('name', $element);
+    $this->assertArrayHasKey('address', $element);
+    $this->assertEquals('John Smith', $element['name']['#plain_text']);
+    $this->assertEquals('9 Drupal Ave', $element['address']['#plain_text']);
   }
 
 }

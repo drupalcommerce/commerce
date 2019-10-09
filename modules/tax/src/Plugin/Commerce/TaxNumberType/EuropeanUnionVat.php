@@ -20,7 +20,14 @@ namespace Drupal\commerce_tax\Plugin\Commerce\TaxNumberType;
  *   examples = {"DE123456789", "HU12345678"}
  * )
  */
-class EuropeanUnionVat extends TaxNumberTypeBase {
+class EuropeanUnionVat extends TaxNumberTypeWithVerificationBase {
+
+  /**
+   * The SOAP client for VIES (VAT Information Exchange System).
+   *
+   * @var \SoapClient
+   */
+  protected $soapClient;
 
   /**
    * {@inheritdoc}
@@ -37,6 +44,93 @@ class EuropeanUnionVat extends TaxNumberTypeBase {
     }
 
     return TRUE;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function doVerify($tax_number) {
+    $time = $this->time->getRequestTime();
+    // The SOAP extension is not a Commerce requirement, since only this
+    // plugin needs it. The check is skipped in test environments because
+    // a mock client will be used instead.
+    if (!extension_loaded('soap') && !drupal_valid_test_ua()) {
+      return VerificationResult::failure($time, ['error' => 'no_extension']);
+    }
+    $patterns = $this->getValidationPatterns();
+    $prefix = substr($tax_number, 0, 2);
+    if (!isset($patterns[$prefix])) {
+      return VerificationResult::failure($time, ['error' => 'invalid_number']);
+    }
+    $number = substr($tax_number, 2);
+
+    try {
+      $parameters = [
+        'countryCode' => $prefix,
+        'vatNumber' => $number,
+      ];
+      $soap_client = $this->getSoapClient();
+      $result = $soap_client->__soapCall('checkVat', [$parameters]);
+    }
+    catch (\SoapFault $e) {
+      return VerificationResult::unknown($time, ['error' => $e->faultstring]);
+    }
+
+    if ($result->valid) {
+      return VerificationResult::success($time, [
+        'name' => $result->name,
+        'address' => $result->address,
+      ]);
+    }
+    else {
+      return VerificationResult::failure($time);
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function renderVerificationResult(VerificationResult $result) {
+    $errors = [
+      // Plugin errors.
+      'no_extension' => $this->t('The SOAP PHP extension is missing from the server.'),
+      'invalid_number' => $this->t('The tax number is not in the right format.'),
+      // VIES errors, as defined in the WSDL.
+      'INVALID_INPUT' => $this->t('The tax number is not in the right format.'),
+      'GLOBAL_MAX_CONCURRENT_REQ' => $this->t('The remote service is temporarily busy. Error code: GLOBAL_MAX_CONCURRENT_REQ.'),
+      'MS_MAX_CONCURRENT_REQ' => $this->t('The remote service is temporarily busy. Error code: MS_MAX_CONCURRENT_REQ.'),
+      'SERVICE_UNAVAILABLE' => $this->t('The remote service is temporarily unavailable. Error code: SERVICE_UNAVAILABLE.'),
+      'MS_UNAVAILABLE' => $this->t('The remote service is temporarily unavailable. Error code: MS_UNAVAILABLE.'),
+      'TIMEOUT' => $this->t('The remote service did not reply within the allocated time period.'),
+    ];
+    $data = $result->getData();
+
+    $element = [];
+    if (isset($data['error'])) {
+      $error = $data['error'];
+
+      $element['error'] = [
+        '#type' => 'item',
+        '#title' => $this->t('Error'),
+        '#plain_text' => isset($errors[$error]) ? $errors[$error] : $error,
+      ];
+    }
+    if (isset($data['name'])) {
+      $element['name'] = [
+        '#type' => 'item',
+        '#title' => $this->t('Name'),
+        '#plain_text' => $data['name'],
+      ];
+    }
+    if (isset($data['address'])) {
+      $element['address'] = [
+        '#type' => 'item',
+        '#title' => $this->t('Address'),
+        '#plain_text' => $data['address'],
+      ];
+    }
+
+    return $element;
   }
 
   /**
@@ -81,6 +175,22 @@ class EuropeanUnionVat extends TaxNumberTypeBase {
     ];
 
     return $patterns;
+  }
+
+  /**
+   * Gets the SOAP client for VIES.
+   *
+   * @return \SoapClient
+   *   The SOAP client.
+   */
+  protected function getSoapClient() {
+    if (!$this->soapClient) {
+      ini_set('default_socket_timeout', 10);
+      $wsdl = 'http://ec.europa.eu/taxation_customs/vies/checkVatService.wsdl';
+      $this->soapClient = new \SoapClient($wsdl, ['exceptions' => TRUE]);
+    }
+
+    return $this->soapClient;
   }
 
 }
