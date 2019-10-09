@@ -98,6 +98,7 @@ function commerce_order_field_widget_form_alter(&$element, FormStateInterface $f
  *   - attributes: HTML attributes for the containing element.
  */
 function template_preprocess_commerce_order(array &$variables) {
+  $view_mode = $variables['elements']['#view_mode'];
   /** @var Drupal\commerce_order\Entity\OrderInterface $order */
   $order = $variables['elements']['#commerce_order'];
 
@@ -107,9 +108,9 @@ function template_preprocess_commerce_order(array &$variables) {
     $variables['order'][$key] = $variables['elements'][$key];
   }
 
-  if ($order->getBillingProfile()) {
+  if ($billing_profile = $order->getBillingProfile()) {
     $profile_view_bulder = \Drupal::entityTypeManager()->getViewBuilder('profile');
-    $variables['order']['billing_information'] = $profile_view_bulder->view($order->getBillingProfile());
+    $variables['order']['billing_information'] = $profile_view_bulder->view($billing_profile, $view_mode);
   }
 }
 

@@ -1,0 +1,25 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - core.entity_view_mode.profile.admin
+    - field.field.profile.customer.address
+    - profile.type.customer
+  enforced:
+    module:
+      - commerce_order
+  module:
+    - address
+id: profile.customer.admin
+targetEntityType: profile
+bundle: customer
+mode: admin
+content:
+  address:
+    type: address_default
+    weight: 0
+    label: hidden
+    settings: {  }
+    third_party_settings: {  }
+    region: content
+hidden: {  }
