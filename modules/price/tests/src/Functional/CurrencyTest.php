@@ -52,19 +52,43 @@ class CurrencyTest extends CommerceBrowserTestBase {
     $edit = [
       'name' => 'Test currency',
       'currencyCode' => 'XXX',
-      'numericCode' => 999,
+      'numericCode' => '999',
       'symbol' => '§',
       'fractionDigits' => 2,
     ];
     $this->submitForm($edit, 'Save');
 
+    $this->assertSession()->pageTextContains(t('Saved the @name currency.', ['@name' => $edit['name']]));
     $currency = Currency::load('XXX');
     $this->assertEquals('XXX', $currency->getCurrencyCode());
     $this->assertEquals('Test currency', $currency->getName());
     $this->assertEquals('999', $currency->getNumericCode());
     $this->assertEquals('§', $currency->getSymbol());
     $this->assertEquals('2', $currency->getFractionDigits());
-    $this->assertSession()->pageTextContains(t("Saved the @name currency.", ['@name' => $edit['name']]));
+  }
+
+  /**
+   * Tests adding a cryptocurrency.
+   */
+  public function testCryptoCurrencyCreation() {
+    $this->drupalGet('admin/commerce/config/currencies');
+    $this->getSession()->getPage()->clickLink('Add custom currency');
+    $edit = [
+      'name' => 'Test cryptocurrency',
+      'currencyCode' => 'XXXX',
+      'numericCode' => '000',
+      'symbol' => '§',
+      'fractionDigits' => 2,
+    ];
+    $this->submitForm($edit, 'Save');
+
+    $this->assertSession()->pageTextContains(t('Saved the @name currency.', ['@name' => $edit['name']]));
+    $currency = Currency::load('XXXX');
+    $this->assertEquals('XXXX', $currency->getCurrencyCode());
+    $this->assertEquals('Test cryptocurrency', $currency->getName());
+    $this->assertEquals('000', $currency->getNumericCode());
+    $this->assertEquals('§', $currency->getSymbol());
+    $this->assertEquals('2', $currency->getFractionDigits());
   }
 
   /**
