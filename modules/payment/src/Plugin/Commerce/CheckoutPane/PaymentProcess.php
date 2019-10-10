@@ -5,6 +5,7 @@ namespace Drupal\commerce_payment\Plugin\Commerce\CheckoutPane;
 use Drupal\commerce\InlineFormManager;
 use Drupal\commerce_checkout\Plugin\Commerce\CheckoutFlow\CheckoutFlowInterface;
 use Drupal\commerce_checkout\Plugin\Commerce\CheckoutPane\CheckoutPaneBase;
+use Drupal\commerce_payment\Entity\PaymentGatewayInterface;
 use Drupal\commerce_payment\Exception\DeclineException;
 use Drupal\commerce_payment\Exception\PaymentGatewayException;
 use Drupal\commerce_payment\Plugin\Commerce\PaymentGateway\ManualPaymentGatewayInterface;
@@ -169,14 +170,7 @@ class PaymentProcess extends CheckoutPaneBase {
     $payment_gateway = $this->order->payment_gateway->entity;
     $payment_gateway_plugin = $payment_gateway->getPlugin();
 
-    $payment_storage = $this->entityTypeManager->getStorage('commerce_payment');
-    /** @var \Drupal\commerce_payment\Entity\PaymentInterface $payment */
-    $payment = $payment_storage->create([
-      'state' => 'new',
-      'amount' => $this->order->getBalance(),
-      'payment_gateway' => $payment_gateway->id(),
-      'order_id' => $this->order->id(),
-    ]);
+    $payment = $this->createPayment($payment_gateway);
     $next_step_id = $this->checkoutFlow->getNextStepId($this->getStepId());
 
     if ($payment_gateway_plugin instanceof OnsitePaymentGatewayInterface) {
@@ -292,6 +286,27 @@ class PaymentProcess extends CheckoutPaneBase {
     }
 
     return $step_id;
+  }
+
+  /**
+   * Creates the payment to be processed.
+   *
+   * @param \Drupal\commerce_payment\Entity\PaymentGatewayInterface $payment_gateway
+   *   The payment gateway in use.
+   *
+   * @return \Drupal\commerce_payment\Entity\PaymentInterface
+   *   The created payment.
+   */
+  protected function createPayment(PaymentGatewayInterface $payment_gateway) {
+    $payment_storage = $this->entityTypeManager->getStorage('commerce_payment');
+    /** @var \Drupal\commerce_payment\Entity\PaymentInterface $payment */
+    $payment = $payment_storage->create([
+      'state' => 'new',
+      'amount' => $this->order->getBalance(),
+      'payment_gateway' => $payment_gateway->id(),
+      'order_id' => $this->order->id(),
+    ]);
+    return $payment;
   }
 
 }
