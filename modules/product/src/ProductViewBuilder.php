@@ -3,18 +3,27 @@
 namespace Drupal\commerce_product;
 
 use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
+use Drupal\Core\Entity\EntityDisplayRepositoryInterface;
 use Drupal\Core\Entity\EntityInterface;
-use Drupal\Core\Entity\EntityManagerInterface;
-use Drupal\Core\Entity\EntityRepository;
+use Drupal\Core\Entity\EntityRepositoryInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Entity\EntityViewBuilder;
 use Drupal\Core\Language\LanguageManagerInterface;
+use Drupal\Core\Theme\Registry;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Defines the entity view builder for products.
  */
 class ProductViewBuilder extends EntityViewBuilder {
+
+  /**
+   * The entity type manager.
+   *
+   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   */
+  protected $entityTypeManager;
 
   /**
    * The product field variation renderer.
@@ -24,30 +33,28 @@ class ProductViewBuilder extends EntityViewBuilder {
   protected $variationFieldRenderer;
 
   /**
-   * The entity repository.
-   *
-   * @var \Drupal\Core\Entity\EntityRepository
-   */
-  protected $entityRepository;
-
-  /**
    * Constructs a new ProductViewBuilder object.
    *
    * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
    *   The entity type definition.
-   * @param \Drupal\Core\Entity\EntityManagerInterface $entity_manager
-   *   The entity manager service.
+   * @param \Drupal\Core\Entity\EntityRepositoryInterface $entity_repository
+   *   The entity repository.
    * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
    *   The language manager.
+   * @param \Drupal\Core\Theme\Registry $theme_registry
+   *   The theme registry.
+   * @param \Drupal\Core\Entity\EntityDisplayRepositoryInterface $entity_display_repository
+   *   The entity display repository.
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   *   The entity type manager.
    * @param \Drupal\commerce_product\ProductVariationFieldRenderer $variation_field_renderer
    *   The product variation field renderer.
-   * @param \Drupal\Core\Entity\EntityRepository $entity_repository
-   *   The entity repository.
    */
-  public function __construct(EntityTypeInterface $entity_type, EntityManagerInterface $entity_manager, LanguageManagerInterface $language_manager, ProductVariationFieldRenderer $variation_field_renderer, EntityRepository $entity_repository) {
-    parent::__construct($entity_type, $entity_manager, $language_manager);
+  public function __construct(EntityTypeInterface $entity_type, EntityRepositoryInterface $entity_repository, LanguageManagerInterface $language_manager, Registry $theme_registry, EntityDisplayRepositoryInterface $entity_display_repository, EntityTypeManagerInterface $entity_type_manager, ProductVariationFieldRenderer $variation_field_renderer) {
+    parent::__construct($entity_type, $entity_repository, $language_manager, $theme_registry, $entity_display_repository);
+
+    $this->entityTypeManager = $entity_type_manager;
     $this->variationFieldRenderer = $variation_field_renderer;
-    $this->entityRepository = $entity_repository;
   }
 
   /**
@@ -56,10 +63,12 @@ class ProductViewBuilder extends EntityViewBuilder {
   public static function createInstance(ContainerInterface $container, EntityTypeInterface $entity_type) {
     return new static(
       $entity_type,
-      $container->get('entity.manager'),
+      $container->get('entity.repository'),
       $container->get('language_manager'),
-      $container->get('commerce_product.variation_field_renderer'),
-      $container->get('entity.repository')
+      $container->get('theme.registry'),
+      $container->get('entity_display.repository'),
+      $container->get('entity_type.manager'),
+      $container->get('commerce_product.variation_field_renderer')
     );
   }
 
@@ -67,9 +76,9 @@ class ProductViewBuilder extends EntityViewBuilder {
    * {@inheritdoc}
    */
   protected function alterBuild(array &$build, EntityInterface $entity, EntityViewDisplayInterface $display, $view_mode) {
-    $product_type_storage = $this->entityManager->getStorage('commerce_product_type');
+    $product_type_storage = $this->entityTypeManager->getStorage('commerce_product_type');
     /** @var \Drupal\commerce_product\ProductVariationStorageInterface $variation_storage */
-    $variation_storage = $this->entityManager->getStorage('commerce_product_variation');
+    $variation_storage = $this->entityTypeManager->getStorage('commerce_product_variation');
     /** @var \Drupal\commerce_product\Entity\ProductTypeInterface $product_type */
     $product_type = $product_type_storage->load($entity->bundle());
     if ($product_type->shouldInjectVariationFields() && $entity->getDefaultVariation()) {
