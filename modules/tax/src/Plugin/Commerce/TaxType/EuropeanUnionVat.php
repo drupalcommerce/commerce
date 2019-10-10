@@ -19,17 +19,6 @@ use Drupal\profile\Entity\ProfileInterface;
 class EuropeanUnionVat extends LocalTaxTypeBase {
 
   /**
-   * The customer profile tax number field name.
-   *
-   * Allows child classes to enable B2B logic without overriding resolveZones().
-   *
-   * @var string
-   *
-   * @todo Default to "tax_number" once implemented.
-   */
-  protected $taxNumberFieldName;
-
-  /**
    * {@inheritdoc}
    */
   public function buildConfigurationForm(array $form, FormStateInterface $form_state) {
@@ -49,7 +38,8 @@ class EuropeanUnionVat extends LocalTaxTypeBase {
    */
   protected function resolveZones(OrderItemInterface $order_item, ProfileInterface $customer_profile) {
     $zones = $this->getZones();
-    $customer_address = $customer_profile->address->first();
+    /** @var \Drupal\address\AddressInterface $customer_address */
+    $customer_address = $customer_profile->get('address')->first();
     $customer_country = $customer_address->getCountryCode();
     $customer_zones = array_filter($zones, function ($zone) use ($customer_address) {
       /** @var \Drupal\commerce_tax\TaxZone $zone */
@@ -73,8 +63,12 @@ class EuropeanUnionVat extends LocalTaxTypeBase {
     });
 
     $customer_tax_number = '';
-    if ($this->taxNumberFieldName) {
-      $customer_tax_number = $customer_profile->get($this->taxNumberFieldName)->value;
+    if (!$customer_profile->get('tax_number')->isEmpty()) {
+      /** @var \Drupal\commerce_tax\Plugin\Field\FieldType\TaxNumberItemInterface $tax_number_item */
+      $tax_number_item = $customer_profile->get('tax_number')->first();
+      if ($tax_number_item->checkValue('european_union_vat')) {
+        $customer_tax_number = $tax_number_item->value;
+      }
     }
     // Since january 1st 2015 all digital goods sold to EU customers
     // must use the customer zone. For example, an ebook sold
@@ -83,11 +77,11 @@ class EuropeanUnionVat extends LocalTaxTypeBase {
     $year = $this->getCalculationDate($order)->format('Y');
     $is_digital = $taxable_type == TaxableType::DIGITAL_GOODS && $year >= 2015;
     if (empty($store_zones) && !empty($store_registration_zones)) {
-      // The store is not in the EU but is registered to collect VAT.
-      // This VAT is only charged on B2C digital services.
+      // The store is not in the EU but is registered to collect VAT for
+      // digital goods.
       $resolved_zones = [];
-      if ($is_digital && !$customer_tax_number) {
-        $resolved_zones = $customer_zones;
+      if ($is_digital) {
+        $resolved_zones = $customer_tax_number ? [$zones['ic']] : $customer_zones;
       }
     }
     elseif ($customer_tax_number && $customer_country != $store_country) {

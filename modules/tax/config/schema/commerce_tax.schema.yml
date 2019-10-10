@@ -61,3 +61,38 @@ commerce_tax.commerce_tax_type.plugin.custom:
       label: 'Territories'
       sequence:
         type: address_zone_territory
+
+field.value.commerce_tax_number:
+  type: mapping
+  label: 'Default value'
+  mapping:
+    type:
+      type: string
+      label: 'Type'
+    value:
+      type: string
+      label: 'Tax number'
+
+field.field_settings.commerce_tax_number:
+  type: mapping
+  label: 'Tax number field settings'
+  mapping:
+    countries:
+      type: sequence
+      label: 'Collect tax numbers for the following countries'
+      sequence:
+        - type: string
+    verify:
+      type: boolean
+      label: 'Verify the tax number via external web services'
+    allow_unverified:
+      type: boolean
+      label: 'Accept unverified tax numbers if the verification service is unavailable'
+
+field.formatter.settings.commerce_tax_number_default:
+  type: mapping
+  label: 'Tax number formatter settings'
+  mapping:
+    show_verification:
+      type: boolean
+      label: 'Show verification details'

@@ -1,0 +1,31 @@
+/**
+ * @file
+ * Styles for the tax number formatter.
+ */
+
+.commerce-tax-number__verification-icon {
+  display: inline-block;
+  width: 25px;
+  height: 25px;
+  vertical-align: middle;
+}
+.commerce-tax-number__verification-icon:before {
+  display: block;
+  width: 100%;
+  height: 100%;
+  content: "";
+  background-repeat: no-repeat;
+  background-position: center 2px;
+  background-size: 16px;
+}
+
+.commerce-tax-number__verification-icon--unknown:before {
+  background-image: url(../icons/e29700/unknown.svg);
+}
+.commerce-tax-number__verification-icon--success:before {
+  background-image: url(../icons/73b355/success.svg);
+}
+.commerce-tax-number__verification-icon--failure:before {
+  background-image: url(../icons/e32700/failure.svg);
+}
+

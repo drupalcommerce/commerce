@@ -1,0 +1,40 @@
+<?php
+
+/**
+ * @file
+ * Install, update and uninstall functions for the Tax module.
+ */
+
+/**
+ * Implements hook_install().
+ */
+function commerce_tax_install() {
+  if (\Drupal::isConfigSyncing()) {
+    return;
+  }
+  // Expose the tax_number field on customer profile view displays.
+  $storage = \Drupal::entityTypeManager()->getStorage('entity_view_display');
+  /** @var \Drupal\Core\Entity\Display\EntityViewDisplayInterface $default_display */
+  $default_display = $storage->load('profile.customer.default');
+  if ($default_display) {
+    $default_display->setComponent('tax_number', [
+      'type' => 'commerce_tax_number_default',
+      'settings' => [
+        'show_verification' => FALSE,
+      ],
+    ]);
+    $default_display->save();
+  }
+
+  /** @var \Drupal\Core\Entity\Display\EntityViewDisplayInterface $admin_display */
+  $admin_display = $storage->load('profile.customer.admin');
+  if ($admin_display) {
+    $admin_display->setComponent('tax_number', [
+      'type' => 'commerce_tax_number_default',
+      'settings' => [
+        'show_verification' => TRUE,
+      ],
+    ]);
+    $admin_display->save();
+  }
+}

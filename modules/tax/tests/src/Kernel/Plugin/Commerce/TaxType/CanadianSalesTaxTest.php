@@ -56,6 +56,7 @@ class CanadianSalesTaxTest extends CommerceKernelTestBase {
     $this->installEntitySchema('commerce_order');
     $this->installEntitySchema('commerce_order_item');
     $this->installConfig('commerce_order');
+    $this->installConfig(['commerce_tax']);
 
     // Order item types that doesn't need a purchasable entity, for simplicity.
     OrderItemType::create([

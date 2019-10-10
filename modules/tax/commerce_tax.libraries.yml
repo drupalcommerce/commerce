@@ -1,0 +1,5 @@
+tax_number:
+  version: VERSION
+  css:
+    theme:
+      css/commerce_tax.tax_number.css: {}

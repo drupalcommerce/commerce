@@ -6,9 +6,11 @@
  */
 
 use Drupal\commerce_tax\TaxableType;
+use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\field\FieldStorageConfigInterface;
 
 /**
  * Implements hook_entity_base_field_info().
@@ -42,6 +44,33 @@ function commerce_tax_entity_base_field_info(EntityTypeInterface $entity_type) {
 
     return $fields;
   }
+}
+
+/**
+ * Implements hook_commerce_inline_form_PLUGIN_ID_alter().
+ */
+function commerce_tax_commerce_inline_form_customer_profile_alter(array &$inline_form, FormStateInterface $form_state, array &$complete_form) {
+  /** @var \Drupal\commerce\Plugin\Commerce\InlineForm\EntityInlineFormInterface $plugin */
+  $plugin = $inline_form['#inline_form'];
+  $profile_type = $plugin->getEntity()->bundle();
+  if ($profile_type == 'customer' && $inline_form['#profile_scope'] != 'billing') {
+    // Hide the tax_number field when it's not used in a billing context.
+    $inline_form['tax_number']['#access'] = FALSE;
+  }
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_access().
+ *
+ * Forbids the profile "tax_number" field from being deletable.
+ * This is an alternative to locking the field which still leaves
+ * the field editable.
+ */
+function commerce_tax_field_storage_config_access(FieldStorageConfigInterface $field_storage, $operation) {
+  if ($field_storage->id() == 'profile.tax_number' && $operation == 'delete') {
+    return AccessResult::forbidden();
+  }
+  return AccessResult::neutral();
 }
 
 /**
@@ -90,4 +119,18 @@ function commerce_tax_order_item_type_form_submit($form, FormStateInterface $for
   $settings = $form_state->getValue(['commerce_tax']);
   $order_item_type->setThirdPartySetting('commerce_tax', 'taxable_type', $settings['taxable_type']);
   $order_item_type->save();
+}
+
+/**
+ * Implements hook_field_formatter_info_alter().
+ */
+function commerce_tax_field_formatter_info_alter(array &$info) {
+  $info['string']['field_types'][] = 'commerce_tax_number';
+}
+
+/**
+ * Implements hook_field_widget_info_alter().
+ */
+function commerce_tax_field_widget_info_alter(array &$info) {
+  $info['string_textfield']['field_types'][] = 'commerce_tax_number';
 }

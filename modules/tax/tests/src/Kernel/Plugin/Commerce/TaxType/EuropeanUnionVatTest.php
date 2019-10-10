@@ -56,6 +56,7 @@ class EuropeanUnionVatTest extends CommerceKernelTestBase {
     $this->installEntitySchema('commerce_order');
     $this->installEntitySchema('commerce_order_item');
     $this->installConfig('commerce_order');
+    $this->installConfig('commerce_tax');
 
     // Order item types that doesn't need a purchasable entity, for simplicity.
     OrderItemType::create([
@@ -91,8 +92,23 @@ class EuropeanUnionVatTest extends CommerceKernelTestBase {
    */
   public function testApplication() {
     // German customer, French store, VAT number provided.
+    $order = $this->buildOrder('DE', 'FR', 'DE123456789');
+    $this->assertTrue($this->plugin->applies($order));
+    $this->plugin->apply($order);
+    $adjustments = $order->collectAdjustments();
+    $adjustment = reset($adjustments);
+    $this->assertCount(1, $adjustments);
+    $this->assertEquals('european_union_vat|ic|zero', $adjustment->getSourceId());
+
     // French customer, French store, VAT number provided.
-    // @todo
+    $order = $this->buildOrder('FR', 'FR', 'FR00123456789');
+    $this->assertTrue($this->plugin->applies($order));
+    $this->plugin->apply($order);
+    $adjustments = $order->collectAdjustments();
+    $adjustment = reset($adjustments);
+    $this->assertCount(1, $adjustments);
+    $this->assertEquals('european_union_vat|fr|standard', $adjustment->getSourceId());
+
     // German customer, French store, physical product.
     $order = $this->buildOrder('DE', 'FR');
     $this->assertTrue($this->plugin->applies($order));
@@ -103,7 +119,7 @@ class EuropeanUnionVatTest extends CommerceKernelTestBase {
     $this->assertEquals('european_union_vat|fr|standard', $adjustment->getSourceId());
 
     // German customer, French store registered for German VAT, physical product.
-    $order = $this->buildOrder('DE', 'FR', ['DE']);
+    $order = $this->buildOrder('DE', 'FR', '', ['DE']);
     $this->assertTrue($this->plugin->applies($order));
     $this->plugin->apply($order);
     $adjustments = $order->collectAdjustments();
@@ -112,7 +128,7 @@ class EuropeanUnionVatTest extends CommerceKernelTestBase {
     $this->assertEquals('european_union_vat|de|standard', $adjustment->getSourceId());
 
     // German customer, French store, digital product before Jan 1st 2015.
-    $order = $this->buildOrder('DE', 'FR', [], TRUE);
+    $order = $this->buildOrder('DE', 'FR', '', [], TRUE);
     $order->setPlacedTime(mktime(1, 1, 1, 1, 1, 2013));
     $order->save();
     $this->assertTrue($this->plugin->applies($order));
@@ -123,7 +139,7 @@ class EuropeanUnionVatTest extends CommerceKernelTestBase {
     $this->assertEquals('european_union_vat|fr|standard', $adjustment->getSourceId());
 
     // German customer, French store, digital product.
-    $order = $this->buildOrder('DE', 'FR', [], TRUE);
+    $order = $this->buildOrder('DE', 'FR', '', [], TRUE);
     $this->assertTrue($this->plugin->applies($order));
     $this->plugin->apply($order);
     $adjustments = $order->collectAdjustments();
@@ -132,7 +148,7 @@ class EuropeanUnionVatTest extends CommerceKernelTestBase {
     $this->assertEquals('european_union_vat|de|standard', $adjustment->getSourceId());
 
     // German customer, US store registered in FR, digital product.
-    $order = $this->buildOrder('DE', 'US', ['FR'], TRUE);
+    $order = $this->buildOrder('DE', 'US', '', ['FR'], TRUE);
     $this->assertTrue($this->plugin->applies($order));
     $this->plugin->apply($order);
     $adjustments = $order->collectAdjustments();
@@ -141,7 +157,14 @@ class EuropeanUnionVatTest extends CommerceKernelTestBase {
     $this->assertEquals('european_union_vat|de|standard', $adjustment->getSourceId());
 
     // German customer with VAT number, US store registered in FR, digital product.
-    // @todo
+    $order = $this->buildOrder('DE', 'US', 'DE123456789', ['FR'], TRUE);
+    $this->assertTrue($this->plugin->applies($order));
+    $this->plugin->apply($order);
+    $adjustments = $order->collectAdjustments();
+    $adjustment = reset($adjustments);
+    $this->assertCount(1, $adjustments);
+    $this->assertEquals('european_union_vat|ic|zero', $adjustment->getSourceId());
+
     // Serbian customer, French store, physical product.
     $order = $this->buildOrder('RS', 'FR');
     $this->assertTrue($this->plugin->applies($order));
@@ -156,10 +179,21 @@ class EuropeanUnionVatTest extends CommerceKernelTestBase {
   /**
    * Builds an order for testing purposes.
    *
+   * @param string $customer_country
+   *   The customer's country code.
+   * @param string $store_country
+   *   The store's country code.
+   * @param string $tax_number
+   *   The customer's tax number.
+   * @param array $store_registrations
+   *   The store's tax registrations.
+   * @param bool $digital
+   *   Whether the order will be used for a digital product.
+   *
    * @return \Drupal\commerce_order\Entity\OrderInterface
    *   The order.
    */
-  protected function buildOrder($customer_country, $store_country, array $store_registrations = [], $digital = FALSE) {
+  protected function buildOrder($customer_country, $store_country, $tax_number = '', array $store_registrations = [], $digital = FALSE) {
     $store = Store::create([
       'type' => 'default',
       'label' => 'My store',
@@ -177,6 +211,13 @@ class EuropeanUnionVatTest extends CommerceKernelTestBase {
         'country_code' => $customer_country,
       ],
     ]);
+    if ($tax_number) {
+      $customer_profile->set('tax_number', [
+        'type' => 'european_union_vat',
+        'value' => $tax_number,
+        'verification_state' => 'success',
+      ]);
+    }
     $customer_profile->save();
     $order_item = OrderItem::create([
       'type' => $digital ? 'test_digital' : 'test_physical',

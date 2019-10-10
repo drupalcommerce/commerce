@@ -48,6 +48,7 @@ class OrderIntegrationTest extends CommerceKernelTestBase {
     $this->installEntitySchema('commerce_order');
     $this->installEntitySchema('commerce_order_item');
     $this->installConfig(['commerce_order']);
+    $this->installConfig(['commerce_tax']);
     $user = $this->createUser(['mail' => $this->randomString() . '@example.com']);
 
     $this->store->set('prices_include_tax', TRUE);

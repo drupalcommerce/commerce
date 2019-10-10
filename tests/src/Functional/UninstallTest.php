@@ -15,6 +15,8 @@ class UninstallTest extends BrowserTestBase {
    * {@inheritdoc}
    */
   public static $modules = [
+    // The list doesn't include commerce_tax, which cannot be uninstalled due
+    // to a core bug (#2871486).
     'commerce',
     'commerce_price',
     'commerce_log',
@@ -24,7 +26,6 @@ class UninstallTest extends BrowserTestBase {
     'commerce_cart',
     'commerce_checkout',
     'commerce_payment',
-    'commerce_tax',
   ];
 
   /**

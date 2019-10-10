@@ -4,7 +4,6 @@ namespace Drupal\commerce_tax\Plugin\Commerce\TaxType;
 
 use Drupal\commerce_order\Entity\OrderInterface;
 use Drupal\commerce_order\Entity\OrderItemInterface;
-use Drupal\commerce_store\Entity\StoreInterface;
 use Drupal\commerce_tax\Event\TaxEvents;
 use Drupal\commerce_tax\Event\CustomerProfileEvent;
 use Drupal\commerce_tax\TaxableType;
@@ -46,11 +45,11 @@ abstract class TaxTypeBase extends PluginBase implements TaxTypeInterface, Conta
   protected $entityId;
 
   /**
-   * A cache of instantiated store profiles.
+   * A cache of prepared customer profiles, keyed by order ID.
    *
    * @var \Drupal\profile\Entity\ProfileInterface
    */
-  protected $storeProfiles = [];
+  protected $profiles = [];
 
   /**
    * Constructs a new TaxTypeBase object.
@@ -222,45 +221,69 @@ abstract class TaxTypeBase extends PluginBase implements TaxTypeInterface, Conta
    */
   protected function resolveCustomerProfile(OrderItemInterface $order_item) {
     $order = $order_item->getOrder();
-    $customer_profile = $order->getBillingProfile();
-    // A shipping profile is preferred, when available.
+    $customer_profile = $this->buildCustomerProfile($order);
+    // Allow the customer profile to be altered, per order item.
     $event = new CustomerProfileEvent($customer_profile, $order_item);
     $this->eventDispatcher->dispatch(TaxEvents::CUSTOMER_PROFILE, $event);
     $customer_profile = $event->getCustomerProfile();
-    // Guard against broken profiles.
-    if ($customer_profile && $customer_profile->get('address')->isEmpty()) {
-      $customer_profile = NULL;
-    }
-    if (!$customer_profile && $this->isDisplayInclusive()) {
-      // The customer is still unknown, but prices are displayed tax-inclusive
-      // (VAT scenario), better to show the store's default tax than nothing.
-      $customer_profile = $this->buildStoreProfile($order->getStore());
-    }
 
     return $customer_profile;
   }
 
   /**
-   * Builds a customer profile for the given store.
+   * Builds a customer profile for the given order.
    *
-   * @param \Drupal\commerce_store\Entity\StoreInterface $store
-   *   The store.
+   * Constructed only for the purposes of tax calculation, never saved.
+   * The address comes one of the saved profiles, with the following priority:
+   * - Shipping profile
+   * - Billing profile
+   * - Store profile (if the tax type is display inclusive)
+   * The tax number comes from the billing profile, if present.
    *
-   * @return \Drupal\profile\Entity\ProfileInterface
-   *   The customer profile.
+   * @param \Drupal\commerce_order\Entity\OrderInterface $order
+   *   The order.
+   *
+   * @return \Drupal\profile\Entity\ProfileInterface|null
+   *   The customer profile, or NULL if not available yet.
    */
-  protected function buildStoreProfile(StoreInterface $store) {
-    $store_id = $store->id();
-    if (!isset($this->storeProfiles[$store_id])) {
+  protected function buildCustomerProfile(OrderInterface $order) {
+    $order_id = $order->id();
+    if (!isset($this->profiles[$order_id])) {
+      $order_profiles = $order->collectProfiles();
+      $address = NULL;
+      foreach (['shipping', 'billing'] as $scope) {
+        if (isset($order_profiles[$scope])) {
+          $address_field = $order_profiles[$scope]->get('address');
+          if (!$address_field->isEmpty()) {
+            $address = $address_field->getValue();
+            break;
+          }
+        }
+      }
+      if (!$address && $this->isDisplayInclusive()) {
+        // Customer is still unknown, but prices are displayed tax-inclusive
+        // (VAT scenario), better to show the store's default tax than nothing.
+        $address = $order->getStore()->getAddress();
+      }
+      if (!$address) {
+        // A customer profile isn't usable without an address. Stop here.
+        return NULL;
+      }
+
+      $tax_number = NULL;
+      if (isset($order_profiles['billing'])) {
+        $tax_number = $order_profiles['billing']->get('tax_number')->getValue();
+      }
       $profile_storage = $this->entityTypeManager->getStorage('profile');
-      $this->storeProfiles[$store_id] = $profile_storage->create([
+      $this->profiles[$order_id] = $profile_storage->create([
         'type' => 'customer',
         'uid' => 0,
-        'address' => $store->getAddress(),
+        'address' => $address,
+        'tax_number' => $tax_number,
       ]);
     }
 
-    return $this->storeProfiles[$store_id];
+    return $this->profiles[$order_id];
   }
 
 }

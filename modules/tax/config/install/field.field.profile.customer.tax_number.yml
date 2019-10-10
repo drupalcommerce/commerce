@@ -1,0 +1,25 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.profile.tax_number
+    - profile.type.customer
+  enforced:
+    module:
+      - commerce_tax
+id: profile.customer.tax_number
+field_name: tax_number
+entity_type: profile
+bundle: customer
+label: 'Tax number'
+description: ''
+required: false
+translatable: false
+default_value:
+  - {  }
+default_value_callback: ''
+settings:
+  countries: {  }
+  verify: true
+  allow_unverified: true
+field_type: commerce_tax_number
