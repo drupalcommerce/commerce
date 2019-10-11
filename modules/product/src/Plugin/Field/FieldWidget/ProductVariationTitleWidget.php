@@ -28,6 +28,7 @@ class ProductVariationTitleWidget extends ProductVariationWidgetBase implements 
     return [
       'label_display' => TRUE,
       'label_text' => 'Please select',
+      'hide_single' => TRUE,
     ] + parent::defaultSettings();
   }
 
@@ -48,6 +49,11 @@ class ProductVariationTitleWidget extends ProductVariationWidgetBase implements 
       '#description' => $this->t('The label will be available to screen readers even if it is not displayed.'),
       '#required' => TRUE,
     ];
+    $element['hide_single'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t("Hide if there's only one product variation"),
+      '#default_value' => $this->getSetting('hide_single'),
+    ];
 
     return $element;
   }
@@ -61,6 +67,9 @@ class ProductVariationTitleWidget extends ProductVariationWidgetBase implements 
       '@text' => $this->getSetting('label_text'),
       '@visible' => $this->getSetting('label_display') ? $this->t('visible') : $this->t('hidden'),
     ]);
+    if ($this->getSetting('hide_single')) {
+      $summary[] = $this->t("Hidden if there's only one product variation.");
+    }
 
     return $summary;
   }
@@ -81,7 +90,7 @@ class ProductVariationTitleWidget extends ProductVariationWidgetBase implements 
       ];
       return $element;
     }
-    elseif (count($variations) === 1) {
+    elseif (count($variations) === 1 && $this->getSetting('hide_single')) {
       /** @var \Drupal\commerce_product\Entity\ProductVariationInterface $selected_variation */
       $selected_variation = reset($variations);
       $element['variation'] = [

@@ -135,6 +135,9 @@ field.widget.settings.commerce_product_variation_title:
     label_text:
       type: label
       label: 'Label text'
+    hide_single:
+      type: boolean
+      label: 'Hide if there''s only one product variation'
 
 action.configuration.commerce_publish_product:
   type: action_configuration_default
