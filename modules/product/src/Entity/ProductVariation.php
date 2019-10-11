@@ -341,7 +341,7 @@ class ProductVariation extends CommerceContentEntityBase implements ProductVaria
     $attribute_values = [];
     foreach ($this->getAttributeFieldNames() as $field_name) {
       $field = $this->get($field_name);
-      if (!$field->isEmpty()) {
+      if (!$field->isEmpty() && $field->entity) {
         $attribute_values[$field_name] = $field->entity;
       }
     }

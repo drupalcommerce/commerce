@@ -226,6 +226,22 @@ class ProductVariationTest extends CommerceKernelTestBase {
       'attribute_color' => $color_attribute_value,
     ], $variation->getAttributeValues());
     $this->assertNull($variation->getAttributeValue('attribute_size'));
+
+    // Confirm that deleted attribute values are handled properly.
+    $variation->set('attribute_size', $size_attribute_value->id());
+    $variation->save();
+    $variation = $this->reloadEntity($variation);
+    $size_attribute_value->delete();
+
+    $this->assertEquals([
+      'attribute_color' => $color_attribute_value->id(),
+      'attribute_size' => $size_attribute_value->id(),
+    ], $variation->getAttributeValueIds());
+
+    $this->assertEquals([
+      'attribute_color' => $color_attribute_value,
+    ], $variation->getAttributeValues());
+    $this->assertNull($variation->getAttributeValue('attribute_size'));
   }
 
 }
