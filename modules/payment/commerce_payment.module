@@ -118,19 +118,6 @@ function template_preprocess_commerce_payment_method(array &$variables) {
 }
 
 /**
- * Implements hook_preprocess_commerce_order().
- */
-function commerce_payment_preprocess_commerce_order(&$variables) {
-  /** @var Drupal\commerce_order\Entity\OrderInterface $order */
-  $order = $variables['elements']['#commerce_order'];
-  if (!$order->get('payment_method')->isEmpty()) {
-    $variables['payment_method'] = [
-      '#markup' => $order->get('payment_method')->first()->entity->label(),
-    ];
-  }
-}
-
-/**
  * Implements hook_preprocess_commerce_checkout_completion_message().
  */
 function commerce_payment_preprocess_commerce_checkout_completion_message(&$variables) {
@@ -158,16 +145,27 @@ function commerce_payment_preprocess_commerce_checkout_completion_message(&$vari
 }
 
 /**
+ * Implements hook_preprocess_commerce_order().
+ */
+function commerce_payment_preprocess_commerce_order(&$variables) {
+  /** @var Drupal\commerce_order\Entity\OrderInterface $order */
+  $order = $variables['order_entity'];
+  /** @var \Drupal\commerce_payment\Entity\PaymentMethodInterface $payment_method */
+  $payment_method = $order->get('payment_method')->entity;
+
+  $variables['payment_method'] = NULL;
+  if ($payment_method) {
+    $variables['payment_method'] = [
+      '#markup' => $payment_method->label(),
+    ];
+  }
+}
+
+/**
  * Implements hook_preprocess_commerce_order_receipt().
  */
 function commerce_payment_preprocess_commerce_order_receipt(&$variables) {
-  /** @var Drupal\commerce_order\Entity\OrderInterface $order */
-  $order = $variables['order_entity'];
-  if (!$order->get('payment_method')->isEmpty()) {
-    $variables['payment_method'] = [
-      '#markup' => $order->get('payment_method')->first()->entity->label(),
-    ];
-  }
+  commerce_payment_preprocess_commerce_order($variables);
 }
 
 /**
