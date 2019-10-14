@@ -6,6 +6,7 @@
  */
 
 use Drupal\commerce_payment\Plugin\Commerce\PaymentGateway\HasPaymentInstructionsInterface;
+use Drupal\commerce_payment\Plugin\Commerce\PaymentGateway\SupportsStoredPaymentMethodsInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
@@ -150,14 +151,27 @@ function commerce_payment_preprocess_commerce_checkout_completion_message(&$vari
 function commerce_payment_preprocess_commerce_order(&$variables) {
   /** @var Drupal\commerce_order\Entity\OrderInterface $order */
   $order = $variables['order_entity'];
+  /** @var \Drupal\commerce_payment\Entity\PaymentGatewayInterface $payment_gateway */
+  $payment_gateway = $order->get('payment_gateway')->entity;
   /** @var \Drupal\commerce_payment\Entity\PaymentMethodInterface $payment_method */
   $payment_method = $order->get('payment_method')->entity;
 
+  // The payment_method variable represents the selected payment option.
+  // Uses the payment gateway display label if payment methods are not
+  // supported, matching the logic in PaymentOptionsBuilder::buildOptions().
   $variables['payment_method'] = NULL;
   if ($payment_method) {
     $variables['payment_method'] = [
       '#markup' => $payment_method->label(),
     ];
+  }
+  elseif ($payment_gateway) {
+    $payment_gateway_plugin = $payment_gateway->getPlugin();
+    if (!($payment_gateway_plugin instanceof SupportsStoredPaymentMethodsInterface)) {
+      $variables['payment_method'] = [
+        '#markup' => $payment_gateway_plugin->getDisplayLabel(),
+      ];
+    }
   }
 }
 

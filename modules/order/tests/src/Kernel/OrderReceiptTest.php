@@ -4,9 +4,11 @@ namespace Drupal\Tests\commerce_order\Kernel;
 
 use Drupal\commerce_order\Entity\Order;
 use Drupal\commerce_order\Entity\OrderType;
+use Drupal\commerce_payment\Entity\PaymentGateway;
 use Drupal\commerce_price\Price;
 use Drupal\commerce_product\Entity\Product;
 use Drupal\commerce_product\Entity\ProductVariation;
+use Drupal\Component\Render\FormattableMarkup;
 use Drupal\Core\Language\Language;
 use Drupal\Core\Site\Settings;
 use Drupal\Core\Test\AssertMailTrait;
@@ -31,18 +33,22 @@ class OrderReceiptTest extends CommerceKernelTestBase {
   protected $order;
 
   /**
-   * Custom translations.
+   * Translated strings used in the order receipt.
    *
    * @var array
    */
-  protected $customTranslations = [
+  protected $translations = [
     'fr' => [
-      'Order #@number confirmed' => 'Commande #123456789 confirmée',
+      'Order #@number confirmed' => 'Commande #@number confirmée',
       'Thank you for your order!' => 'Nous vous remercions de votre commande!',
+      'Default store' => 'Magasin par défaut',
+      'Cash on delivery' => 'Paiement à la livraison',
     ],
     'es' => [
-      'Order #@number confirmed' => 'Pedido #123456789 confirmado',
+      'Order #@number confirmed' => 'Pedido #@number confirmado',
       'Thank you for your order!' => '¡Gracias por su orden!',
+      'Default store' => 'Tienda por defecto',
+      'Cash on delivery' => 'Contra reembolso',
     ],
   ];
 
@@ -55,6 +61,7 @@ class OrderReceiptTest extends CommerceKernelTestBase {
     'state_machine',
     'commerce_product',
     'commerce_order',
+    'commerce_payment',
     'language',
     'locale',
     'content_translation',
@@ -76,12 +83,12 @@ class OrderReceiptTest extends CommerceKernelTestBase {
     $this->installConfig(['commerce_product', 'commerce_order']);
     $user = $this->createUser(['mail' => $this->randomString() . '@example.com']);
 
-    foreach (array_keys($this->customTranslations) as $langcode) {
+    foreach (array_keys($this->translations) as $langcode) {
       ConfigurableLanguage::createFromLangcode($langcode)->save();
     }
     // Provide the translated strings by overriding in-memory settings.
     $settings = Settings::getAll();
-    foreach ($this->customTranslations as $langcode => $custom_translation) {
+    foreach ($this->translations as $langcode => $custom_translation) {
       foreach ($custom_translation as $untranslated => $translated) {
         $settings['locale_custom_strings_' . $langcode][''][$untranslated] = $translated;
       }
@@ -90,7 +97,7 @@ class OrderReceiptTest extends CommerceKernelTestBase {
 
     /** @var \Drupal\commerce_price\CurrencyImporterInterface $currency_importer */
     $currency_importer = $this->container->get('commerce_price.currency_importer');
-    $currency_importer->importTranslations(array_keys($this->customTranslations));
+    $currency_importer->importTranslations(array_keys($this->translations));
     /** @var \Drupal\language\ConfigurableLanguageManagerInterface $language_manager */
     $language_manager = $this->container->get('language_manager');
     // The translated USD symbol is $US in both French and Spanish.
@@ -105,12 +112,37 @@ class OrderReceiptTest extends CommerceKernelTestBase {
 
     $this->store = $this->reloadEntity($this->store);
     $this->store->addTranslation('es', [
-      'name' => 'Tienda por defecto',
+      'name' => $this->translations['es']['Default store'],
     ]);
     $this->store->addTranslation('fr', [
-      'name' => 'Magasin par défaut',
+      'name' => $this->translations['fr']['Default store'],
     ]);
     $this->store->save();
+
+    /** @var \Drupal\commerce_payment\Entity\PaymentGatewayInterface $payment_gateway */
+    $payment_gateway = PaymentGateway::create([
+      'id' => 'cod',
+      'label' => 'Manual',
+      'plugin' => 'manual',
+      'configuration' => [
+        'display_label' => 'Cash on delivery',
+        'instructions' => [
+          'value' => 'Sample payment instructions.',
+          'format' => 'plain_text',
+        ],
+      ],
+    ]);
+    $payment_gateway->save();
+    $es_payment_gateway = $language_manager->getLanguageConfigOverride('es', 'commerce_payment.commerce_payment_gateway.cod');
+    $es_payment_gateway->set('configuration', [
+      'display_label' => $this->translations['es']['Cash on delivery'],
+    ]);
+    $es_payment_gateway->save();
+    $fr_payment_gateway = $language_manager->getLanguageConfigOverride('fr', 'commerce_payment.commerce_payment_gateway.cod');
+    $fr_payment_gateway->set('configuration', [
+      'display_label' => $this->translations['fr']['Cash on delivery'],
+    ]);
+    $fr_payment_gateway->save();
 
     $product = Product::create([
       'type' => 'default',
@@ -157,6 +189,7 @@ class OrderReceiptTest extends CommerceKernelTestBase {
       'billing_profile' => $profile,
       'store_id' => $this->store->id(),
       'order_items' => [$order_item1],
+      'payment_gateway' => $payment_gateway->id(),
     ]);
     $order->save();
     $this->order = $this->reloadEntity($order);
@@ -187,18 +220,12 @@ class OrderReceiptTest extends CommerceKernelTestBase {
    *   The langcode to test with.
    * @param string $expected_langcode
    *   The expected langcode.
-   * @param string $expected_subject
-   *   The expected subject.
-   * @param string $expected_store_label
-   *   The expected store label.
-   * @param string $expected_thank_you_text
-   *   The expected thank you text.
    * @param string $expected_order_total
    *   The expected order total.
    *
    * @dataProvider providerOrderReceiptMultilingualData
    */
-  public function testOrderReceipt($langcode, $expected_langcode, $expected_subject, $expected_store_label, $expected_thank_you_text, $expected_order_total) {
+  public function testOrderReceipt($langcode, $expected_langcode, $expected_order_total) {
     $customer = $this->order->getCustomer();
     $customer->set('preferred_langcode', $langcode);
     $customer->save();
@@ -207,15 +234,29 @@ class OrderReceiptTest extends CommerceKernelTestBase {
     $this->order->getState()->applyTransitionById('place');
     $this->order->save();
 
+    if (isset($this->translations[$expected_langcode])) {
+      $strings = $this->translations[$expected_langcode];
+    }
+    else {
+      // Use the untranslated strings.
+      $strings = array_keys($this->translations['fr']);
+      $strings = array_combine($strings, $strings);
+    }
+    $subject = new FormattableMarkup($strings['Order #@number confirmed'], [
+      '@number' => $this->order->getOrderNumber(),
+    ]);
+
     $emails = $this->getMails();
     $email = reset($emails);
     $this->assertEquals($this->order->getEmail(), $email['to']);
     $this->assertEquals('bcc@example.com', $email['headers']['Bcc']);
     $this->assertEquals($expected_langcode, $email['langcode']);
-    $this->assertEquals($expected_subject, $email['subject']);
-    $this->assertContains($expected_store_label, $email['body']);
-    $this->assertContains($expected_thank_you_text, $email['body']);
-    $this->assertContains($expected_order_total, $email['body']);
+
+    $this->assertEquals((string) $subject, $email['subject']);
+    $this->assertContains($strings['Thank you for your order!'], $email['body']);
+    $this->assertContains($strings['Default store'], $email['body']);
+    $this->assertContains($strings['Cash on delivery'], $email['body']);
+    $this->assertContains('Order Total: ' . $expected_order_total, $email['body']);
   }
 
   /**
@@ -226,11 +267,11 @@ class OrderReceiptTest extends CommerceKernelTestBase {
    */
   public function providerOrderReceiptMultilingualData() {
     return [
-      [NULL, 'en', 'Order #123456789 confirmed', 'Default store', 'Thank you for your order!', 'Order Total: $12.00'],
-      [Language::LANGCODE_DEFAULT, 'en', 'Order #123456789 confirmed', 'Default store', 'Thank you for your order!', 'Order Total: $12.00'],
-      ['es', 'es', $this->customTranslations['es']['Order #@number confirmed'], 'Tienda por defecto', $this->customTranslations['es']['Thank you for your order!'], 'Order Total: US$12.00'],
-      ['fr', 'fr', $this->customTranslations['fr']['Order #@number confirmed'], 'Magasin par défaut', $this->customTranslations['fr']['Thank you for your order!'], 'Order Total: U$D12.00'],
-      ['en', 'en', 'Order #123456789 confirmed', 'Default store', 'Thank you for your order!', 'Order Total: $12.00'],
+      [NULL, 'en', '$12.00'],
+      [Language::LANGCODE_DEFAULT, 'en', '$12.00'],
+      ['es', 'es', 'US$12.00'],
+      ['fr', 'fr', 'U$D12.00'],
+      ['en', 'en', '$12.00'],
     ];
   }
 
