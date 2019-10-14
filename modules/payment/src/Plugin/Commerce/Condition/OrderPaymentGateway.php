@@ -13,7 +13,7 @@ use Drupal\Core\Form\FormStateInterface;
  *   id = "order_payment_gateway",
  *   label = @Translation("Payment gateway"),
  *   display_label = @Translation("Selected payment gateway"),
- *   category = @Translation("Order"),
+ *   category = @Translation("Order", context = "Commerce"),
  *   entity_type = "commerce_order",
  * )
  */

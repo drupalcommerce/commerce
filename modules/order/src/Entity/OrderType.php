@@ -9,13 +9,14 @@ use Drupal\commerce\Entity\CommerceBundleEntityBase;
  *
  * @ConfigEntityType(
  *   id = "commerce_order_type",
- *   label = @Translation("Order type"),
- *   label_collection = @Translation("Order types"),
- *   label_singular = @Translation("order type"),
- *   label_plural = @Translation("order types"),
+ *   label = @Translation("Order type", context = "Commerce"),
+ *   label_collection = @Translation("Order types", context = "Commerce"),
+ *   label_singular = @Translation("order type", context = "Commerce"),
+ *   label_plural = @Translation("order types", context = "Commerce"),
  *   label_count = @PluralTranslation(
  *     singular = "@count order type",
  *     plural = "@count order types",
+ *     context = "Commerce",
  *   ),
  *   handlers = {
  *     "access" = "Drupal\commerce\CommerceBundleAccessControlHandler",

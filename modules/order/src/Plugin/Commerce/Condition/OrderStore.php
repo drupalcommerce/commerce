@@ -14,9 +14,9 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *
  * @CommerceCondition(
  *   id = "order_store",
- *   label = @Translation("Store"),
- *   display_label = @Translation("Store"),
- *   category = @Translation("Order"),
+ *   label = @Translation("Store", context = "Commerce"),
+ *   display_label = @Translation("Store", context = "Commerce"),
+ *   category = @Translation("Order", context = "Commerce"),
  *   entity_type = "commerce_order",
  * )
  */

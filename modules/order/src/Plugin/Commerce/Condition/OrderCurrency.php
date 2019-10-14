@@ -12,7 +12,7 @@ use Drupal\Core\Form\FormStateInterface;
  * @CommerceCondition(
  *   id = "order_currency",
  *   label = @Translation("Order currency"),
- *   category = @Translation("Order"),
+ *   category = @Translation("Order", context = "Commerce"),
  *   entity_type = "commerce_order",
  * )
  */

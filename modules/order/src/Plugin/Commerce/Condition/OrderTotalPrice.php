@@ -14,7 +14,7 @@ use Drupal\commerce_price\Price;
  *   id = "order_total_price",
  *   label = @Translation("Total price"),
  *   display_label = @Translation("Current order total"),
- *   category = @Translation("Order"),
+ *   category = @Translation("Order", context = "Commerce"),
  *   entity_type = "commerce_order",
  * )
  */

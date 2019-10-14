@@ -21,15 +21,16 @@ use Drupal\profile\Entity\ProfileInterface;
  *
  * @ContentEntityType(
  *   id = "commerce_order",
- *   label = @Translation("Order"),
- *   label_collection = @Translation("Orders"),
- *   label_singular = @Translation("order"),
- *   label_plural = @Translation("orders"),
+ *   label = @Translation("Order", context = "Commerce"),
+ *   label_collection = @Translation("Orders", context = "Commerce"),
+ *   label_singular = @Translation("order", context = "Commerce"),
+ *   label_plural = @Translation("orders", context = "Commerce"),
  *   label_count = @PluralTranslation(
  *     singular = "@count order",
  *     plural = "@count orders",
+ *     context = "Commerce",
  *   ),
- *   bundle_label = @Translation("Order type"),
+ *   bundle_label = @Translation("Order type", context = "Commerce"),
  *   handlers = {
  *     "event" = "Drupal\commerce_order\Event\OrderEvent",
  *     "storage" = "Drupal\commerce_order\OrderStorage",

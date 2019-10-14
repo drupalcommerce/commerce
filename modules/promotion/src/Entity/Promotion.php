@@ -19,13 +19,14 @@ use Drupal\Core\Field\BaseFieldDefinition;
  *
  * @ContentEntityType(
  *   id = "commerce_promotion",
- *   label = @Translation("Promotion"),
- *   label_collection = @Translation("Promotions"),
- *   label_singular = @Translation("promotion"),
- *   label_plural = @Translation("promotions"),
+ *   label = @Translation("Promotion", context = "Commerce"),
+ *   label_collection = @Translation("Promotions", context = "Commerce"),
+ *   label_singular = @Translation("promotion", context = "Commerce"),
+ *   label_plural = @Translation("promotions", context = "Commerce"),
  *   label_count = @PluralTranslation(
  *     singular = "@count promotion",
  *     plural = "@count promotions",
+ *     context = "Commerce",
  *   ),
  *   handlers = {
  *     "event" = "Drupal\commerce_promotion\Event\PromotionEvent",

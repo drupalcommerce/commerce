@@ -9,13 +9,14 @@ use Drupal\commerce\Entity\CommerceBundleEntityBase;
  *
  * @ConfigEntityType(
  *   id = "commerce_store_type",
- *   label = @Translation("Store type"),
- *   label_collection = @Translation("Store types"),
- *   label_singular = @Translation("store type"),
- *   label_plural = @Translation("store types"),
+ *   label = @Translation("Store type", context = "Commerce"),
+ *   label_collection = @Translation("Store types", context = "Commerce"),
+ *   label_singular = @Translation("store type", context = "Commerce"),
+ *   label_plural = @Translation("store types", context = "Commerce"),
  *   label_count = @PluralTranslation(
  *     singular = "@count store type",
  *     plural = "@count store types",
+ *     context = "Commerce",
  *   ),
  *   handlers = {
  *     "access" = "Drupal\commerce\CommerceBundleAccessControlHandler",
