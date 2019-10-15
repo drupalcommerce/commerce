@@ -17,19 +17,28 @@ class PaymentMethodDeleteForm extends ContentEntityDeleteForm {
   public function submitForm(array &$form, FormStateInterface $form_state) {
     /** @var \Drupal\commerce_payment\Entity\PaymentMethodInterface $payment_method */
     $payment_method = $this->getEntity();
-    /** @var \Drupal\commerce_payment\Plugin\Commerce\PaymentGateway\SupportsStoredPaymentMethodsInterface $payment_gateway_plugin */
-    $payment_gateway_plugin = $payment_method->getPaymentGateway()->getPlugin();
-    $form_state->setRedirectUrl($this->getRedirectUrl());
-    try {
-      $payment_gateway_plugin->deletePaymentMethod($payment_method);
+    $payment_gateway = $payment_method->getPaymentGateway();
+    if ($payment_gateway) {
+      /** @var \Drupal\commerce_payment\Plugin\Commerce\PaymentGateway\SupportsStoredPaymentMethodsInterface $payment_gateway_plugin */
+      $payment_gateway_plugin = $payment_gateway->getPlugin();
+      try {
+        $payment_gateway_plugin->deletePaymentMethod($payment_method);
+      }
+      catch (PaymentGatewayException $e) {
+        $this->messenger()->addError($e->getMessage());
+        $form_state->setRedirectUrl($this->getRedirectUrl());
+        return;
+      }
     }
-    catch (PaymentGatewayException $e) {
-      $this->messenger()->addError($e->getMessage());
-      return;
+    else {
+      // Without a payment gateway, the remote payment method cannot
+      // be deleted. Delete the local payment method only.
+      $payment_method->delete();
     }
 
     $this->messenger()->addMessage($this->getDeletionMessage());
     $this->logDeletionMessage();
+    $form_state->setRedirectUrl($this->getRedirectUrl());
   }
 
 }

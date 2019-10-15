@@ -96,6 +96,62 @@ class PaymentMethodAccessTest extends CommerceKernelTestBase {
   }
 
   /**
+   * @covers ::checkAccess
+   */
+  public function testDeletedGateway() {
+    $payment_gateway = PaymentGateway::create([
+      'id' => 'onsite',
+      'label' => 'On-site',
+      'plugin' => 'example_onsite',
+    ]);
+    $payment_gateway->save();
+
+    /** @var \Drupal\commerce_payment\Entity\PaymentMethodInterface $payment_method */
+    $payment_method = PaymentMethod::create([
+      'type' => 'credit_card',
+      'payment_gateway' => $payment_gateway->id(),
+    ]);
+    $payment_method->save();
+
+    $payment_gateway->delete();
+    $payment_method = $this->reloadEntity($payment_method);
+    // Confirm that not even the administrator can update the payment
+    // method if its gateway has been deleted.
+    $account = $this->createUser([], ['administer commerce_payment_method']);
+    $this->assertTrue($payment_method->access('view', $account));
+    $this->assertFalse($payment_method->access('update', $account));
+    $this->assertTrue($payment_method->access('delete', $account));
+  }
+
+  /**
+   * @covers ::checkAccess
+   */
+  public function testUnsupportedUpdate() {
+    // Commerce doesn't ship with an on-site gateway which doesn't support
+    // updating payment methods, so we simulate it here with an off-site one.
+    $payment_gateway = PaymentGateway::create([
+      'id' => 'offsite',
+      'label' => 'Off-site',
+      'plugin' => 'example_offsite_redirect',
+    ]);
+    $payment_gateway->save();
+
+    /** @var \Drupal\commerce_payment\Entity\PaymentMethodInterface $payment_method */
+    $payment_method = PaymentMethod::create([
+      'type' => 'credit_card',
+      'payment_gateway' => $payment_gateway->id(),
+    ]);
+    $payment_method->save();
+
+    // Confirm that not even the administrator can update the payment
+    // method if its gateway does not support it.
+    $account = $this->createUser([], ['administer commerce_payment_method']);
+    $this->assertTrue($payment_method->access('view', $account));
+    $this->assertFalse($payment_method->access('update', $account));
+    $this->assertTrue($payment_method->access('delete', $account));
+  }
+
+  /**
    * @covers ::checkCreateAccess
    */
   public function testCreateAccess() {

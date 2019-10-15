@@ -2,7 +2,6 @@
 
 namespace Drupal\commerce_payment;
 
-use Drupal\commerce_payment\Plugin\Commerce\PaymentGateway\SupportsUpdatingStoredPaymentMethodsInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityListBuilder;
 
@@ -82,20 +81,6 @@ class PaymentMethodListBuilder extends EntityListBuilder {
     $build = parent::render();
     $build['#attached']['library'][] = 'commerce_payment/payment_method_icons';
     return $build;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  protected function getDefaultOperations(EntityInterface $entity) {
-    $operations = parent::getDefaultOperations($entity);
-    /** @var \Drupal\commerce_payment\Entity\PaymentMethodInterface $entity */
-    $payment_gateway_plugin = $entity->getPaymentGateway()->getPlugin();
-    if (!($payment_gateway_plugin instanceof SupportsUpdatingStoredPaymentMethodsInterface)) {
-      unset($operations['edit']);
-    }
-
-    return $operations;
   }
 
   /**

@@ -258,4 +258,29 @@ class PaymentMethodTest extends CommerceBrowserTestBase {
     $this->assertNull($payment_gateway);
   }
 
+  /**
+   * Tests deleting a payment method without a gateway.
+   */
+  public function testPaymentMethodDeletionNoGateway() {
+    $payment_method = $this->createEntity('commerce_payment_method', [
+      'uid' => $this->user->id(),
+      'type' => 'credit_card',
+      'payment_gateway' => 'example',
+    ]);
+    $details = [
+      'type' => 'visa',
+      'number' => '4111111111111111',
+      'expiration' => ['month' => '01', 'year' => date("Y") + 1],
+    ];
+    $this->paymentGateway->getPlugin()->createPaymentMethod($payment_method, $details);
+    $this->paymentGateway->delete();
+
+    $this->drupalGet($this->collectionUrl . '/' . $payment_method->id() . '/delete');
+    $this->getSession()->getPage()->pressButton('Delete');
+    $this->assertSession()->addressEquals($this->collectionUrl);
+
+    $payment_gateway = PaymentMethod::load($payment_method->id());
+    $this->assertNull($payment_gateway);
+  }
+
 }

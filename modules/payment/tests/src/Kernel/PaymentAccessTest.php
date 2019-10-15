@@ -144,6 +144,19 @@ class PaymentAccessTest extends CommerceKernelTestBase {
     ]);
     $payment->set('payment_gateway_mode', 'test');
     $this->assertTrue($payment->access('delete', $account));
+
+    // Gateway-specific operation access (e.g. "refund") is denied if the
+    // gateway is missing.
+    $payment_gateway->delete();
+    $payment = $this->reloadEntity($payment);
+    $account = $this->createUser([], [
+      'administer commerce_payment',
+      'view default commerce_order',
+    ]);
+    $this->assertTrue($payment->access('view', $account));
+    $this->assertFalse($payment->access('delete', $account));
+    $this->assertFalse($payment->access('capture', $account));
+    $this->assertFalse($payment->access('refund', $account));
   }
 
   /**
