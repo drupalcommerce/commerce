@@ -112,8 +112,12 @@ function commerce_payment_post_update_2(&$sandbox = NULL) {
 function commerce_payment_post_update_3(&$sandbox = NULL) {
   $payment_method_storage = \Drupal::entityTypeManager()->getStorage('commerce_payment_method');
   if (!isset($sandbox['current_count'])) {
-    $query = $payment_method_storage->getQuery()
+    $query = $payment_method_storage->getQuery();
+    $query
       ->condition('reusable', TRUE)
+      ->condition($query->orConditionGroup()
+        ->condition('expires', \Drupal::time()->getRequestTime(), '>')
+        ->condition('expires', 0))
       ->count();
     $sandbox['total_count'] = $query->execute();
     $sandbox['current_count'] = 0;
@@ -124,9 +128,13 @@ function commerce_payment_post_update_3(&$sandbox = NULL) {
     }
   }
 
-  $query = $payment_method_storage->getQuery()
+  $query = $payment_method_storage->getQuery();
+  $query
     ->condition('reusable', TRUE)
-    ->range($sandbox['current_count'], 25);
+    ->condition($query->orConditionGroup()
+      ->condition('expires', \Drupal::time()->getRequestTime(), '>')
+      ->condition('expires', 0))
+    ->range($sandbox['current_count'], 50);
   $result = $query->execute();
   if (empty($result)) {
     $sandbox['#finished'] = 1;
@@ -151,7 +159,7 @@ function commerce_payment_post_update_3(&$sandbox = NULL) {
     }
   }
 
-  $sandbox['current_count'] += 25;
+  $sandbox['current_count'] += 50;
   if ($sandbox['current_count'] >= $sandbox['total_count']) {
     $sandbox['#finished'] = 1;
   }
