@@ -13,6 +13,7 @@ use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Url;
 use Drupal\user\UserInterface;
+use Symfony\Component\Routing\Exception\RouteNotFoundException;
 
 /**
  * Defines the product variation entity class.
@@ -103,6 +104,13 @@ class ProductVariation extends CommerceContentEntityBase implements ProductVaria
    * {@inheritdoc}
    */
   public function toUrl($rel = 'canonical', array $options = []) {
+    // Product variation URLs depend on the parent product.
+    if (!$this->getProductId()) {
+      // RouteNotFoundException tells EntityBase::uriRelationships()
+      // to skip this product variation's link relationships.
+      throw new RouteNotFoundException();
+    }
+
     // StringFormatter assumes 'revision' is always a valid link template.
     if (in_array($rel, ['canonical', 'revision'])) {
       $route_name = 'entity.commerce_product.canonical';

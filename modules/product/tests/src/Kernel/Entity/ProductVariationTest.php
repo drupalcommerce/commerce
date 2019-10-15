@@ -26,6 +26,9 @@ class ProductVariationTest extends CommerceKernelTestBase {
   public static $modules = [
     'path',
     'commerce_product',
+    // Needed to confirm that url generation doesn't cause a crash when
+    // deleting a product variation without a referenced product.
+    'menu_link_content',
   ];
 
   /**
@@ -242,6 +245,20 @@ class ProductVariationTest extends CommerceKernelTestBase {
       'attribute_color' => $color_attribute_value,
     ], $variation->getAttributeValues());
     $this->assertNull($variation->getAttributeValue('attribute_size'));
+  }
+
+  /**
+   * @covers ::toUrl
+   */
+  public function testDeleteIncomplete() {
+    // Confirm that a variation can be deleted even if it has no product.
+    $variation = ProductVariation::create([
+      'type' => 'default',
+      'sku' => strtolower($this->randomMachineName()),
+      'title' => $this->randomString(),
+    ]);
+    $variation->save();
+    $variation->delete();
   }
 
 }
