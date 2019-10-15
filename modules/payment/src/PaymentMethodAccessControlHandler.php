@@ -39,7 +39,7 @@ class PaymentMethodAccessControlHandler extends EntityAccessControlHandler {
     return AccessResult::allowedIfHasPermissions($account, [
       $this->entityType->getAdminPermission(),
       'manage own commerce_payment_method',
-    ]);
+    ], 'OR');
   }
 
 }
