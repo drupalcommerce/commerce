@@ -2,11 +2,12 @@
 
 namespace Drupal\commerce_payment;
 
+use Drupal\Core\DestructableInterface;
 use Drupal\commerce_order\Entity\OrderInterface;
 use Drupal\commerce_price\Price;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 
-class PaymentOrderUpdater implements PaymentOrderUpdaterInterface {
+class PaymentOrderUpdater implements PaymentOrderUpdaterInterface, DestructableInterface {
 
   /**
    * The entity type manager.
@@ -90,6 +91,13 @@ class PaymentOrderUpdater implements PaymentOrderUpdaterInterface {
     }
 
     unset($this->updateList[$order->id()]);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function destruct() {
+    $this->updateOrders();
   }
 
 }

@@ -26,12 +26,6 @@ services:
     tags:
       - { name: event_subscriber }
 
-  commerce_payment.kernel_subscriber:
-    class: Drupal\commerce_payment\EventSubscriber\KernelSubscriber
-    arguments: ['@commerce_payment.order_updater']
-    tags:
-    - { name: event_subscriber }
-
   commerce_payment.order_assign_subscriber:
     class: Drupal\commerce_payment\EventSubscriber\OrderAssignSubscriber
     arguments: ['@commerce_order.address_book']
@@ -56,3 +50,5 @@ services:
   commerce_payment.order_updater:
     class: Drupal\commerce_payment\PaymentOrderUpdater
     arguments: ['@entity_type.manager']
+    tags:
+      - { name: needs_destruction }
