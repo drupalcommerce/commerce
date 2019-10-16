@@ -8,6 +8,7 @@ use Drupal\Component\Plugin\DependentPluginInterface;
 use Drupal\Component\Plugin\DerivativeInspectionInterface;
 use Drupal\Core\Plugin\PluginFormInterface;
 use Drupal\Core\Plugin\PluginWithFormsInterface;
+use Drupal\commerce_price\Price;
 
 /**
  * Defines the base interface for payment gateways.
@@ -121,5 +122,18 @@ interface PaymentGatewayInterface extends PluginWithFormsInterface, Configurable
    *   - access: Whether the operation is allowed for the given payment.
    */
   public function buildPaymentOperations(PaymentInterface $payment);
+
+  /**
+   * Converts the given amount to its minor units.
+   *
+   * For example, 9.99 USD becomes 999.
+   *
+   * @param \Drupal\commerce_price\Price $amount
+   *   The amount.
+   *
+   * @return int
+   *   The amount in minor units, as an integer.
+   */
+  public function toMinorUnits(Price $amount);
 
 }

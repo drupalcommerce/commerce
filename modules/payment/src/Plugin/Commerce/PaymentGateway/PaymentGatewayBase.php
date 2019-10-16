@@ -382,17 +382,9 @@ abstract class PaymentGatewayBase extends PluginBase implements PaymentGatewayIn
   }
 
   /**
-   * Converts the given amount to its minor units.
-   *
-   * For example, 9.99 USD becomes 999.
-   *
-   * @param \Drupal\commerce_price\Price $amount
-   *   The amount.
-   *
-   * @return int
-   *   The amount in minor units, as an integer.
+   * {@inheritdoc}
    */
-  protected function toMinorUnits(Price $amount) {
+  public function toMinorUnits(Price $amount) {
     $currency_storage = $this->entityTypeManager->getStorage('commerce_currency');
     /** @var \Drupal\commerce_price\Entity\CurrencyInterface $currency */
     $currency = $currency_storage->load($amount->getCurrencyCode());
