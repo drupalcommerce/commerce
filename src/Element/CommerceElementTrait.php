@@ -62,8 +62,8 @@ trait CommerceElementTrait {
   public static function validateElementSubmit(array &$element, FormStateInterface $form_state) {
     // Button-level #validate handlers replace the form-level ones, which means
     // that executeElementSubmitHandlers() won't be triggered.
-    if ($handlers = $form_state->getValidateHandlers()) {
-      throw new \Exception('The current form must not have button-level #validate handlers');
+    if (self::shouldExecuteElementSubmit($form_state) && $form_state->getValidateHandlers()) {
+      throw new \Exception('The triggering element must not have #validate handlers');
     }
   }
 
@@ -82,19 +82,34 @@ trait CommerceElementTrait {
    *   The form state.
    */
   public static function executeElementSubmitHandlers(array &$form, FormStateInterface $form_state) {
+    if (self::shouldExecuteElementSubmit($form_state)) {
+      self::doExecuteSubmitHandlers($form, $form_state);
+    }
+  }
+
+  /**
+   * Checks whether #commerce_element_submit callbacks should be executed.
+   *
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   *   The form state.
+   *
+   * @return bool
+   *   TRUE if the callbacks can be executed, FALSE otherwise.
+   */
+  protected static function shouldExecuteElementSubmit(FormStateInterface $form_state) {
     if (!$form_state->isSubmitted() || $form_state->hasAnyErrors()) {
       // The form wasn't submitted (#ajax in progress) or failed validation.
-      return;
+      return FALSE;
     }
     $triggering_element = $form_state->getTriggeringElement();
     $button_type = isset($triggering_element['#button_type']) ? $triggering_element['#button_type'] : '';
     if ($button_type != 'primary' && count($form_state->getButtons()) > 1) {
       // The form was submitted, but not via the primary button, which
       // indicates that it will probably be rebuilt.
-      return;
+      return FALSE;
     }
 
-    self::doExecuteSubmitHandlers($form, $form_state);
+    return TRUE;
   }
 
   /**
@@ -105,7 +120,7 @@ trait CommerceElementTrait {
    * @param \Drupal\Core\Form\FormStateInterface $form_state
    *   The form state.
    */
-  public static function doExecuteSubmitHandlers(array &$element, FormStateInterface $form_state) {
+  protected static function doExecuteSubmitHandlers(array &$element, FormStateInterface $form_state) {
     // Recurse through all children.
     foreach (Element::children($element) as $key) {
       if (!empty($element[$key])) {
