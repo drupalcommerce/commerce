@@ -383,10 +383,15 @@ abstract class CheckoutFlowBase extends PluginBase implements CheckoutFlowInterf
       ];
       if ($has_previous_step) {
         $label = $steps[$previous_step_id]['previous_label'];
+        $options = [
+          'attributes' => [
+            'class' => ['link--previous'],
+          ],
+        ];
         $actions['next']['#suffix'] = Link::createFromRoute($label, 'commerce_checkout.form', [
           'commerce_order' => $this->order->id(),
           'step' => $previous_step_id,
-        ])->toString();
+        ], $options)->toString();
       }
     }
 
