@@ -26,6 +26,6 @@ configuration:
       step: complete
       weight: 4
     order_summary:
-      view: commerce_checkout_order_summary
+      view: null
       step: _sidebar
       weight: 5
