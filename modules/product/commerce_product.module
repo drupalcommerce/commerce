@@ -317,6 +317,23 @@ function commerce_product_form_entity_form_display_edit_form_alter(array &$form,
 }
 
 /**
+ * Implements hook_form_FORM_ID_alter() for 'entity_form_display_edit_form'.
+ *
+ * Hide the cardinality setting for attribute fields.
+ */
+function commerce_product_form_field_storage_config_edit_form_alter(array &$form, FormStateInterface $form_state) {
+  /** @var \Drupal\field\FieldStorageConfigInterface $field_storage */
+  $field_storage = $form_state->getFormObject()->getEntity();
+  $entity_type_id = $field_storage->getTargetEntityTypeId();
+  $target_type = $field_storage->getSetting('target_type');
+  if ($entity_type_id === 'commerce_product_variation' && $target_type === 'commerce_product_attribute_value') {
+    $form['cardinality_container']['#access'] = FALSE;
+    $form['cardinality_container']['cardinality']['#value'] = 'number';
+    $form['cardinality_container']['cardinality_number']['#value'] = '1';
+  }
+}
+
+/**
  * Implements hook_search_api_views_handler_mapping_alter().
  *
  * Search API views filters do not use the options filter by default
