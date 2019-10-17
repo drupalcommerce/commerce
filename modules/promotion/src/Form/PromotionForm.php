@@ -111,6 +111,7 @@ class PromotionForm extends ContentEntityForm {
       $actions['submit_continue'] = [
         '#type' => 'submit',
         '#value' => $this->t('Save and add coupons'),
+        '#button_type' => 'secondary',
         '#continue' => TRUE,
         '#submit' => ['::submitForm', '::save'],
       ];

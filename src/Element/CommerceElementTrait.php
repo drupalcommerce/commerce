@@ -14,8 +14,8 @@ use Drupal\Core\Render\Element;
  * validateElementSubmit callbacks to their getInfo() methods.
  *
  * If the parent form has multiple submit buttons, the element submit
- * callbacks will only be invoked when the form is submitted via the
- * primary submit button (#button_type => primary).
+ * callbacks will only be invoked when the form is submitted through a
+ * submit button with a #button_type of 'primary' or 'secondary'.
  * This prevents irreversible changes from being applied for submit buttons
  * which only rebuild the form (e.g. "Upload file" or "Add another item").
  */
@@ -101,15 +101,22 @@ trait CommerceElementTrait {
       // The form wasn't submitted (#ajax in progress) or failed validation.
       return FALSE;
     }
+    if (count($form_state->getButtons()) === 1) {
+      // The form has only one button, no need to guess if it was clicked.
+      return TRUE;
+    }
     $triggering_element = $form_state->getTriggeringElement();
     $button_type = isset($triggering_element['#button_type']) ? $triggering_element['#button_type'] : '';
-    if ($button_type != 'primary' && count($form_state->getButtons()) > 1) {
-      // The form was submitted, but not via the primary button, which
-      // indicates that it will probably be rebuilt.
-      return FALSE;
+    if (in_array($button_type, ['primary', 'secondary'])) {
+      // Invoke callbacks only for submit buttons with a known #button_type.
+      // Buttons without a #button_type usually rebuild the form.
+      // The 'secondary' #button_type was invented by Commerce for buttons
+      // which behave like a primary button (e.g. saving the entity), but
+      // shouldn't have the styling of a primary button.
+      return TRUE;
     }
 
-    return TRUE;
+    return FALSE;
   }
 
   /**

@@ -94,6 +94,28 @@ class PromotionTest extends CommerceWebDriverTestBase {
   }
 
   /**
+   * Tests creating a promotion using the "Save and add coupons" button.
+   */
+  public function testCreatePromotionWithSaveAndAddCoupons() {
+    $this->drupalGet('admin/commerce/promotions');
+    $this->getSession()->getPage()->clickLink('Add promotion');
+
+    $name = $this->randomString();
+    $this->getSession()->getPage()->fillField('name[0][value]', $name);
+    $this->getSession()->getPage()->selectFieldOption('offer[0][target_plugin_id]', 'order_item_fixed_amount_off');
+    $this->waitForAjaxToFinish();
+    $this->getSession()->getPage()->fillField('offer[0][target_plugin_configuration][order_item_fixed_amount_off][amount][number]', '10.00');
+    $this->submitForm([], t('Save and add coupons'));
+    $this->assertSession()->pageTextContains("Saved the $name promotion.");
+
+    /** @var \Drupal\commerce_promotion\Entity\PromotionInterface $promotion */
+    $promotion = Promotion::load(1);
+    $offer = $promotion->getOffer();
+    $this->assertEquals('order_item_fixed_amount_off', $offer->getPluginId());
+    $this->assertEquals('10.00', $offer->getConfiguration()['amount']['number']);
+  }
+
+  /**
    * Tests creating a promotion with an end date.
    */
   public function testCreatePromotionWithEndDate() {
