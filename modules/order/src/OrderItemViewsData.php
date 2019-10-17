@@ -33,6 +33,9 @@ class OrderItemViewsData extends CommerceEntityViewsData {
 
     // Provide a relationship for each entity type found.
     foreach ($entity_type_ids as $entity_type_id) {
+      if (!$this->entityManager->hasDefinition($entity_type_id)) {
+        continue;
+      }
       /** @var \Drupal\Core\Entity\EntityTypeInterface $entity_type */
       $entity_type = $this->entityManager->getDefinition($entity_type_id);
       $data['commerce_order_item'][$entity_type_id] = [
