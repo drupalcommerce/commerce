@@ -317,7 +317,7 @@ function commerce_product_form_entity_form_display_edit_form_alter(array &$form,
 }
 
 /**
- * Implements hook_form_FORM_ID_alter() for 'entity_form_display_edit_form'.
+ * Implements hook_form_FORM_ID_alter() for 'field_storage_config_edit_form'.
  *
  * Hide the cardinality setting for attribute fields.
  */
