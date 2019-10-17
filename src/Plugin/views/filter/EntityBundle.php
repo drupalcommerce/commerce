@@ -53,7 +53,7 @@ class EntityBundle extends Bundle {
    * {@inheritdoc}
    */
   public function access(AccountInterface $account) {
-    $bundles = $this->entityManager->getBundleInfo($this->getEntityType());
+    $bundles = $this->bundleInfoService->getBundleInfo($this->getEntityType());
     if ($this->options['expose']['hide_single_bundle'] && count($bundles) <= 1) {
       return FALSE;
     }
