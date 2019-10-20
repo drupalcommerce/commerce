@@ -31,7 +31,8 @@ class AdjustmentTest extends CommerceKernelTestBase {
    * @dataProvider invalidDefinitionProvider
    */
   public function testInvalidAdjustmentConstruct($definition, $message) {
-    $this->setExpectedException(\InvalidArgumentException::class, $message);
+    $this->expectException(\InvalidArgumentException::class);
+    $this->expectExceptionMessage($message);
     new Adjustment($definition);
   }
 
@@ -220,7 +221,8 @@ class AdjustmentTest extends CommerceKernelTestBase {
       'locked' => TRUE,
     ]);
 
-    $this->setExpectedException(\InvalidArgumentException::class, 'Adjustment type "promotion" does not match "custom".');
+    $this->expectException(\InvalidArgumentException::class);
+    $this->expectExceptionMessage('Adjustment type "promotion" does not match "custom".');
     $first_adjustment->add($second_adjustment);
   }
 
@@ -247,7 +249,8 @@ class AdjustmentTest extends CommerceKernelTestBase {
       'locked' => TRUE,
     ]);
 
-    $this->setExpectedException(\InvalidArgumentException::class, 'Adjustment source ID "2" does not match "1".');
+    $this->expectException(\InvalidArgumentException::class);
+    $this->expectExceptionMessage('Adjustment source ID "2" does not match "1".');
     $first_adjustment->add($second_adjustment);
   }
 

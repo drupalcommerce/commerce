@@ -186,7 +186,8 @@ class OrderItemTest extends CommerceKernelTestBase {
    * @covers ::bundleFieldDefinitions
    */
   public function testInvalidBundle() {
-    $this->setExpectedException(\RuntimeException::class, 'Could not load the "invalid" order item type.');
+    $this->expectException(\RuntimeException::class);
+    $this->expectExceptionMessage('Could not load the "invalid" order item type.');
 
     $order_item = OrderItem::create([
       'type' => 'invalid',

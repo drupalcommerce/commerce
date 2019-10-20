@@ -31,7 +31,7 @@ class PriceTwigExtensionTest extends CommerceKernelTestBase {
         'currency_co' => 'USD',
       ],
     ];
-    $this->setExpectedException('InvalidArgumentException');
+    $this->expectException('InvalidArgumentException');
     $this->render($theme);
   }
 

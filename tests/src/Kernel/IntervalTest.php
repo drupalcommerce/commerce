@@ -27,7 +27,7 @@ class IntervalTest extends KernelTestBase {
    * ::covers __construct.
    */
   public function testInvalidNumber() {
-    $this->setExpectedException(\InvalidArgumentException::class);
+    $this->expectException(\InvalidArgumentException::class);
     $interval = new Interval('INVALID', 'month');
   }
 
@@ -37,7 +37,7 @@ class IntervalTest extends KernelTestBase {
    * ::covers __construct.
    */
   public function testInvalidUnit() {
-    $this->setExpectedException(\InvalidArgumentException::class);
+    $this->expectException(\InvalidArgumentException::class);
     $interval = new Interval('1', 'INVALID');
   }
 

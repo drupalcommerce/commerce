@@ -50,7 +50,7 @@ class RounderTest extends UnitTestCase {
    * ::covers round.
    */
   public function testUnknownCurrency() {
-    $this->setExpectedException(\InvalidArgumentException::class);
+    $this->expectException(\InvalidArgumentException::class);
     $this->rounder->round(new Price('10', 'EUR'));
   }
 

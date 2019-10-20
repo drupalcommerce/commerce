@@ -35,7 +35,7 @@ class PriceTest extends UnitTestCase {
    * ::covers __construct.
    */
   public function testCreateFromInvalidArray() {
-    $this->setExpectedException(\InvalidArgumentException::class);
+    $this->expectException(\InvalidArgumentException::class);
     $price = Price::fromArray([]);
   }
 
@@ -58,7 +58,7 @@ class PriceTest extends UnitTestCase {
    * ::covers __construct.
    */
   public function testInvalidNumber() {
-    $this->setExpectedException(\InvalidArgumentException::class);
+    $this->expectException(\InvalidArgumentException::class);
     $price = new Price('INVALID', 'USD');
   }
 
@@ -68,7 +68,7 @@ class PriceTest extends UnitTestCase {
    * ::covers __construct.
    */
   public function testInvalidCurrencyCode() {
-    $this->setExpectedException(\InvalidArgumentException::class);
+    $this->expectException(\InvalidArgumentException::class);
     $price = new Price('10', 'INVALID');
   }
 

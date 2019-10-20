@@ -92,7 +92,7 @@ class ConfigurableFieldManagerTest extends CommerceKernelTestBase {
   public function testInvalidDefinition() {
     $field_definition = BundleFieldDefinition::create('entity_reference');
     $field_definition->setName('stores');
-    $this->setExpectedException(\InvalidArgumentException::class);
+    $this->expectException(\InvalidArgumentException::class);
     $this->configurableFieldManager->createField($field_definition);
   }
 
@@ -105,7 +105,8 @@ class ConfigurableFieldManagerTest extends CommerceKernelTestBase {
       ->setTargetBundle('entity_test')
       ->setName('stores');
     $expected_message = 'The field "stores" does not exist on bundle "entity_test" of entity type "entity_test".';
-    $this->setExpectedException(\RuntimeException::class, $expected_message);
+    $this->expectException(\RuntimeException::class);
+    $this->expectExceptionMessage($expected_message);
     $this->configurableFieldManager->deleteField($field_definition);
   }
 

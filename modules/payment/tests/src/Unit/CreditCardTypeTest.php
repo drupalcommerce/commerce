@@ -91,7 +91,8 @@ class CreditCardTypeTest extends UnitTestCase {
    * @dataProvider definitionProvider
    */
   public function testInvalidDefinition($definition, $message) {
-    $this->setExpectedException(\InvalidArgumentException::class, $message);
+    $this->expectException(\InvalidArgumentException::class);
+    $this->expectExceptionMessage($message);
     $card = new CreditCardType($definition);
   }
 

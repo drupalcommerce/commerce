@@ -26,7 +26,7 @@ class CommerceTwigExtensionTest extends CommerceKernelTestBase {
       '#theme' => 'render_entity',
       '#entity' => Currency::load('USD'),
     ];
-    $this->setExpectedException('InvalidArgumentException');
+    $this->expectException('InvalidArgumentException');
     $this->render($theme);
   }
 

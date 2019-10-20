@@ -103,7 +103,7 @@ class CartProviderTest extends CommerceKernelTestBase {
     $this->assertInstanceOf(OrderInterface::class, $cart);
 
     // Trying to recreate the same cart should throw an exception.
-    $this->setExpectedException(DuplicateCartException::class);
+    $this->expectException(DuplicateCartException::class);
     $cart_provider->createCart($order_type, $this->store, $this->anonymousUser);
   }
 
@@ -146,7 +146,7 @@ class CartProviderTest extends CommerceKernelTestBase {
     $this->assertInstanceOf(OrderInterface::class, $cart);
 
     // Trying to recreate the same cart should throw an exception.
-    $this->setExpectedException(DuplicateCartException::class);
+    $this->expectException(DuplicateCartException::class);
     $cart_provider->createCart('default', $this->store, $this->authenticatedUser);
   }
 
