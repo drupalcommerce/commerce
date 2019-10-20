@@ -9,6 +9,7 @@ use Drupal\views\EntityViewsData;
  * Provides improvements to core's generic views integration for entities.
  */
 class CommerceEntityViewsData extends EntityViewsData {
+  use EntityManagerBridgeTrait;
 
   /**
    * Corrects the views data for commerce_price base fields.

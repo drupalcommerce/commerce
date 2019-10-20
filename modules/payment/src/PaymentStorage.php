@@ -3,12 +3,14 @@
 namespace Drupal\commerce_payment;
 
 use Drupal\commerce\CommerceContentEntityStorage;
+use Drupal\commerce\EntityManagerBridgeTrait;
 use Drupal\commerce_order\Entity\OrderInterface;
 
 /**
  * Defines the payment storage.
  */
 class PaymentStorage extends CommerceContentEntityStorage implements PaymentStorageInterface {
+  use EntityManagerBridgeTrait;
 
   /**
    * {@inheritdoc}
@@ -41,7 +43,7 @@ class PaymentStorage extends CommerceContentEntityStorage implements PaymentStor
       $payment_gateway = $values['payment_gateway'];
       if (is_string($payment_gateway)) {
         // The caller passed tha payment gateway ID, load the full entity.
-        $payment_gateway_storage = $this->entityManager->getStorage('commerce_payment_gateway');
+        $payment_gateway_storage = $this->getEntityTypeManager()->getStorage('commerce_payment_gateway');
         /** @var \Drupal\commerce_payment\Entity\PaymentGatewayInterface $payment_gateway */
         $payment_gateway = $payment_gateway_storage->load($payment_gateway);
       }

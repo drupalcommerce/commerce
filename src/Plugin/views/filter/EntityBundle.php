@@ -2,6 +2,7 @@
 
 namespace Drupal\commerce\Plugin\views\filter;
 
+use Drupal\commerce\EntityManagerBridgeTrait;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\views\Plugin\views\filter\Bundle;
 use Drupal\Core\Session\AccountInterface;
@@ -17,6 +18,7 @@ use Drupal\Core\Session\AccountInterface;
  * @ViewsFilter("commerce_entity_bundle")
  */
 class EntityBundle extends Bundle {
+  use EntityManagerBridgeTrait;
 
   /**
    * {@inheritdoc}
@@ -74,7 +76,7 @@ class EntityBundle extends Bundle {
 
     $bundle_entity_type = $this->entityType->getBundleEntityType();
     if ($bundle_entity_type) {
-      $bundle_entity_storage = $this->entityManager->getStorage($bundle_entity_type);
+      $bundle_entity_storage = $this->getEntityTypeManager()->getStorage($bundle_entity_type);
 
       foreach (array_keys($this->value) as $bundle) {
         if ($bundle_entity = $bundle_entity_storage->load($bundle)) {
