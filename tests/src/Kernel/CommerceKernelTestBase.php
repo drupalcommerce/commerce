@@ -46,6 +46,9 @@ abstract class CommerceKernelTestBase extends EntityKernelTestBase {
   protected function setUp() {
     parent::setUp();
 
+    if (\Drupal::entityTypeManager()->hasDefinition('path_alias')) {
+      $this->installEntitySchema('path_alias');
+    }
     $this->installEntitySchema('commerce_currency');
     $this->installEntitySchema('commerce_store');
     $this->installConfig(['commerce_store']);
