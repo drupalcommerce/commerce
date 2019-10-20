@@ -18,6 +18,7 @@ use Drupal\Core\Session\AccountInterface;
  * @ViewsFilter("commerce_entity_bundle")
  */
 class EntityBundle extends Bundle {
+
   use EntityManagerBridgeTrait;
 
   /**

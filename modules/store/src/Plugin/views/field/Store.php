@@ -17,6 +17,7 @@ use Drupal\Core\Session\AccountInterface;
  * @ViewsField("commerce_store")
  */
 class Store extends EntityField {
+
   use EntityManagerBridgeTrait;
 
   /**

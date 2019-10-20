@@ -3,14 +3,12 @@
 namespace Drupal\commerce_payment;
 
 use Drupal\commerce\CommerceContentEntityStorage;
-use Drupal\commerce\EntityManagerBridgeTrait;
 use Drupal\commerce_order\Entity\OrderInterface;
 
 /**
  * Defines the payment storage.
  */
 class PaymentStorage extends CommerceContentEntityStorage implements PaymentStorageInterface {
-  use EntityManagerBridgeTrait;
 
   /**
    * {@inheritdoc}
