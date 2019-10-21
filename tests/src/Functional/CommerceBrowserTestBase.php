@@ -60,6 +60,22 @@ abstract class CommerceBrowserTestBase extends BrowserTestBase {
 
     $this->adminUser = $this->drupalCreateUser($this->getAdministratorPermissions());
     $this->drupalLogin($this->adminUser);
+    $previous_error_handler = set_error_handler(function ($severity, $message, $file, $line, $context) use (&$previous_error_handler) {
+      $skipped_deprecations = [
+        "Render #post_render callbacks must be methods of a class that implements \Drupal\Core\Security\TrustedCallbackInterface or be an anonymous function. The callback was Drupal\address\Plugin\Field\FieldFormatter\AddressDefaultFormatter::postRender. Support for this callback implementation is deprecated in 8.8.0 and will be removed in Drupal 9.0.0. See https://www.drupal.org/node/2966725",
+      ];
+      if (!in_array($message, $skipped_deprecations, TRUE)) {
+        return $previous_error_handler($severity, $message, $file, $line, $context);
+      }
+    }, E_USER_DEPRECATED);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function tearDown() {
+    restore_error_handler();
+    parent::tearDown();
   }
 
   /**
