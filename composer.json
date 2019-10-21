@@ -17,5 +17,8 @@
         "drupal/token": "^1.0",
         "commerceguys/intl": "^1.0.0"
     },
+    "require-dev": {
+        "drupal/mailsystem": "~4.1.0"
+    },
     "minimum-stability": "dev"
 }
