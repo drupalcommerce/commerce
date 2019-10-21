@@ -6,6 +6,7 @@ use Drupal\Core\Entity\EntityRepositoryInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\FormBuilderInterface;
 use Drupal\Core\Form\FormState;
+
 // @codingStandardsIgnoreStart
 // @todo remove this BC layer once support for Drupal 8.7 is sunsetted
 if (interface_exists('\Drupal\Core\Security\TrustedCallbackInterface')) {
@@ -15,7 +16,6 @@ else {
   interface TrustedCallbackInterface {}
 }
 // @codingStandardsIgnoreStop
-
 /**
  * Provides #lazy_builder callbacks.
  */
