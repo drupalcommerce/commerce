@@ -53,8 +53,8 @@ abstract class CommerceBrowserTestBase extends BrowserTestBase {
    * {@inheritdoc}
    */
   protected function setUp() {
-    parent::setUp();
     $this->setErrorHandler();
+    parent::setUp();
 
     $this->store = $this->createStore();
     $this->placeBlock('local_tasks_block');
@@ -69,8 +69,8 @@ abstract class CommerceBrowserTestBase extends BrowserTestBase {
    * {@inheritdoc}
    */
   protected function tearDown() {
-    $this->restoreErrorHandler();
     parent::tearDown();
+    $this->restoreErrorHandler();
   }
 
   /**
