@@ -33,7 +33,11 @@ trait DeprecationSuppressionTrait {
     }, E_USER_DEPRECATED);
   }
 
+  /**
+   * Restores the original error handler.
+   */
   protected function restoreErrorHandler() {
     restore_error_handler();
   }
+
 }
