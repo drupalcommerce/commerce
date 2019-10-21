@@ -41,7 +41,7 @@ class PaymentStorage extends CommerceContentEntityStorage implements PaymentStor
       $payment_gateway = $values['payment_gateway'];
       if (is_string($payment_gateway)) {
         // The caller passed tha payment gateway ID, load the full entity.
-        $payment_gateway_storage = $this->entityManager->getStorage('commerce_payment_gateway');
+        $payment_gateway_storage = $this->entityTypeManager->getStorage('commerce_payment_gateway');
         /** @var \Drupal\commerce_payment\Entity\PaymentGatewayInterface $payment_gateway */
         $payment_gateway = $payment_gateway_storage->load($payment_gateway);
       }

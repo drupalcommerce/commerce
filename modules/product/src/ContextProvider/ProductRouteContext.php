@@ -5,7 +5,7 @@ namespace Drupal\commerce_product\ContextProvider;
 use Drupal\commerce_product\Entity\Product;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Plugin\Context\Context;
-use Drupal\Core\Plugin\Context\ContextDefinition;
+use Drupal\Core\Plugin\Context\EntityContextDefinition;
 use Drupal\Core\Plugin\Context\ContextProviderInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
@@ -40,7 +40,7 @@ class ProductRouteContext implements ContextProviderInterface {
    * {@inheritdoc}
    */
   public function getRuntimeContexts(array $unqualified_context_ids) {
-    $context_definition = new ContextDefinition('entity:commerce_product', NULL, FALSE);
+    $context_definition = new EntityContextDefinition('entity:commerce_product', NULL, FALSE);
     $value = NULL;
     if ($product = $this->routeMatch->getParameter('commerce_product')) {
       $value = $product;
@@ -62,7 +62,7 @@ class ProductRouteContext implements ContextProviderInterface {
    * {@inheritdoc}
    */
   public function getAvailableContexts() {
-    $context = new Context(new ContextDefinition(
+    $context = new Context(new EntityContextDefinition(
       'entity:commerce_product', $this->t('Product from URL')
     ));
     return ['commerce_product' => $context];
