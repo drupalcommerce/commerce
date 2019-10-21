@@ -7,10 +7,19 @@ use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\FormBuilderInterface;
 use Drupal\Core\Form\FormState;
 
+// @codingStandardsIgnoreStart
+// @todo remove this BC layer once support for Drupal 8.7 is sunsetted
+if (interface_exists('\Drupal\Core\Security\TrustedCallbackInterface')) {
+  interface TrustedCallbackInterface extends \Drupal\Core\Security\TrustedCallbackInterface {}
+}
+else {
+  interface TrustedCallbackInterface {}
+}
+// @codingStandardsIgnoreStop
 /**
  * Provides #lazy_builder callbacks.
  */
-class ProductLazyBuilders {
+class ProductLazyBuilders implements TrustedCallbackInterface {
 
   /**
    * The entity type manager.
@@ -94,6 +103,13 @@ class ProductLazyBuilders {
     ]);
 
     return $this->formBuilder->buildForm($form_object, $form_state);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function trustedCallbacks() {
+    return ['addToCartForm'];
   }
 
 }
