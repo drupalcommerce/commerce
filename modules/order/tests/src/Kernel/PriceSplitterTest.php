@@ -82,6 +82,17 @@ class PriceSplitterTest extends CommerceKernelTestBase {
   /**
    * @covers ::split
    */
+  public function testEmptyOrder() {
+    // Confirm that the splitter can be run on orders with no items.
+    $amounts = $this->splitter->split($this->order, new Price('42', 'USD'), '50');
+    $this->assertEquals([], $amounts);
+    $amounts = $this->splitter->split($this->order, new Price('42', 'USD'));
+    $this->assertEquals([], $amounts);
+  }
+
+  /**
+   * @covers ::split
+   */
   public function testSplit() {
     // 6 x 3 + 6 x 3 = 36.
     $unit_price = new Price('6', 'USD');

@@ -41,6 +41,9 @@ class PriceSplitter implements PriceSplitterInterface {
    * {@inheritdoc}
    */
   public function split(OrderInterface $order, Price $amount, $percentage = NULL) {
+    if (!$order->getItems()) {
+      return [];
+    }
     if (!$percentage) {
       // The percentage is intentionally not rounded, for maximum precision.
       $percentage = Calculator::divide($amount->getNumber(), $order->getSubtotalPrice()->getNumber());
