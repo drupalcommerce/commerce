@@ -10,6 +10,8 @@ use Drupal\views\EntityViewsData;
  */
 class CommerceEntityViewsData extends EntityViewsData {
 
+  use EntityManagerBridgeTrait;
+
   /**
    * Corrects the views data for commerce_price base fields.
    *
