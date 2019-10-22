@@ -156,9 +156,8 @@ class SingleVariationWidget extends WidgetBase implements ContainerFactoryPlugin
     $element = NestedArray::getValue($form, $parents);
     /** @var \Drupal\commerce\Plugin\Commerce\InlineForm\EntityInlineFormInterface $inline_form */
     $inline_form = $element['entity']['#inline_form'];
-    $values = [
-      ['entity' => $inline_form->getEntity()],
-    ];
+    $values = $items->getValue();
+    $values[0] = ['entity' => $inline_form->getEntity()];
     $items->setValue($values);
     $items->filterEmptyItems();
   }
