@@ -3,6 +3,7 @@
 namespace Drupal\Tests\commerce\Functional;
 
 use Drupal\Tests\BrowserTestBase;
+use Drupal\Tests\commerce\Traits\DeprecationSuppressionTrait;
 
 /**
  * Tests module uninstallation.
@@ -10,6 +11,24 @@ use Drupal\Tests\BrowserTestBase;
  * @group commerce
  */
 class UninstallTest extends BrowserTestBase {
+
+  use DeprecationSuppressionTrait;
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function setUp() {
+    $this->setErrorHandler();
+    parent::setUp();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function tearDown() {
+    parent::tearDown();
+    $this->restoreErrorHandler();
+  }
 
   /**
    * {@inheritdoc}
