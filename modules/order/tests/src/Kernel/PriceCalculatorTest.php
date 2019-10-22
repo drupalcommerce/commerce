@@ -163,69 +163,69 @@ class PriceCalculatorTest extends CommerceKernelTestBase {
 
     // No adjustment types specified.
     $result = $this->priceCalculator->calculate($this->firstVariation, 1, $first_context);
-    $this->assertEquals(new Price('3.00', 'USD'), $result->getCalculatedPrice());
-    $this->assertEquals(new Price('3.00', 'USD'), $result->getBasePrice());
+    $this->assertTrue($result->getCalculatedPrice()->equals(new Price('3.00', 'USD')));
+    $this->assertTrue($result->getBasePrice()->equals(new Price('3.00', 'USD')));
     $this->assertEquals([], $result->getAdjustments());
 
     // Unknown adjustment type specified.
     $result = $this->priceCalculator->calculate($this->secondVariation, 1, $first_context, ['invalid']);
-    $this->assertEquals(new Price('4.00', 'USD'), $result->getCalculatedPrice());
-    $this->assertEquals(new Price('4.00', 'USD'), $result->getBasePrice());
+    $this->assertTrue($result->getCalculatedPrice()->equals(new Price('4.00', 'USD')));
+    $this->assertTrue($result->getBasePrice()->equals(new Price('4.00', 'USD')));
     $this->assertEquals([], $result->getAdjustments());
 
     // Only tax.
     $result = $this->priceCalculator->calculate($this->firstVariation, 1, $first_context, ['tax']);
-    $this->assertEquals(new Price('3.60', 'USD'), $result->getCalculatedPrice());
-    $this->assertEquals(new Price('3.00', 'USD'), $result->getBasePrice());
+    $this->assertTrue($result->getCalculatedPrice()->equals(new Price('3.60', 'USD')));
+    $this->assertTrue($result->getBasePrice()->equals(new Price('3.00', 'USD')));
     $this->assertCount(1, $result->getAdjustments());
     $adjustments = $result->getAdjustments();
     $first_adjustment = reset($adjustments);
     $this->assertEquals('tax', $first_adjustment->getType());
-    $this->assertEquals(new Price('0.60', 'USD'), $first_adjustment->getAmount());
+    $this->assertTrue($first_adjustment->getAmount()->equals(new Price('0.60', 'USD')));
 
     $result = $this->priceCalculator->calculate($this->secondVariation, 1, $first_context, ['tax']);
-    $this->assertEquals(new Price('4.80', 'USD'), $result->getCalculatedPrice());
-    $this->assertEquals(new Price('4.00', 'USD'), $result->getBasePrice());
+    $this->assertTrue($result->getCalculatedPrice()->equals(new Price('4.80', 'USD')));
+    $this->assertTrue($result->getBasePrice()->equals(new Price('4.00', 'USD')));
     $this->assertCount(1, $result->getAdjustments());
     $adjustments = $result->getAdjustments();
     $first_adjustment = reset($adjustments);
     $this->assertEquals('tax', $first_adjustment->getType());
-    $this->assertEquals(new Price('0.80', 'USD'), $first_adjustment->getAmount());
+    $this->assertTrue($first_adjustment->getAmount()->equals(new Price('0.80', 'USD')));
 
     // Tax and promotions.
     $result = $this->priceCalculator->calculate($this->firstVariation, 1, $first_context, ['tax', 'promotion']);
-    $this->assertEquals(new Price('1.80', 'USD'), $result->getCalculatedPrice());
-    $this->assertEquals(new Price('3.00', 'USD'), $result->getBasePrice());
+    $this->assertTrue($result->getCalculatedPrice()->equals(new Price('1.80', 'USD')));
+    $this->assertTrue($result->getBasePrice()->equals(new Price('3.00', 'USD')));
     $this->assertCount(2, $result->getAdjustments());
     $adjustments = $result->getAdjustments();
     $first_adjustment = reset($adjustments);
     $this->assertEquals('promotion', $first_adjustment->getType());
-    $this->assertEquals(new Price('-1.80', 'USD'), $first_adjustment->getAmount());
+    $this->assertTrue($first_adjustment->getAmount()->equals(new Price('-1.80', 'USD')));
     $second_adjustment = end($adjustments);
     $this->assertEquals('tax', $second_adjustment->getType());
-    $this->assertEquals(new Price('0.60', 'USD'), $second_adjustment->getAmount());
+    $this->assertTrue($second_adjustment->getAmount()->equals(new Price('0.60', 'USD')));
 
     $result = $this->priceCalculator->calculate($this->secondVariation, 1, $first_context, ['tax', 'promotion']);
-    $this->assertEquals(new Price('2.40', 'USD'), $result->getCalculatedPrice());
-    $this->assertEquals(new Price('4.00', 'USD'), $result->getBasePrice());
+    $this->assertTrue($result->getCalculatedPrice()->equals(new Price('2.40', 'USD')));
+    $this->assertTrue($result->getBasePrice()->equals(new Price('4.00', 'USD')));
     $this->assertCount(2, $result->getAdjustments());
     $adjustments = $result->getAdjustments();
     $first_adjustment = reset($adjustments);
     $this->assertEquals('promotion', $first_adjustment->getType());
-    $this->assertEquals(new Price('-2.40', 'USD'), $first_adjustment->getAmount());
+    $this->assertTrue($first_adjustment->getAmount()->equals(new Price('-2.40', 'USD')));
     $second_adjustment = end($adjustments);
     $this->assertEquals('tax', $second_adjustment->getType());
-    $this->assertEquals(new Price('0.80', 'USD'), $second_adjustment->getAmount());
+    $this->assertTrue($second_adjustment->getAmount()->equals(new Price('0.80', 'USD')));
 
     // User-specific adjustment added by TestAdjustmentProcessor.
     $result = $this->priceCalculator->calculate($this->secondVariation, 1, $second_context, ['test_adjustment_type']);
-    $this->assertEquals(new Price('6.00', 'USD'), $result->getCalculatedPrice());
-    $this->assertEquals(new Price('4.00', 'USD'), $result->getBasePrice());
+    $this->assertTrue($result->getCalculatedPrice()->equals(new Price('6.00', 'USD')));
+    $this->assertTrue($result->getBasePrice()->equals(new Price('4.00', 'USD')));
     $this->assertCount(1, $result->getAdjustments());
     $adjustments = $result->getAdjustments();
     $first_adjustment = reset($adjustments);
     $this->assertEquals('test_adjustment_type', $first_adjustment->getType());
-    $this->assertEquals(new Price('2.00', 'USD'), $first_adjustment->getAmount());
+    $this->assertTrue($first_adjustment->getAmount()->equals(new Price('2.00', 'USD')));
   }
 
 }

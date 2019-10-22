@@ -125,7 +125,7 @@ class PromotionOrderProcessorTest extends CommerceKernelTestBase {
     $this->order->recalculateTotalPrice();
 
     $this->assertEquals(1, count($this->order->collectAdjustments()));
-    $this->assertEquals(new Price('36.00', 'USD'), $this->order->getTotalPrice());
+    $this->assertTrue($this->order->getTotalPrice()->equals(new Price('36.00', 'USD')));
   }
 
   /**
@@ -190,7 +190,7 @@ class PromotionOrderProcessorTest extends CommerceKernelTestBase {
     $this->order->recalculateTotalPrice();
 
     $this->assertEquals(1, count($this->order->collectAdjustments()));
-    $this->assertEquals(new Price('36.00', 'USD'), $this->order->getTotalPrice());
+    $this->assertTrue($this->order->getTotalPrice()->equals(new Price('36.00', 'USD')));
   }
 
 }

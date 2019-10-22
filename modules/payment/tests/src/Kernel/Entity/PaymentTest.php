@@ -151,14 +151,14 @@ class PaymentTest extends CommerceKernelTestBase {
     $payment->setRemoteState('pending');
     $this->assertEquals('pending', $payment->getRemoteState());
 
-    $this->assertEquals(new Price('30', 'USD'), $payment->getAmount());
-    $this->assertEquals(new Price('10', 'USD'), $payment->getRefundedAmount());
-    $this->assertEquals(new Price('20', 'USD'), $payment->getBalance());
+    $this->assertTrue($payment->getAmount()->equals(new Price('30', 'USD')));
+    $this->assertTrue($payment->getRefundedAmount()->equals(new Price('10', 'USD')));
+    $this->assertTrue($payment->getBalance()->equals(new Price('20', 'USD')));
 
     $payment->setAmount(new Price('40', 'USD'));
-    $this->assertEquals(new Price('40', 'USD'), $payment->getAmount());
+    $this->assertTrue($payment->getAmount()->equals(new Price('40', 'USD')));
     $payment->setRefundedAmount(new Price('15', 'USD'));
-    $this->assertEquals(new Price('15', 'USD'), $payment->getRefundedAmount());
+    $this->assertTrue($payment->getRefundedAmount()->equals(new Price('15', 'USD')));
 
     $this->assertEquals('refunded', $payment->getState()->getId());
     $payment->setState('completed');
@@ -186,8 +186,8 @@ class PaymentTest extends CommerceKernelTestBase {
    * @covers ::postDelete
    */
   public function testOrderIntegration() {
-    $this->assertEquals(new Price('0', 'USD'), $this->order->getTotalPaid());
-    $this->assertEquals(new Price('30', 'USD'), $this->order->getBalance());
+    $this->assertTrue($this->order->getTotalPaid()->equals(new Price('0', 'USD')));
+    $this->assertTrue($this->order->getBalance()->equals(new Price('30', 'USD')));
 
     /** @var \Drupal\commerce_payment\Entity\PaymentInterface $payment */
     $payment = Payment::create([
@@ -199,15 +199,15 @@ class PaymentTest extends CommerceKernelTestBase {
     ]);
     $payment->save();
     $this->order->save();
-    $this->assertEquals(new Price('30', 'USD'), $this->order->getTotalPaid());
-    $this->assertEquals(new Price('0', 'USD'), $this->order->getBalance());
+    $this->assertTrue($this->order->getTotalPaid()->equals(new Price('30', 'USD')));
+    $this->assertTrue($this->order->getBalance()->equals(new Price('0', 'USD')));
 
     $payment->setRefundedAmount(new Price('15', 'USD'));
     $payment->setState('partially_refunded');
     $payment->save();
     $this->order->save();
-    $this->assertEquals(new Price('15', 'USD'), $this->order->getTotalPaid());
-    $this->assertEquals(new Price('15', 'USD'), $this->order->getBalance());
+    $this->assertTrue($this->order->getTotalPaid()->equals(new Price('15', 'USD')));
+    $this->assertTrue($this->order->getBalance()->equals(new Price('15', 'USD')));
 
     $payment->delete();
     // Confirm that if the order isn't explicitly saved, it will be saved
@@ -216,8 +216,8 @@ class PaymentTest extends CommerceKernelTestBase {
     $kernel = $this->container->get('kernel');
     $kernel->terminate($request, new Response());
     $this->order = $this->reloadEntity($this->order);
-    $this->assertEquals(new Price('0', 'USD'), $this->order->getTotalPaid());
-    $this->assertEquals(new Price('30', 'USD'), $this->order->getBalance());
+    $this->assertTrue($this->order->getTotalPaid()->equals(new Price('0', 'USD')));
+    $this->assertTrue($this->order->getBalance()->equals(new Price('30', 'USD')));
   }
 
   /**
@@ -240,11 +240,11 @@ class PaymentTest extends CommerceKernelTestBase {
     $this->assertEmpty($payment->getAuthorizedTime());
     $this->assertEmpty($payment->getCompletedTime());
     // Confirm that getBalance() works before the payment is saved.
-    $this->assertEquals(new Price('30', 'USD'), $payment->getBalance());
+    $this->assertTrue($payment->getBalance()->equals(new Price('30', 'USD')));
 
     $payment->save();
     $this->assertEquals('test', $payment->getPaymentGatewayMode());
-    $this->assertEquals(new Price('0', 'USD'), $payment->getRefundedAmount());
+    $this->assertTrue($payment->getRefundedAmount()->equals(new Price('0', 'USD')));
     $this->assertEquals($request_time, $payment->getAuthorizedTime());
     $this->assertEmpty($payment->getCompletedTime());
 

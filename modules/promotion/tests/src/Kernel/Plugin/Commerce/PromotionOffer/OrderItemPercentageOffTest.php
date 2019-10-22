@@ -142,16 +142,16 @@ class OrderItemPercentageOffTest extends CommerceKernelTestBase {
     /** @var \Drupal\commerce_order\Entity\OrderItemInterface $order_item */
     $order_item = $this->reloadEntity($order_item);
 
-    $this->assertEquals(new Price('4.99', 'USD'), $order_item->getUnitPrice());
-    $this->assertEquals(new Price('9.98', 'USD'), $order_item->getTotalPrice());
-    $this->assertEquals(new Price('9.98', 'USD'), $order_item->getAdjustedTotalPrice());
+    $this->assertTrue($order_item->getUnitPrice()->equals(new Price('4.99', 'USD')));
+    $this->assertTrue($order_item->getTotalPrice()->equals(new Price('9.98', 'USD')));
+    $this->assertTrue($order_item->getAdjustedTotalPrice()->equals(new Price('9.98', 'USD')));
     $this->assertEquals(1, count($order_item->getAdjustments()));
     $adjustment = $order_item->getAdjustments()[0];
-    $this->assertEquals(new Price('-10.00', 'USD'), $adjustment->getAmount());
+    $this->assertTrue($adjustment->getAmount()->equals(new Price('-10.00', 'USD')));
     $this->assertEquals('0.50', $adjustment->getPercentage());
     $this->assertTrue($adjustment->isIncluded());
     $this->order->recalculateTotalPrice();
-    $this->assertEquals(new Price('9.98', 'USD'), $this->order->getTotalPrice());
+    $this->assertTrue($this->order->getTotalPrice()->equals(new Price('9.98', 'USD')));
   }
 
   /**
@@ -191,16 +191,16 @@ class OrderItemPercentageOffTest extends CommerceKernelTestBase {
     /** @var \Drupal\commerce_order\Entity\OrderItemInterface $order_item */
     $order_item = $this->reloadEntity($order_item);
 
-    $this->assertEquals(new Price('9.99', 'USD'), $order_item->getUnitPrice());
-    $this->assertEquals(new Price('19.98', 'USD'), $order_item->getTotalPrice());
-    $this->assertEquals(new Price('9.99', 'USD'), $order_item->getAdjustedTotalPrice());
+    $this->assertTrue($order_item->getUnitPrice()->equals(new Price('9.99', 'USD')));
+    $this->assertTrue($order_item->getTotalPrice()->equals(new Price('19.98', 'USD')));
+    $this->assertTrue($order_item->getAdjustedTotalPrice()->equals(new Price('9.99', 'USD')));
     $this->assertEquals(1, count($order_item->getAdjustments()));
     $adjustment = $order_item->getAdjustments()[0];
-    $this->assertEquals(new Price('-9.99', 'USD'), $adjustment->getAmount());
+    $this->assertTrue($adjustment->getAmount()->equals(new Price('-9.99', 'USD')));
     $this->assertEquals('0.50', $adjustment->getPercentage());
     $this->assertFalse($adjustment->isIncluded());
     $this->order->recalculateTotalPrice();
-    $this->assertEquals(new Price('9.99', 'USD'), $this->order->getTotalPrice());
+    $this->assertTrue($this->order->getTotalPrice()->equals(new Price('9.99', 'USD')));
   }
 
 }

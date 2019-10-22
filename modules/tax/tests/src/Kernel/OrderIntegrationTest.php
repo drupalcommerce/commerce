@@ -110,7 +110,7 @@ class OrderIntegrationTest extends CommerceKernelTestBase {
     $adjustments = $this->order->collectAdjustments();
     $adjustment = reset($adjustments);
     $this->assertCount(1, $adjustments);
-    $this->assertEquals(new Price('2.00', 'USD'), $adjustment->getAmount());
+    $this->assertTrue($adjustment->getAmount()->equals(new Price('2.00', 'USD')));
     $this->assertEquals('us_vat|default|standard', $adjustment->getSourceId());
   }
 
@@ -137,7 +137,7 @@ class OrderIntegrationTest extends CommerceKernelTestBase {
     $adjustments = $this->order->collectAdjustments();
     $adjustment = reset($adjustments);
     $this->assertCount(1, $adjustments);
-    $this->assertEquals(new Price('2.00', 'USD'), $adjustment->getAmount());
+    $this->assertTrue($adjustment->getAmount()->equals(new Price('2.00', 'USD')));
     $this->assertEquals('us_vat|default|standard', $adjustment->getSourceId());
   }
 
@@ -166,7 +166,7 @@ class OrderIntegrationTest extends CommerceKernelTestBase {
     $adjustments = $this->order->collectAdjustments();
     $adjustment = reset($adjustments);
     $this->assertCount(1, $adjustments);
-    $this->assertEquals(new Price('2.00', 'USD'), $adjustment->getAmount());
+    $this->assertTrue($adjustment->getAmount()->equals(new Price('2.00', 'USD')));
     $this->assertEquals('us_vat|default|standard', $adjustment->getSourceId());
   }
 
@@ -195,7 +195,7 @@ class OrderIntegrationTest extends CommerceKernelTestBase {
     $this->assertCount(0, $this->order->collectAdjustments());
     $order_items = $this->order->getItems();
     $order_item = reset($order_items);
-    $this->assertEquals(new Price('10.00', 'USD'), $order_item->getUnitPrice());
+    $this->assertTrue($order_item->getUnitPrice()->equals(new Price('10.00', 'USD')));
     // Confirm that the overridden_unit_price flag is preserved.
     $this->assertTrue($order_item->isUnitPriceOverridden());
   }

@@ -121,7 +121,7 @@ class OrderAdminTest extends OrderWebDriverTestBase {
 
     $order = Order::load(1);
     $this->assertEquals(1, count($order->getItems()));
-    $this->assertEquals(new Price('5.33', 'USD'), $order->getTotalPrice());
+    $this->assertTrue($order->getTotalPrice()->equals(new Price('5.33', 'USD')));
     $this->assertCount(1, $order->getAdjustments());
     $billing_profile = $order->getBillingProfile();
     $this->assertEquals($this->defaultAddress, array_filter($billing_profile->get('address')->first()->toArray()));

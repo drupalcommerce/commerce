@@ -270,7 +270,7 @@ class CouponRedemptionPaneTest extends CommerceWebDriverTestBase {
     $order_storage = $this->container->get('entity_type.manager')->getStorage('commerce_order');
     $order_storage->resetCache([$this->cart->id()]);
     $this->cart = $order_storage->load($this->cart->id());
-    $this->assertEquals(new Price('899.10', 'USD'), $this->cart->getTotalPrice());
+    $this->assertTrue($this->cart->getTotalPrice()->equals(new Price('899.10', 'USD')));
   }
 
   /**
@@ -294,7 +294,7 @@ class CouponRedemptionPaneTest extends CommerceWebDriverTestBase {
     $order_storage = $this->container->get('entity_type.manager')->getStorage('commerce_order');
     $order_storage->resetCache([$this->cart->id()]);
     $this->cart = $order_storage->load($this->cart->id());
-    $this->assertEquals(new Price('899.10', 'USD'), $this->cart->getTotalPrice());
+    $this->assertTrue($this->cart->getTotalPrice()->equals(new Price('899.10', 'USD')));
   }
 
   /**

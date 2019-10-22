@@ -97,16 +97,16 @@ class PriceTest extends UnitTestCase {
    */
   public function testArithmetic() {
     $result = $this->price->add(new Price('5', 'USD'));
-    $this->assertEquals(new Price('15', 'USD'), $result);
+    $this->assertTrue($result->equals(new Price('15', 'USD')));
 
     $result = $this->price->subtract(new Price('5', 'USD'));
-    $this->assertEquals(new Price('5', 'USD'), $result);
+    $this->assertTrue($result->equals(new Price('5', 'USD')));
 
     $result = $this->price->multiply('5');
-    $this->assertEquals(new Price('50', 'USD'), $result);
+    $this->assertTrue($result->equals(new Price('50', 'USD')));
 
     $result = $this->price->divide('10');
-    $this->assertEquals(new Price('1', 'USD'), $result);
+    $this->assertTrue($result->equals(new Price('1', 'USD')));
   }
 
   /**

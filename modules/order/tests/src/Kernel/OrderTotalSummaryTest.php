@@ -134,14 +134,14 @@ class OrderTotalSummaryTest extends CommerceKernelTestBase {
     $this->order->save();
 
     $totals = $this->orderTotalSummary->buildTotals($this->order);
-    $this->assertEquals(new Price('12.00', 'USD'), $totals['subtotal']);
-    $this->assertEquals(new Price('7.00', 'USD'), $totals['total']);
+    $this->assertTrue($totals['subtotal']->equals(new Price('12.00', 'USD')));
+    $this->assertTrue($totals['total']->equals(new Price('7.00', 'USD')));
 
     $this->assertCount(1, $totals['adjustments']);
     $first = array_shift($totals['adjustments']);
     $this->assertEquals('promotion', $first['type']);
     $this->assertEquals('Back to school discount', $first['label']);
-    $this->assertEquals(new Price('-5', 'USD'), $first['amount']);
+    $this->assertTrue($first['amount']->equals(new Price('-5', 'USD')));
     $this->assertEquals('0.1', $first['percentage']);
   }
 
@@ -168,14 +168,14 @@ class OrderTotalSummaryTest extends CommerceKernelTestBase {
     $this->order->save();
 
     $totals = $this->orderTotalSummary->buildTotals($this->order);
-    $this->assertEquals(new Price('12.00', 'USD'), $totals['subtotal']);
-    $this->assertEquals(new Price('11.00', 'USD'), $totals['total']);
+    $this->assertTrue($totals['subtotal']->equals(new Price('12.00', 'USD')));
+    $this->assertTrue($totals['total']->equals(new Price('11.00', 'USD')));
 
     $this->assertCount(1, $totals['adjustments']);
     $first = array_shift($totals['adjustments']);
     $this->assertEquals('promotion', $first['type']);
     $this->assertEquals('Back to school discount', $first['label']);
-    $this->assertEquals(new Price('-1', 'USD'), $first['amount']);
+    $this->assertTrue($first['amount']->equals(new Price('-1', 'USD')));
     $this->assertEquals('0.1', $first['percentage']);
   }
 
@@ -221,26 +221,26 @@ class OrderTotalSummaryTest extends CommerceKernelTestBase {
     $this->order->save();
 
     $totals = $this->orderTotalSummary->buildTotals($this->order);
-    $this->assertEquals(new Price('24.00', 'USD'), $totals['subtotal']);
-    $this->assertEquals(new Price('28.50', 'USD'), $totals['total']);
+    $this->assertTrue($totals['subtotal']->equals(new Price('24.00', 'USD')));
+    $this->assertTrue($totals['total']->equals(new Price('28.50', 'USD')));
 
     $this->assertCount(3, $totals['adjustments']);
     $first = array_shift($totals['adjustments']);
     $this->assertEquals('test_adjustment_type', $first['type']);
     $this->assertEquals('50 cent item fee', $first['label']);
-    $this->assertEquals(new Price('0.50', 'USD'), $first['amount']);
+    $this->assertTrue($first['amount']->equals(new Price('0.50', 'USD')));
     $this->assertNull($first['percentage']);
 
     $second = array_shift($totals['adjustments']);
     $this->assertEquals('promotion', $second['type']);
     $this->assertEquals('Back to school discount', $second['label']);
-    $this->assertEquals(new Price('-6', 'USD'), $second['amount']);
+    $this->assertTrue($second['amount']->equals(new Price('-6', 'USD')));
     $this->assertEquals('0.1', $second['percentage']);
 
     $third = array_shift($totals['adjustments']);
     $this->assertEquals('custom', $third['type']);
     $this->assertEquals('Handling fee', $third['label']);
-    $this->assertEquals(new Price('10', 'USD'), $third['amount']);
+    $this->assertTrue($third['amount']->equals(new Price('10', 'USD')));
     $this->assertNull($third['percentage']);
   }
 

@@ -471,7 +471,7 @@ class ProductAdminTest extends ProductBrowserTestBase {
     $variation = $product->getDefaultVariation();
     $this->assertNotEmpty($variation);
     $this->assertEquals($sku, $variation->getSku());
-    $this->assertEquals(new Price('99.99', 'USD'), $variation->getPrice());
+    $this->assertTrue($variation->getPrice()->equals(new Price('99.99', 'USD')));
     $this->assertFalse($variation->get('field_image')->isEmpty());
 
     $this->drupalGet($product->toUrl('edit-form'));
@@ -491,7 +491,7 @@ class ProductAdminTest extends ProductBrowserTestBase {
     $this->assertNotEmpty($variation);
     $this->assertEquals(1, $variation->id());
     $this->assertEquals($sku, $variation->getSku());
-    $this->assertEquals(new Price('199.99', 'USD'), $variation->getPrice());
+    $this->assertTrue($variation->getPrice()->equals(new Price('199.99', 'USD')));
 
     // The variation collection page should be inaccessible.
     $this->drupalGet($variation->toUrl('collection'));

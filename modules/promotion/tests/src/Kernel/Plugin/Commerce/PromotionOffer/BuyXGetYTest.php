@@ -242,7 +242,7 @@ class BuyXGetYTest extends CommerceKernelTestBase {
     $adjustments = $third_order_item->getAdjustments();
     $adjustment = reset($adjustments);
     $this->assertEquals('promotion', $adjustment->getType());
-    $this->assertEquals(new Price('-3', 'USD'), $adjustment->getAmount());
+    $this->assertTrue($adjustment->getAmount()->equals(new Price('-3', 'USD')));
     $this->assertEquals($this->promotion->id(), $adjustment->getSourceId());
 
     // Test having two offer order items, one ($third_order_item) reduced
@@ -264,13 +264,13 @@ class BuyXGetYTest extends CommerceKernelTestBase {
     $adjustments = $third_order_item->getAdjustments();
     $adjustment = reset($adjustments);
     $this->assertEquals('promotion', $adjustment->getType());
-    $this->assertEquals(new Price('-3', 'USD'), $adjustment->getAmount());
+    $this->assertTrue($adjustment->getAmount()->equals(new Price('-3', 'USD')));
     $this->assertEquals($this->promotion->id(), $adjustment->getSourceId());
 
     $adjustments = $fourth_order_item->getAdjustments();
     $adjustment = reset($adjustments);
     $this->assertEquals('promotion', $adjustment->getType());
-    $this->assertEquals(new Price('-1', 'USD'), $adjustment->getAmount());
+    $this->assertTrue($adjustment->getAmount()->equals(new Price('-1', 'USD')));
     $this->assertEquals($this->promotion->id(), $adjustment->getSourceId());
   }
 
@@ -315,7 +315,7 @@ class BuyXGetYTest extends CommerceKernelTestBase {
     $adjustments = $third_order_item->getAdjustments();
     $adjustment = reset($adjustments);
     $this->assertEquals('promotion', $adjustment->getType());
-    $this->assertEquals(new Price('-18', 'USD'), $adjustment->getAmount());
+    $this->assertTrue($adjustment->getAmount()->equals(new Price('-18', 'USD')));
     $this->assertEquals($this->promotion->id(), $adjustment->getSourceId());
 
     // Test having two offer order items, one ($third_order_item) reduced
@@ -337,13 +337,13 @@ class BuyXGetYTest extends CommerceKernelTestBase {
     $adjustments = $third_order_item->getAdjustments();
     $adjustment = reset($adjustments);
     $this->assertEquals('promotion', $adjustment->getType());
-    $this->assertEquals(new Price('-18', 'USD'), $adjustment->getAmount());
+    $this->assertTrue($adjustment->getAmount()->equals(new Price('-18', 'USD')));
     $this->assertEquals($this->promotion->id(), $adjustment->getSourceId());
 
     $adjustments = $fourth_order_item->getAdjustments();
     $adjustment = reset($adjustments);
     $this->assertEquals('promotion', $adjustment->getType());
-    $this->assertEquals(new Price('-6', 'USD'), $adjustment->getAmount());
+    $this->assertTrue($adjustment->getAmount()->equals(new Price('-6', 'USD')));
     $this->assertEquals($this->promotion->id(), $adjustment->getSourceId());
   }
 
@@ -378,7 +378,7 @@ class BuyXGetYTest extends CommerceKernelTestBase {
     $adjustments = $order_item->getAdjustments();
     $adjustment = reset($adjustments);
     $this->assertEquals('promotion', $adjustment->getType());
-    $this->assertEquals(new Price('-2', 'USD'), $adjustment->getAmount());
+    $this->assertTrue($adjustment->getAmount()->equals(new Price('-2', 'USD')));
     $this->assertEquals($this->promotion->id(), $adjustment->getSourceId());
   }
 
@@ -461,13 +461,13 @@ class BuyXGetYTest extends CommerceKernelTestBase {
     $adjustments = $third_order_item->getAdjustments();
     $adjustment = reset($adjustments);
     $this->assertEquals('promotion', $adjustment->getType());
-    $this->assertEquals(new Price('-1.5', 'USD'), $adjustment->getAmount());
+    $this->assertTrue($adjustment->getAmount()->equals(new Price('-1.5', 'USD')));
     $this->assertEquals($this->promotion->id(), $adjustment->getSourceId());
 
     $adjustments = $fourth_order_item->getAdjustments();
     $adjustment = reset($adjustments);
     $this->assertEquals('promotion', $adjustment->getType());
-    $this->assertEquals(new Price('-2.5', 'USD'), $adjustment->getAmount());
+    $this->assertTrue($adjustment->getAmount()->equals(new Price('-2.5', 'USD')));
     $this->assertEquals($this->promotion->id(), $adjustment->getSourceId());
   }
 

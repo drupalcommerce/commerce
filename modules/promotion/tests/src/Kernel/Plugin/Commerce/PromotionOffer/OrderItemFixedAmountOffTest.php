@@ -145,12 +145,12 @@ class OrderItemFixedAmountOffTest extends CommerceKernelTestBase {
     $order_item = $this->reloadEntity($order_item);
 
     // Offer amount larger than the order item unit price.
-    $this->assertEquals(new Price('0.00', 'USD'), $order_item->getUnitPrice());
-    $this->assertEquals(new Price('0.00', 'USD'), $order_item->getTotalPrice());
-    $this->assertEquals(new Price('0.00', 'USD'), $order_item->getAdjustedTotalPrice());
+    $this->assertTrue($order_item->getUnitPrice()->equals(new Price('0.00', 'USD')));
+    $this->assertTrue($order_item->getTotalPrice()->equals(new Price('0.00', 'USD')));
+    $this->assertTrue($order_item->getAdjustedTotalPrice()->equals(new Price('0.00', 'USD')));
     $this->assertEquals(1, count($order_item->getAdjustments()));
     $adjustment = $order_item->getAdjustments()[0];
-    $this->assertEquals(new Price('-20.00', 'USD'), $adjustment->getAmount());
+    $this->assertTrue($adjustment->getAmount()->equals(new Price('-20.00', 'USD')));
     $this->assertTrue($adjustment->isIncluded());
 
     // Offer amount smaller than the order item unit price.
@@ -159,12 +159,12 @@ class OrderItemFixedAmountOffTest extends CommerceKernelTestBase {
     $this->container->get('commerce_order.order_refresh')->refresh($this->order);
     $this->order = $this->reloadEntity($this->order);
     $order_item = $this->reloadEntity($order_item);
-    $this->assertEquals(new Price('5.00', 'USD'), $order_item->getUnitPrice());
-    $this->assertEquals(new Price('10.00', 'USD'), $order_item->getTotalPrice());
-    $this->assertEquals(new Price('10.00', 'USD'), $order_item->getAdjustedTotalPrice());
+    $this->assertTrue($order_item->getUnitPrice()->equals(new Price('5.00', 'USD')));
+    $this->assertTrue($order_item->getTotalPrice()->equals(new Price('10.00', 'USD')));
+    $this->assertTrue($order_item->getAdjustedTotalPrice()->equals(new Price('10.00', 'USD')));
     $this->assertEquals(1, count($order_item->getAdjustments()));
     $adjustment = $order_item->getAdjustments()[0];
-    $this->assertEquals(new Price('-30.00', 'USD'), $adjustment->getAmount());
+    $this->assertTrue($adjustment->getAmount()->equals(new Price('-30.00', 'USD')));
     $this->assertTrue($adjustment->isIncluded());
   }
 
@@ -208,12 +208,12 @@ class OrderItemFixedAmountOffTest extends CommerceKernelTestBase {
     $order_item = $this->reloadEntity($order_item);
 
     // Offer amount larger than the order item unit price.
-    $this->assertEquals(new Price('10.00', 'USD'), $order_item->getUnitPrice());
-    $this->assertEquals(new Price('20.00', 'USD'), $order_item->getTotalPrice());
-    $this->assertEquals(new Price('0.00', 'USD'), $order_item->getAdjustedTotalPrice());
+    $this->assertTrue($order_item->getUnitPrice()->equals(new Price('10.00', 'USD')));
+    $this->assertTrue($order_item->getTotalPrice()->equals(new Price('20.00', 'USD')));
+    $this->assertTrue($order_item->getAdjustedTotalPrice()->equals(new Price('0.00', 'USD')));
     $this->assertEquals(1, count($order_item->getAdjustments()));
     $adjustment = $order_item->getAdjustments()[0];
-    $this->assertEquals(new Price('-20.00', 'USD'), $adjustment->getAmount());
+    $this->assertTrue($adjustment->getAmount()->equals(new Price('-20.00', 'USD')));
     $this->assertFalse($adjustment->isIncluded());
 
     // Offer amount smaller than the order item unit price.
@@ -223,12 +223,12 @@ class OrderItemFixedAmountOffTest extends CommerceKernelTestBase {
     $this->order = $this->reloadEntity($this->order);
     $order_item = $this->reloadEntity($order_item);
     $this->assertEquals(1, count($order_item->getAdjustments()));
-    $this->assertEquals(new Price('20.00', 'USD'), $order_item->getUnitPrice());
-    $this->assertEquals(new Price('40.00', 'USD'), $order_item->getTotalPrice());
-    $this->assertEquals(new Price('10.00', 'USD'), $order_item->getAdjustedTotalPrice());
+    $this->assertTrue($order_item->getUnitPrice()->equals(new Price('20.00', 'USD')));
+    $this->assertTrue($order_item->getTotalPrice()->equals(new Price('40.00', 'USD')));
+    $this->assertTrue($order_item->getAdjustedTotalPrice()->equals(new Price('10.00', 'USD')));
     $this->assertEquals(1, count($order_item->getAdjustments()));
     $adjustment = $order_item->getAdjustments()[0];
-    $this->assertEquals(new Price('-30.00', 'USD'), $adjustment->getAmount());
+    $this->assertTrue($adjustment->getAmount()->equals(new Price('-30.00', 'USD')));
     $this->assertFalse($adjustment->isIncluded());
   }
 
