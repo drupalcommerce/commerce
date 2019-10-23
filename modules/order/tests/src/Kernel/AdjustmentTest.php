@@ -3,8 +3,10 @@
 namespace Drupal\Tests\commerce_order\Kernel;
 
 use Drupal\commerce_order\Adjustment;
+use Drupal\commerce_order\Comparator\AdjustmentComparator;
 use Drupal\commerce_price\Price;
 use Drupal\Tests\commerce\Kernel\CommerceKernelTestBase;
+use SebastianBergmann\Comparator\Factory as PhpUnitComparatorFactory;
 
 /**
  * @coversDefaultClass Drupal\commerce_order\Adjustment
@@ -192,6 +194,7 @@ class AdjustmentTest extends CommerceKernelTestBase {
       'locked' => TRUE,
     ]);
 
+    PhpUnitComparatorFactory::getInstance()->register(new AdjustmentComparator());
     $this->assertEquals($third_adjustment, $first_adjustment->add($second_adjustment));
     $this->assertEquals($second_adjustment, $third_adjustment->subtract($first_adjustment));
     $this->assertEquals($fourth_adjustment, $second_adjustment->multiply('2'));

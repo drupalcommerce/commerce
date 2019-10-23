@@ -121,7 +121,7 @@ class OrderPercentageOffTest extends CommerceKernelTestBase {
     $this->assertEquals(new Price('40.00', 'USD'), $order_item->getTotalPrice());
     $this->assertEquals(new Price('36.00', 'USD'), $order_item->getAdjustedTotalPrice());
     $this->assertEquals(new Price('-4.00', 'USD'), $adjustment->getAmount());
-    $this->assertEquals('0.1', $adjustment->getPercentage());
+    $this->assertSame(0.1, (float) $adjustment->getPercentage());
     $this->assertEquals(new Price('36.00', 'USD'), $this->order->getTotalPrice());
   }
 

@@ -115,7 +115,7 @@ class ManualPaymentAdminTest extends CommerceBrowserTestBase {
     /** @var \Drupal\commerce_payment\Entity\PaymentInterface $payment */
     $payment = Payment::load(1);
     $this->assertEquals($payment->getOrderId(), $this->order->id());
-    $this->assertEquals($payment->getAmount()->getNumber(), '100');
+    $this->assertSame(100.00, (float) $payment->getAmount()->getNumber());
     $this->assertEquals($payment->getState()->getLabel(), 'Pending');
 
     $this->drupalGet($this->paymentUri . '/add');
@@ -129,7 +129,7 @@ class ManualPaymentAdminTest extends CommerceBrowserTestBase {
     /** @var \Drupal\commerce_payment\Entity\PaymentInterface $payment */
     $payment = Payment::load(2);
     $this->assertEquals($payment->getOrderId(), $this->order->id());
-    $this->assertEquals($payment->getAmount()->getNumber(), '100');
+    $this->assertSame(100.00, (float) $payment->getAmount()->getNumber());
     $this->assertEquals($payment->getState()->getLabel(), 'Completed');
     $this->assertNotEmpty($payment->getCompletedTime());
   }
