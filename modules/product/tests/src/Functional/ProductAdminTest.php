@@ -498,4 +498,59 @@ class ProductAdminTest extends ProductBrowserTestBase {
     $this->assertSession()->statusCodeEquals('403');
   }
 
+  /**
+   * Tests the single variation widget on a product allowing multiple.
+   */
+  public function testMixedMode() {
+    $form_display = EntityFormDisplay::load('commerce_product.default.default');
+    $form_display->setComponent('variations', [
+      'type' => 'commerce_product_single_variation',
+      'weight' => 2,
+    ]);
+    $form_display->save();
+
+    $this->drupalGet('admin/commerce/products');
+    $this->getSession()->getPage()->clickLink('Add product');
+    $this->assertSession()->buttonExists('Save and add variations');
+    $this->assertSession()->fieldExists('variations[entity][sku][0][value]');
+
+    $title = 'Mug';
+    $store_id = $this->stores[0]->id();
+    $sku = strtolower($this->randomMachineName());
+    $page = $this->getSession()->getPage();
+    $page->fillField('title[0][value]', $title);
+    $page->fillField('stores[target_id][value][' . $store_id . ']', $store_id);
+    $page->fillField('variations[entity][sku][0][value]', $sku);
+    $page->fillField('variations[entity][price][0][number]', '99.99');
+    $this->submitForm([], 'Save and add variations');
+
+    $product = Product::load(1);
+    $this->assertNotEmpty($product);
+    $this->assertEquals($title, $product->getTitle());
+    $this->assertEquals([$store_id], $product->getStoreIds());
+    $variation = $product->getDefaultVariation();
+    $this->assertNotEmpty($variation);
+    $this->assertEquals($sku, $variation->getSku());
+    $this->assertEquals(new Price('99.99', 'USD'), $variation->getPrice());
+
+    $this->drupalGet($product->toUrl('edit-form'));
+    $edit = [
+      'title[0][value]' => 'New title',
+      'variations[entity][price][0][number]' => '199.99',
+    ];
+    $this->submitForm($edit, 'Save');
+
+    \Drupal::entityTypeManager()->getStorage('commerce_product')->resetCache([1]);
+    \Drupal::entityTypeManager()->getStorage('commerce_product_variation')->resetCache([1]);
+    $product = Product::load(1);
+    $this->assertNotEmpty($product);
+    $this->assertEquals('New title', $product->getTitle());
+    $this->assertEquals([$store_id], $product->getStoreIds());
+    $variation = $product->getDefaultVariation();
+    $this->assertNotEmpty($variation);
+    $this->assertEquals(1, $variation->id());
+    $this->assertEquals($sku, $variation->getSku());
+    $this->assertEquals(new Price('199.99', 'USD'), $variation->getPrice());
+  }
+
 }

@@ -211,13 +211,17 @@ class ProductForm extends ContentEntityForm {
     $actions = parent::actions($form, $form_state);
 
     if ($this->entity->isNew()) {
+      $product_type_storage = $this->entityTypeManager->getStorage('commerce_product_type');
+      /** @var \Drupal\commerce_product\Entity\ProductTypeInterface $product_type */
+      $product_type = $product_type_storage->load($this->entity->bundle());
+
       $actions['submit_continue'] = [
         '#type' => 'submit',
         '#value' => $this->t('Save and add variations'),
+        '#button_type' => 'secondary',
         '#continue' => TRUE,
         '#submit' => ['::submitForm', '::save'],
-        // Hide the button if variations are managed through a widget.
-        '#access' => empty($form['variations']),
+        '#access' => $product_type->allowsMultipleVariations(),
       ];
     }
 
