@@ -6,6 +6,7 @@ use Drupal\commerce_store\StoreCreationTrait;
 use Drupal\Tests\block\Traits\BlockCreationTrait;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\Tests\commerce\Traits\CommerceBrowserTestTrait;
+use Drupal\Tests\commerce\Traits\DeprecationSuppressionTrait;
 
 /**
  * Provides a base class for Commerce functional tests.
@@ -15,6 +16,7 @@ abstract class CommerceBrowserTestBase extends BrowserTestBase {
   use BlockCreationTrait;
   use StoreCreationTrait;
   use CommerceBrowserTestTrait;
+  use DeprecationSuppressionTrait;
 
   /**
    * The store entity.
@@ -51,6 +53,7 @@ abstract class CommerceBrowserTestBase extends BrowserTestBase {
    * {@inheritdoc}
    */
   protected function setUp() {
+    $this->setErrorHandler();
     parent::setUp();
 
     $this->store = $this->createStore();
@@ -60,6 +63,14 @@ abstract class CommerceBrowserTestBase extends BrowserTestBase {
 
     $this->adminUser = $this->drupalCreateUser($this->getAdministratorPermissions());
     $this->drupalLogin($this->adminUser);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function tearDown() {
+    parent::tearDown();
+    $this->restoreErrorHandler();
   }
 
   /**

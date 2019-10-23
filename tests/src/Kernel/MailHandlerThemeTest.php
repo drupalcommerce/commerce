@@ -45,7 +45,7 @@ class MailHandlerThemeTest extends CommerceKernelTestBase {
     parent::setUp();
 
     $this->installConfig(['mailsystem']);
-    \Drupal::service('theme_handler')->install(['commerce_test_theme']);
+    \Drupal::service('theme_installer')->install(['commerce_test_theme']);
 
     $this->mailHandler = $this->container->get('commerce.mail_handler');
     $this->user = $this->createUser(['mail' => 'customer@example.com']);

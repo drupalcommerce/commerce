@@ -4,12 +4,14 @@ namespace Drupal\Tests\commerce\Kernel;
 
 use Drupal\commerce_store\StoreCreationTrait;
 use Drupal\KernelTests\Core\Entity\EntityKernelTestBase;
+use Drupal\Tests\commerce\Traits\DeprecationSuppressionTrait;
 
 /**
  * Provides a base class for Commerce kernel tests.
  */
 abstract class CommerceKernelTestBase extends EntityKernelTestBase {
 
+  use DeprecationSuppressionTrait;
   use StoreCreationTrait;
 
   /**
@@ -45,6 +47,7 @@ abstract class CommerceKernelTestBase extends EntityKernelTestBase {
    */
   protected function setUp() {
     parent::setUp();
+    $this->setErrorHandler();
 
     if (\Drupal::entityTypeManager()->hasDefinition('path_alias')) {
       $this->installEntitySchema('path_alias');
@@ -58,6 +61,14 @@ abstract class CommerceKernelTestBase extends EntityKernelTestBase {
 
     $this->store = $this->createStore('Default store', 'admin@example.com');
     \Drupal::entityTypeManager()->getStorage('commerce_store')->markAsDefault($this->store);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function tearDown() {
+    $this->restoreErrorHandler();
+    parent::tearDown();
   }
 
 }

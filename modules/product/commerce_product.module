@@ -368,3 +368,18 @@ function commerce_product_type_labels() {
 
   return EntityHelper::extractLabels($product_types);
 }
+
+/**
+ * Implements hook_config_schema_info_alter().
+ *
+ * This method provides a compatibility layer to allow new config schemas to be
+ * used with older versions of Drupal.
+ */
+function commerce_product_config_schema_info_alter(&$definitions) {
+  if (!isset($definitions['field.widget.settings.entity_reference_autocomplete']['mapping']['match_limit'])) {
+    $definitions['field.widget.settings.entity_reference_autocomplete']['mapping']['match_limit'] = [
+      'type' => 'integer',
+      'label' => 'Maximum number of autocomplete suggestions.',
+    ];
+  }
+}
