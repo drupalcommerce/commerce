@@ -110,14 +110,14 @@ class PromotionCartTest extends CommerceKernelTestBase {
     $this->cartManager->addEntity($cart, $variation);
 
     $this->assertEquals(1, count($cart->collectAdjustments()));
-    $this->assertTrue($cart->getTotalPrice()->equals(new Price('9.00', 'USD')));
+    $this->assertEquals(new Price('9.00', 'USD'), $cart->getTotalPrice());
 
     // Disable the promotion.
     $promotion->setEnabled(FALSE);
     $promotion->save();
     $this->container->get('commerce_order.order_refresh')->refresh($cart);
     $this->assertEmpty($cart->getAdjustments());
-    $this->assertTrue($cart->getTotalPrice()->equals(new Price('10.00', 'USD')));
+    $this->assertEquals(new Price('10.00', 'USD'), $cart->getTotalPrice());
   }
 
 }

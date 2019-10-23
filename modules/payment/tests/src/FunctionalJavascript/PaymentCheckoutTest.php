@@ -368,8 +368,8 @@ class PaymentCheckoutTest extends CommerceWebDriverTestBase {
     $order = Order::load(1);
     // Save the order to recalculate the balance.
     $order->save();
-    $this->assertTrue($order->getTotalPaid()->equals(new Price('20', 'USD')));
-    $this->assertTrue($order->getBalance()->equals(new Price('19.99', 'USD')));
+    $this->assertEquals(new Price('20', 'USD'), $order->getTotalPaid());
+    $this->assertEquals(new Price('19.99', 'USD'), $order->getBalance());
 
     $this->submitForm([
       'payment_information[payment_method]' => '1',
@@ -391,9 +391,9 @@ class PaymentCheckoutTest extends CommerceWebDriverTestBase {
     $payment = Payment::load(2);
     $this->assertNotNull($payment);
     $this->assertEquals('completed', $payment->getState()->getId());
-    $this->assertTrue($payment->getAmount()->equals(new Price('19.99', 'USD')));
-    $this->assertTrue($order->getTotalPaid()->equals(new Price('39.99', 'USD')));
-    $this->assertTrue($order->getBalance()->equals(new Price('0', 'USD')));
+    $this->assertEquals(new Price('19.99', 'USD'), $payment->getAmount());
+    $this->assertEquals(new Price('39.99', 'USD'), $order->getTotalPaid());
+    $this->assertEquals(new Price('0', 'USD'), $order->getBalance());
 
     /** @var \Drupal\profile\Entity\ProfileInterface $order_billing_profile */
     $order_billing_profile = $order->getBillingProfile();
@@ -694,8 +694,8 @@ class PaymentCheckoutTest extends CommerceWebDriverTestBase {
     $order = Order::load(1);
     // Save the order to recalculate the balance.
     $order->save();
-    $this->assertTrue($order->getTotalPaid()->equals(new Price('20', 'USD')));
-    $this->assertTrue($order->getBalance()->equals(new Price('19.99', 'USD')));
+    $this->assertEquals(new Price('20', 'USD'), $order->getTotalPaid());
+    $this->assertEquals(new Price('19.99', 'USD'), $order->getBalance());
 
     $radio_button = $this->getSession()->getPage()->findField('Cash on delivery');
     $radio_button->click();
@@ -720,9 +720,9 @@ class PaymentCheckoutTest extends CommerceWebDriverTestBase {
     $payment = Payment::load(2);
     $this->assertNotNull($payment);
     $this->assertEquals('pending', $payment->getState()->getId());
-    $this->assertTrue($payment->getAmount()->equals(new Price('19.99', 'USD')));
-    $this->assertTrue($order->getTotalPaid()->equals(new Price('20', 'USD')));
-    $this->assertTrue($order->getBalance()->equals(new Price('19.99', 'USD')));
+    $this->assertEquals(new Price('19.99', 'USD'), $payment->getAmount());
+    $this->assertEquals(new Price('20', 'USD'), $order->getTotalPaid());
+    $this->assertEquals(new Price('19.99', 'USD'), $order->getBalance());
   }
 
   /**

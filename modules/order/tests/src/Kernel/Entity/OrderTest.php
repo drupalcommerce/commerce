@@ -214,7 +214,7 @@ class OrderTest extends CommerceKernelTestBase {
     $order->addItem($another_order_item);
     $this->assertEquals([$order_item, $another_order_item], $order->getItems());
     $this->assertNotEmpty($order->hasItem($another_order_item));
-    $this->assertTrue($order->getTotalPrice()->equals(new Price('8.00', 'USD')));
+    $this->assertEquals(new Price('8.00', 'USD'), $order->getTotalPrice());
 
     $adjustments = [];
     $adjustments[] = new Adjustment([
@@ -235,12 +235,12 @@ class OrderTest extends CommerceKernelTestBase {
     $this->assertEquals([$adjustments[0]], $order->getAdjustments(['custom']));
     $this->assertEquals([$adjustments[1]], $order->getAdjustments(['fee']));
     $order->removeAdjustment($adjustments[0]);
-    $this->assertTrue($order->getSubtotalPrice()->equals(new Price('8.00', 'USD')));
-    $this->assertTrue($order->getTotalPrice()->equals(new Price('18.00', 'USD')));
+    $this->assertEquals(new Price('8.00', 'USD'), $order->getSubtotalPrice());
+    $this->assertEquals(new Price('18.00', 'USD'), $order->getTotalPrice());
     $this->assertEquals([$adjustments[1]], $order->getAdjustments());
     $order->setAdjustments($adjustments);
     $this->assertEquals($adjustments, $order->getAdjustments());
-    $this->assertTrue($order->getTotalPrice()->equals(new Price('17.00', 'USD')));
+    $this->assertEquals(new Price('17.00', 'USD'), $order->getTotalPrice());
     // Confirm that locked adjustments persist after clear.
     // Custom adjustments are locked by default.
     $order->addAdjustment(new Adjustment([
@@ -256,23 +256,23 @@ class OrderTest extends CommerceKernelTestBase {
     $this->assertEquals([$adjustments[0]], $order->collectAdjustments(['custom']));
     $this->assertEquals([$adjustments[1]], $order->collectAdjustments(['fee']));
 
-    $this->assertTrue($order->getTotalPaid()->equals(new Price('0', 'USD')));
-    $this->assertTrue($order->getBalance()->equals(new Price('17.00', 'USD')));
+    $this->assertEquals(new Price('0', 'USD'), $order->getTotalPaid());
+    $this->assertEquals(new Price('17.00', 'USD'), $order->getBalance());
     $this->assertFalse($order->isPaid());
 
     $order->setTotalPaid(new Price('7.00', 'USD'));
-    $this->assertTrue($order->getTotalPaid()->equals(new Price('7.00', 'USD')));
-    $this->assertTrue($order->getBalance()->equals(new Price('10.00', 'USD')));
+    $this->assertEquals(new Price('7.00', 'USD'), $order->getTotalPaid());
+    $this->assertEquals(new Price('10.00', 'USD'), $order->getBalance());
     $this->assertFalse($order->isPaid());
 
     $order->setTotalPaid(new Price('17.00', 'USD'));
-    $this->assertTrue($order->getTotalPaid()->equals(new Price('17.00', 'USD')));
-    $this->assertTrue($order->getBalance()->equals(new Price('0', 'USD')));
+    $this->assertEquals(new Price('17.00', 'USD'), $order->getTotalPaid());
+    $this->assertEquals(new Price('0', 'USD'), $order->getBalance());
     $this->assertTrue($order->isPaid());
 
     $order->setTotalPaid(new Price('27.00', 'USD'));
-    $this->assertTrue($order->getTotalPaid()->equals(new Price('27.00', 'USD')));
-    $this->assertTrue($order->getBalance()->equals(new Price('-10.00', 'USD')));
+    $this->assertEquals(new Price('27.00', 'USD'), $order->getTotalPaid());
+    $this->assertEquals(new Price('-10.00', 'USD'), $order->getBalance());
     $this->assertTrue($order->isPaid());
 
     $this->assertEquals('completed', $order->getState()->getId());
@@ -499,7 +499,7 @@ class OrderTest extends CommerceKernelTestBase {
     $this->assertEquals($adjustments[0], $collected_adjustments[2]);
     // The total will be correct only if the adjustments were correctly
     // combined, and rounded.
-    $this->assertTrue($order->getTotalPrice()->equals(new Price('14.47', 'USD')));
+    $this->assertEquals(new Price('14.47', 'USD'), $order->getTotalPrice());
 
     // Test handling deleted order items + non-inclusive adjustments.
     $order->addAdjustment($adjustments[1]);

@@ -72,10 +72,10 @@ class TaxRatePercentageTest extends CommerceKernelTestBase {
     $percentage = new TaxRatePercentage($definition);
 
     $tax_amount = $percentage->calculateTaxAmount(new Price('12', 'USD'), FALSE);
-    $this->assertTrue($tax_amount->equals(new Price('2.4', 'USD')));
+    $this->assertEquals(new Price('2.4', 'USD'), $tax_amount);
 
     $tax_amount = $percentage->calculateTaxAmount(new Price('12', 'USD'), TRUE);
-    $this->assertTrue($tax_amount->equals(new Price('2', 'USD')));
+    $this->assertEquals(new Price('2', 'USD'), $tax_amount);
   }
 
 }
