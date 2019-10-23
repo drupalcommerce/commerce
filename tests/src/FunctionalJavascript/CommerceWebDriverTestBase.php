@@ -2,11 +2,13 @@
 
 namespace Drupal\Tests\commerce\FunctionalJavascript;
 
+use Drupal\commerce_price\Comparator\PriceComparator;
 use Drupal\commerce_store\StoreCreationTrait;
 use Drupal\FunctionalJavascriptTests\JSWebAssert;
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
 use Drupal\Tests\block\Traits\BlockCreationTrait;
 use Drupal\Tests\commerce\Traits\CommerceBrowserTestTrait;
+use SebastianBergmann\Comparator\Factory as PhpUnitComparatorFactory;
 
 /**
  * Provides a base class for Commerce functional tests.
@@ -60,6 +62,7 @@ abstract class CommerceWebDriverTestBase extends WebDriverTestBase {
    */
   protected function setUp() {
     parent::setUp();
+    PhpUnitComparatorFactory::getInstance()->register(new PriceComparator());
 
     $this->store = $this->createStore();
     $this->placeBlock('local_tasks_block');
