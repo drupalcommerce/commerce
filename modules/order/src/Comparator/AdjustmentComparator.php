@@ -33,7 +33,7 @@ class AdjustmentComparator extends Comparator {
         $actual->getLabel(),
         FALSE,
         \sprintf(
-          'Failed asserting that Price %s matches expected %s.',
+          'Failed asserting that Adjustment %s matches expected %s.',
           $actual->getLabel(),
           $expected->getLabel()
         )
