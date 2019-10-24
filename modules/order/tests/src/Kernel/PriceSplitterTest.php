@@ -103,13 +103,16 @@ class PriceSplitterTest extends CommerceKernelTestBase {
     // Each order item should be discounted by half (9 USD).
     $amounts = $this->splitter->split($this->order, new Price('18', 'USD'));
     $expected_amount = new Price('9', 'USD');
-    $this->assertEquals([$expected_amount, $expected_amount], array_values($amounts));
+    foreach ($amounts as $amount) {
+      $this->assertEquals($expected_amount, $amount);
+    }
 
     // Same result with an explicit percentage.
     $amounts = $this->splitter->split($this->order, new Price('18', 'USD'), '0.5');
     $expected_amount = new Price('9', 'USD');
-    $this->assertEquals([$expected_amount, $expected_amount], array_values($amounts));
-
+    foreach ($amounts as $amount) {
+      $this->assertEquals($expected_amount, $amount);
+    }
     // 9.99 x 3 + 1.01 x 3 = 33.
     $first_unit_price = new Price('9.99', 'USD');
     $second_unit_price = new Price('1.01', 'USD');
@@ -121,8 +124,10 @@ class PriceSplitterTest extends CommerceKernelTestBase {
     $amounts = $this->splitter->split($this->order, $amount);
     $first_expected_amount = new Price('4.54', 'USD');
     $second_expected_amount = new Price('0.46', 'USD');
-    $this->assertEquals($amount, $first_expected_amount->add($second_expected_amount));
-    $this->assertEquals([$first_expected_amount, $second_expected_amount], array_values($amounts));
+    $this->assertEquals($first_expected_amount->add($second_expected_amount), $amount);
+    $amounts = array_values($amounts);
+    $this->assertEquals($first_expected_amount, $amounts[0]);
+    $this->assertEquals($second_expected_amount, $amounts[1]);
 
     // Split an amount that has a reminder.
     $unit_price = new Price('69.99', 'USD');
@@ -134,8 +139,10 @@ class PriceSplitterTest extends CommerceKernelTestBase {
     $amounts = $this->splitter->split($this->order, $amount, '0.3');
     $first_expected_amount = new Price('21.00', 'USD');
     $second_expected_amount = new Price('20.99', 'USD');
-    $this->assertEquals($amount, $first_expected_amount->add($second_expected_amount));
-    $this->assertEquals([$first_expected_amount, $second_expected_amount], array_values($amounts));
+    $this->assertEquals($first_expected_amount->add($second_expected_amount), $amount);
+    $amounts = array_values($amounts);
+    $this->assertEquals($first_expected_amount, $amounts[0]);
+    $this->assertEquals($second_expected_amount, $amounts[1]);
   }
 
   /**

@@ -351,8 +351,8 @@ class ProductAdminTest extends ProductBrowserTestBase {
 
     $this->container->get('entity_type.manager')->getStorage('commerce_product_variation')->resetCache([$variation->id()]);
     $variation = ProductVariation::load($variation->id());
-    $this->assertEquals($variation->getSku(), $new_sku);
-    $this->assertEquals($variation->getPrice()->getNumber(), $new_price_amount);
+    $this->assertEquals($new_sku, $variation->getSku());
+    $this->assertEquals($new_price_amount, $variation->getPrice()->getNumber());
   }
 
   /**
@@ -395,8 +395,8 @@ class ProductAdminTest extends ProductBrowserTestBase {
 
     $expected_variation_id = $variation->id() + 1;
     $variation = ProductVariation::load($expected_variation_id);
-    $this->assertEquals($variation->getSku(), $new_sku);
-    $this->assertEquals($variation->getPrice()->getNumber(), '12.00');
+    $this->assertEquals($new_sku, $variation->getSku());
+    $this->assertEquals('12.00', $variation->getPrice()->getNumber());
     $this->assertTrue($variation->isPublished());
   }
 

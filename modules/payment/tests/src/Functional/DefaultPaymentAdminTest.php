@@ -174,8 +174,8 @@ class DefaultPaymentAdminTest extends CommerceBrowserTestBase {
     \Drupal::entityTypeManager()->getStorage('commerce_payment')->resetCache([1]);
     /** @var \Drupal\commerce_payment\Entity\PaymentInterface $payment */
     $payment = Payment::load(1);
-    $this->assertEquals($payment->getOrderId(), $this->order->id());
-    $this->assertEquals($payment->getAmount()->getNumber(), '100');
+    $this->assertEquals($this->order->id(), $payment->getOrderId());
+    $this->assertEquals('100.00', $payment->getAmount()->getNumber());
     $this->assertNotEmpty($payment->getCompletedTime());
   }
 
