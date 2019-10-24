@@ -22,6 +22,8 @@ class PriceComparator extends Comparator {
    * {@inheritdoc}
    */
   public function assertEquals($expected, $actual, $delta = 0.0, $canonicalize = FALSE, $ignoreCase = FALSE) {
+    assert($expected instanceof Price);
+    assert($actual instanceof Price);
     if (!$actual->equals($expected)) {
       throw new ComparisonFailure(
         $expected,

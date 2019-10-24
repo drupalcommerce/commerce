@@ -417,8 +417,8 @@ class OrderTest extends CommerceKernelTestBase {
     // Confirm that legacy adjustments are multiplied by quantity.
     $adjustments = $order->collectAdjustments();
     $this->assertCount(2, $adjustments);
-    $this->assertSame(-2.00, (float) $adjustments[0]->getAmount()->getNumber());
-    $this->assertSame(4.00, (float) $adjustments[1]->getAmount()->getNumber());
+    $this->assertEquals('-2.00', $adjustments[0]->getAmount()->getNumber());
+    $this->assertEquals('4.00', $adjustments[1]->getAmount()->getNumber());
 
     // Confirm that the legacy order item adjustments are converted on clear.
     $order->clearAdjustments();
@@ -428,7 +428,7 @@ class OrderTest extends CommerceKernelTestBase {
 
     $this->assertFalse($order_item->usesLegacyAdjustments());
     $this->assertCount(1, $adjustments);
-    $this->assertSame(-2.00, (float) $adjustments[0]->getAmount()->getNumber());
+    $this->assertEquals('-2.00', $adjustments[0]->getAmount()->getNumber());
 
     // The order item adjustments are no longer multiplied by quantity.
     $this->assertEquals($adjustments, $order->collectAdjustments());

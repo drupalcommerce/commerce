@@ -22,6 +22,8 @@ class AdjustmentComparator extends Comparator {
    * {@inheritdoc}
    */
   public function assertEquals($expected, $actual, $delta = 0.0, $canonicalize = FALSE, $ignoreCase = FALSE) {
+    assert($expected instanceof Adjustment);
+    assert($actual instanceof Adjustment);
     $expected_array = $expected->toArray();
     $actual_array = $actual->toArray();
     unset($expected_array['amount'], $actual_array['amount']);

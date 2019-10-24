@@ -49,6 +49,7 @@ abstract class CommerceKernelTestBase extends EntityKernelTestBase {
    */
   protected function setUp() {
     parent::setUp();
+
     $this->setErrorHandler();
     PhpUnitComparatorFactory::getInstance()->register(new PriceComparator());
 

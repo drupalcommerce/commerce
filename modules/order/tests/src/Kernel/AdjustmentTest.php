@@ -26,6 +26,15 @@ class AdjustmentTest extends CommerceKernelTestBase {
   ];
 
   /**
+   * {@inheritdoc}
+   */
+  protected function setUp() {
+    parent::setUp();
+
+    PhpUnitComparatorFactory::getInstance()->register(new AdjustmentComparator());
+  }
+
+  /**
    * Tests the constructor and definition checks.
    *
    * @covers ::__construct
@@ -194,7 +203,6 @@ class AdjustmentTest extends CommerceKernelTestBase {
       'locked' => TRUE,
     ]);
 
-    PhpUnitComparatorFactory::getInstance()->register(new AdjustmentComparator());
     $this->assertEquals($third_adjustment, $first_adjustment->add($second_adjustment));
     $this->assertEquals($second_adjustment, $third_adjustment->subtract($first_adjustment));
     $this->assertEquals($fourth_adjustment, $second_adjustment->multiply('2'));
