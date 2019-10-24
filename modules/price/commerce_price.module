@@ -5,7 +5,10 @@
  * Defines the Currency entity and the Price field.
  */
 
+use Drupal\commerce_price\Plugin\Field\FieldFormatter\PriceCalculatedFormatter;
+use Drupal\Core\Form\FormStateInterface;
 use Drupal\language\Entity\ConfigurableLanguage;
+use Drupal\views\Plugin\views\field\EntityField;
 
 /**
  * Implements hook_theme().
@@ -30,5 +33,30 @@ function commerce_price_configurable_language_insert(ConfigurableLanguage $langu
     // Import currency translations for the new language.
     $importer = \Drupal::service('commerce_price.currency_importer');
     $importer->importTranslations([$language->getId()]);
+  }
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ *
+ * Removes the "Calculated price" formatter from views field options, if
+ * it is not applicable. Since the formatter is product variation specific,
+ * this prevents it from accidentally being used on other entity types.
+ *
+ * @todo Remove when https://www.drupal.org/node/2991660 gets fixed.
+ */
+function commerce_price_form_views_ui_config_item_form_alter(&$form, FormStateInterface $form_state) {
+  /** @var \Drupal\views\Plugin\views\field\EntityField $handler */
+  $handler = $form_state->get('handler');
+  if ($handler instanceof EntityField) {
+    $entity_type_id = $handler->options['entity_type'];
+    $field_name = $handler->options['entity_field'];
+    /** @var \Drupal\Core\Entity\EntityFieldManagerInterface $field_manager */
+    $field_manager = \Drupal::service('entity_field.manager');
+    $field_definitions = $field_manager->getFieldStorageDefinitions($entity_type_id);
+    $field_definition = $field_definitions[$field_name];
+    if ($field_definition->getType() === 'commerce_price' && !PriceCalculatedFormatter::isApplicable($field_definition)) {
+      unset($form['options']['type']['#options']['commerce_price_calculated']);
+    }
   }
 }
