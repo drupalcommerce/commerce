@@ -52,7 +52,7 @@ abstract class CommerceKernelTestBase extends EntityKernelTestBase {
     parent::setUp();
     $this->setErrorHandler();
 
-    $factory = PhpUnitComparatorFactory::getInstance()
+    $factory = PhpUnitComparatorFactory::getInstance();
     $factory->register(new PriceComparator());
     $factory->register(new NumberComparator());
 

@@ -58,7 +58,7 @@ abstract class CommerceBrowserTestBase extends BrowserTestBase {
   protected function setUp() {
     $this->setErrorHandler();
     parent::setUp();
-    $factory = PhpUnitComparatorFactory::getInstance()
+    $factory = PhpUnitComparatorFactory::getInstance();
     $factory->register(new PriceComparator());
     $factory->register(new NumberComparator());
 

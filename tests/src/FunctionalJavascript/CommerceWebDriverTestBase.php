@@ -64,7 +64,7 @@ abstract class CommerceWebDriverTestBase extends WebDriverTestBase {
   protected function setUp() {
     parent::setUp();
 
-    $factory = PhpUnitComparatorFactory::getInstance()
+    $factory = PhpUnitComparatorFactory::getInstance();
     $factory->register(new PriceComparator());
     $factory->register(new NumberComparator());
 
