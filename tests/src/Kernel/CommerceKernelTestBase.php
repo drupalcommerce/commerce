@@ -2,6 +2,7 @@
 
 namespace Drupal\Tests\commerce\Kernel;
 
+use Drupal\commerce_price\Comparator\NumberComparator;
 use Drupal\commerce_price\Comparator\PriceComparator;
 use Drupal\commerce_store\StoreCreationTrait;
 use Drupal\KernelTests\Core\Entity\EntityKernelTestBase;
@@ -49,9 +50,11 @@ abstract class CommerceKernelTestBase extends EntityKernelTestBase {
    */
   protected function setUp() {
     parent::setUp();
-
     $this->setErrorHandler();
-    PhpUnitComparatorFactory::getInstance()->register(new PriceComparator());
+
+    $factory = PhpUnitComparatorFactory::getInstance()
+    $factory->register(new PriceComparator());
+    $factory->register(new NumberComparator());
 
     if (\Drupal::entityTypeManager()->hasDefinition('path_alias')) {
       $this->installEntitySchema('path_alias');

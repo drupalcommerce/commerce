@@ -2,6 +2,7 @@
 
 namespace Drupal\Tests\commerce\Functional;
 
+use Drupal\commerce_price\Comparator\NumberComparator;
 use Drupal\commerce_price\Comparator\PriceComparator;
 use Drupal\commerce_store\StoreCreationTrait;
 use Drupal\Tests\block\Traits\BlockCreationTrait;
@@ -57,8 +58,9 @@ abstract class CommerceBrowserTestBase extends BrowserTestBase {
   protected function setUp() {
     $this->setErrorHandler();
     parent::setUp();
-
-    PhpUnitComparatorFactory::getInstance()->register(new PriceComparator());
+    $factory = PhpUnitComparatorFactory::getInstance()
+    $factory->register(new PriceComparator());
+    $factory->register(new NumberComparator());
 
     $this->store = $this->createStore();
     $this->placeBlock('local_tasks_block');

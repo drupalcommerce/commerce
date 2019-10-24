@@ -2,6 +2,7 @@
 
 namespace Drupal\Tests\commerce\FunctionalJavascript;
 
+use Drupal\commerce_price\Comparator\NumberComparator;
 use Drupal\commerce_price\Comparator\PriceComparator;
 use Drupal\commerce_store\StoreCreationTrait;
 use Drupal\FunctionalJavascriptTests\JSWebAssert;
@@ -63,7 +64,9 @@ abstract class CommerceWebDriverTestBase extends WebDriverTestBase {
   protected function setUp() {
     parent::setUp();
 
-    PhpUnitComparatorFactory::getInstance()->register(new PriceComparator());
+    $factory = PhpUnitComparatorFactory::getInstance()
+    $factory->register(new PriceComparator());
+    $factory->register(new NumberComparator());
 
     $this->store = $this->createStore();
     $this->placeBlock('local_tasks_block');

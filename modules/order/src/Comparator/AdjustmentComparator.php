@@ -31,11 +31,11 @@ class AdjustmentComparator extends Comparator {
       throw new ComparisonFailure(
         $expected,
         $actual,
-        $expected->getLabel(),
-        $actual->getLabel(),
+        var_export($expected, TRUE),
+        var_export($actual, TRUE),
         FALSE,
         \sprintf(
-          'Failed asserting that Adjustment %s matches expected %s.',
+          'Failed asserting that Adjustment "%s" matches expected "%s".',
           $actual->getLabel(),
           $expected->getLabel()
         )
