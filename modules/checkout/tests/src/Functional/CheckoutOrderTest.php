@@ -664,6 +664,53 @@ class CheckoutOrderTest extends CommerceBrowserTestBase {
   }
 
   /**
+   * Tests that login works even if the registration form has a required field.
+   */
+  public function testLoginWithRequiredRegistrationField() {
+    $field_storage = FieldStorageConfig::create([
+      'field_name' => 'test_user_field',
+      'entity_type' => 'user',
+      'type' => 'string',
+      'cardinality' => 1,
+    ]);
+    $field_storage->save();
+    $field = FieldConfig::create([
+      'field_storage' => $field_storage,
+      'label' => 'Custom user field',
+      'bundle' => 'user',
+      'required' => TRUE,
+    ]);
+    $field->save();
+    $form_display = commerce_get_entity_display('user', 'user', 'form');
+    $form_display->setComponent('test_user_field', ['type' => 'string_textfield']);
+    $form_display->save();
+
+    $config = \Drupal::configFactory()->getEditable('commerce_checkout.commerce_checkout_flow.default');
+    $config->set('configuration.panes.login.allow_guest_checkout', FALSE);
+    $config->set('configuration.panes.login.allow_registration', TRUE);
+    $config->save();
+
+    $this->drupalLogout();
+    $permissions = [
+      'access checkout',
+      'view commerce_product',
+    ];
+    $this->drupalCreateUser($permissions, 'testuser', FALSE, ['pass' => 'pass']);
+
+    $this->drupalGet($this->product->toUrl()->toString());
+    $this->submitForm([], 'Add to cart');
+    $cart_link = $this->getSession()->getPage()->findLink('your cart');
+    $cart_link->click();
+    $this->submitForm([], 'Checkout');
+
+    $this->submitForm([
+      'login[returning_customer][name]' => 'testuser',
+      'login[returning_customer][password]' => 'pass',
+    ], 'Log in');
+    $this->assertCheckoutProgressStep('Order information');
+  }
+
+  /**
    * Asserts the current step in the checkout progress block.
    *
    * @param string $expected
