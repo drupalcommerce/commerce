@@ -9,6 +9,7 @@ use Drupal\FunctionalJavascriptTests\JSWebAssert;
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
 use Drupal\Tests\block\Traits\BlockCreationTrait;
 use Drupal\Tests\commerce\Traits\CommerceBrowserTestTrait;
+use Drupal\Tests\commerce\Traits\DeprecationSuppressionTrait;
 use SebastianBergmann\Comparator\Factory as PhpUnitComparatorFactory;
 
 /**
@@ -19,6 +20,7 @@ abstract class CommerceWebDriverTestBase extends WebDriverTestBase {
   use BlockCreationTrait;
   use StoreCreationTrait;
   use CommerceBrowserTestTrait;
+  use DeprecationSuppressionTrait;
 
   /**
    * The store entity.
@@ -62,6 +64,7 @@ abstract class CommerceWebDriverTestBase extends WebDriverTestBase {
    * {@inheritdoc}
    */
   protected function setUp() {
+    $this->setErrorHandler();
     parent::setUp();
 
     $factory = PhpUnitComparatorFactory::getInstance();
@@ -78,6 +81,14 @@ abstract class CommerceWebDriverTestBase extends WebDriverTestBase {
 
     $this->adminUser = $this->drupalCreateUser($this->getAdministratorPermissions());
     $this->drupalLogin($this->adminUser);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function tearDown() {
+    parent::tearDown();
+    $this->restoreErrorHandler();
   }
 
   /**

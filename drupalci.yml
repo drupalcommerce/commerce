@@ -1,4 +1,3 @@
-# Learn to make one for your own drupal.org project:
 # https://www.drupal.org/drupalorg/docs/drupal-ci/customizing-drupalci-testing
 build:
   assessment:
@@ -10,11 +9,13 @@ build:
         sniff-all-files: true
         halt-on-fail: false
     testing:
-      # run_tests task is executed several times in order of performance speeds.
-      # halt-on-fail can be set on the run_tests tasks in order to fail fast.
-      # suppress-deprecations is false in order to be alerted to usages of
-      # deprecated code.
       run_tests.standard:
-        types: 'Simpletest,PHPUnit-Unit,PHPUnit-Kernel,PHPUnit-Functional'
+        types: 'PHPUnit-Unit,PHPUnit-Kernel,PHPUnit-Functional'
         testgroups: '--all'
         suppress-deprecations: false
+      run_tests.javascript:
+        concurrency: 1
+        types: 'PHPUnit-FunctionalJavascript'
+        testgroups: '--all'
+        suppress-deprecations: false
+        halt-on-fail: false
