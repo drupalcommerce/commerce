@@ -4,9 +4,7 @@ namespace Drupal\Tests\commerce_order\Kernel;
 
 use Drupal\commerce_order\Entity\Order;
 use Drupal\commerce_order\Entity\OrderItem;
-use Drupal\commerce_order\Entity\OrderItemType;
 use Drupal\commerce_price\Price;
-use Drupal\Tests\commerce\Kernel\CommerceKernelTestBase;
 
 /**
  * Tests the price splitter.
@@ -15,7 +13,7 @@ use Drupal\Tests\commerce\Kernel\CommerceKernelTestBase;
  *
  * @group commerce
  */
-class PriceSplitterTest extends CommerceKernelTestBase {
+class PriceSplitterTest extends OrderKernelTestBase {
 
   /**
    * A sample order.
@@ -32,37 +30,12 @@ class PriceSplitterTest extends CommerceKernelTestBase {
   protected $splitter;
 
   /**
-   * Modules to enable.
-   *
-   * @var array
-   */
-  public static $modules = [
-    'entity_reference_revisions',
-    'profile',
-    'state_machine',
-    'commerce_product',
-    'commerce_order',
-  ];
-
-  /**
    * {@inheritdoc}
    */
   protected function setUp() {
     parent::setUp();
 
-    $this->installEntitySchema('profile');
-    $this->installEntitySchema('commerce_order');
-    $this->installEntitySchema('commerce_order_item');
-    $this->installEntitySchema('commerce_product');
-    $this->installEntitySchema('commerce_product_variation');
-    $this->installConfig(['commerce_product', 'commerce_order']);
     $user = $this->createUser(['mail' => $this->randomString() . '@example.com']);
-
-    OrderItemType::create([
-      'id' => 'test',
-      'label' => 'Test',
-      'orderType' => 'default',
-    ])->save();
 
     $order = Order::create([
       'type' => 'default',

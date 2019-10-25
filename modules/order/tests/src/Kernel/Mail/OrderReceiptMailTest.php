@@ -9,7 +9,7 @@ use Drupal\commerce_product\Entity\ProductVariation;
 use Drupal\commerce_product\Entity\ProductVariationType;
 use Drupal\Core\Test\AssertMailTrait;
 use Drupal\profile\Entity\Profile;
-use Drupal\Tests\commerce\Kernel\CommerceKernelTestBase;
+use Drupal\Tests\commerce_order\Kernel\OrderKernelTestBase;
 
 /**
  * Tests the sending of order receipt emails.
@@ -17,7 +17,7 @@ use Drupal\Tests\commerce\Kernel\CommerceKernelTestBase;
  * @coversDefaultClass \Drupal\commerce_order\Mail\OrderReceiptMail
  * @group commerce
  */
-class OrderReceiptMailTest extends CommerceKernelTestBase {
+class OrderReceiptMailTest extends OrderKernelTestBase {
 
   use AssertMailTrait;
 
@@ -36,30 +36,11 @@ class OrderReceiptMailTest extends CommerceKernelTestBase {
   protected $orderReceiptMail;
 
   /**
-   * Modules to enable.
-   *
-   * @var array
-   */
-  public static $modules = [
-    'entity_reference_revisions',
-    'profile',
-    'state_machine',
-    'commerce_product',
-    'commerce_order',
-  ];
-
-  /**
    * {@inheritdoc}
    */
   protected function setUp() {
     parent::setUp();
 
-    $this->installEntitySchema('profile');
-    $this->installEntitySchema('commerce_order');
-    $this->installEntitySchema('commerce_order_item');
-    $this->installEntitySchema('commerce_product');
-    $this->installEntitySchema('commerce_product_variation');
-    $this->installConfig(['commerce_product', 'commerce_order']);
     $user = $this->createUser([
       'mail' => 'customer@example.com',
       'preferred_langcode' => 'en',

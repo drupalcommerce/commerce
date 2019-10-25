@@ -10,14 +10,13 @@ use Drupal\commerce_product\Entity\Product;
 use Drupal\commerce_product\Entity\ProductVariation;
 use Drupal\commerce_product\Entity\ProductVariationType;
 use Drupal\profile\Entity\Profile;
-use Drupal\Tests\commerce\Kernel\CommerceKernelTestBase;
 
 /**
  * Tests the order total summary.
  *
  * @group commerce
  */
-class OrderTotalSummaryTest extends CommerceKernelTestBase {
+class OrderTotalSummaryTest extends OrderKernelTestBase {
 
   /**
    * A sample order.
@@ -39,12 +38,7 @@ class OrderTotalSummaryTest extends CommerceKernelTestBase {
    * @var array
    */
   public static $modules = [
-    'entity_reference_revisions',
-    'profile',
-    'state_machine',
-    'commerce_product',
     'commerce_promotion',
-    'commerce_order',
     'commerce_test',
     'commerce_order_test',
   ];
@@ -55,13 +49,7 @@ class OrderTotalSummaryTest extends CommerceKernelTestBase {
   protected function setUp() {
     parent::setUp();
 
-    $this->installEntitySchema('profile');
-    $this->installEntitySchema('commerce_order');
-    $this->installEntitySchema('commerce_order_item');
-    $this->installEntitySchema('commerce_product');
-    $this->installEntitySchema('commerce_product_variation');
     $this->installEntitySchema('commerce_promotion');
-    $this->installConfig(['commerce_product', 'commerce_order']);
 
     $this->orderTotalSummary = $this->container->get('commerce_order.order_total_summary');
 

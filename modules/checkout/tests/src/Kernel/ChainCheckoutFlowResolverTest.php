@@ -3,14 +3,14 @@
 namespace Drupal\Tests\commerce_checkout\Kernel;
 
 use Drupal\commerce_order\Entity\Order;
-use Drupal\Tests\commerce\Kernel\CommerceKernelTestBase;
+use Drupal\Tests\commerce_order\Kernel\OrderKernelTestBase;
 
 /**
  * Tests the chain checkout flow resolver.
  *
  * @group commerce
  */
-class ChainCheckoutFlowResolverTest extends CommerceKernelTestBase {
+class ChainCheckoutFlowResolverTest extends OrderKernelTestBase {
 
   /**
    * Modules to enable.
@@ -18,19 +18,6 @@ class ChainCheckoutFlowResolverTest extends CommerceKernelTestBase {
    * @var array
    */
   public static $modules = [
-    'options',
-    'entity',
-    'entity_reference_revisions',
-    'views',
-    'address',
-    'profile',
-    'state_machine',
-    'inline_entity_form',
-    'commerce',
-    'commerce_price',
-    'commerce_store',
-    'commerce_product',
-    'commerce_order',
     'commerce_checkout',
   ];
 
@@ -39,13 +26,7 @@ class ChainCheckoutFlowResolverTest extends CommerceKernelTestBase {
    */
   protected function setUp() {
     parent::setUp();
-    $this->installEntitySchema('profile');
-    $this->installEntitySchema('commerce_order');
-    $this->installEntitySchema('commerce_order_item');
-    $this->installEntitySchema('commerce_product');
-    $this->installEntitySchema('commerce_product_variation');
-    $this->installConfig('commerce_order');
-    $this->installConfig('commerce_product');
+
     $this->installConfig('commerce_checkout');
   }
 

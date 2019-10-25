@@ -4,18 +4,17 @@ namespace Drupal\Tests\commerce_promotion\Kernel;
 
 use Drupal\commerce_order\Entity\Order;
 use Drupal\commerce_order\Entity\OrderItem;
-use Drupal\commerce_order\Entity\OrderItemType;
 use Drupal\commerce_price\Price;
 use Drupal\commerce_promotion\Entity\Promotion;
 use Drupal\Core\Datetime\DrupalDateTime;
-use Drupal\Tests\commerce\Kernel\CommerceKernelTestBase;
+use Drupal\Tests\commerce_order\Kernel\OrderKernelTestBase;
 
 /**
  * Tests the promotion availability logic.
  *
  * @group commerce
  */
-class PromotionAvailabilityTest extends CommerceKernelTestBase {
+class PromotionAvailabilityTest extends OrderKernelTestBase {
 
   /**
    * Modules to enable.
@@ -23,11 +22,6 @@ class PromotionAvailabilityTest extends CommerceKernelTestBase {
    * @var array
    */
   public static $modules = [
-    'entity_reference_revisions',
-    'profile',
-    'state_machine',
-    'commerce_order',
-    'commerce_product',
     'commerce_promotion',
   ];
 
@@ -44,23 +38,10 @@ class PromotionAvailabilityTest extends CommerceKernelTestBase {
   protected function setUp() {
     parent::setUp();
 
-    $this->installEntitySchema('profile');
-    $this->installEntitySchema('commerce_order');
-    $this->installEntitySchema('commerce_order_item');
     $this->installEntitySchema('commerce_promotion');
     $this->installEntitySchema('commerce_promotion_coupon');
     $this->installSchema('commerce_promotion', ['commerce_promotion_usage']);
-    $this->installConfig([
-      'profile',
-      'commerce_order',
-      'commerce_promotion',
-    ]);
-
-    OrderItemType::create([
-      'id' => 'test',
-      'label' => 'Test',
-      'orderType' => 'default',
-    ])->save();
+    $this->installConfig(['commerce_promotion']);
 
     $order_item = OrderItem::create([
       'type' => 'test',

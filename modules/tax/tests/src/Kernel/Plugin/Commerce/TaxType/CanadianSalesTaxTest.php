@@ -9,14 +9,14 @@ use Drupal\commerce_price\Price;
 use Drupal\commerce_store\Entity\Store;
 use Drupal\commerce_tax\Plugin\Commerce\TaxType\CanadianSalesTax;
 use Drupal\commerce_tax\TaxableType;
-use Drupal\Tests\commerce\Kernel\CommerceKernelTestBase;
 use Drupal\profile\Entity\Profile;
+use Drupal\Tests\commerce_order\Kernel\OrderKernelTestBase;
 
 /**
  * @coversDefaultClass \Drupal\commerce_tax\Plugin\Commerce\TaxType\CanadianSalesTax
  * @group commerce
  */
-class CanadianSalesTaxTest extends CommerceKernelTestBase {
+class CanadianSalesTaxTest extends OrderKernelTestBase {
 
   /**
    * The tax type plugin.
@@ -38,11 +38,6 @@ class CanadianSalesTaxTest extends CommerceKernelTestBase {
    * @var array
    */
   public static $modules = [
-    'entity_reference_revisions',
-    'profile',
-    'state_machine',
-    'commerce_product',
-    'commerce_order',
     'commerce_tax',
   ];
 
@@ -52,10 +47,6 @@ class CanadianSalesTaxTest extends CommerceKernelTestBase {
   protected function setUp() {
     parent::setUp();
 
-    $this->installEntitySchema('profile');
-    $this->installEntitySchema('commerce_order');
-    $this->installEntitySchema('commerce_order_item');
-    $this->installConfig('commerce_order');
     $this->installConfig(['commerce_tax']);
 
     // Order item types that doesn't need a purchasable entity, for simplicity.

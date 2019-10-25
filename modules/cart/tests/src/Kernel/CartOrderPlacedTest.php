@@ -3,8 +3,8 @@
 namespace Drupal\Tests\commerce_cart\Kernel;
 
 use Drupal\Component\Render\FormattableMarkup;
-use Drupal\Tests\commerce\Kernel\CommerceKernelTestBase;
 use Drupal\Tests\commerce_cart\Traits\CartManagerTestTrait;
+use Drupal\Tests\commerce_order\Kernel\OrderKernelTestBase;
 
 /**
  * Tests the unsetting of the cart flag when order is placed.
@@ -12,7 +12,7 @@ use Drupal\Tests\commerce_cart\Traits\CartManagerTestTrait;
  * @covers \Drupal\commerce_cart\CartProvider::finalizeCart()
  * @group commerce
  */
-class CartOrderPlacedTest extends CommerceKernelTestBase {
+class CartOrderPlacedTest extends OrderKernelTestBase {
 
   use CartManagerTestTrait;
 
@@ -31,33 +31,12 @@ class CartOrderPlacedTest extends CommerceKernelTestBase {
   protected $cartManager;
 
   /**
-   * Modules to enable.
-   *
-   * @var array
-   */
-  public static $modules = [
-    'entity_reference_revisions',
-    'profile',
-    'state_machine',
-    'commerce_product',
-    'commerce_order',
-  ];
-
-  /**
    * {@inheritdoc}
    */
   protected function setUp() {
     parent::setUp();
 
-    $this->installEntitySchema('profile');
-    $this->installEntitySchema('commerce_product');
-    $this->installEntitySchema('commerce_product_variation');
-    $this->installEntitySchema('commerce_order');
-    $this->installEntitySchema('commerce_order_item');
-    $this->installConfig('commerce_order');
-    $this->installConfig('commerce_product');
     $this->installCommerceCart();
-
     $this->createUser();
 
     // Create a product variation.

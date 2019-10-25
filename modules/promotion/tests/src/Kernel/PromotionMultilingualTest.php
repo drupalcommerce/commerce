@@ -4,14 +4,14 @@ namespace Drupal\Tests\commerce_promotion\Kernel;
 
 use Drupal\commerce_promotion\Entity\Promotion;
 use Drupal\language\Entity\ConfigurableLanguage;
-use Drupal\Tests\commerce\Kernel\CommerceKernelTestBase;
+use Drupal\Tests\commerce_order\Kernel\OrderKernelTestBase;
 
 /**
  * Tests promotions in a multilingual context.
  *
  * @group commerce
  */
-class PromotionMultilingualTest extends CommerceKernelTestBase {
+class PromotionMultilingualTest extends OrderKernelTestBase {
 
   /**
    * Modules to enable.
@@ -19,10 +19,6 @@ class PromotionMultilingualTest extends CommerceKernelTestBase {
    * @var array
    */
   public static $modules = [
-    'entity_reference_revisions',
-    'profile',
-    'state_machine',
-    'commerce_order',
     'commerce_promotion',
     'language',
     'content_translation',
@@ -33,6 +29,7 @@ class PromotionMultilingualTest extends CommerceKernelTestBase {
    */
   protected function setUp() {
     parent::setUp();
+
     $this->installEntitySchema('commerce_promotion');
     ConfigurableLanguage::createFromLangcode('fr')->save();
     ConfigurableLanguage::createFromLangcode('sr')->save();

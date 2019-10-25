@@ -4,14 +4,14 @@ namespace Drupal\Tests\commerce_promotion\Kernel;
 
 use Drupal\commerce_promotion\Entity\Coupon;
 use Drupal\Component\Render\FormattableMarkup;
-use Drupal\Tests\commerce\Kernel\CommerceKernelTestBase;
+use Drupal\Tests\commerce_order\Kernel\OrderKernelTestBase;
 
 /**
  * Tests coupon validation constraints.
  *
  * @group commerce
  */
-class CouponValidationTest extends CommerceKernelTestBase {
+class CouponValidationTest extends OrderKernelTestBase {
 
   /**
    * Modules to enable.
@@ -19,10 +19,6 @@ class CouponValidationTest extends CommerceKernelTestBase {
    * @var array
    */
   public static $modules = [
-    'entity_reference_revisions',
-    'profile',
-    'state_machine',
-    'commerce_order',
     'commerce_promotion',
   ];
 

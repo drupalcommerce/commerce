@@ -5,18 +5,17 @@ namespace Drupal\Tests\commerce_tax\Kernel\Plugin\Commerce\TaxType;
 use Drupal\commerce_order\Adjustment;
 use Drupal\commerce_order\Entity\Order;
 use Drupal\commerce_order\Entity\OrderItem;
-use Drupal\commerce_order\Entity\OrderItemType;
 use Drupal\commerce_price\Price;
 use Drupal\commerce_store\Entity\Store;
 use Drupal\commerce_tax\Plugin\Commerce\TaxType\Custom;
-use Drupal\Tests\commerce\Kernel\CommerceKernelTestBase;
 use Drupal\profile\Entity\Profile;
+use Drupal\Tests\commerce_order\Kernel\OrderKernelTestBase;
 
 /**
  * @coversDefaultClass \Drupal\commerce_tax\Plugin\Commerce\TaxType\Custom
  * @group commerce
  */
-class CustomTest extends CommerceKernelTestBase {
+class CustomTest extends OrderKernelTestBase {
 
   /**
    * The tax type plugin.
@@ -38,11 +37,6 @@ class CustomTest extends CommerceKernelTestBase {
    * @var array
    */
   public static $modules = [
-    'entity_reference_revisions',
-    'profile',
-    'state_machine',
-    'commerce_product',
-    'commerce_order',
     'commerce_tax',
   ];
 
@@ -52,18 +46,7 @@ class CustomTest extends CommerceKernelTestBase {
   protected function setUp() {
     parent::setUp();
 
-    $this->installEntitySchema('profile');
-    $this->installEntitySchema('commerce_order');
-    $this->installEntitySchema('commerce_order_item');
-    $this->installConfig('commerce_order');
     $this->installConfig(['commerce_tax']);
-
-    // An order item type that doesn't need a purchasable entity, for simplicity.
-    OrderItemType::create([
-      'id' => 'test',
-      'label' => 'Test',
-      'orderType' => 'default',
-    ])->save();
 
     $user = $this->createUser();
     $this->user = $this->reloadEntity($user);

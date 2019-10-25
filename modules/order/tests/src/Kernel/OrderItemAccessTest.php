@@ -4,9 +4,7 @@ namespace Drupal\Tests\commerce_order\Kernel;
 
 use Drupal\commerce_order\Entity\Order;
 use Drupal\commerce_order\Entity\OrderItem;
-use Drupal\commerce_order\Entity\OrderItemType;
 use Drupal\commerce_price\Price;
-use Drupal\Tests\commerce\Kernel\CommerceKernelTestBase;
 
 /**
  * Tests the order item access control.
@@ -14,37 +12,13 @@ use Drupal\Tests\commerce\Kernel\CommerceKernelTestBase;
  * @coversDefaultClass \Drupal\commerce_order\OrderItemAccessControlHandler
  * @group commerce
  */
-class OrderItemAccessTest extends CommerceKernelTestBase {
-
-  /**
-   * Modules to enable.
-   *
-   * @var array
-   */
-  public static $modules = [
-    'entity_reference_revisions',
-    'profile',
-    'state_machine',
-    'commerce_order',
-  ];
+class OrderItemAccessTest extends OrderKernelTestBase {
 
   /**
    * {@inheritdoc}
    */
   protected function setUp() {
     parent::setUp();
-
-    $this->installEntitySchema('profile');
-    $this->installEntitySchema('commerce_order');
-    $this->installEntitySchema('commerce_order_item');
-
-    $this->installConfig('commerce_order');
-
-    OrderItemType::create([
-      'id' => 'test',
-      'label' => 'Test',
-      'orderType' => 'default',
-    ])->save();
 
     // Create uid: 1 here so that it's skipped in test cases.
     $admin_user = $this->createUser();

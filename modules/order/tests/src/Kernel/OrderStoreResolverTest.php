@@ -3,7 +3,6 @@
 namespace Drupal\Tests\commerce_order\Kernel;
 
 use Drupal\commerce_order\Entity\Order;
-use Drupal\Tests\commerce\Kernel\CommerceKernelTestBase;
 use Symfony\Cmf\Component\Routing\RouteObjectInterface;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -12,7 +11,7 @@ use Symfony\Component\HttpFoundation\Request;
  *
  * @group commerce
  */
-class OrderStoreResolverTest extends CommerceKernelTestBase {
+class OrderStoreResolverTest extends OrderKernelTestBase {
 
   /**
    * A sample order.
@@ -29,28 +28,11 @@ class OrderStoreResolverTest extends CommerceKernelTestBase {
   protected $store2;
 
   /**
-   * Modules to enable.
-   *
-   * @var array
-   */
-  public static $modules = [
-    'entity_reference_revisions',
-    'profile',
-    'state_machine',
-    'commerce_product',
-    'commerce_order',
-  ];
-
-  /**
    * {@inheritdoc}
    */
   protected function setUp() {
     parent::setUp();
 
-    $this->installEntitySchema('profile');
-    $this->installEntitySchema('commerce_order');
-    $this->installEntitySchema('commerce_order_item');
-    $this->installConfig(['commerce_order']);
     $this->store2 = $this->createStore('Second store', 'admin2@example.com', 'online', FALSE);
     $user = $this->createUser();
     /** @var \Drupal\commerce_order\Entity\Order $order */

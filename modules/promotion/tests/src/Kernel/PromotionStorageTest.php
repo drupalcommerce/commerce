@@ -6,17 +6,17 @@ use Drupal\commerce_order\Entity\OrderType;
 use Drupal\commerce_promotion\Entity\Coupon;
 use Drupal\commerce_promotion\Entity\Promotion;
 use Drupal\Core\Datetime\DrupalDateTime;
-use Drupal\Tests\commerce\Kernel\CommerceKernelTestBase;
 use Drupal\commerce_order\Entity\OrderItem;
 use Drupal\commerce_price\Price;
 use Drupal\commerce_order\Entity\Order;
+use Drupal\Tests\commerce_order\Kernel\OrderKernelTestBase;
 
 /**
  * Tests promotion storage.
  *
  * @group commerce
  */
-class PromotionStorageTest extends CommerceKernelTestBase {
+class PromotionStorageTest extends OrderKernelTestBase {
 
   /**
    * The promotion storage.
@@ -31,11 +31,6 @@ class PromotionStorageTest extends CommerceKernelTestBase {
    * @var array
    */
   public static $modules = [
-    'entity_reference_revisions',
-    'profile',
-    'state_machine',
-    'commerce_order',
-    'commerce_product',
     'commerce_promotion',
   ];
 
@@ -59,16 +54,9 @@ class PromotionStorageTest extends CommerceKernelTestBase {
   protected function setUp() {
     parent::setUp();
 
-    $this->installEntitySchema('profile');
-    $this->installEntitySchema('commerce_order');
-    $this->installEntitySchema('commerce_order_item');
     $this->installEntitySchema('commerce_promotion');
     $this->installEntitySchema('commerce_promotion_coupon');
-    $this->installConfig([
-      'profile',
-      'commerce_order',
-      'commerce_promotion',
-    ]);
+    $this->installConfig(['commerce_promotion']);
     $this->installSchema('commerce_promotion', ['commerce_promotion_usage']);
 
     $this->promotionStorage = $this->container->get('entity_type.manager')->getStorage('commerce_promotion');

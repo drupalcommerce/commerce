@@ -3,14 +3,14 @@
 namespace Drupal\Tests\commerce_promotion\Kernel;
 
 use Drupal\commerce_promotion\Entity\Coupon;
-use Drupal\Tests\commerce\Kernel\CommerceKernelTestBase;
+use Drupal\Tests\commerce_order\Kernel\OrderKernelTestBase;
 
 /**
  * Tests coupon storage.
  *
  * @group commerce
  */
-class CouponStorageTest extends CommerceKernelTestBase {
+class CouponStorageTest extends OrderKernelTestBase {
 
   /**
    * The coupon storage.
@@ -25,11 +25,6 @@ class CouponStorageTest extends CommerceKernelTestBase {
    * @var array
    */
   public static $modules = [
-    'entity_reference_revisions',
-    'profile',
-    'state_machine',
-    'commerce_order',
-    'commerce_product',
     'commerce_promotion',
   ];
 
@@ -39,16 +34,9 @@ class CouponStorageTest extends CommerceKernelTestBase {
   protected function setUp() {
     parent::setUp();
 
-    $this->installEntitySchema('profile');
-    $this->installEntitySchema('commerce_order');
-    $this->installEntitySchema('commerce_order_type');
     $this->installEntitySchema('commerce_promotion');
     $this->installEntitySchema('commerce_promotion_coupon');
-    $this->installConfig([
-      'profile',
-      'commerce_order',
-      'commerce_promotion',
-    ]);
+    $this->installConfig(['commerce_promotion']);
 
     $this->couponStorage = $this->container->get('entity_type.manager')->getStorage('commerce_promotion_coupon');
   }

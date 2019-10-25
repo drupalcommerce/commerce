@@ -4,18 +4,17 @@ namespace Drupal\Tests\commerce_tax\Kernel;
 
 use Drupal\commerce_order\Entity\Order;
 use Drupal\commerce_order\Entity\OrderItem;
-use Drupal\commerce_order\Entity\OrderItemType;
 use Drupal\commerce_price\Price;
 use Drupal\commerce_tax\Entity\TaxType;
 use Drupal\profile\Entity\Profile;
-use Drupal\Tests\commerce\Kernel\CommerceKernelTestBase;
+use Drupal\Tests\commerce_order\Kernel\OrderKernelTestBase;
 
 /**
  * Tests integration with orders.
  *
  * @group commerce
  */
-class OrderIntegrationTest extends CommerceKernelTestBase {
+class OrderIntegrationTest extends OrderKernelTestBase {
 
   /**
    * A sample order.
@@ -30,11 +29,6 @@ class OrderIntegrationTest extends CommerceKernelTestBase {
    * @var array
    */
   public static $modules = [
-    'entity_reference_revisions',
-    'path',
-    'profile',
-    'state_machine',
-    'commerce_order',
     'commerce_tax',
   ];
 
@@ -44,10 +38,6 @@ class OrderIntegrationTest extends CommerceKernelTestBase {
   protected function setUp() {
     parent::setUp();
 
-    $this->installEntitySchema('profile');
-    $this->installEntitySchema('commerce_order');
-    $this->installEntitySchema('commerce_order_item');
-    $this->installConfig(['commerce_order']);
     $this->installConfig(['commerce_tax']);
     $user = $this->createUser(['mail' => $this->randomString() . '@example.com']);
 
@@ -75,11 +65,6 @@ class OrderIntegrationTest extends CommerceKernelTestBase {
       ],
     ])->save();
 
-    OrderItemType::create([
-      'id' => 'test',
-      'label' => 'Test',
-      'orderType' => 'default',
-    ])->save();
     $order = Order::create([
       'type' => 'default',
       'store_id' => $this->store->id(),

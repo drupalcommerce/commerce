@@ -10,7 +10,7 @@ use Drupal\commerce_product\Entity\Product;
 use Drupal\commerce_product\Entity\ProductVariation;
 use Drupal\commerce_product\Entity\ProductVariationType;
 use Drupal\profile\Entity\Profile;
-use Drupal\Tests\commerce\Kernel\CommerceKernelTestBase;
+use Drupal\Tests\commerce_order\Kernel\OrderKernelTestBase;
 use Drupal\user\Entity\User;
 
 /**
@@ -18,7 +18,7 @@ use Drupal\user\Entity\User;
  *
  * @group commerce
  */
-class OrderIntegrationTest extends CommerceKernelTestBase {
+class OrderIntegrationTest extends OrderKernelTestBase {
 
   /**
    * A sample order.
@@ -47,12 +47,7 @@ class OrderIntegrationTest extends CommerceKernelTestBase {
    * @var array
    */
   public static $modules = [
-    'entity_reference_revisions',
-    'profile',
-    'state_machine',
     'commerce_log',
-    'commerce_product',
-    'commerce_order',
   ];
 
   /**
@@ -61,13 +56,7 @@ class OrderIntegrationTest extends CommerceKernelTestBase {
   protected function setUp() {
     parent::setUp();
 
-    $this->installEntitySchema('profile');
     $this->installEntitySchema('commerce_log');
-    $this->installEntitySchema('commerce_order');
-    $this->installEntitySchema('commerce_order_item');
-    $this->installEntitySchema('commerce_product');
-    $this->installEntitySchema('commerce_product_variation');
-    $this->installConfig(['commerce_product', 'commerce_order']);
     $user = $this->createUser(['mail' => $this->randomString() . '@example.com']);
     $this->logStorage = $this->container->get('entity_type.manager')->getStorage('commerce_log');
     $this->logViewBuilder = $this->container->get('entity_type.manager')->getViewBuilder('commerce_log');

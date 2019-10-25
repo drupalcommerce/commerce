@@ -2,7 +2,7 @@
 
 namespace Drupal\Tests\commerce_payment\Kernel;
 
-use Drupal\Tests\commerce\Kernel\CommerceKernelTestBase;
+use Drupal\Tests\commerce_order\Kernel\OrderKernelTestBase;
 use Drupal\views\Views;
 
 /**
@@ -12,7 +12,7 @@ use Drupal\views\Views;
  *
  * @group commerce
  */
-class ViewsIntegrationTest extends CommerceKernelTestBase {
+class ViewsIntegrationTest extends OrderKernelTestBase {
 
   /**
    * Modules to enable.
@@ -37,12 +37,8 @@ class ViewsIntegrationTest extends CommerceKernelTestBase {
   protected function setUp() {
     parent::setUp();
 
-    $this->installEntitySchema('profile');
-    $this->installEntitySchema('commerce_order');
-    $this->installEntitySchema('commerce_order_item');
     $this->installEntitySchema('commerce_payment');
     $this->installEntitySchema('commerce_payment_method');
-    $this->installConfig('commerce_order');
     $this->installConfig('commerce_payment');
     $this->installConfig('commerce_payment_test');
   }

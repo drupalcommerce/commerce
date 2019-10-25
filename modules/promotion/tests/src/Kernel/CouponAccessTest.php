@@ -4,7 +4,7 @@ namespace Drupal\Tests\commerce_promotion\Kernel;
 
 use Drupal\commerce_promotion\Entity\Coupon;
 use Drupal\commerce_promotion\Entity\Promotion;
-use Drupal\Tests\commerce\Kernel\CommerceKernelTestBase;
+use Drupal\Tests\commerce_order\Kernel\OrderKernelTestBase;
 
 /**
  * Tests the coupon access control.
@@ -12,7 +12,7 @@ use Drupal\Tests\commerce\Kernel\CommerceKernelTestBase;
  * @coversDefaultClass \Drupal\commerce_promotion\CouponAccessControlHandler
  * @group commerce
  */
-class CouponAccessTest extends CommerceKernelTestBase {
+class CouponAccessTest extends OrderKernelTestBase {
 
   /**
    * Modules to enable.
@@ -20,11 +20,7 @@ class CouponAccessTest extends CommerceKernelTestBase {
    * @var array
    */
   public static $modules = [
-    'entity_reference_revisions',
-    'profile',
-    'state_machine',
     'commerce_promotion',
-    'commerce_order',
   ];
 
   /**
@@ -33,13 +29,8 @@ class CouponAccessTest extends CommerceKernelTestBase {
   protected function setUp() {
     parent::setUp();
 
-    $this->installEntitySchema('profile');
-    $this->installEntitySchema('commerce_order');
-    $this->installEntitySchema('commerce_order_item');
     $this->installEntitySchema('commerce_promotion');
     $this->installEntitySchema('commerce_promotion_coupon');
-
-    $this->installConfig('commerce_order');
 
     // Create uid: 1 here so that it's skipped in test cases.
     $admin_user = $this->createUser();

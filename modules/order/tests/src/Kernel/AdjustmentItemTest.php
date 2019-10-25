@@ -7,14 +7,13 @@ use Drupal\commerce_price\Price;
 use Drupal\entity_test\Entity\EntityTest;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
-use Drupal\Tests\commerce\Kernel\CommerceKernelTestBase;
 
 /**
  * Tests the adjustment field.
  *
  * @group commerce
  */
-class AdjustmentItemTest extends CommerceKernelTestBase {
+class AdjustmentItemTest extends OrderKernelTestBase {
 
   /**
    * The test entity.
@@ -22,16 +21,6 @@ class AdjustmentItemTest extends CommerceKernelTestBase {
    * @var \Drupal\entity_test\Entity\EntityTest
    */
   protected $testEntity;
-
-  /**
-   * {@inheritdoc}
-   */
-  public static $modules = [
-    'entity_reference_revisions',
-    'profile',
-    'state_machine',
-    'commerce_order',
-  ];
 
   /**
    * {@inheritdoc}

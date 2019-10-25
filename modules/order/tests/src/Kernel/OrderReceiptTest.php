@@ -14,14 +14,13 @@ use Drupal\Core\Site\Settings;
 use Drupal\Core\Test\AssertMailTrait;
 use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\profile\Entity\Profile;
-use Drupal\Tests\commerce\Kernel\CommerceKernelTestBase;
 
 /**
  * Tests the sending of multilingual order receipt emails.
  *
  * @group commerce
  */
-class OrderReceiptTest extends CommerceKernelTestBase {
+class OrderReceiptTest extends OrderKernelTestBase {
 
   use AssertMailTrait;
 
@@ -56,11 +55,6 @@ class OrderReceiptTest extends CommerceKernelTestBase {
    * {@inheritdoc}
    */
   public static $modules = [
-    'entity_reference_revisions',
-    'profile',
-    'state_machine',
-    'commerce_product',
-    'commerce_order',
     'commerce_payment',
     'language',
     'locale',
@@ -75,12 +69,6 @@ class OrderReceiptTest extends CommerceKernelTestBase {
 
     $this->installConfig(['language']);
     $this->installSchema('locale', ['locales_source', 'locales_target', 'locales_location']);
-    $this->installEntitySchema('profile');
-    $this->installEntitySchema('commerce_order');
-    $this->installEntitySchema('commerce_order_item');
-    $this->installEntitySchema('commerce_product');
-    $this->installEntitySchema('commerce_product_variation');
-    $this->installConfig(['commerce_product', 'commerce_order']);
     $user = $this->createUser(['mail' => $this->randomString() . '@example.com']);
 
     foreach (array_keys($this->translations) as $langcode) {

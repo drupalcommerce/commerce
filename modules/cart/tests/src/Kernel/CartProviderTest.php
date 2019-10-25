@@ -4,11 +4,10 @@ namespace Drupal\Tests\commerce_cart\Kernel;
 
 use Drupal\commerce_cart\Exception\DuplicateCartException;
 use Drupal\commerce_order\Entity\OrderInterface;
-use Drupal\commerce_order\Entity\OrderItemType;
 use Drupal\commerce_store\Entity\Store;
 use Drupal\commerce_store\Entity\StoreType;
-use Drupal\Tests\commerce\Kernel\CommerceKernelTestBase;
 use Drupal\Tests\commerce_cart\Traits\CartManagerTestTrait;
+use Drupal\Tests\commerce_order\Kernel\OrderKernelTestBase;
 
 /**
  * Tests the cart provider.
@@ -16,22 +15,9 @@ use Drupal\Tests\commerce_cart\Traits\CartManagerTestTrait;
  * @coversDefaultClass \Drupal\commerce_cart\CartProvider
  * @group commerce
  */
-class CartProviderTest extends CommerceKernelTestBase {
+class CartProviderTest extends OrderKernelTestBase {
 
   use CartManagerTestTrait;
-
-  /**
-   * Modules to enable.
-   *
-   * @var array
-   */
-  public static $modules = [
-    'entity_reference_revisions',
-    'profile',
-    'state_machine',
-    'commerce_product',
-    'commerce_order',
-  ];
 
   /**
    * Anonymous user.
@@ -59,17 +45,6 @@ class CartProviderTest extends CommerceKernelTestBase {
    */
   protected function setUp() {
     parent::setUp();
-
-    $this->installEntitySchema('profile');
-    $this->installEntitySchema('commerce_order');
-    $this->installEntitySchema('commerce_order_item');
-    $this->installConfig(['commerce_order']);
-
-    OrderItemType::create([
-      'id' => 'test',
-      'label' => 'Test',
-      'orderType' => 'default',
-    ])->save();
 
     StoreType::create(['id' => 'animals', 'label' => 'Animals']);
     $store = Store::create([

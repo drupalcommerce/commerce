@@ -3,11 +3,10 @@
 namespace Drupal\Tests\commerce_cart\Kernel;
 
 use Drupal\commerce_order\Entity\OrderItem;
-use Drupal\commerce_order\Entity\OrderItemType;
 use Drupal\commerce_price\Price;
 use Drupal\commerce_product\Entity\ProductVariation;
-use Drupal\Tests\commerce\Kernel\CommerceKernelTestBase;
 use Drupal\Tests\commerce_cart\Traits\CartManagerTestTrait;
+use Drupal\Tests\commerce_order\Kernel\OrderKernelTestBase;
 
 /**
  * Tests the order item matcher.
@@ -15,7 +14,7 @@ use Drupal\Tests\commerce_cart\Traits\CartManagerTestTrait;
  * @coversDefaultClass \Drupal\commerce_cart\OrderItemMatcher
  * @group commerce
  */
-class OrderItemMatcherTest extends CommerceKernelTestBase {
+class OrderItemMatcherTest extends OrderKernelTestBase {
 
   use CartManagerTestTrait;
 
@@ -46,11 +45,6 @@ class OrderItemMatcherTest extends CommerceKernelTestBase {
    * @var array
    */
   public static $modules = [
-    'entity_reference_revisions',
-    'profile',
-    'state_machine',
-    'commerce_product',
-    'commerce_order',
     'extra_order_item_field',
   ];
 
@@ -60,20 +54,7 @@ class OrderItemMatcherTest extends CommerceKernelTestBase {
   protected function setUp() {
     parent::setUp();
 
-    $this->installEntitySchema('profile');
-    $this->installEntitySchema('commerce_order');
-    $this->installEntitySchema('commerce_order_item');
-    $this->installEntitySchema('commerce_product');
-    $this->installEntitySchema('commerce_product_variation');
-    $this->installConfig(['commerce_order']);
-    $this->installConfig(['commerce_product']);
     $this->installConfig(['extra_order_item_field']);
-
-    OrderItemType::create([
-      'id' => 'test',
-      'label' => 'Test',
-      'orderType' => 'default',
-    ])->save();
 
     $this->variation1 = ProductVariation::create([
       'type' => 'default',

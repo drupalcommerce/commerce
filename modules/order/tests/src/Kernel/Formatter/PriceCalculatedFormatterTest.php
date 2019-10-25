@@ -7,14 +7,14 @@ use Drupal\commerce_product\Entity\Product;
 use Drupal\commerce_product\Entity\ProductVariation;
 use Drupal\commerce_promotion\Entity\Promotion;
 use Drupal\commerce_tax\Entity\TaxType;
-use Drupal\Tests\commerce\Kernel\CommerceKernelTestBase;
+use Drupal\Tests\commerce_order\Kernel\OrderKernelTestBase;
 
 /**
  * Tests the calculated price formatter.
  *
  * @group commerce
  */
-class PriceCalculatedFormatterTest extends CommerceKernelTestBase {
+class PriceCalculatedFormatterTest extends OrderKernelTestBase {
 
   /**
    * The first variation.
@@ -43,13 +43,8 @@ class PriceCalculatedFormatterTest extends CommerceKernelTestBase {
    * @var array
    */
   public static $modules = [
-    'entity_reference_revisions',
-    'profile',
-    'state_machine',
-    'commerce_product',
     'commerce_promotion',
     'commerce_tax',
-    'commerce_order',
   ];
 
   /**
@@ -58,13 +53,7 @@ class PriceCalculatedFormatterTest extends CommerceKernelTestBase {
   protected function setUp() {
     parent::setUp();
 
-    $this->installEntitySchema('profile');
-    $this->installEntitySchema('commerce_order');
-    $this->installEntitySchema('commerce_order_item');
-    $this->installEntitySchema('commerce_product');
-    $this->installEntitySchema('commerce_product_variation');
     $this->installEntitySchema('commerce_promotion');
-    $this->installConfig(['commerce_product', 'commerce_order']);
 
     $promotion = Promotion::create([
       'name' => 'Promotion 1',

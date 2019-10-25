@@ -3,13 +3,12 @@
 namespace Drupal\Tests\commerce_promotion\Kernel\Plugin\Commerce\PromotionOffer;
 
 use Drupal\commerce_order\Entity\OrderItem;
-use Drupal\commerce_order\Entity\OrderItemType;
 use Drupal\commerce_order\Entity\Order;
 use Drupal\commerce_price\Price;
 use Drupal\commerce_product\Entity\Product;
 use Drupal\commerce_product\Entity\ProductVariation;
 use Drupal\commerce_promotion\Entity\Promotion;
-use Drupal\Tests\commerce\Kernel\CommerceKernelTestBase;
+use Drupal\Tests\commerce_order\Kernel\OrderKernelTestBase;
 
 /**
  * Tests the percentage off offer for order items.
@@ -18,7 +17,7 @@ use Drupal\Tests\commerce\Kernel\CommerceKernelTestBase;
  *
  * @group commerce
  */
-class OrderItemPercentageOffTest extends CommerceKernelTestBase {
+class OrderItemPercentageOffTest extends OrderKernelTestBase {
 
   /**
    * The test order.
@@ -40,12 +39,6 @@ class OrderItemPercentageOffTest extends CommerceKernelTestBase {
    * @var array
    */
   public static $modules = [
-    'entity_reference_revisions',
-    'profile',
-    'state_machine',
-    'commerce_order',
-    'path',
-    'commerce_product',
     'commerce_promotion',
   ];
 
@@ -55,18 +48,8 @@ class OrderItemPercentageOffTest extends CommerceKernelTestBase {
   protected function setUp() {
     parent::setUp();
 
-    $this->installEntitySchema('profile');
-    $this->installEntitySchema('commerce_order');
-    $this->installEntitySchema('commerce_order_item');
     $this->installEntitySchema('commerce_promotion');
-    $this->installEntitySchema('commerce_product_variation');
-    $this->installEntitySchema('commerce_product');
-    $this->installConfig([
-      'profile',
-      'commerce_order',
-      'commerce_product',
-      'commerce_promotion',
-    ]);
+    $this->installConfig(['commerce_promotion']);
     $this->installSchema('commerce_promotion', ['commerce_promotion_usage']);
 
     $variation = ProductVariation::create([
@@ -86,12 +69,6 @@ class OrderItemPercentageOffTest extends CommerceKernelTestBase {
       'variations' => [$variation],
     ]);
     $product->save();
-
-    OrderItemType::create([
-      'id' => 'test',
-      'label' => 'Test',
-      'orderType' => 'default',
-    ])->save();
 
     $this->order = Order::create([
       'type' => 'default',

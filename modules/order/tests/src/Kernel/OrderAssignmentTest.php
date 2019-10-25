@@ -10,7 +10,6 @@ use Drupal\commerce_product\Entity\Product;
 use Drupal\commerce_product\Entity\ProductVariation;
 use Drupal\commerce_product\Entity\ProductVariationType;
 use Drupal\profile\Entity\Profile;
-use Drupal\Tests\commerce\Kernel\CommerceKernelTestBase;
 
 /**
  * Tests the order assignment service.
@@ -18,7 +17,7 @@ use Drupal\Tests\commerce\Kernel\CommerceKernelTestBase;
  * @coversDefaultClass \Drupal\commerce_order\OrderAssignment
  * @group commerce
  */
-class OrderAssignmentTest extends CommerceKernelTestBase {
+class OrderAssignmentTest extends OrderKernelTestBase {
 
   /**
    * The order assignment service.
@@ -47,12 +46,6 @@ class OrderAssignmentTest extends CommerceKernelTestBase {
    * @var array
    */
   public static $modules = [
-    'entity_reference_revisions',
-    'path',
-    'profile',
-    'state_machine',
-    'commerce_product',
-    'commerce_order',
     'commerce_payment',
     'commerce_payment_example',
     'commerce_test',
@@ -64,14 +57,9 @@ class OrderAssignmentTest extends CommerceKernelTestBase {
   protected function setUp() {
     parent::setUp();
 
-    $this->installEntitySchema('profile');
-    $this->installEntitySchema('commerce_order');
-    $this->installEntitySchema('commerce_order_item');
-    $this->installEntitySchema('commerce_product');
-    $this->installEntitySchema('commerce_product_variation');
     $this->installEntitySchema('commerce_payment');
     $this->installEntitySchema('commerce_payment_method');
-    $this->installConfig(['commerce_product', 'commerce_order', 'commerce_payment']);
+    $this->installConfig(['commerce_payment']);
     $this->user = $this->createUser(['mail' => $this->randomString() . '@example.com']);
 
     // Turn off title generation to allow explicit values to be used.

@@ -4,13 +4,13 @@ namespace Drupal\Tests\commerce_tax\Kernel\Plugin\Commerce\TaxNumberType;
 
 use Drupal\commerce_tax\Plugin\Commerce\TaxNumberType\EuropeanUnionVat;
 use Drupal\commerce_tax\Plugin\Commerce\TaxNumberType\VerificationResult;
-use Drupal\Tests\commerce\Kernel\CommerceKernelTestBase;
+use Drupal\Tests\commerce_order\Kernel\OrderKernelTestBase;
 
 /**
  * @coversDefaultClass \Drupal\commerce_tax\Plugin\Commerce\TaxNumberType\EuropeanUnionVat
  * @group commerce
  */
-class EuropeanUnionVatTest extends CommerceKernelTestBase {
+class EuropeanUnionVatTest extends OrderKernelTestBase {
 
   /**
    * The tax number type plugin.
@@ -25,11 +25,6 @@ class EuropeanUnionVatTest extends CommerceKernelTestBase {
    * @var array
    */
   public static $modules = [
-    'entity_reference_revisions',
-    'profile',
-    'state_machine',
-    'commerce_product',
-    'commerce_order',
     'commerce_tax',
   ];
 

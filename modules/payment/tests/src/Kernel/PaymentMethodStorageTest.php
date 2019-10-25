@@ -2,19 +2,18 @@
 
 namespace Drupal\Tests\commerce_payment\Kernel;
 
-use Drupal\commerce_order\Entity\OrderItemType;
 use Drupal\commerce_payment\Entity\PaymentGateway;
 use Drupal\commerce_payment\Entity\PaymentMethod;
 use Drupal\profile\Entity\Profile;
+use Drupal\Tests\commerce_order\Kernel\OrderKernelTestBase;
 use Drupal\user\Entity\User;
-use Drupal\Tests\commerce\Kernel\CommerceKernelTestBase;
 
 /**
  * Tests the payment method storage.
  *
  * @group commerce
  */
-class PaymentMethodStorageTest extends CommerceKernelTestBase {
+class PaymentMethodStorageTest extends OrderKernelTestBase {
 
   /**
    * A sample user.
@@ -43,12 +42,6 @@ class PaymentMethodStorageTest extends CommerceKernelTestBase {
    * @var array
    */
   public static $modules = [
-    'address',
-    'entity_reference_revisions',
-    'profile',
-    'state_machine',
-    'commerce_product',
-    'commerce_order',
     'commerce_payment',
     'commerce_payment_example',
   ];
@@ -59,20 +52,9 @@ class PaymentMethodStorageTest extends CommerceKernelTestBase {
   protected function setUp() {
     parent::setUp();
 
-    $this->installEntitySchema('profile');
-    $this->installEntitySchema('commerce_order');
-    $this->installEntitySchema('commerce_order_item');
     $this->installEntitySchema('commerce_payment');
     $this->installEntitySchema('commerce_payment_method');
-    $this->installConfig('commerce_order');
     $this->installConfig('commerce_payment');
-
-    // An order item type that doesn't need a purchasable entity, for simplicity.
-    OrderItemType::create([
-      'id' => 'test',
-      'label' => 'Test',
-      'orderType' => 'default',
-    ])->save();
 
     $payment_gateway = PaymentGateway::create([
       'id' => 'example',

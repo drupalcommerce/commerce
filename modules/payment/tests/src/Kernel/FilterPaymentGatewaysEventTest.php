@@ -5,14 +5,14 @@ namespace Drupal\Tests\commerce_payment\Kernel;
 use Drupal\commerce_order\Entity\Order;
 use Drupal\commerce_payment\Entity\PaymentGateway;
 use Drupal\profile\Entity\Profile;
-use Drupal\Tests\commerce\Kernel\CommerceKernelTestBase;
+use Drupal\Tests\commerce_order\Kernel\OrderKernelTestBase;
 
 /**
  * Tests the FilterPaymentGatewaysEvent.
  *
  * @group commerce
  */
-class FilterPaymentGatewaysEventTest extends CommerceKernelTestBase {
+class FilterPaymentGatewaysEventTest extends OrderKernelTestBase {
 
   /**
    * The payment gateway storage.
@@ -27,12 +27,6 @@ class FilterPaymentGatewaysEventTest extends CommerceKernelTestBase {
    * @var array
    */
   public static $modules = [
-    'address',
-    'entity_reference_revisions',
-    'profile',
-    'state_machine',
-    'commerce_product',
-    'commerce_order',
     'commerce_payment',
     'commerce_payment_example',
     'commerce_payment_test',
@@ -44,10 +38,6 @@ class FilterPaymentGatewaysEventTest extends CommerceKernelTestBase {
   protected function setUp() {
     parent::setUp();
 
-    $this->installEntitySchema('profile');
-    $this->installEntitySchema('commerce_order');
-    $this->installEntitySchema('commerce_order_item');
-    $this->installConfig('commerce_order');
     $this->installConfig('commerce_payment');
 
     $this->storage = $this->container->get('entity_type.manager')->getStorage('commerce_payment_gateway');

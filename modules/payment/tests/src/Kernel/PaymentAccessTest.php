@@ -4,11 +4,10 @@ namespace Drupal\Tests\commerce_payment\Kernel;
 
 use Drupal\commerce_order\Entity\Order;
 use Drupal\commerce_order\Entity\OrderItem;
-use Drupal\commerce_order\Entity\OrderItemType;
 use Drupal\commerce_payment\Entity\PaymentGateway;
 use Drupal\commerce_payment\Entity\Payment;
 use Drupal\commerce_price\Price;
-use Drupal\Tests\commerce\Kernel\CommerceKernelTestBase;
+use Drupal\Tests\commerce_order\Kernel\OrderKernelTestBase;
 
 /**
  * Tests the payment access control.
@@ -16,7 +15,7 @@ use Drupal\Tests\commerce\Kernel\CommerceKernelTestBase;
  * @coversDefaultClass \Drupal\commerce_payment\PaymentAccessControlHandler
  * @group commerce
  */
-class PaymentAccessTest extends CommerceKernelTestBase {
+class PaymentAccessTest extends OrderKernelTestBase {
 
   /**
    * Modules to enable.
@@ -24,12 +23,6 @@ class PaymentAccessTest extends CommerceKernelTestBase {
    * @var array
    */
   public static $modules = [
-    'address',
-    'entity_reference_revisions',
-    'profile',
-    'state_machine',
-    'commerce_product',
-    'commerce_order',
     'commerce_payment',
     'commerce_payment_example',
   ];
@@ -54,20 +47,9 @@ class PaymentAccessTest extends CommerceKernelTestBase {
   protected function setUp() {
     parent::setUp();
 
-    $this->installEntitySchema('profile');
-    $this->installEntitySchema('commerce_order');
-    $this->installEntitySchema('commerce_order_item');
     $this->installEntitySchema('commerce_payment_method');
     $this->installEntitySchema('commerce_payment');
-    $this->installConfig('commerce_order');
     $this->installConfig(['commerce_payment']);
-
-    // An order item type that doesn't need a purchasable entity, for simplicity.
-    OrderItemType::create([
-      'id' => 'test',
-      'label' => 'Test',
-      'orderType' => 'default',
-    ])->save();
 
     $order_item = OrderItem::create([
       'type' => 'test',

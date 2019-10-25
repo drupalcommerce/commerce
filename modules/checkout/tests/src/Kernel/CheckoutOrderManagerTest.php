@@ -5,7 +5,7 @@ namespace Drupal\Tests\commerce_checkout\Kernel;
 use Drupal\commerce_checkout\Entity\CheckoutFlow;
 use Drupal\commerce_order\Entity\Order;
 use Drupal\Core\Url;
-use Drupal\Tests\commerce\Kernel\CommerceKernelTestBase;
+use Drupal\Tests\commerce_order\Kernel\OrderKernelTestBase;
 use Symfony\Cmf\Component\Routing\RouteObjectInterface;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -14,7 +14,7 @@ use Symfony\Component\HttpFoundation\Request;
  *
  * @group commerce
  */
-class CheckoutOrderManagerTest extends CommerceKernelTestBase {
+class CheckoutOrderManagerTest extends OrderKernelTestBase {
 
   /**
    * A sample order.
@@ -36,11 +36,6 @@ class CheckoutOrderManagerTest extends CommerceKernelTestBase {
    * @var array
    */
   public static $modules = [
-    'entity_reference_revisions',
-    'profile',
-    'state_machine',
-    'commerce_product',
-    'commerce_order',
     'commerce_checkout',
   ];
 
@@ -50,13 +45,6 @@ class CheckoutOrderManagerTest extends CommerceKernelTestBase {
   protected function setUp() {
     parent::setUp();
 
-    $this->installEntitySchema('profile');
-    $this->installEntitySchema('commerce_order');
-    $this->installEntitySchema('commerce_order_item');
-    $this->installEntitySchema('commerce_product');
-    $this->installEntitySchema('commerce_product_variation');
-    $this->installConfig('commerce_order');
-    $this->installConfig('commerce_product');
     $this->installConfig('commerce_checkout');
 
     $user = $this->createUser(['mail' => $this->randomString() . '@example.com']);

@@ -5,7 +5,7 @@ namespace Drupal\Tests\commerce_promotion\Kernel;
 use Drupal\commerce_promotion\CouponCodePattern;
 use Drupal\commerce_promotion\Entity\Coupon;
 use Drupal\commerce_promotion\Entity\Promotion;
-use Drupal\Tests\commerce\Kernel\CommerceKernelTestBase;
+use Drupal\Tests\commerce_order\Kernel\OrderKernelTestBase;
 
 /**
  * Tests the coupon code generator.
@@ -14,7 +14,7 @@ use Drupal\Tests\commerce\Kernel\CommerceKernelTestBase;
  *
  * @group commerce
  */
-class CouponCodeGeneratorTest extends CommerceKernelTestBase {
+class CouponCodeGeneratorTest extends OrderKernelTestBase {
 
   /**
    * The coupon code generator.
@@ -36,10 +36,6 @@ class CouponCodeGeneratorTest extends CommerceKernelTestBase {
    * @var array
    */
   public static $modules = [
-    'entity_reference_revisions',
-    'profile',
-    'state_machine',
-    'commerce_order',
     'commerce_promotion',
   ];
 
@@ -49,9 +45,6 @@ class CouponCodeGeneratorTest extends CommerceKernelTestBase {
   protected function setUp() {
     parent::setUp();
 
-    $this->installEntitySchema('profile');
-    $this->installEntitySchema('commerce_order');
-    $this->installEntitySchema('commerce_order_item');
     $this->installEntitySchema('commerce_promotion');
     $this->installEntitySchema('commerce_promotion_coupon');
     $this->installConfig(['commerce_order']);

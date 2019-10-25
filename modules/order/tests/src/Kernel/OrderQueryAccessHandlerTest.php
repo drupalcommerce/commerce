@@ -5,7 +5,6 @@ namespace Drupal\Tests\commerce_order\Kernel;
 use Drupal\commerce_order\Entity\OrderType;
 use Drupal\commerce_order\OrderQueryAccessHandler;
 use Drupal\entity\QueryAccess\Condition;
-use Drupal\Tests\commerce\Kernel\CommerceKernelTestBase;
 
 /**
  * Tests the order query access handler.
@@ -13,7 +12,7 @@ use Drupal\Tests\commerce\Kernel\CommerceKernelTestBase;
  * @coversDefaultClass \Drupal\commerce_order\OrderQueryAccessHandler
  * @group commerce
  */
-class OrderQueryAccessHandlerTest extends CommerceKernelTestBase {
+class OrderQueryAccessHandlerTest extends OrderKernelTestBase {
 
   /**
    * The query access handler.
@@ -23,30 +22,10 @@ class OrderQueryAccessHandlerTest extends CommerceKernelTestBase {
   protected $handler;
 
   /**
-   * Modules to enable.
-   *
-   * @var array
-   */
-  public static $modules = [
-    'entity_reference_revisions',
-    'profile',
-    'state_machine',
-    'commerce_product',
-    'commerce_order',
-  ];
-
-  /**
    * {@inheritdoc}
    */
   protected function setUp() {
     parent::setUp();
-
-    $this->installEntitySchema('profile');
-    $this->installEntitySchema('commerce_order');
-    $this->installEntitySchema('commerce_order_item');
-    $this->installEntitySchema('commerce_product');
-    $this->installEntitySchema('commerce_product_variation');
-    $this->installConfig(['commerce_product', 'commerce_order']);
 
     // Create uid: 1 here so that it's skipped in test cases.
     $admin_user = $this->createUser();

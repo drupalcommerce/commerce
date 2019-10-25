@@ -4,7 +4,7 @@ namespace Drupal\Tests\commerce_payment\Kernel;
 
 use Drupal\commerce_payment\Entity\PaymentGateway;
 use Drupal\commerce_payment\Entity\PaymentMethod;
-use Drupal\Tests\commerce\Kernel\CommerceKernelTestBase;
+use Drupal\Tests\commerce_order\Kernel\OrderKernelTestBase;
 
 /**
  * Tests the payment method access control.
@@ -12,7 +12,7 @@ use Drupal\Tests\commerce\Kernel\CommerceKernelTestBase;
  * @coversDefaultClass \Drupal\commerce_payment\PaymentMethodAccessControlHandler
  * @group commerce
  */
-class PaymentMethodAccessTest extends CommerceKernelTestBase {
+class PaymentMethodAccessTest extends OrderKernelTestBase {
 
   /**
    * Modules to enable.
@@ -20,12 +20,6 @@ class PaymentMethodAccessTest extends CommerceKernelTestBase {
    * @var array
    */
   public static $modules = [
-    'address',
-    'entity_reference_revisions',
-    'profile',
-    'state_machine',
-    'commerce_product',
-    'commerce_order',
     'commerce_payment',
     'commerce_payment_example',
   ];

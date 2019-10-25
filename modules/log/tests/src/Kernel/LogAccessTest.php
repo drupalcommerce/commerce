@@ -4,7 +4,7 @@ namespace Drupal\Tests\commerce_log\Kernel;
 
 use Drupal\commerce_order\Entity\Order;
 use Drupal\commerce_log\Entity\Log;
-use Drupal\Tests\commerce\Kernel\CommerceKernelTestBase;
+use Drupal\Tests\commerce_order\Kernel\OrderKernelTestBase;
 
 /**
  * Tests the log access control.
@@ -12,7 +12,7 @@ use Drupal\Tests\commerce\Kernel\CommerceKernelTestBase;
  * @coversDefaultClass \Drupal\commerce_log\LogAccessControlHandler
  * @group commerce
  */
-class LogAccessTest extends CommerceKernelTestBase {
+class LogAccessTest extends OrderKernelTestBase {
 
   /**
    * Modules to enable.
@@ -20,11 +20,7 @@ class LogAccessTest extends CommerceKernelTestBase {
    * @var array
    */
   public static $modules = [
-    'entity_reference_revisions',
-    'profile',
-    'state_machine',
     'commerce_log',
-    'commerce_order',
   ];
 
   /**
@@ -33,12 +29,7 @@ class LogAccessTest extends CommerceKernelTestBase {
   protected function setUp() {
     parent::setUp();
 
-    $this->installEntitySchema('profile');
-    $this->installEntitySchema('commerce_order');
-    $this->installEntitySchema('commerce_order_item');
     $this->installEntitySchema('commerce_log');
-
-    $this->installConfig('commerce_order');
 
     // Create uid: 1 here so that it's skipped in test cases.
     $admin_user = $this->createUser();

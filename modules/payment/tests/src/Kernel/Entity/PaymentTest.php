@@ -4,12 +4,11 @@ namespace Drupal\Tests\commerce_payment\Kernel\Entity;
 
 use Drupal\commerce_order\Entity\Order;
 use Drupal\commerce_order\Entity\OrderItem;
-use Drupal\commerce_order\Entity\OrderItemType;
 use Drupal\commerce_payment\Entity\PaymentGateway;
 use Drupal\commerce_payment\Entity\Payment;
 use Drupal\commerce_payment\Plugin\Commerce\PaymentType\PaymentDefault;
 use Drupal\commerce_price\Price;
-use Drupal\Tests\commerce\Kernel\CommerceKernelTestBase;
+use Drupal\Tests\commerce_order\Kernel\OrderKernelTestBase;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
@@ -19,7 +18,7 @@ use Symfony\Component\HttpFoundation\Response;
  *
  * @group commerce
  */
-class PaymentTest extends CommerceKernelTestBase {
+class PaymentTest extends OrderKernelTestBase {
 
   /**
    * A sample order.
@@ -41,11 +40,6 @@ class PaymentTest extends CommerceKernelTestBase {
    * @var array
    */
   public static $modules = [
-    'entity_reference_revisions',
-    'profile',
-    'state_machine',
-    'commerce_product',
-    'commerce_order',
     'commerce_payment',
     'commerce_payment_example',
   ];
@@ -56,11 +50,7 @@ class PaymentTest extends CommerceKernelTestBase {
   protected function setUp() {
     parent::setUp();
 
-    $this->installEntitySchema('profile');
-    $this->installEntitySchema('commerce_order');
-    $this->installEntitySchema('commerce_order_item');
     $this->installEntitySchema('commerce_payment');
-    $this->installConfig('commerce_order');
     $this->installConfig('commerce_payment');
 
     PaymentGateway::create([
@@ -71,13 +61,6 @@ class PaymentTest extends CommerceKernelTestBase {
 
     $user = $this->createUser();
     $this->user = $this->reloadEntity($user);
-
-    // An order item type that doesn't need a purchasable entity.
-    OrderItemType::create([
-      'id' => 'test',
-      'label' => 'Test',
-      'orderType' => 'default',
-    ])->save();
 
     $order_item = OrderItem::create([
       'title' => 'Membership subscription',

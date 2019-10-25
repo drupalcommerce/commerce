@@ -4,7 +4,6 @@ namespace Drupal\Tests\commerce_order\Kernel;
 
 use Drupal\commerce_order\Adjustment;
 use Drupal\commerce_price\Price;
-use Drupal\Tests\commerce\Kernel\CommerceKernelTestBase;
 
 /**
  * Tests the adjustment transformer.
@@ -13,7 +12,7 @@ use Drupal\Tests\commerce\Kernel\CommerceKernelTestBase;
  *
  * @group commerce
  */
-class AdjustmentTransformerTest extends CommerceKernelTestBase {
+class AdjustmentTransformerTest extends OrderKernelTestBase {
 
   /**
    * The adjustment transformer.
@@ -21,18 +20,6 @@ class AdjustmentTransformerTest extends CommerceKernelTestBase {
    * @var \Drupal\commerce_order\AdjustmentTransformerInterface
    */
   protected $adjustmentTransformer;
-
-  /**
-   * Modules to enable.
-   *
-   * @var array
-   */
-  public static $modules = [
-    'entity_reference_revisions',
-    'profile',
-    'state_machine',
-    'commerce_order',
-  ];
 
   /**
    * {@inheritdoc}

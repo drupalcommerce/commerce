@@ -4,7 +4,6 @@ namespace Drupal\Tests\commerce_order\Kernel;
 
 use Drupal\profile\Entity\Profile;
 use Drupal\profile\Entity\ProfileType;
-use Drupal\Tests\commerce\Kernel\CommerceKernelTestBase;
 use Drupal\user\Entity\User;
 
 /**
@@ -14,7 +13,7 @@ use Drupal\user\Entity\User;
  *
  * @group commerce
  */
-class AddressBookTest extends CommerceKernelTestBase {
+class AddressBookTest extends OrderKernelTestBase {
 
   /**
    * The address book.
@@ -50,10 +49,6 @@ class AddressBookTest extends CommerceKernelTestBase {
    * @var array
    */
   public static $modules = [
-    'entity_reference_revisions',
-    'profile',
-    'state_machine',
-    'commerce_order',
     'commerce_order_test',
   ];
 
@@ -62,9 +57,6 @@ class AddressBookTest extends CommerceKernelTestBase {
    */
   protected function setUp() {
     parent::setUp();
-
-    $this->installEntitySchema('profile');
-    $this->installConfig('commerce_order');
 
     $this->addressBook = $this->container->get('commerce_order.address_book');
     $this->user = $this->createUser(['mail' => 'user1@example.com']);

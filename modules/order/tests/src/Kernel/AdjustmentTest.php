@@ -3,36 +3,20 @@
 namespace Drupal\Tests\commerce_order\Kernel;
 
 use Drupal\commerce_order\Adjustment;
-use Drupal\commerce_order\Comparator\AdjustmentComparator;
 use Drupal\commerce_price\Price;
-use Drupal\Tests\commerce\Kernel\CommerceKernelTestBase;
-use SebastianBergmann\Comparator\Factory as PhpUnitComparatorFactory;
 
 /**
- * @coversDefaultClass Drupal\commerce_order\Adjustment
+ * @coversDefaultClass \Drupal\commerce_order\Adjustment
  * @group commerce
  */
-class AdjustmentTest extends CommerceKernelTestBase {
+class AdjustmentTest extends OrderKernelTestBase {
 
   /**
    * {@inheritdoc}
    */
   public static $modules = [
-    'entity_reference_revisions',
-    'profile',
-    'state_machine',
-    'commerce_order',
     'commerce_order_test',
   ];
-
-  /**
-   * {@inheritdoc}
-   */
-  protected function setUp() {
-    parent::setUp();
-
-    PhpUnitComparatorFactory::getInstance()->register(new AdjustmentComparator());
-  }
 
   /**
    * Tests the constructor and definition checks.

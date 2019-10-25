@@ -8,8 +8,8 @@ use Drupal\commerce_product\Entity\Product;
 use Drupal\commerce_product\Entity\ProductVariation;
 use Drupal\commerce_store\StoreCreationTrait;
 use Drupal\Core\Url;
-use Drupal\Tests\commerce\Kernel\CommerceKernelTestBase;
 use Drupal\Tests\commerce_cart\Traits\CartManagerTestTrait;
+use Drupal\Tests\commerce_order\Kernel\OrderKernelTestBase;
 use Drupal\user\UserInterface;
 use Symfony\Cmf\Component\Routing\RouteObjectInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -19,7 +19,7 @@ use Symfony\Component\HttpFoundation\Request;
  *
  * @group commerce
  */
-class CheckoutAccessTest extends CommerceKernelTestBase {
+class CheckoutAccessTest extends OrderKernelTestBase {
 
   use CartManagerTestTrait;
   use StoreCreationTrait;
@@ -58,11 +58,6 @@ class CheckoutAccessTest extends CommerceKernelTestBase {
    * @var array
    */
   public static $modules = [
-    'entity_reference_revisions',
-    'profile',
-    'state_machine',
-    'commerce_product',
-    'commerce_order',
     'commerce_checkout',
   ];
 
@@ -72,13 +67,6 @@ class CheckoutAccessTest extends CommerceKernelTestBase {
   protected function setUp() {
     parent::setUp();
 
-    $this->installEntitySchema('profile');
-    $this->installEntitySchema('commerce_product');
-    $this->installEntitySchema('commerce_product_variation');
-    $this->installEntitySchema('commerce_order');
-    $this->installEntitySchema('commerce_order_item');
-    $this->installConfig('commerce_order');
-    $this->installConfig('commerce_product');
     $this->installConfig('commerce_checkout');
     $this->createUser();
     $this->installCommerceCart();

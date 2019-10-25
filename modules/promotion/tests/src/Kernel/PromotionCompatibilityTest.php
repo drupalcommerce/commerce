@@ -4,12 +4,11 @@ namespace Drupal\Tests\commerce_promotion\Kernel;
 
 use Drupal\commerce_order\Entity\Order;
 use Drupal\commerce_order\Entity\OrderItem;
-use Drupal\commerce_order\Entity\OrderItemType;
 use Drupal\commerce_order\Entity\OrderType;
 use Drupal\commerce_price\Price;
 use Drupal\commerce_promotion\Entity\Promotion;
 use Drupal\commerce_promotion\Entity\PromotionInterface;
-use Drupal\Tests\commerce\Kernel\CommerceKernelTestBase;
+use Drupal\Tests\commerce_order\Kernel\OrderKernelTestBase;
 
 /**
  * Tests promotion compatibility options.
@@ -17,7 +16,7 @@ use Drupal\Tests\commerce\Kernel\CommerceKernelTestBase;
  * @group commerce
  * @group commerce_promotion
  */
-class PromotionCompatibilityTest extends CommerceKernelTestBase {
+class PromotionCompatibilityTest extends OrderKernelTestBase {
 
   /**
    * The test order.
@@ -32,10 +31,6 @@ class PromotionCompatibilityTest extends CommerceKernelTestBase {
    * @var array
    */
   public static $modules = [
-    'entity_reference_revisions',
-    'profile',
-    'state_machine',
-    'commerce_order',
     'commerce_promotion',
   ];
 
@@ -45,24 +40,11 @@ class PromotionCompatibilityTest extends CommerceKernelTestBase {
   protected function setUp() {
     parent::setUp();
 
-    $this->installEntitySchema('profile');
-    $this->installEntitySchema('commerce_order');
-    $this->installEntitySchema('commerce_order_item');
     $this->installEntitySchema('commerce_promotion');
     $this->installEntitySchema('commerce_promotion_coupon');
-    $this->installConfig([
-      'profile',
-      'commerce_order',
-      'commerce_promotion',
-    ]);
+    $this->installConfig(['commerce_promotion']);
     $this->installSchema('commerce_promotion', ['commerce_promotion_usage']);
 
-    // An order item type that doesn't need a purchasable entity, for simplicity.
-    OrderItemType::create([
-      'id' => 'test',
-      'label' => 'Test',
-      'orderType' => 'default',
-    ])->save();
     $order_item = OrderItem::create([
       'type' => 'test',
       'quantity' => 1,

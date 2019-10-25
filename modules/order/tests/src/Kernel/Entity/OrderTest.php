@@ -5,11 +5,10 @@ namespace Drupal\Tests\commerce_order\Kernel\Entity;
 use Drupal\commerce_order\Adjustment;
 use Drupal\commerce_order\Entity\Order;
 use Drupal\commerce_order\Entity\OrderItem;
-use Drupal\commerce_order\Entity\OrderItemType;
 use Drupal\commerce_price\Exception\CurrencyMismatchException;
 use Drupal\commerce_price\Price;
 use Drupal\profile\Entity\Profile;
-use Drupal\Tests\commerce\Kernel\CommerceKernelTestBase;
+use Drupal\Tests\commerce_order\Kernel\OrderKernelTestBase;
 use Drupal\user\UserInterface;
 
 /**
@@ -19,7 +18,7 @@ use Drupal\user\UserInterface;
  *
  * @group commerce
  */
-class OrderTest extends CommerceKernelTestBase {
+class OrderTest extends OrderKernelTestBase {
 
   /**
    * A sample user.
@@ -34,11 +33,6 @@ class OrderTest extends CommerceKernelTestBase {
    * @var array
    */
   public static $modules = [
-    'entity_reference_revisions',
-    'profile',
-    'state_machine',
-    'commerce_product',
-    'commerce_order',
     'commerce_order_test',
   ];
 
@@ -47,18 +41,6 @@ class OrderTest extends CommerceKernelTestBase {
    */
   protected function setUp() {
     parent::setUp();
-
-    $this->installEntitySchema('profile');
-    $this->installEntitySchema('commerce_order');
-    $this->installEntitySchema('commerce_order_item');
-    $this->installConfig('commerce_order');
-
-    // An order item type that doesn't need a purchasable entity, for simplicity.
-    OrderItemType::create([
-      'id' => 'test',
-      'label' => 'Test',
-      'orderType' => 'default',
-    ])->save();
 
     $user = $this->createUser();
     $this->user = $this->reloadEntity($user);
