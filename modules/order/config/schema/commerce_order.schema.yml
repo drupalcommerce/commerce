@@ -75,6 +75,9 @@ commerce_order.commerce_order_type.*:
     workflow:
       type: string
       label: 'Workflow'
+    numberPattern:
+      type: string
+      label: 'Number pattern'
     refresh_mode:
       type: string
       label: 'Order refresh mode'

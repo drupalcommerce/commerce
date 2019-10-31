@@ -34,6 +34,32 @@ interface OrderTypeInterface extends CommerceBundleEntityInterface {
   public function setWorkflowId($workflow_id);
 
   /**
+   * Gets the order type's number pattern.
+   *
+   * @return \Drupal\commerce_number_pattern\Entity\NumberPatternInterface
+   *   The number pattern.
+   */
+  public function getNumberPattern();
+
+  /**
+   * Gets the order type's number pattern ID.
+   *
+   * @return string
+   *   The number pattern ID.
+   */
+  public function getNumberPatternId();
+
+  /**
+   * Sets the order type's number pattern ID.
+   *
+   * @param string $number_pattern_id
+   *   The number pattern ID.
+   *
+   * @return $this
+   */
+  public function setNumberPatternId($number_pattern_id);
+
+  /**
    * Gets the order type's refresh mode.
    *
    * Used by the order refresh process.

@@ -2,6 +2,7 @@
 
 namespace Drupal\commerce_order\Form;
 
+use Drupal\commerce\EntityHelper;
 use Drupal\commerce\EntityTraitManagerInterface;
 use Drupal\commerce_order\Entity\OrderType;
 use Drupal\commerce\Form\CommerceBundleEntityFormBase;
@@ -57,6 +58,8 @@ class OrderTypeForm extends CommerceBundleEntityFormBase {
     /** @var \Drupal\commerce_order\Entity\OrderTypeInterface $order_type */
     $order_type = $this->entity;
     $workflows = $this->workflowManager->getGroupedLabels('commerce_order');
+    $number_pattern_storage = $this->entityTypeManager->getStorage('commerce_number_pattern');
+    $number_patterns = $number_pattern_storage->loadByProperties(['targetEntityType' => 'commerce_order']);
 
     $form['#tree'] = TRUE;
     $form['label'] = [
@@ -82,6 +85,22 @@ class OrderTypeForm extends CommerceBundleEntityFormBase {
       '#options' => $workflows,
       '#default_value' => $order_type->getWorkflowId(),
       '#description' => $this->t('Used by all orders of this type.'),
+    ];
+    $form['generate_number'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Generate a sequential order number when the order is placed'),
+      '#default_value' => (bool) $order_type->getNumberPatternId(),
+    ];
+    $form['numberPattern'] = [
+      '#type' => 'select',
+      '#title' => $this->t('Number pattern'),
+      '#default_value' => $order_type->getNumberPatternId(),
+      '#options' => EntityHelper::extractLabels($number_patterns),
+      '#states' => [
+        'visible' => [
+          ':input[name="generate_number"]' => ['checked' => TRUE],
+        ],
+      ],
     ];
     $form = $this->buildTraitForm($form, $form_state);
 
@@ -162,6 +181,10 @@ class OrderTypeForm extends CommerceBundleEntityFormBase {
       $form_state->setError($form['workflow'], $this->t('The @workflow workflow does not have a "Draft" state.', [
         '@workflow' => $workflow->getLabel(),
       ]));
+    }
+    // Remove the number pattern if the checkbox was unchecked.
+    if (!$form_state->getValue('generate_number')) {
+      $form_state->setValue('numberPattern', NULL);
     }
     $this->validateTraitForm($form, $form_state);
   }

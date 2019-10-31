@@ -64,6 +64,7 @@ services:
 
   commerce_order.order_number_subscriber:
     class: Drupal\commerce_order\EventSubscriber\OrderNumberSubscriber
+    arguments: ['@entity_type.manager']
     tags:
       - { name: event_subscriber }
 

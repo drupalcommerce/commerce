@@ -97,3 +97,10 @@ function commerce_order_update_8206() {
   $database->query("UPDATE {profile} SET uid = 0 WHERE type = 'customer'");
   $database->query("UPDATE {profile_revision} SET uid = 0 WHERE profile_id IN (SELECT profile_id FROM {profile} WHERE type = 'customer')");
 }
+
+/**
+ * Install the Commerce Number Pattern module.
+ */
+function commerce_order_update_8207() {
+  \Drupal::service('module_installer')->install(['commerce_number_pattern']);
+}

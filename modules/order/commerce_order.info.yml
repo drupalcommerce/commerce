@@ -8,6 +8,7 @@ dependencies:
   - commerce:commerce
   - commerce:commerce_price
   - commerce:commerce_store
+  - commerce:commerce_number_pattern
   - entity_reference_revisions:entity_reference_revisions
   - profile:profile
   - state_machine:state_machine

@@ -3,6 +3,7 @@
 namespace Drupal\commerce_order\Entity;
 
 use Drupal\commerce\Entity\CommerceBundleEntityBase;
+use Drupal\commerce_number_pattern\Entity\NumberPattern;
 
 /**
  * Defines the order type entity class.
@@ -46,6 +47,7 @@ use Drupal\commerce\Entity\CommerceBundleEntityBase;
  *     "label",
  *     "id",
  *     "workflow",
+ *     "numberPattern",
  *     "refresh_mode",
  *     "refresh_frequency",
  *     "sendReceipt",
@@ -70,6 +72,13 @@ class OrderType extends CommerceBundleEntityBase implements OrderTypeInterface {
    * @var string
    */
   protected $workflow;
+
+  /**
+   * The number pattern ID.
+   *
+   * @var string
+   */
+  protected $numberPattern;
 
   /**
    * The order type refresh mode.
@@ -111,6 +120,30 @@ class OrderType extends CommerceBundleEntityBase implements OrderTypeInterface {
    */
   public function setWorkflowId($workflow_id) {
     $this->workflow = $workflow_id;
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getNumberPattern() {
+    if ($this->numberPattern) {
+      return NumberPattern::load($this->numberPattern);
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getNumberPatternId() {
+    return $this->numberPattern;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setNumberPatternId($number_pattern_id) {
+    $this->numberPattern = $number_pattern_id;
     return $this;
   }
 

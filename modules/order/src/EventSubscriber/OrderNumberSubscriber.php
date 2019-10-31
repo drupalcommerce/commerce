@@ -2,6 +2,7 @@
 
 namespace Drupal\commerce_order\EventSubscriber;
 
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\state_machine\Event\WorkflowTransitionEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -17,6 +18,23 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 class OrderNumberSubscriber implements EventSubscriberInterface {
 
   /**
+   * The entity type manager.
+   *
+   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   */
+  protected $entityTypeManager;
+
+  /**
+   * Constructs a new OrderNumberSubscriber object.
+   *
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   *   The entity type manager.
+   */
+  public function __construct(EntityTypeManagerInterface $entity_type_manager) {
+    $this->entityTypeManager = $entity_type_manager;
+  }
+
+  /**
    * {@inheritdoc}
    */
   public static function getSubscribedEvents() {
@@ -27,7 +45,11 @@ class OrderNumberSubscriber implements EventSubscriberInterface {
   }
 
   /**
-   * Sets the order number to the order ID.
+   * Sets the order number.
+   *
+   * The number is generated using the number pattern specified by the
+   * order type. If no number pattern was specified, the order ID is
+   * used as a fallback.
    *
    * Skipped if the order number has already been set.
    *
@@ -38,7 +60,19 @@ class OrderNumberSubscriber implements EventSubscriberInterface {
     /** @var \Drupal\commerce_order\Entity\OrderInterface $order */
     $order = $event->getEntity();
     if (!$order->getOrderNumber()) {
-      $order->setOrderNumber($order->id());
+      $order_type_storage = $this->entityTypeManager->getStorage('commerce_order_type');
+      /** @var \Drupal\commerce_order\Entity\OrderTypeInterface $order_type */
+      $order_type = $order_type_storage->load($order->bundle());
+      /** @var \Drupal\commerce_number_pattern\Entity\NumberPatternInterface $number_pattern */
+      $number_pattern = $order_type->getNumberPattern();
+      if ($number_pattern) {
+        $order_number = $number_pattern->getPlugin()->generate($order);
+      }
+      else {
+        $order_number = $order->id();
+      }
+
+      $order->setOrderNumber($order_number);
     }
   }
 

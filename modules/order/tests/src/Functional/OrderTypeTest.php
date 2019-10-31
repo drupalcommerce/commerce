@@ -43,6 +43,7 @@ class OrderTypeTest extends OrderBrowserTestBase {
 
     $order_type = OrderType::load('foo');
     $this->assertNotEmpty($order_type);
+    $this->assertEmpty($order_type->getNumberPatternId());
     $this->assertEquals($edit['refresh_mode'], $order_type->getRefreshMode());
     $this->assertEquals($edit['refresh_frequency'], $order_type->getRefreshFrequency());
 
@@ -58,6 +59,7 @@ class OrderTypeTest extends OrderBrowserTestBase {
     $this->drupalGet('admin/commerce/config/order-types/default/edit');
     $edit = [
       'label' => 'Default!',
+      'generate_number' => FALSE,
       'refresh_mode' => 'always',
       'refresh_frequency' => 60,
     ];
@@ -67,6 +69,7 @@ class OrderTypeTest extends OrderBrowserTestBase {
     $order_type = OrderType::load('default');
     $this->assertNotEmpty($order_type);
     $this->assertEquals($edit['label'], $order_type->label());
+    $this->assertEmpty($order_type->getNumberPatternId());
     $this->assertEquals($edit['refresh_mode'], $order_type->getRefreshMode());
     $this->assertEquals($edit['refresh_frequency'], $order_type->getRefreshFrequency());
   }
@@ -88,11 +91,13 @@ class OrderTypeTest extends OrderBrowserTestBase {
     $order_type = OrderType::load('default');
     $this->assertNotEmpty($order_type);
     $this->assertEquals('Default', $order_type->label());
+    $this->assertEquals('order_default', $order_type->getNumberPatternId());
 
     // Confirm that the new order type has the expected data.
     $order_type = OrderType::load('default2');
     $this->assertNotEmpty($order_type);
     $this->assertEquals('Default2', $order_type->label());
+    $this->assertEquals('order_default', $order_type->getNumberPatternId());
   }
 
   /**

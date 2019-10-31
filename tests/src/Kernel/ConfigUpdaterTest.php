@@ -15,11 +15,6 @@ class ConfigUpdaterTest extends CommerceKernelTestBase {
    * @var array
    */
   public static $modules = [
-    'entity_reference_revisions',
-    'profile',
-    'state_machine',
-    'commerce_product',
-    'commerce_order',
     'commerce_update_test',
   ];
 
@@ -36,9 +31,6 @@ class ConfigUpdaterTest extends CommerceKernelTestBase {
   protected function setUp() {
     parent::setUp();
 
-    $this->installEntitySchema('profile');
-    $this->installEntitySchema('commerce_order');
-    $this->installConfig('commerce_order');
     $this->installConfig('commerce_update_test');
 
     $this->configUpdater = $this->container->get('commerce.config_updater');
