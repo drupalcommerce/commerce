@@ -48,7 +48,7 @@ function commerce_price_configurable_language_insert(ConfigurableLanguage $langu
 function commerce_price_form_views_ui_config_item_form_alter(&$form, FormStateInterface $form_state) {
   /** @var \Drupal\views\Plugin\views\field\EntityField $handler */
   $handler = $form_state->get('handler');
-  if ($handler instanceof EntityField) {
+  if ($handler instanceof EntityField && $handler->options['entity_type']) {
     $entity_type_id = $handler->options['entity_type'];
     $field_name = $handler->options['entity_field'];
     /** @var \Drupal\Core\Entity\EntityFieldManagerInterface $field_manager */
