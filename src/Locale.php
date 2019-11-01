@@ -20,7 +20,7 @@ final class Locale {
    * @param string $locale_code
    *   The locale code.
    */
-  public function __construct($locale_code) {
+  public function __construct(string $locale_code) {
     $this->localeCode = $locale_code;
   }
 
@@ -30,7 +30,7 @@ final class Locale {
    * @return string
    *   The locale code.
    */
-  public function getLocaleCode() {
+  public function getLocaleCode() : string {
     return $this->localeCode;
   }
 
@@ -40,7 +40,7 @@ final class Locale {
    * @return string
    *   The string representation of the locale.
    */
-  public function __toString() {
+  public function __toString() : string {
     return $this->localeCode;
   }
 

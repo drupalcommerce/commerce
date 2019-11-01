@@ -109,7 +109,7 @@ final class Adjustment {
    * @return string
    *   The adjustment type.
    */
-  public function getType() {
+  public function getType() : string {
     return $this->type;
   }
 
@@ -119,7 +119,7 @@ final class Adjustment {
    * @return string
    *   The adjustment label.
    */
-  public function getLabel() {
+  public function getLabel() : string {
     return $this->label;
   }
 
@@ -129,7 +129,7 @@ final class Adjustment {
    * @return \Drupal\commerce_price\Price
    *   The adjustment amount.
    */
-  public function getAmount() {
+  public function getAmount() : Price {
     return $this->amount;
   }
 
@@ -139,7 +139,7 @@ final class Adjustment {
    * @return bool
    *   TRUE if the adjustment is positive, FALSE otherwise.
    */
-  public function isPositive() {
+  public function isPositive() : bool {
     return $this->amount->getNumber() >= 0;
   }
 
@@ -149,7 +149,7 @@ final class Adjustment {
    * @return bool
    *   TRUE if the adjustment is negative, FALSE otherwise.
    */
-  public function isNegative() {
+  public function isNegative() : bool {
     return $this->amount->getNumber() < 0;
   }
 
@@ -167,8 +167,8 @@ final class Adjustment {
   /**
    * Get the source identifier.
    *
-   * @return string
-   *   The source identifier.
+   * @return string|null
+   *   The source identifier, if available.
    */
   public function getSourceId() {
     return $this->sourceId;
@@ -180,7 +180,7 @@ final class Adjustment {
    * @return bool
    *   TRUE if the adjustment is included in the base price, FALSE otherwise.
    */
-  public function isIncluded() {
+  public function isIncluded() : bool {
     return $this->included;
   }
 
@@ -192,7 +192,7 @@ final class Adjustment {
    * @return bool
    *   TRUE if the adjustment is locked, FALSE otherwise.
    */
-  public function isLocked() {
+  public function isLocked() : bool {
     return $this->locked;
   }
 
@@ -202,7 +202,7 @@ final class Adjustment {
    * @return array
    *   The array representation of the adjustment.
    */
-  public function toArray() {
+  public function toArray() : array {
     return [
       'type' => $this->type,
       'label' => $this->label,
@@ -223,7 +223,7 @@ final class Adjustment {
    * @return static
    *   The resulting adjustment.
    */
-  public function add(Adjustment $adjustment) {
+  public function add(Adjustment $adjustment) : Adjustment {
     $this->assertSameType($adjustment);
     $this->assertSameSourceId($adjustment);
     $definition = [
@@ -242,7 +242,7 @@ final class Adjustment {
    * @return static
    *   The resulting adjustment.
    */
-  public function subtract(Adjustment $adjustment) {
+  public function subtract(Adjustment $adjustment) : Adjustment {
     $this->assertSameType($adjustment);
     $this->assertSameSourceId($adjustment);
     $definition = [
@@ -261,7 +261,7 @@ final class Adjustment {
    * @return static
    *   The resulting adjustment.
    */
-  public function multiply($number) {
+  public function multiply($number) : Adjustment {
     $definition = [
       'amount' => $this->amount->multiply($number),
     ] + $this->toArray();
@@ -278,7 +278,7 @@ final class Adjustment {
    * @return static
    *   The resulting adjustment.
    */
-  public function divide($number) {
+  public function divide($number) : Adjustment {
     $definition = [
       'amount' => $this->amount->divide($number),
     ] + $this->toArray();

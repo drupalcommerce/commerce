@@ -56,7 +56,7 @@ final class PriceCalculatorResult {
    * @return \Drupal\commerce_price\Price
    *   The calculated price.
    */
-  public function getCalculatedPrice() {
+  public function getCalculatedPrice() : Price {
     return $this->calculatedPrice;
   }
 
@@ -68,7 +68,7 @@ final class PriceCalculatorResult {
    * @return \Drupal\commerce_price\Price
    *   The base price.
    */
-  public function getBasePrice() {
+  public function getBasePrice() : Price {
     return $this->basePrice;
   }
 
@@ -78,7 +78,7 @@ final class PriceCalculatorResult {
    * @return \Drupal\commerce_order\Adjustment[]
    *   The adjustments.
    */
-  public function getAdjustments() {
+  public function getAdjustments() : array {
     return $this->adjustments;
   }
 

@@ -73,7 +73,7 @@ final class PreparedAttribute {
    * @return string
    *   The ID.
    */
-  public function getId() {
+  public function getId() : string {
     return $this->id;
   }
 
@@ -83,7 +83,7 @@ final class PreparedAttribute {
    * @return string
    *   The label.
    */
-  public function getLabel() {
+  public function getLabel() : string {
     return $this->label;
   }
 
@@ -93,7 +93,7 @@ final class PreparedAttribute {
    * @return string
    *   The element type.
    */
-  public function getElementType() {
+  public function getElementType() : string {
     return $this->elementType;
   }
 
@@ -103,7 +103,7 @@ final class PreparedAttribute {
    * @return bool
    *   TRUE if the attribute is required, FALSE otherwise.
    */
-  public function isRequired() {
+  public function isRequired() : bool {
     return $this->required;
   }
 
@@ -113,7 +113,7 @@ final class PreparedAttribute {
    * @return string[]
    *   The attribute values.
    */
-  public function getValues() {
+  public function getValues() : array {
     return $this->values;
   }
 
@@ -123,7 +123,7 @@ final class PreparedAttribute {
    * @return array
    *   The array representation of the prepared attribute.
    */
-  public function toArray() {
+  public function toArray() : array {
     return [
       'id' => $this->id,
       'label' => $this->label,

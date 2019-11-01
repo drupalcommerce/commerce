@@ -51,7 +51,7 @@ final class Sequence {
    * @return int
    *   The number.
    */
-  public function getNumber() {
+  public function getNumber() : int {
     return $this->number;
   }
 
@@ -61,7 +61,7 @@ final class Sequence {
    * @return int
    *   The generated timestamp.
    */
-  public function getGeneratedTime() {
+  public function getGeneratedTime() : int {
     return $this->generated;
   }
 
@@ -71,7 +71,7 @@ final class Sequence {
    * @return int
    *   The store ID, or 0 if the sequence is not store specific.
    */
-  public function getStoreId() {
+  public function getStoreId() : int {
     return $this->storeId;
   }
 

@@ -47,7 +47,7 @@ final class VerificationResult {
    * @param array $data
    *   The data. Optional.
    */
-  public function __construct($state, $timestamp, array $data = []) {
+  public function __construct(string $state, int $timestamp, array $data = []) {
     $this->state = $state;
     $this->timestamp = $timestamp;
     $this->data = $data;
@@ -63,7 +63,7 @@ final class VerificationResult {
    *
    * @return static
    */
-  public static function success($timestamp, array $data = []) {
+  public static function success(int $timestamp, array $data = []) : VerificationResult {
     return new static(self::STATE_SUCCESS, $timestamp, $data);
   }
 
@@ -77,7 +77,7 @@ final class VerificationResult {
    *
    * @return static
    */
-  public static function failure($timestamp, array $data = []) {
+  public static function failure(int $timestamp, array $data = []) : VerificationResult {
     return new static(self::STATE_FAILURE, $timestamp, $data);
   }
 
@@ -91,7 +91,7 @@ final class VerificationResult {
    *
    * @return static
    */
-  public static function unknown($timestamp, array $data = []) {
+  public static function unknown(int $timestamp, array $data = []) : VerificationResult {
     return new static(self::STATE_UNKNOWN, $timestamp, $data);
   }
 
@@ -101,7 +101,7 @@ final class VerificationResult {
    * @return bool
    *   TRUE if the verification was successful, FALSE otherwise.
    */
-  public function isSuccess() {
+  public function isSuccess() : bool {
     return $this->state == self::STATE_SUCCESS;
   }
 
@@ -111,7 +111,7 @@ final class VerificationResult {
    * @return bool
    *   TRUE if the verification failed, FALSE otherwise.
    */
-  public function isFailure() {
+  public function isFailure() : bool {
     return $this->state == self::STATE_FAILURE;
   }
 
@@ -123,7 +123,7 @@ final class VerificationResult {
    * @return bool
    *   TRUE if the verification state is unknown, FALSE otherwise.
    */
-  public function isUnknown() {
+  public function isUnknown() : bool {
     return $this->state == self::STATE_UNKNOWN;
   }
 
@@ -133,7 +133,7 @@ final class VerificationResult {
    * @return string
    *   The state. One of the STATE_ constants.
    */
-  public function getState() {
+  public function getState() : string {
     return $this->state;
   }
 
@@ -143,7 +143,7 @@ final class VerificationResult {
    * @return int
    *   The timestamp.
    */
-  public function getTimestamp() {
+  public function getTimestamp() : int {
     return $this->timestamp;
   }
 
@@ -153,7 +153,7 @@ final class VerificationResult {
    * @return array
    *   The data.
    */
-  public function getData() {
+  public function getData() : array {
     return $this->data;
   }
 

@@ -9,7 +9,7 @@ use Drupal\Core\Entity\EntityInterface;
  *
  * Meant to be instantiated directly.
  */
-class ConditionGroup {
+final class ConditionGroup {
 
   /**
    * The conditions.
@@ -38,7 +38,7 @@ class ConditionGroup {
    * @throws \InvalidArgumentException
    *   Thrown when an invalid operator is given.
    */
-  public function __construct(array $conditions, $operator) {
+  public function __construct(array $conditions, string $operator) {
     if (!in_array($operator, ['AND', 'OR'])) {
       throw new \InvalidArgumentException(sprintf('Invalid operator "%s" given, expecting "AND" or "OR".', $operator));
     }
@@ -53,7 +53,7 @@ class ConditionGroup {
    * @return \Drupal\commerce\Plugin\Commerce\Condition\ConditionInterface[]
    *   The conditions.
    */
-  public function getConditions() {
+  public function getConditions() : array {
     return $this->conditions;
   }
 
@@ -63,7 +63,7 @@ class ConditionGroup {
    * @return string
    *   The operator. Possible values: AND, OR.
    */
-  public function getOperator() {
+  public function getOperator() : string {
     return $this->operator;
   }
 
@@ -76,7 +76,7 @@ class ConditionGroup {
    * @return bool
    *   TRUE if the condition group has passed, FALSE otherwise.
    */
-  public function evaluate(EntityInterface $entity) {
+  public function evaluate(EntityInterface $entity) : bool {
     if (empty($this->conditions)) {
       return TRUE;
     }

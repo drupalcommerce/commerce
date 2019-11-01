@@ -55,7 +55,7 @@ final class Context {
    * @param array $data
    *   The data.
    */
-  public function __construct(AccountInterface $customer, StoreInterface $store, $time = NULL, array $data = []) {
+  public function __construct(AccountInterface $customer, StoreInterface $store, int $time = NULL, array $data = []) {
     $this->customer = $customer;
     $this->store = $store;
     $this->time = $time ?: time();
@@ -68,7 +68,7 @@ final class Context {
    * @return \Drupal\Core\Session\AccountInterface
    *   The customer.
    */
-  public function getCustomer() {
+  public function getCustomer() : AccountInterface {
     return $this->customer;
   }
 
@@ -78,7 +78,7 @@ final class Context {
    * @return \Drupal\commerce_store\Entity\StoreInterface
    *   The store.
    */
-  public function getStore() {
+  public function getStore() : StoreInterface {
     return $this->store;
   }
 
@@ -88,7 +88,7 @@ final class Context {
    * @return int
    *   The time.
    */
-  public function getTime() {
+  public function getTime() : int {
     return $this->time;
   }
 
@@ -103,7 +103,7 @@ final class Context {
    * @return mixed
    *   The value.
    */
-  public function getData($key, $default = NULL) {
+  public function getData(string $key, $default = NULL) {
     return isset($this->data[$key]) ? $this->data[$key] : $default;
   }
 

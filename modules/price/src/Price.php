@@ -33,7 +33,7 @@ final class Price {
    * @param string $currency_code
    *   The currency code.
    */
-  public function __construct($number, $currency_code) {
+  public function __construct(string $number, string $currency_code) {
     Calculator::assertNumberFormat($number);
     $this->assertCurrencyCodeFormat($currency_code);
 
@@ -49,7 +49,7 @@ final class Price {
    *
    * @return static
    */
-  public static function fromArray(array $price) {
+  public static function fromArray(array $price) : Price {
     if (!isset($price['number'], $price['currency_code'])) {
       throw new \InvalidArgumentException('Price::fromArray() called with a malformed array.');
     }
@@ -62,7 +62,7 @@ final class Price {
    * @return string
    *   The number.
    */
-  public function getNumber() {
+  public function getNumber() : string {
     return $this->number;
   }
 
@@ -72,7 +72,7 @@ final class Price {
    * @return string
    *   The currency code.
    */
-  public function getCurrencyCode() {
+  public function getCurrencyCode() : string {
     return $this->currencyCode;
   }
 
@@ -82,7 +82,7 @@ final class Price {
    * @return string
    *   The string representation of the price.
    */
-  public function __toString() {
+  public function __toString() : string {
     return Calculator::trim($this->number) . ' ' . $this->currencyCode;
   }
 
@@ -92,7 +92,7 @@ final class Price {
    * @return array
    *   The array representation of the price.
    */
-  public function toArray() {
+  public function toArray() : array {
     return ['number' => $this->number, 'currency_code' => $this->currencyCode];
   }
 
@@ -107,7 +107,7 @@ final class Price {
    * @return static
    *   The resulting price.
    */
-  public function convert($currency_code, $rate = '1') {
+  public function convert($currency_code, $rate = '1') : Price {
     $new_number = Calculator::multiply($this->number, $rate);
     return new static($new_number, $currency_code);
   }
@@ -121,7 +121,7 @@ final class Price {
    * @return static
    *   The resulting price.
    */
-  public function add(Price $price) {
+  public function add(Price $price) : Price {
     $this->assertSameCurrency($this, $price);
     $new_number = Calculator::add($this->number, $price->getNumber());
     return new static($new_number, $this->currencyCode);
@@ -136,7 +136,7 @@ final class Price {
    * @return static
    *   The resulting price.
    */
-  public function subtract(Price $price) {
+  public function subtract(Price $price) : Price {
     $this->assertSameCurrency($this, $price);
     $new_number = Calculator::subtract($this->number, $price->getNumber());
     return new static($new_number, $this->currencyCode);
@@ -151,7 +151,7 @@ final class Price {
    * @return static
    *   The resulting price.
    */
-  public function multiply($number) {
+  public function multiply(string $number) : Price {
     $new_number = Calculator::multiply($this->number, $number);
     return new static($new_number, $this->currencyCode);
   }
@@ -165,7 +165,7 @@ final class Price {
    * @return static
    *   The resulting price.
    */
-  public function divide($number) {
+  public function divide(string $number) : Price {
     $new_number = Calculator::divide($this->number, $number);
     return new static($new_number, $this->currencyCode);
   }
@@ -179,7 +179,7 @@ final class Price {
    * @return int
    *   0 if both prices are equal, 1 if the first one is greater, -1 otherwise.
    */
-  public function compareTo(Price $price) {
+  public function compareTo(Price $price) : int {
     $this->assertSameCurrency($this, $price);
     return Calculator::compare($this->number, $price->getNumber());
   }
@@ -190,7 +190,7 @@ final class Price {
    * @return bool
    *   TRUE if the price is positive, FALSE otherwise.
    */
-  public function isPositive() {
+  public function isPositive() : bool {
     return Calculator::compare($this->number, '0') == 1;
   }
 
@@ -200,7 +200,7 @@ final class Price {
    * @return bool
    *   TRUE if the price is negative, FALSE otherwise.
    */
-  public function isNegative() {
+  public function isNegative() : bool {
     return Calculator::compare($this->number, '0') == -1;
   }
 
@@ -210,7 +210,7 @@ final class Price {
    * @return bool
    *   TRUE if the price is zero, FALSE otherwise.
    */
-  public function isZero() {
+  public function isZero() : bool {
     return Calculator::compare($this->number, '0') == 0;
   }
 
@@ -223,7 +223,7 @@ final class Price {
    * @return bool
    *   TRUE if the prices are equal, FALSE otherwise.
    */
-  public function equals(Price $price) {
+  public function equals(Price $price) : bool {
     return $this->compareTo($price) == 0;
   }
 
@@ -237,7 +237,7 @@ final class Price {
    *   TRUE if the current price is greater than the given price,
    *   FALSE otherwise.
    */
-  public function greaterThan(Price $price) {
+  public function greaterThan(Price $price) : bool {
     return $this->compareTo($price) == 1;
   }
 
@@ -251,7 +251,7 @@ final class Price {
    *   TRUE if the current price is greater than or equal to the given price,
    *   FALSE otherwise.
    */
-  public function greaterThanOrEqual(Price $price) {
+  public function greaterThanOrEqual(Price $price) : bool {
     return $this->greaterThan($price) || $this->equals($price);
   }
 
@@ -265,7 +265,7 @@ final class Price {
    *   TRUE if the current price is lesser than the given price,
    *   FALSE otherwise.
    */
-  public function lessThan(Price $price) {
+  public function lessThan(Price $price) : bool {
     return $this->compareTo($price) == -1;
   }
 
@@ -279,7 +279,7 @@ final class Price {
    *   TRUE if the current price is lesser than or equal to the given price,
    *   FALSE otherwise.
    */
-  public function lessThanOrEqual(Price $price) {
+  public function lessThanOrEqual(Price $price) : bool {
     return $this->lessThan($price) || $this->equals($price);
   }
 

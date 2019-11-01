@@ -82,7 +82,7 @@ final class CreditCardType {
    * @return string
    *   The credit card type ID.
    */
-  public function getId() {
+  public function getId() : string {
     return $this->id;
   }
 
@@ -92,7 +92,7 @@ final class CreditCardType {
    * @return string
    *   The credit card type label.
    */
-  public function getLabel() {
+  public function getLabel() : string {
     return $this->label;
   }
 
@@ -102,7 +102,7 @@ final class CreditCardType {
    * @return array
    *   The credit card type number prefixes.
    */
-  public function getNumberPrefixes() {
+  public function getNumberPrefixes() : array {
     return $this->numberPrefixes;
   }
 
@@ -112,7 +112,7 @@ final class CreditCardType {
    * @return array
    *   The credit card type number lengths.
    */
-  public function getNumberLengths() {
+  public function getNumberLengths() : array {
     return $this->numberLengths;
   }
 
@@ -122,7 +122,7 @@ final class CreditCardType {
    * @return string
    *   The credit card type security code length.
    */
-  public function getSecurityCodeLength() {
+  public function getSecurityCodeLength() : string {
     return $this->securityCodeLength;
   }
 
@@ -132,7 +132,7 @@ final class CreditCardType {
    * @return bool
    *   TRUE if the credit card type uses Luhn validation, FALSE otherwise.
    */
-  public function usesLuhn() {
+  public function usesLuhn() : bool {
     return $this->usesLuhn;
   }
 

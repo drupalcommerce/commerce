@@ -27,7 +27,7 @@ final class Calculator {
    * @return string
    *   The result.
    */
-  public static function add($first_number, $second_number, $scale = 6) {
+  public static function add(string $first_number, string $second_number, int $scale = 6) : string {
     self::assertNumberFormat($first_number);
     self::assertNumberFormat($second_number);
     $result = bcadd($first_number, $second_number, $scale);
@@ -48,7 +48,7 @@ final class Calculator {
    * @return string
    *   The result.
    */
-  public static function subtract($first_number, $second_number, $scale = 6) {
+  public static function subtract(string $first_number, string $second_number, int $scale = 6) : string {
     self::assertNumberFormat($first_number);
     self::assertNumberFormat($second_number);
     $result = bcsub($first_number, $second_number, $scale);
@@ -69,7 +69,7 @@ final class Calculator {
    * @return string
    *   The result.
    */
-  public static function multiply($first_number, $second_number, $scale = 6) {
+  public static function multiply(string $first_number, string $second_number, int $scale = 6) : string {
     self::assertNumberFormat($first_number);
     self::assertNumberFormat($second_number);
     $result = bcmul($first_number, $second_number, $scale);
@@ -90,7 +90,7 @@ final class Calculator {
    * @return string
    *   The result.
    */
-  public static function divide($first_number, $second_number, $scale = 6) {
+  public static function divide(string $first_number, string $second_number, int $scale = 6) : string {
     self::assertNumberFormat($first_number);
     self::assertNumberFormat($second_number);
     $result = bcdiv($first_number, $second_number, $scale);
@@ -106,7 +106,7 @@ final class Calculator {
    * @return string
    *   The result.
    */
-  public static function ceil($number) {
+  public static function ceil(string $number) : string {
     if (self::compare($number, 0) == 1) {
       $result = bcadd($number, '1', 0);
     }
@@ -125,7 +125,7 @@ final class Calculator {
    * @return string
    *   The result.
    */
-  public static function floor($number) {
+  public static function floor(string $number) : string {
     if (self::compare($number, 0) == 1) {
       $result = bcadd($number, '0', 0);
     }
@@ -155,7 +155,7 @@ final class Calculator {
    * @throws \InvalidArgumentException
    *   Thrown when an invalid (non-numeric or negative) precision is given.
    */
-  public static function round($number, $precision = 0, $mode = PHP_ROUND_HALF_UP) {
+  public static function round(string $number, int $precision = 0, int $mode = PHP_ROUND_HALF_UP) : string {
     self::assertNumberFormat($number);
     if (!is_numeric($precision) || $precision < 0) {
       throw new \InvalidArgumentException('The provided precision should be a positive number');
@@ -214,7 +214,7 @@ final class Calculator {
    * @return int
    *   0 if both numbers are equal, 1 if the first one is greater, -1 otherwise.
    */
-  public static function compare($first_number, $second_number, $scale = 6) {
+  public static function compare(string $first_number, string $second_number, int $scale = 6) : int {
     self::assertNumberFormat($first_number);
     self::assertNumberFormat($second_number);
     return bccomp($first_number, $second_number, $scale);
@@ -233,7 +233,7 @@ final class Calculator {
    * @return string
    *   The trimmed number.
    */
-  public static function trim($number) {
+  public static function trim(string $number) : string {
     if (strpos($number, '.') != FALSE) {
       // The number is decimal, strip trailing zeroes.
       // If no digits remain after the decimal point, strip it as well.

@@ -24,7 +24,7 @@ class NeedsRedirectException extends EnforcedResponseException {
    * @param string[] $headers
    *   Headers to pass with the redirect.
    */
-  public function __construct($url, $status_code = 302, array $headers = []) {
+  public function __construct(string $url, int $status_code = 302, array $headers = []) {
     if (!UrlHelper::isValid($url)) {
       throw new \InvalidArgumentException('Invalid URL provided.');
     }

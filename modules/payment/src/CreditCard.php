@@ -25,7 +25,7 @@ final class CreditCard {
    * @return \Drupal\commerce_payment\CreditCardType
    *   The credit card type.
    */
-  public static function getType($id) {
+  public static function getType(string $id) : CreditCardType {
     $types = self::getTypes();
     if (!isset($types[$id])) {
       throw new \InvalidArgumentException(sprintf('Invalid credit card type "%s"', $id));
@@ -40,7 +40,7 @@ final class CreditCard {
    * @return \Drupal\commerce_payment\CreditCardType[]
    *   The credit card types.
    */
-  public static function getTypes() {
+  public static function getTypes() : array {
     $definitions = [
       'visa' => [
         'id' => 'visa',
@@ -107,7 +107,7 @@ final class CreditCard {
    * @return array
    *   The labels, keyed by ID.
    */
-  public static function getTypeLabels() {
+  public static function getTypeLabels() : array {
     $types = self::getTypes();
     $type_labels = array_map(function ($type) {
       return $type->getLabel();
@@ -153,7 +153,7 @@ final class CreditCard {
    * @return bool
    *   TRUE if the credit card number matches the prefix, FALSE otherwise.
    */
-  public static function matchPrefix($number, $prefix) {
+  public static function matchPrefix(string $number, string $prefix) : bool {
     if (is_numeric($prefix)) {
       return substr($number, 0, strlen($prefix)) == $prefix;
     }
@@ -175,7 +175,7 @@ final class CreditCard {
    * @return bool
    *   TRUE if the credit card number is valid, FALSE otherwise.
    */
-  public static function validateNumber($number, CreditCardType $type) {
+  public static function validateNumber(string $number, CreditCardType $type) : bool {
     if (!is_numeric($number)) {
       return FALSE;
     }
@@ -198,7 +198,7 @@ final class CreditCard {
    * @return bool
    *   TRUE if the credit card number is valid, FALSE otherwise.
    */
-  public static function validateLuhn($number) {
+  public static function validateLuhn(string $number) : bool {
     $total = 0;
     foreach (array_reverse(str_split($number)) as $i => $digit) {
       $digit = $i % 2 ? $digit * 2 : $digit;
@@ -219,7 +219,7 @@ final class CreditCard {
    * @return bool
    *   TRUE if the credit card expiration date is valid, FALSE otherwise.
    */
-  public static function validateExpirationDate($month, $year) {
+  public static function validateExpirationDate(string $month, string $year) : bool {
     if ($month < 1 || $month > 12) {
       return FALSE;
     }
@@ -244,7 +244,7 @@ final class CreditCard {
    * @return int
    *   The expiration date as a unix timestamp.
    */
-  public static function calculateExpirationTimestamp($month, $year) {
+  public static function calculateExpirationTimestamp(string $month, string $year) : int {
     // Credit cards expire on the last day of the month.
     $month_start = strtotime($year . '-' . $month . '-01');
     $last_day = date('t', $month_start);
@@ -262,7 +262,7 @@ final class CreditCard {
    * @return bool
    *   TRUE if the credit card security code is valid, FALSE otherwise.
    */
-  public static function validateSecurityCode($security_code, CreditCardType $type) {
+  public static function validateSecurityCode(string $security_code, CreditCardType $type) : bool {
     if (!is_numeric($security_code)) {
       return FALSE;
     }

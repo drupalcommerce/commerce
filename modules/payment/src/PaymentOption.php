@@ -74,7 +74,7 @@ final class PaymentOption {
    * @return string
    *   The ID.
    */
-  public function getId() {
+  public function getId() : string {
     return $this->id;
   }
 
@@ -84,7 +84,7 @@ final class PaymentOption {
    * @return string
    *   The label.
    */
-  public function getLabel() {
+  public function getLabel() : string {
     return $this->label;
   }
 
@@ -94,7 +94,7 @@ final class PaymentOption {
    * @return string
    *   The payment gateway ID.
    */
-  public function getPaymentGatewayId() {
+  public function getPaymentGatewayId() : string {
     return $this->paymentGatewayId;
   }
 

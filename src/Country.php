@@ -20,7 +20,7 @@ final class Country {
    * @param string $country_code
    *   The country code.
    */
-  public function __construct($country_code) {
+  public function __construct(string $country_code) {
     $this->countryCode = strtoupper($country_code);
   }
 
@@ -30,7 +30,7 @@ final class Country {
    * @return string
    *   The country code.
    */
-  public function getCountryCode() {
+  public function getCountryCode() : string {
     return $this->countryCode;
   }
 
@@ -40,7 +40,7 @@ final class Country {
    * @return string
    *   The string representation of the country
    */
-  public function __toString() {
+  public function __toString() : string {
     return $this->countryCode;
   }
 

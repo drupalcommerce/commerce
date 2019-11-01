@@ -56,7 +56,7 @@ final class CouponCodePattern {
    * @param int $length
    *   The length.
    */
-  public function __construct($type, $prefix = '', $suffix = '', $length = 8) {
+  public function __construct(string $type, string $prefix = '', string $suffix = '', int $length = 8) {
     $pattern_types = [self::ALPHANUMERIC, self::ALPHABETIC, self::NUMERIC];
     if (!in_array($type, $pattern_types)) {
       throw new \InvalidArgumentException(sprintf('Unknown pattern type "%s".', $type));
@@ -74,7 +74,7 @@ final class CouponCodePattern {
    * @return string
    *   The pattern type.
    */
-  public function getType() {
+  public function getType() : string {
     return $this->type;
   }
 
@@ -84,7 +84,7 @@ final class CouponCodePattern {
    * @return string
    *   The prefix.
    */
-  public function getPrefix() {
+  public function getPrefix() : string {
     return $this->prefix;
   }
 
@@ -94,7 +94,7 @@ final class CouponCodePattern {
    * @return string
    *   The suffix.
    */
-  public function getSuffix() {
+  public function getSuffix() : string {
     return $this->suffix;
   }
 
@@ -104,7 +104,7 @@ final class CouponCodePattern {
    * @return int
    *   The length.
    */
-  public function getLength() {
+  public function getLength() : int {
     return $this->length;
   }
 

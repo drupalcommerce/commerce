@@ -13,7 +13,7 @@ class EntityHelper {
    * @return array
    *   The entity IDs.
    */
-  public static function extractIds(array $entities) {
+  public static function extractIds(array $entities) : array {
     return array_map(function ($entity) {
       /** @var \Drupal\Core\Entity\EntityInterface $entity */
       return $entity->id();
@@ -29,7 +29,7 @@ class EntityHelper {
    * @return array
    *   The entity labels.
    */
-  public static function extractLabels(array $entities) {
+  public static function extractLabels(array $entities) : array {
     return array_map(function ($entity) {
       /** @var \Drupal\Core\Entity\EntityInterface $entity */
       return $entity->label();
