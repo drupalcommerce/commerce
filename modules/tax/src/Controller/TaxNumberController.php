@@ -10,12 +10,16 @@ use Drupal\Component\Plugin\Exception\PluginNotFoundException;
 use Drupal\Core\Datetime\DateFormatterInterface;
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\Messenger\MessengerTrait;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
+use Drupal\Core\Url;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 class TaxNumberController implements ContainerInjectionInterface {
 
+  use MessengerTrait;
   use StringTranslationTrait;
 
   /**
@@ -56,6 +60,46 @@ class TaxNumberController implements ContainerInjectionInterface {
   }
 
   /**
+   * Verifies the given tax number.
+   *
+   * @param string $tax_number
+   *   The tax number.
+   * @param string $context
+   *   The encoded context.
+   *
+   * @return \Symfony\Component\HttpFoundation\Response
+   *   A response.
+   *
+   * @throws \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException
+   *   If the context is invalid or the user doesn't have access to update
+   *   the parent entity.
+   */
+  public function verify($tax_number, $context) {
+    $context = $this->prepareContext($context);
+    if (!$context) {
+      throw new AccessDeniedHttpException();
+    }
+    /** @var \Drupal\Core\Entity\ContentEntityInterface $entity */
+    $entity = $context['entity'];
+    if (!$entity->access('update')) {
+      throw new AccessDeniedHttpException();
+    }
+    /** @var \Drupal\commerce_tax\Plugin\Field\FieldType\TaxNumberItemInterface $field */
+    $field = $entity->get('tax_number')->first();
+    $type_plugin = $field->getTypePlugin();
+    if ($type_plugin instanceof SupportsVerificationInterface) {
+      $result = $type_plugin->verify($tax_number);
+      $field->applyVerificationResult($result);
+      $entity->save();
+      $this->messenger()->addStatus($this->t('The tax number @number has been reverified.', [
+        '@number' => $tax_number,
+      ]));
+    }
+
+    return new RedirectResponse(Url::fromRoute('<front>', [], ['absolute' => TRUE])->toString());
+  }
+
+  /**
    * Displays the verification result for the given tax number.
    *
    * @param string $tax_number
@@ -81,7 +125,7 @@ class TaxNumberController implements ContainerInjectionInterface {
       throw new AccessDeniedHttpException();
     }
     /** @var \Drupal\commerce_tax\Plugin\Field\FieldType\TaxNumberItemInterface $field */
-    $field = $context['field'];
+    $field = $entity->get('tax_number')->first();
     if ($field->value != $tax_number) {
       throw new AccessDeniedHttpException();
     }
@@ -149,9 +193,8 @@ class TaxNumberController implements ContainerInjectionInterface {
     if (!($field instanceof TaxNumberItemInterface)) {
       return FALSE;
     }
-    // Upcast the values in the context array.
+    // Upcast the entity in the context array.
     $context['entity'] = $entity;
-    $context['field'] = $field;
 
     return $context;
   }

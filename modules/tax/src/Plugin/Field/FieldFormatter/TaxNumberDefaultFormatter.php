@@ -3,6 +3,7 @@
 namespace Drupal\commerce_tax\Plugin\Field\FieldFormatter;
 
 use Drupal\commerce\UrlData;
+use Drupal\commerce_tax\Plugin\Commerce\TaxNumberType\VerificationResult;
 use Drupal\Component\Serialization\Json;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Field\FormatterBase;
@@ -95,9 +96,7 @@ class TaxNumberDefaultFormatter extends FormatterBase {
               'context' => $context,
             ]),
             '#attributes' => [
-              'class' => [
-                'use-ajax',
-              ],
+              'class' => ['use-ajax'],
               'data-dialog-type' => 'modal',
               'data-dialog-options' => Json::encode([
                 'width' => 500,
@@ -119,6 +118,24 @@ class TaxNumberDefaultFormatter extends FormatterBase {
                 'commerce-tax-number__verification-icon--' . $item->verification_state,
               ],
             ],
+          ];
+
+          $options = [
+            'query' => [
+              'destination' => Url::fromRoute('<current>')->toString(),
+            ],
+          ];
+          $element['reverify'] = [
+            '#type' => 'container',
+            '#access' => $item->verification_state == VerificationResult::STATE_UNKNOWN,
+          ];
+          $element['reverify']['link'] = [
+            '#type' => 'link',
+            '#title' => $this->t('Reverify'),
+            '#url' => Url::fromRoute('commerce_tax.verify', [
+              'tax_number' => $item->value,
+              'context' => $context,
+            ], $options),
           ];
         }
       }

@@ -220,6 +220,7 @@ class TaxNumberTest extends CommerceWebDriverTestBase {
     $rendered_field = $this->getSession()->getPage()->find('css', '.field--name-tax-number');
     $this->assertContains('Tax number', $rendered_field->getHtml());
     $this->assertTrue($rendered_field->hasLink('123'));
+    $this->assertFalse($rendered_field->hasLink('Reverify'));
     $state_field = $rendered_field->find('css', '.commerce-tax-number__verification-icon');
     $this->assertNotEmpty($state_field);
     $this->assertEquals('Verification state: Success', $state_field->getAttribute('title'));
@@ -243,6 +244,7 @@ class TaxNumberTest extends CommerceWebDriverTestBase {
     $rendered_field = $this->getSession()->getPage()->find('css', '.field--name-tax-number');
     $this->assertContains('Tax number', $rendered_field->getHtml());
     $this->assertTrue($rendered_field->hasLink('124'));
+    $this->assertFalse($rendered_field->hasLink('Reverify'));
     $state_field = $rendered_field->find('css', '.commerce-tax-number__verification-icon');
     $this->assertNotEmpty($state_field);
     $this->assertEquals('Verification state: Failure', $state_field->getAttribute('title'));
@@ -266,6 +268,7 @@ class TaxNumberTest extends CommerceWebDriverTestBase {
     $rendered_field = $this->getSession()->getPage()->find('css', '.field--name-tax-number');
     $this->assertContains('Tax number', $rendered_field->getHtml());
     $this->assertTrue($rendered_field->hasLink('125'));
+    $this->assertTrue($rendered_field->hasLink('Reverify'));
     $state_field = $rendered_field->find('css', '.commerce-tax-number__verification-icon');
     $this->assertNotEmpty($state_field);
     $this->assertEquals('Verification state: Unknown', $state_field->getAttribute('title'));
@@ -275,6 +278,11 @@ class TaxNumberTest extends CommerceWebDriverTestBase {
     $this->clickLink('125');
     $this->assertSession()->pageTextContains('August 10, 2019 - 00:00');
     $this->assertSession()->pageTextContains('Too many requests.');
+
+    // Confirm that the number can be reverified.
+    $this->drupalGet($this->order->toUrl('canonical'));
+    $this->clickLink('Reverify');
+    $this->assertSession()->pageTextContains('The tax number 125 has been reverified.');
 
     // Confirm that invalid verification states are ignored.
     $this->customerProfile->set('tax_number', [

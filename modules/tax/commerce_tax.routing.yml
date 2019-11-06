@@ -1,3 +1,13 @@
+commerce_tax.verify:
+  path: '/commerce_tax/verify/{tax_number}/{context}'
+  defaults:
+    _controller: '\Drupal\commerce_tax\Controller\TaxNumberController::verify'
+    _title: 'Verify tax number'
+  requirements:
+    _access: 'TRUE'
+  options:
+    _admin_route: TRUE
+
 commerce_tax.verification_result:
   path: '/commerce_tax/verification-result/{tax_number}/{context}'
   defaults:
