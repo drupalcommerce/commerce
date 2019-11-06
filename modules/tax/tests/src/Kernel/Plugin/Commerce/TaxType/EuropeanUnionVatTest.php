@@ -7,7 +7,7 @@ use Drupal\commerce_order\Entity\OrderItem;
 use Drupal\commerce_order\Entity\OrderItemType;
 use Drupal\commerce_price\Price;
 use Drupal\commerce_store\Entity\Store;
-use Drupal\commerce_tax\Plugin\Commerce\TaxType\EuropeanUnionVat;
+use Drupal\commerce_tax\Entity\TaxType;
 use Drupal\commerce_tax\TaxableType;
 use Drupal\profile\Entity\Profile;
 use Drupal\Tests\commerce_order\Kernel\OrderKernelTestBase;
@@ -19,11 +19,11 @@ use Drupal\Tests\commerce_order\Kernel\OrderKernelTestBase;
 class EuropeanUnionVatTest extends OrderKernelTestBase {
 
   /**
-   * The tax type plugin.
+   * The tax type.
    *
-   * @var \Drupal\commerce_tax\Plugin\Commerce\TaxType\TaxTypeInterface
+   * @var \Drupal\commerce_tax\Entity\TaxTypeInterface
    */
-  protected $plugin;
+  protected $taxType;
 
   /**
    * A sample user.
@@ -70,11 +70,17 @@ class EuropeanUnionVatTest extends OrderKernelTestBase {
     $user = $this->createUser();
     $this->user = $this->reloadEntity($user);
 
-    $configuration = [
-      '_entity_id' => 'european_union_vat',
-      'display_inclusive' => TRUE,
-    ];
-    $this->plugin = EuropeanUnionVat::create($this->container, $configuration, 'european_union_vat', ['label' => 'EU VAT']);
+    $this->taxType = TaxType::create([
+      'id' => 'european_union_vat',
+      'label' => 'EU VAT',
+      'plugin' => 'european_union_vat',
+      'configuration' => [
+        'display_inclusive' => TRUE,
+      ],
+      // Don't allow the tax type to apply automatically.
+      'status' => FALSE,
+    ]);
+    $this->taxType->save();
   }
 
   /**
@@ -82,10 +88,11 @@ class EuropeanUnionVatTest extends OrderKernelTestBase {
    * @covers ::apply
    */
   public function testApplication() {
+    $plugin = $this->taxType->getPlugin();
     // German customer, French store, VAT number provided.
     $order = $this->buildOrder('DE', 'FR', 'DE123456789');
-    $this->assertTrue($this->plugin->applies($order));
-    $this->plugin->apply($order);
+    $this->assertTrue($plugin->applies($order));
+    $plugin->apply($order);
     $adjustments = $order->collectAdjustments();
     $adjustment = reset($adjustments);
     $this->assertCount(1, $adjustments);
@@ -93,8 +100,8 @@ class EuropeanUnionVatTest extends OrderKernelTestBase {
 
     // French customer, French store, VAT number provided.
     $order = $this->buildOrder('FR', 'FR', 'FR00123456789');
-    $this->assertTrue($this->plugin->applies($order));
-    $this->plugin->apply($order);
+    $this->assertTrue($plugin->applies($order));
+    $plugin->apply($order);
     $adjustments = $order->collectAdjustments();
     $adjustment = reset($adjustments);
     $this->assertCount(1, $adjustments);
@@ -102,8 +109,8 @@ class EuropeanUnionVatTest extends OrderKernelTestBase {
 
     // German customer, French store, physical product.
     $order = $this->buildOrder('DE', 'FR');
-    $this->assertTrue($this->plugin->applies($order));
-    $this->plugin->apply($order);
+    $this->assertTrue($plugin->applies($order));
+    $plugin->apply($order);
     $adjustments = $order->collectAdjustments();
     $adjustment = reset($adjustments);
     $this->assertCount(1, $adjustments);
@@ -111,8 +118,8 @@ class EuropeanUnionVatTest extends OrderKernelTestBase {
 
     // German customer, French store registered for German VAT, physical product.
     $order = $this->buildOrder('DE', 'FR', '', ['DE']);
-    $this->assertTrue($this->plugin->applies($order));
-    $this->plugin->apply($order);
+    $this->assertTrue($plugin->applies($order));
+    $plugin->apply($order);
     $adjustments = $order->collectAdjustments();
     $adjustment = reset($adjustments);
     $this->assertCount(1, $adjustments);
@@ -122,8 +129,8 @@ class EuropeanUnionVatTest extends OrderKernelTestBase {
     $order = $this->buildOrder('DE', 'FR', '', [], TRUE);
     $order->setPlacedTime(mktime(1, 1, 1, 1, 1, 2013));
     $order->save();
-    $this->assertTrue($this->plugin->applies($order));
-    $this->plugin->apply($order);
+    $this->assertTrue($plugin->applies($order));
+    $plugin->apply($order);
     $adjustments = $order->collectAdjustments();
     $adjustment = reset($adjustments);
     $this->assertCount(1, $adjustments);
@@ -131,8 +138,8 @@ class EuropeanUnionVatTest extends OrderKernelTestBase {
 
     // German customer, French store, digital product.
     $order = $this->buildOrder('DE', 'FR', '', [], TRUE);
-    $this->assertTrue($this->plugin->applies($order));
-    $this->plugin->apply($order);
+    $this->assertTrue($plugin->applies($order));
+    $plugin->apply($order);
     $adjustments = $order->collectAdjustments();
     $adjustment = reset($adjustments);
     $this->assertCount(1, $adjustments);
@@ -140,8 +147,8 @@ class EuropeanUnionVatTest extends OrderKernelTestBase {
 
     // German customer, US store registered in FR, digital product.
     $order = $this->buildOrder('DE', 'US', '', ['FR'], TRUE);
-    $this->assertTrue($this->plugin->applies($order));
-    $this->plugin->apply($order);
+    $this->assertTrue($plugin->applies($order));
+    $plugin->apply($order);
     $adjustments = $order->collectAdjustments();
     $adjustment = reset($adjustments);
     $this->assertCount(1, $adjustments);
@@ -149,8 +156,8 @@ class EuropeanUnionVatTest extends OrderKernelTestBase {
 
     // German customer with VAT number, US store registered in FR, digital product.
     $order = $this->buildOrder('DE', 'US', 'DE123456789', ['FR'], TRUE);
-    $this->assertTrue($this->plugin->applies($order));
-    $this->plugin->apply($order);
+    $this->assertTrue($plugin->applies($order));
+    $plugin->apply($order);
     $adjustments = $order->collectAdjustments();
     $adjustment = reset($adjustments);
     $this->assertCount(1, $adjustments);
@@ -158,13 +165,13 @@ class EuropeanUnionVatTest extends OrderKernelTestBase {
 
     // Serbian customer, French store, physical product.
     $order = $this->buildOrder('RS', 'FR');
-    $this->assertTrue($this->plugin->applies($order));
-    $this->plugin->apply($order);
+    $this->assertTrue($plugin->applies($order));
+    $plugin->apply($order);
     $this->assertCount(0, $order->collectAdjustments());
 
     // French customer, Serbian store, physical product.
     $order = $this->buildOrder('FR', 'RS');
-    $this->assertFalse($this->plugin->applies($order));
+    $this->assertFalse($plugin->applies($order));
   }
 
   /**

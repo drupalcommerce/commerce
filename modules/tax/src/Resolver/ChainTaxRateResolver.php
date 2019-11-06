@@ -8,6 +8,8 @@ use Drupal\profile\Entity\ProfileInterface;
 
 class ChainTaxRateResolver implements ChainTaxRateResolverInterface {
 
+  use TaxTypeAwareTrait;
+
   /**
    * The resolvers.
    *
@@ -45,6 +47,9 @@ class ChainTaxRateResolver implements ChainTaxRateResolverInterface {
   public function resolve(TaxZone $zone, OrderItemInterface $order_item, ProfileInterface $customer_profile) {
     $result = NULL;
     foreach ($this->resolvers as $resolver) {
+      if ($resolver instanceof TaxTypeAwareInterface) {
+        $resolver->setTaxType($this->taxType);
+      }
       $result = $resolver->resolve($zone, $order_item, $customer_profile);
       if ($result) {
         break;

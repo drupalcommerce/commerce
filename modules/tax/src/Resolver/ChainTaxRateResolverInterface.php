@@ -8,7 +8,7 @@ namespace Drupal\commerce_tax\Resolver;
  * Each resolver in the chain can be another chain, which is why this interface
  * extends the tax rate resolver one.
  */
-interface ChainTaxRateResolverInterface extends TaxRateResolverInterface {
+interface ChainTaxRateResolverInterface extends TaxRateResolverInterface, TaxTypeAwareInterface {
 
   /**
    * Adds a resolver.
