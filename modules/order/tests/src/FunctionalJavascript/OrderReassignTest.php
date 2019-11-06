@@ -66,7 +66,7 @@ class OrderReassignTest extends OrderWebDriverTestBase {
   public function testReassignToNewUser() {
     $this->drupalGet($this->order->toUrl('reassign-form'));
     $this->getSession()->getPage()->fillField('customer_type', 'new');
-    $this->waitForAjaxToFinish();
+    $this->assertSession()->assertWaitOnAjaxRequest();
     $values = [
       'mail' => 'example@example.com',
     ];

@@ -179,7 +179,7 @@ class AddToCartMultilingualTest extends CartWebDriverTestBase {
     $this->drupalGet($this->product->getTranslation('fr')->toUrl());
     // Use AJAX to change the size to Medium, keeping the color on Red.
     $this->getSession()->getPage()->selectFieldOption('purchased_entity[0][attributes][attribute_size]', 'FR Medium');
-    $this->waitForAjaxToFinish();
+    $this->assertSession()->assertWaitOnAjaxRequest();
     $this->assertAttributeSelected('purchased_entity[0][attributes][attribute_color]', 'FR Red');
     $this->assertAttributeSelected('purchased_entity[0][attributes][attribute_size]', 'FR Medium');
     $this->assertAttributeExists('purchased_entity[0][attributes][attribute_color]', $this->colorAttributes['blue']->id());
@@ -188,7 +188,7 @@ class AddToCartMultilingualTest extends CartWebDriverTestBase {
 
     // Use AJAX to change the color to Blue, keeping the size on Medium.
     $this->getSession()->getPage()->selectFieldOption('purchased_entity[0][attributes][attribute_color]', 'FR Blue');
-    $this->waitForAjaxToFinish();
+    $this->assertSession()->assertWaitOnAjaxRequest();
     $this->assertAttributeSelected('purchased_entity[0][attributes][attribute_color]', 'FR Blue');
     $this->assertAttributeSelected('purchased_entity[0][attributes][attribute_size]', 'FR Medium');
     $this->assertAttributeExists('purchased_entity[0][attributes][attribute_color]', $this->colorAttributes['red']->id());
@@ -246,12 +246,12 @@ class AddToCartMultilingualTest extends CartWebDriverTestBase {
     // Use AJAX to change the size to Medium, keeping the color on Red.
     $this->assertAttributeSelected('purchased_entity[0][variation]', 'Mon super produit - FR Red, FR Small');
     $this->getSession()->getPage()->selectFieldOption('purchased_entity[0][variation]', 'Mon super produit - FR Red, FR Medium');
-    $this->waitForAjaxToFinish();
+    $this->assertSession()->assertWaitOnAjaxRequest();
     $this->assertAttributeSelected('purchased_entity[0][variation]', 'Mon super produit - FR Red, FR Medium');
     $this->assertSession()->pageTextContains('Mon super produit - FR Red, FR Medium');
     // Use AJAX to change the color to Blue, keeping the size on Medium.
     $this->getSession()->getPage()->selectFieldOption('purchased_entity[0][variation]', 'Mon super produit - FR Blue, FR Medium');
-    $this->waitForAjaxToFinish();
+    $this->assertSession()->assertWaitOnAjaxRequest();
     $this->assertAttributeSelected('purchased_entity[0][variation]', 'Mon super produit - FR Blue, FR Medium');
     $this->assertSession()->pageTextContains('Mon super produit - FR Blue, FR Medium');
     $this->getSession()->getPage()->pressButton('Add to cart');

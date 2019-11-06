@@ -149,6 +149,8 @@ abstract class CommerceWebDriverTestBase extends WebDriverTestBase {
 
   /**
    * Waits for jQuery to become active and animations to complete.
+   *
+   * @deprecated in commerce:8.x-2.16 and is removed from commerce:3.x.
    */
   protected function waitForAjaxToFinish() {
     $condition = "(0 === jQuery.active && 0 === jQuery(':animated').length)";

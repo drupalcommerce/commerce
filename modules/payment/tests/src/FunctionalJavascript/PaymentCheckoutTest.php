@@ -285,10 +285,10 @@ class PaymentCheckoutTest extends CommerceWebDriverTestBase {
     $this->drupalGet('checkout/1');
     $radio_button = $this->getSession()->getPage()->findField('Credit card');
     $radio_button->click();
-    $this->waitForAjaxToFinish();
+    $this->assertSession()->assertWaitOnAjaxRequest();
     $this->assertRenderedAddress($this->defaultAddress, 'payment_information[add_payment_method][billing_information]');
     $this->getSession()->getPage()->pressButton('billing_edit');
-    $this->waitForAjaxToFinish();
+    $this->assertSession()->assertWaitOnAjaxRequest();
 
     $this->submitForm([
       'payment_information[add_payment_method][payment_details][number]' => '4012888888881881',
@@ -415,10 +415,10 @@ class PaymentCheckoutTest extends CommerceWebDriverTestBase {
     $this->drupalGet('checkout/1');
     $radio_button = $this->getSession()->getPage()->findField('Credit card');
     $radio_button->click();
-    $this->waitForAjaxToFinish();
+    $this->assertSession()->assertWaitOnAjaxRequest();
     $this->assertRenderedAddress($this->defaultAddress, 'payment_information[add_payment_method][billing_information]');
     $this->getSession()->getPage()->fillField('payment_information[add_payment_method][billing_information][select_address]', '_new');
-    $this->waitForAjaxToFinish();
+    $this->assertSession()->assertWaitOnAjaxRequest();
 
     $this->submitForm([
       'payment_information[add_payment_method][payment_details][number]' => '4111111111111111',
@@ -462,7 +462,7 @@ class PaymentCheckoutTest extends CommerceWebDriverTestBase {
     $this->drupalGet('checkout/1');
     $radio_button = $this->getSession()->getPage()->findField('Example');
     $radio_button->click();
-    $this->waitForAjaxToFinish();
+    $this->assertSession()->assertWaitOnAjaxRequest();
     $this->assertRenderedAddress($this->defaultAddress, 'payment_information[billing_information]');
 
     $this->submitForm([], 'Continue to review');
@@ -504,7 +504,7 @@ class PaymentCheckoutTest extends CommerceWebDriverTestBase {
     $this->drupalGet('checkout/1');
     $radio_button = $this->getSession()->getPage()->findField('Example');
     $radio_button->click();
-    $this->waitForAjaxToFinish();
+    $this->assertSession()->assertWaitOnAjaxRequest();
     $this->assertRenderedAddress($this->defaultAddress, 'payment_information[billing_information]');
 
     $this->submitForm([], 'Continue to review');
@@ -592,10 +592,10 @@ class PaymentCheckoutTest extends CommerceWebDriverTestBase {
     $this->drupalGet('checkout/1');
     $radio_button = $this->getSession()->getPage()->findField('Example');
     $radio_button->click();
-    $this->waitForAjaxToFinish();
+    $this->assertSession()->assertWaitOnAjaxRequest();
     $this->assertRenderedAddress($this->defaultAddress, 'payment_information[billing_information]');
     $this->getSession()->getPage()->pressButton('billing_edit');
-    $this->waitForAjaxToFinish();
+    $this->assertSession()->assertWaitOnAjaxRequest();
 
     $this->submitForm([
       'payment_information[billing_information][address][0][address][family_name]' => 'FAIL',
@@ -635,7 +635,7 @@ class PaymentCheckoutTest extends CommerceWebDriverTestBase {
     $this->drupalGet('checkout/1');
     $radio_button = $this->getSession()->getPage()->findField('Example');
     $radio_button->click();
-    $this->waitForAjaxToFinish();
+    $this->assertSession()->assertWaitOnAjaxRequest();
     $this->assertRenderedAddress($this->defaultAddress, 'payment_information[billing_information]');
 
     $this->submitForm([], 'Continue to review');
@@ -699,7 +699,7 @@ class PaymentCheckoutTest extends CommerceWebDriverTestBase {
 
     $radio_button = $this->getSession()->getPage()->findField('Cash on delivery');
     $radio_button->click();
-    $this->waitForAjaxToFinish();
+    $this->assertSession()->assertWaitOnAjaxRequest();
     $this->assertRenderedAddress($this->defaultAddress, 'payment_information[billing_information]');
 
     $this->submitForm([], 'Continue to review');
@@ -744,7 +744,7 @@ class PaymentCheckoutTest extends CommerceWebDriverTestBase {
     $this->drupalGet('checkout/1');
     $radio_button = $this->getSession()->getPage()->findField('Cash on delivery');
     $radio_button->click();
-    $this->waitForAjaxToFinish();
+    $this->assertSession()->assertWaitOnAjaxRequest();
     $this->assertSession()->pageTextNotContains('Country');
     $this->submitForm([], 'Continue to review');
     $this->assertSession()->pageTextContains('Payment information');
@@ -799,7 +799,7 @@ class PaymentCheckoutTest extends CommerceWebDriverTestBase {
     $this->assertSession()->pageTextNotContains('Payment information');
     $this->assertRenderedAddress($this->defaultAddress, 'payment_information[billing_information]');
     $this->getSession()->getPage()->fillField('payment_information[billing_information][select_address]', $new_address_book_profile->id());
-    $this->waitForAjaxToFinish();
+    $this->assertSession()->assertWaitOnAjaxRequest();
     $this->assertRenderedAddress($new_address, 'payment_information[billing_information]');
 
     $this->submitForm([], 'Continue to review');
@@ -845,7 +845,7 @@ class PaymentCheckoutTest extends CommerceWebDriverTestBase {
     $this->assertSession()->pageTextNotContains('Payment information');
     $this->assertRenderedAddress($this->defaultAddress, 'payment_information[billing_information]');
     $this->getSession()->getPage()->fillField('payment_information[billing_information][select_address]', $new_address_book_profile->id());
-    $this->waitForAjaxToFinish();
+    $this->assertSession()->assertWaitOnAjaxRequest();
     $this->assertRenderedAddress($new_address, 'payment_information[billing_information]');
 
     $this->submitForm([], 'Continue to review');

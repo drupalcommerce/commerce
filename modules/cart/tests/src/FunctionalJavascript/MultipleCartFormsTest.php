@@ -202,9 +202,9 @@ class MultipleCartFormsTest extends CartWebDriverTestBase {
     $current_form = $forms[3];
     $current_form->fillField('Quantity', '10');
     $current_form->selectFieldOption('Size', 'Large');
-    $this->waitForAjaxToFinish();
+    $this->assertSession()->assertWaitOnAjaxRequest();
     $current_form->selectFieldOption('Color', 'Blue');
-    $this->waitForAjaxToFinish();
+    $this->assertSession()->assertWaitOnAjaxRequest();
     $current_form->pressButton('Add to cart');
 
     \Drupal::entityTypeManager()->getStorage('commerce_order')->resetCache();

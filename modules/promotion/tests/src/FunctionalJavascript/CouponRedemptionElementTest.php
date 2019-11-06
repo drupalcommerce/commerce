@@ -112,26 +112,26 @@ class CouponRedemptionElementTest extends CommerceWebDriverTestBase {
     $this->drupalGet(Url::fromRoute('commerce_cart.page', [], ['query' => ['coupon_cardinality' => 1]]));
     // Empty coupon.
     $this->getSession()->getPage()->pressButton('Apply coupon');
-    $this->waitForAjaxToFinish();
+    $this->assertSession()->assertWaitOnAjaxRequest();
     $this->assertSession()->pageTextContains('Please provide a coupon code');
 
     // Non-existent coupon.
     $this->getSession()->getPage()->fillField('Coupon code', $this->randomString());
     $this->getSession()->getPage()->pressButton('Apply coupon');
-    $this->waitForAjaxToFinish();
+    $this->assertSession()->assertWaitOnAjaxRequest();
     $this->assertSession()->pageTextContains('The provided coupon code is invalid');
 
     // Valid coupon.
     $this->getSession()->getPage()->fillField('Coupon code', $coupon->getCode());
     $this->getSession()->getPage()->pressButton('Apply coupon');
-    $this->waitForAjaxToFinish();
+    $this->assertSession()->assertWaitOnAjaxRequest();
     $this->assertSession()->pageTextContains($coupon->getCode());
     $this->assertSession()->fieldNotExists('Coupon code');
     $this->assertSession()->buttonNotExists('Apply coupon');
 
     // Coupon removal.
     $this->getSession()->getPage()->pressButton('Remove coupon');
-    $this->waitForAjaxToFinish();
+    $this->assertSession()->assertWaitOnAjaxRequest();
     $this->assertSession()->pageTextNotContains($coupon->getCode());
     $this->assertSession()->fieldExists('Coupon code');
     $this->assertSession()->buttonExists('Apply coupon');
@@ -151,7 +151,7 @@ class CouponRedemptionElementTest extends CommerceWebDriverTestBase {
     // First coupon.
     $this->getSession()->getPage()->fillField('Coupon code', $first_coupon->getCode());
     $this->getSession()->getPage()->pressButton('Apply coupon');
-    $this->waitForAjaxToFinish();
+    $this->assertSession()->assertWaitOnAjaxRequest();
     $this->assertSession()->pageTextContains($first_coupon->getCode());
     $this->assertSession()->fieldExists('Coupon code');
     // The coupon code input field needs to be cleared.
@@ -160,26 +160,26 @@ class CouponRedemptionElementTest extends CommerceWebDriverTestBase {
     // First coupon, applied for the second time.
     $this->getSession()->getPage()->fillField('Coupon code', $first_coupon->getCode());
     $this->getSession()->getPage()->pressButton('Apply coupon');
-    $this->waitForAjaxToFinish();
+    $this->assertSession()->assertWaitOnAjaxRequest();
     $this->assertSession()->pageTextNotContains('The provided coupon code is invalid');
     $this->assertSession()->pageTextContains($first_coupon->getCode());
 
     // Second coupon.
     $this->getSession()->getPage()->fillField('Coupon code', $second_coupon->getCode());
     $this->getSession()->getPage()->pressButton('Apply coupon');
-    $this->waitForAjaxToFinish();
+    $this->assertSession()->assertWaitOnAjaxRequest();
     $this->assertSession()->pageTextContains($first_coupon->getCode());
     $this->assertSession()->pageTextContains($second_coupon->getCode());
 
     // Second coupon removal.
     $this->getSession()->getPage()->pressButton('remove_coupon_1');
-    $this->waitForAjaxToFinish();
+    $this->assertSession()->assertWaitOnAjaxRequest();
     $this->assertSession()->pageTextNotContains($second_coupon->getCode());
     $this->assertSession()->pageTextContains($first_coupon->getCode());
 
     // First coupon removal.
     $this->getSession()->getPage()->pressButton('remove_coupon_0');
-    $this->waitForAjaxToFinish();
+    $this->assertSession()->assertWaitOnAjaxRequest();
     $this->assertSession()->pageTextNotContains($second_coupon->getCode());
     $this->assertSession()->pageTextNotContains($first_coupon->getCode());
   }

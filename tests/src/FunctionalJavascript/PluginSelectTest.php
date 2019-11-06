@@ -115,7 +115,7 @@ class PluginSelectTest extends CommerceWebDriverTestBase {
     ]);
     $this->drupalGet($entity->toUrl('edit-form'));
     $this->getSession()->getPage()->fillField('test_plugin[0][target_plugin_id]', 'order_email');
-    $this->waitForAjaxToFinish();
+    $this->assertSession()->assertWaitOnAjaxRequest();
 
     $this->submitForm([
       'test_plugin[0][target_plugin_configuration][order_email][mail]' => 'test@example.com',
@@ -131,7 +131,7 @@ class PluginSelectTest extends CommerceWebDriverTestBase {
     // Select the other condition.
     $this->drupalGet($entity->toUrl('edit-form'));
     $this->getSession()->getPage()->fillField('test_plugin[0][target_plugin_id]', 'order_total_price');
-    $this->waitForAjaxToFinish();
+    $this->assertSession()->assertWaitOnAjaxRequest();
 
     $this->submitForm([
       'test_plugin[0][target_plugin_configuration][order_total_price][operator]' => '<',

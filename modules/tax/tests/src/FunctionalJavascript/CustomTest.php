@@ -43,31 +43,31 @@ class CustomTest extends CommerceWebDriverTestBase {
 
     $this->drupalGet($tax_type->toUrl('edit-form'));
     $this->getSession()->getPage()->pressButton('remove_rate0');
-    $this->waitForAjaxToFinish();
+    $this->assertSession()->assertWaitOnAjaxRequest();
     $this->getSession()->getPage()->pressButton('remove_territory0');
-    $this->waitForAjaxToFinish();
+    $this->assertSession()->assertWaitOnAjaxRequest();
     $this->submitForm([], t('Save'));
     $this->assertSession()->pageTextContains('Please add at least one rate.');
     $this->assertSession()->pageTextContains('Please add at least one territory.');
 
     $this->getSession()->getPage()->selectFieldOption('configuration[custom][display_label]', 'vat');
     $this->getSession()->getPage()->pressButton('Add rate');
-    $this->waitForAjaxToFinish();
+    $this->assertSession()->assertWaitOnAjaxRequest();
     $this->getSession()->getPage()->fillField('configuration[custom][rates][0][rate][label]', 'Sample rate');
     $this->getSession()->getPage()->fillField('configuration[custom][rates][0][percentage]', '15');
     $this->getSession()->getPage()->pressButton('Add rate');
-    $this->waitForAjaxToFinish();
+    $this->assertSession()->assertWaitOnAjaxRequest();
     $this->getSession()->getPage()->fillField('configuration[custom][rates][1][rate][label]', 'Sample rate 2');
     $this->getSession()->getPage()->fillField('configuration[custom][rates][1][percentage]', '17.5');
 
     $this->getSession()->getPage()->pressButton('Add territory');
-    $this->waitForAjaxToFinish();
+    $this->assertSession()->assertWaitOnAjaxRequest();
     $this->getSession()->getPage()->selectFieldOption('configuration[custom][territories][0][territory][country_code]', 'FR');
-    $this->waitForAjaxToFinish();
+    $this->assertSession()->assertWaitOnAjaxRequest();
     $this->getSession()->getPage()->pressButton('Add territory');
-    $this->waitForAjaxToFinish();
+    $this->assertSession()->assertWaitOnAjaxRequest();
     $this->getSession()->getPage()->selectFieldOption('configuration[custom][territories][1][territory][country_code]', 'IT');
-    $this->waitForAjaxToFinish();
+    $this->assertSession()->assertWaitOnAjaxRequest();
     $this->submitForm([], t('Save'));
     $this->container->get('entity_type.manager')->getStorage('commerce_tax_type')->resetCache([$tax_type->id()]);
     $tax_type = TaxType::load($tax_type->id());

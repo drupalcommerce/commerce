@@ -209,7 +209,7 @@ class AddressBookTest extends OrderWebDriverTestBase {
     // Confirm that a profile can be created.
     $this->getSession()->getPage()->clickLink('Add address');
     $this->getSession()->getPage()->fillField('address[0][address][country_code]', 'FR');
-    $this->waitForAjaxToFinish();
+    $this->assertSession()->assertWaitOnAjaxRequest();
     foreach ($this->fourthAddress as $property => $value) {
       $this->getSession()->getPage()->fillField("address[0][address][$property]", $value);
     }

@@ -45,12 +45,12 @@ class PromotionTest extends CommerceWebDriverTestBase {
     $name = $this->randomMachineName(8);
     $this->getSession()->getPage()->fillField('name[0][value]', $name);
     $this->getSession()->getPage()->selectFieldOption('offer[0][target_plugin_id]', 'order_item_percentage_off');
-    $this->waitForAjaxToFinish();
+    $this->assertSession()->assertWaitOnAjaxRequest();
     $this->getSession()->getPage()->fillField('offer[0][target_plugin_configuration][order_item_percentage_off][percentage]', '10.0');
 
     // Change, assert any values reset.
     $this->getSession()->getPage()->selectFieldOption('offer[0][target_plugin_id]', 'order_percentage_off');
-    $this->waitForAjaxToFinish();
+    $this->assertSession()->assertWaitOnAjaxRequest();
     $this->assertSession()->fieldValueNotEquals('offer[0][target_plugin_configuration][order_percentage_off][percentage]', '10.0');
     $this->getSession()->getPage()->fillField('offer[0][target_plugin_configuration][order_percentage_off][percentage]', '10.0');
 
@@ -63,7 +63,7 @@ class PromotionTest extends CommerceWebDriverTestBase {
     $vertical_tab_element = reset($vertical_tab_elements);
     $vertical_tab_element->click();
     $this->getSession()->getPage()->checkField('Current order total');
-    $this->waitForAjaxToFinish();
+    $this->assertSession()->assertWaitOnAjaxRequest();
     $this->getSession()->getPage()->fillField('conditions[form][order][order_total_price][configuration][form][amount][number]', '50.00');
 
     // Confirm that the usage limit widget works properly.
@@ -103,7 +103,7 @@ class PromotionTest extends CommerceWebDriverTestBase {
     $name = $this->randomString();
     $this->getSession()->getPage()->fillField('name[0][value]', $name);
     $this->getSession()->getPage()->selectFieldOption('offer[0][target_plugin_id]', 'order_item_fixed_amount_off');
-    $this->waitForAjaxToFinish();
+    $this->assertSession()->assertWaitOnAjaxRequest();
     $this->getSession()->getPage()->fillField('offer[0][target_plugin_configuration][order_item_fixed_amount_off][amount][number]', '10.00');
     $this->submitForm([], t('Save and add coupons'));
     $this->assertSession()->pageTextContains("Saved the $name promotion.");
@@ -127,7 +127,7 @@ class PromotionTest extends CommerceWebDriverTestBase {
     $this->assertSession()->fieldExists('name[0][value]');
 
     $this->getSession()->getPage()->fillField('offer[0][target_plugin_id]', 'order_percentage_off');
-    $this->waitForAjaxToFinish();
+    $this->assertSession()->assertWaitOnAjaxRequest();
 
     $name = $this->randomMachineName(8);
     $this->getSession()->getPage()->checkField('end_date[0][has_value]');

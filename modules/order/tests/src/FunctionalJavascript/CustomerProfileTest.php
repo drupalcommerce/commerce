@@ -87,7 +87,7 @@ class CustomerProfileTest extends OrderWebDriverTestBase {
 
     // Confirm that it is possible to change the country and submit the form.
     $this->getSession()->getPage()->fillField('profile[address][0][address][country_code]', 'FR');
-    $this->waitForAjaxToFinish();
+    $this->assertSession()->assertWaitOnAjaxRequest();
     $this->submitForm([
       'profile[address][0][address][given_name]' => 'Leon',
       'profile[address][0][address][family_name]' => 'Blum',
@@ -151,7 +151,7 @@ class CustomerProfileTest extends OrderWebDriverTestBase {
     // Confirm that it is possible to edit and submit the US profile.
     $this->drupalGet('/commerce_order_test/customer_profile_test_form');
     $this->getSession()->getPage()->pressButton('billing_edit');
-    $this->waitForAjaxToFinish();
+    $this->assertSession()->assertWaitOnAjaxRequest();
     foreach ($this->usAddress as $property => $value) {
       $this->assertSession()->fieldValueEquals("profile[address][0][address][$property]", $value);
     }
@@ -165,7 +165,7 @@ class CustomerProfileTest extends OrderWebDriverTestBase {
     // Confirm that it is possible to select the French profile.
     $this->drupalGet('/commerce_order_test/customer_profile_test_form');
     $this->getSession()->getPage()->fillField('profile[select_address]', $french_profile->id());
-    $this->waitForAjaxToFinish();
+    $this->assertSession()->assertWaitOnAjaxRequest();
     $this->assertRenderedAddress($this->frenchAddress);
     $this->submitForm([], 'Submit');
     $this->assertSession()->pageTextContains('The street is "38 Rue du Sentier" and the country code is FR. Address book: No');
@@ -173,9 +173,9 @@ class CustomerProfileTest extends OrderWebDriverTestBase {
     // Confirm that it is possible to select and edit the French profile.
     $this->drupalGet('/commerce_order_test/customer_profile_test_form');
     $this->getSession()->getPage()->fillField('profile[select_address]', $french_profile->id());
-    $this->waitForAjaxToFinish();
+    $this->assertSession()->assertWaitOnAjaxRequest();
     $this->getSession()->getPage()->pressButton('billing_edit');
-    $this->waitForAjaxToFinish();
+    $this->assertSession()->assertWaitOnAjaxRequest();
     foreach ($this->frenchAddress as $property => $value) {
       $this->assertSession()->fieldValueEquals("profile[address][0][address][$property]", $value);
     }
@@ -188,17 +188,17 @@ class CustomerProfileTest extends OrderWebDriverTestBase {
     // Confirm that selecting a different address reverts to render mode.
     $this->drupalGet('/commerce_order_test/customer_profile_test_form');
     $this->getSession()->getPage()->pressButton('billing_edit');
-    $this->waitForAjaxToFinish();
+    $this->assertSession()->assertWaitOnAjaxRequest();
     foreach ($this->usAddress as $property => $value) {
       $this->assertSession()->fieldValueEquals("profile[address][0][address][$property]", $value);
     }
     $this->getSession()->getPage()->fillField('profile[select_address]', $french_profile->id());
-    $this->waitForAjaxToFinish();
+    $this->assertSession()->assertWaitOnAjaxRequest();
     $this->assertRenderedAddress($this->frenchAddress);
 
     // Confirm that it is possible to add a new profile.
     $this->getSession()->getPage()->fillField('profile[select_address]', '_new');
-    $this->waitForAjaxToFinish();
+    $this->assertSession()->assertWaitOnAjaxRequest();
     foreach ($this->emptyAddress as $property => $value) {
       $this->assertSession()->fieldValueEquals("profile[address][0][address][$property]", $value);
     }
@@ -234,7 +234,7 @@ class CustomerProfileTest extends OrderWebDriverTestBase {
     // Confirm that it is possible to edit the profile.
     $this->drupalGet('/commerce_order_test/customer_profile_test_form/' . $profile->id());
     $this->getSession()->getPage()->pressButton('billing_edit');
-    $this->waitForAjaxToFinish();
+    $this->assertSession()->assertWaitOnAjaxRequest();
     foreach ($this->frenchAddress as $property => $value) {
       $this->assertSession()->fieldValueEquals("profile[address][0][address][$property]", $value);
     }
@@ -258,7 +258,7 @@ class CustomerProfileTest extends OrderWebDriverTestBase {
     // Confirm that it is possible to edit the copy checkbox.
     $this->drupalGet('/commerce_order_test/customer_profile_test_form/' . $profile->id());
     $this->getSession()->getPage()->pressButton('billing_edit');
-    $this->waitForAjaxToFinish();
+    $this->assertSession()->assertWaitOnAjaxRequest();
     $this->assertSession()->checkboxChecked('profile[copy_to_address_book]');
     $this->assertSession()->pageTextContains('Save to my address book');
     $this->submitForm([
@@ -309,7 +309,7 @@ class CustomerProfileTest extends OrderWebDriverTestBase {
     // Confirm that it is possible to edit the profile.
     $this->drupalGet('/commerce_order_test/customer_profile_test_form/' . $profile->id());
     $this->getSession()->getPage()->pressButton('billing_edit');
-    $this->waitForAjaxToFinish();
+    $this->assertSession()->assertWaitOnAjaxRequest();
     foreach ($this->frenchAddress as $property => $value) {
       $this->assertSession()->fieldValueEquals("profile[address][0][address][$property]", $value);
     }
@@ -358,7 +358,7 @@ class CustomerProfileTest extends OrderWebDriverTestBase {
     // Confirm that it is possible to switch to a different profile.
     $this->drupalGet('/commerce_order_test/customer_profile_test_form/' . $profile->id());
     $this->getSession()->getPage()->fillField('profile[select_address]', $french_profile->id());
-    $this->waitForAjaxToFinish();
+    $this->assertSession()->assertWaitOnAjaxRequest();
     $this->assertRenderedAddress($new_french_address);
     $this->submitForm([], 'Submit');
     $this->assertSession()->pageTextContains('The street is "39 Rue du Sentier" and the country code is FR. Address book: No');
@@ -366,10 +366,10 @@ class CustomerProfileTest extends OrderWebDriverTestBase {
     // Confirm that it is possible to switch to a different profile, and back.
     $this->drupalGet('/commerce_order_test/customer_profile_test_form/' . $profile->id());
     $this->getSession()->getPage()->fillField('profile[select_address]', $french_profile->id());
-    $this->waitForAjaxToFinish();
+    $this->assertSession()->assertWaitOnAjaxRequest();
     $this->assertRenderedAddress($new_french_address);
     $this->getSession()->getPage()->fillField('profile[select_address]', '_original');
-    $this->waitForAjaxToFinish();
+    $this->assertSession()->assertWaitOnAjaxRequest();
     $this->assertRenderedAddress($this->frenchAddress);
     $this->submitForm([], 'Submit');
     $this->assertSession()->pageTextContains('The street is "38 Rue du Sentier" and the country code is FR. Address book: No');
@@ -379,7 +379,7 @@ class CustomerProfileTest extends OrderWebDriverTestBase {
     // the source address book profile is now out of sync.
     $this->drupalGet('/commerce_order_test/customer_profile_test_form/' . $profile->id());
     $this->getSession()->getPage()->pressButton('billing_edit');
-    $this->waitForAjaxToFinish();
+    $this->assertSession()->assertWaitOnAjaxRequest();
     foreach ($this->frenchAddress as $property => $value) {
       $this->assertSession()->fieldValueEquals("profile[address][0][address][$property]", $value);
     }
@@ -431,7 +431,7 @@ class CustomerProfileTest extends OrderWebDriverTestBase {
     // the source address book profile is now out of sync.
     $this->drupalGet('/commerce_order_test/customer_profile_test_form/' . $profile->id());
     $this->getSession()->getPage()->pressButton('billing_edit');
-    $this->waitForAjaxToFinish();
+    $this->assertSession()->assertWaitOnAjaxRequest();
     foreach ($this->frenchAddress as $property => $value) {
       $this->assertSession()->fieldValueEquals("profile[address][0][address][$property]", $value);
     }
@@ -461,7 +461,7 @@ class CustomerProfileTest extends OrderWebDriverTestBase {
     // be treated as a one-off (with the checkbox shown to allow copying again).
     $this->drupalGet('/commerce_order_test/customer_profile_test_form/' . $profile->id());
     $this->getSession()->getPage()->pressButton('billing_edit');
-    $this->waitForAjaxToFinish();
+    $this->assertSession()->assertWaitOnAjaxRequest();
     foreach ($this->frenchAddress as $property => $value) {
       $this->assertSession()->fieldValueEquals("profile[address][0][address][$property]", $value);
     }
@@ -488,7 +488,7 @@ class CustomerProfileTest extends OrderWebDriverTestBase {
     $this->drupalGet('/commerce_order_test/customer_profile_test_form/' . $profile->id() . '/TRUE');
     $this->assertRenderedAddress($this->frenchAddress);
     $this->getSession()->getPage()->pressButton('billing_edit');
-    $this->waitForAjaxToFinish();
+    $this->assertSession()->assertWaitOnAjaxRequest();
     foreach ($this->frenchAddress as $property => $value) {
       $this->assertSession()->fieldValueEquals("profile[address][0][address][$property]", $value);
     }
@@ -510,7 +510,7 @@ class CustomerProfileTest extends OrderWebDriverTestBase {
     // Update the profile.
     $this->drupalGet('/commerce_order_test/customer_profile_test_form/' . $profile->id() . '/TRUE');
     $this->getSession()->getPage()->pressButton('billing_edit');
-    $this->waitForAjaxToFinish();
+    $this->assertSession()->assertWaitOnAjaxRequest();
     foreach ($this->frenchAddress as $property => $value) {
       $this->assertSession()->fieldValueEquals("profile[address][0][address][$property]", $value);
     }
@@ -531,7 +531,7 @@ class CustomerProfileTest extends OrderWebDriverTestBase {
     // Replace the profile with a new one.
     $this->drupalGet('/commerce_order_test/customer_profile_test_form/' . $profile->id() . '/TRUE');
     $this->getSession()->getPage()->fillField('profile[select_address]', '_new');
-    $this->waitForAjaxToFinish();
+    $this->assertSession()->assertWaitOnAjaxRequest();
     foreach ($this->emptyAddress as $property => $value) {
       $this->assertSession()->fieldValueEquals("profile[address][0][address][$property]", $value);
     }
@@ -589,7 +589,7 @@ class CustomerProfileTest extends OrderWebDriverTestBase {
     ];
     $this->assertRenderedAddress($rendered_address);
     $this->getSession()->getPage()->pressButton('billing_edit');
-    $this->waitForAjaxToFinish();
+    $this->assertSession()->assertWaitOnAjaxRequest();
     $this->assertSession()->checkboxNotChecked('profile[copy_to_address_book]');
     $this->assertSession()->pageTextContains("Save to the customer's address book");
   }
@@ -636,7 +636,7 @@ class CustomerProfileTest extends OrderWebDriverTestBase {
     // Confirm that it is possible to edit the profile.
     $this->drupalGet('/commerce_order_test/customer_profile_test_form');
     $this->getSession()->getPage()->pressButton('billing_edit');
-    $this->waitForAjaxToFinish();
+    $this->assertSession()->assertWaitOnAjaxRequest();
     foreach ($this->frenchAddress as $property => $value) {
       $this->assertSession()->fieldValueEquals("profile[address][0][address][$property]", $value);
     }
@@ -677,7 +677,7 @@ class CustomerProfileTest extends OrderWebDriverTestBase {
     // Confirm that the profile can be edited.
     $this->drupalGet('/commerce_order_test/customer_profile_test_form/' . $profile->id());
     $this->getSession()->getPage()->pressButton('billing_edit');
-    $this->waitForAjaxToFinish();
+    $this->assertSession()->assertWaitOnAjaxRequest();
     foreach ($this->frenchAddress as $property => $value) {
       $this->assertSession()->fieldValueEquals("profile[address][0][address][$property]", $value);
     }
@@ -712,7 +712,7 @@ class CustomerProfileTest extends OrderWebDriverTestBase {
     // Confirm that the profile can be edited.
     $this->drupalGet('/commerce_order_test/customer_profile_test_form/' . $profile->id());
     $this->getSession()->getPage()->pressButton('billing_edit');
-    $this->waitForAjaxToFinish();
+    $this->assertSession()->assertWaitOnAjaxRequest();
     foreach ($this->usAddress as $property => $value) {
       $this->assertSession()->fieldValueEquals("profile[address][0][address][$property]", $value);
     }
@@ -740,7 +740,7 @@ class CustomerProfileTest extends OrderWebDriverTestBase {
     // Confirm that it is possible to edit the profile.
     $this->drupalGet('/commerce_order_test/customer_profile_test_form/' . $profile->id());
     $this->getSession()->getPage()->pressButton('billing_edit');
-    $this->waitForAjaxToFinish();
+    $this->assertSession()->assertWaitOnAjaxRequest();
     foreach ($this->frenchAddress as $property => $value) {
       $this->assertSession()->fieldValueEquals("profile[address][0][address][$property]", $value);
     }
@@ -772,7 +772,7 @@ class CustomerProfileTest extends OrderWebDriverTestBase {
     $this->assertSession()->fieldNotExists('select_address');
     $this->assertRenderedAddress($this->frenchAddress);
     $this->getSession()->getPage()->pressButton('billing_edit');
-    $this->waitForAjaxToFinish();
+    $this->assertSession()->assertWaitOnAjaxRequest();
     foreach ($this->frenchAddress as $property => $value) {
       $this->assertSession()->fieldValueEquals("profile[address][0][address][$property]", $value);
     }
@@ -795,7 +795,7 @@ class CustomerProfileTest extends OrderWebDriverTestBase {
     $this->drupalGet('/commerce_order_test/customer_profile_test_form/' . $profile->id() . '/TRUE');
     $this->assertSession()->fieldNotExists('select_address');
     $this->getSession()->getPage()->pressButton('billing_edit');
-    $this->waitForAjaxToFinish();
+    $this->assertSession()->assertWaitOnAjaxRequest();
     foreach ($this->frenchAddress as $property => $value) {
       $this->assertSession()->fieldValueEquals("profile[address][0][address][$property]", $value);
     }
@@ -822,7 +822,7 @@ class CustomerProfileTest extends OrderWebDriverTestBase {
     ] + $this->frenchAddress;
     $this->assertRenderedAddress($rendered_address);
     $this->getSession()->getPage()->pressButton('billing_edit');
-    $this->waitForAjaxToFinish();
+    $this->assertSession()->assertWaitOnAjaxRequest();
     $this->assertSession()->checkboxNotChecked('profile[copy_to_address_book]');
     $this->assertSession()->pageTextContains("Save to the customer's address book");
   }

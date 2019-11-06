@@ -174,13 +174,13 @@ class CouponRedemptionPaneTest extends CommerceWebDriverTestBase {
     $this->drupalGet($checkout_url);
     // Confirm that validation errors set by the form element are visible.
     $this->getSession()->getPage()->pressButton('Apply coupon');
-    $this->waitForAjaxToFinish();
+    $this->assertSession()->assertWaitOnAjaxRequest();
     $this->assertSession()->pageTextContains('Please provide a coupon code');
 
     // Valid coupon.
     $this->getSession()->getPage()->fillField('Coupon code', $coupon->getCode());
     $this->getSession()->getPage()->pressButton('Apply coupon');
-    $this->waitForAjaxToFinish();
+    $this->assertSession()->assertWaitOnAjaxRequest();
     $this->assertSession()->pageTextContains($coupon->getCode());
     $this->assertSession()->fieldNotExists('Coupon code');
     $this->assertSession()->buttonNotExists('Apply coupon');
@@ -189,7 +189,7 @@ class CouponRedemptionPaneTest extends CommerceWebDriverTestBase {
 
     // Coupon removal.
     $this->getSession()->getPage()->pressButton('Remove coupon');
-    $this->waitForAjaxToFinish();
+    $this->assertSession()->assertWaitOnAjaxRequest();
     $this->assertSession()->pageTextNotContains($coupon->getCode());
     $this->assertSession()->fieldExists('Coupon code');
     $this->assertSession()->buttonExists('Apply coupon');
@@ -206,7 +206,7 @@ class CouponRedemptionPaneTest extends CommerceWebDriverTestBase {
     $this->drupalGet($checkout_url);
     $this->getSession()->getPage()->fillField('Coupon code', $coupon->getCode());
     $this->getSession()->getPage()->pressButton('Apply coupon');
-    $this->waitForAjaxToFinish();
+    $this->assertSession()->assertWaitOnAjaxRequest();
     $this->assertSession()->pageTextContains($coupon->getCode());
     $this->assertSession()->fieldNotExists('Coupon code');
     $this->assertSession()->buttonNotExists('Apply coupon');
@@ -227,14 +227,14 @@ class CouponRedemptionPaneTest extends CommerceWebDriverTestBase {
     $this->drupalGet(Url::fromRoute('commerce_checkout.form', ['commerce_order' => $this->cart->id()]));
     $this->getSession()->getPage()->fillField('Coupon code', $coupon->getCode());
     $this->getSession()->getPage()->pressButton('Apply coupon');
-    $this->waitForAjaxToFinish();
+    $this->assertSession()->assertWaitOnAjaxRequest();
     $this->assertSession()->pageTextContains($coupon->getCode());
     $this->assertSession()->fieldExists('Coupon code');
     $this->assertSession()->pageTextContains('-$99.90');
     $this->assertSession()->pageTextContains('$899.10');
 
     $this->getSession()->getPage()->pressButton('Remove coupon');
-    $this->waitForAjaxToFinish();
+    $this->assertSession()->assertWaitOnAjaxRequest();
     $this->assertSession()->pageTextContains('$999.00');
   }
 
@@ -248,7 +248,7 @@ class CouponRedemptionPaneTest extends CommerceWebDriverTestBase {
 
     $this->getSession()->getPage()->fillField('Coupon code', $coupon->getCode());
     $this->getSession()->getPage()->pressButton('Apply coupon');
-    $this->waitForAjaxToFinish();
+    $this->assertSession()->assertWaitOnAjaxRequest();
     $this->assertSession()->pageTextContains($coupon->getCode());
     $this->assertSession()->pageTextContains('-$99.90');
     $this->assertSession()->pageTextContains('$899.10');
@@ -256,7 +256,7 @@ class CouponRedemptionPaneTest extends CommerceWebDriverTestBase {
     // Ensure that the payment method ajax works with the coupon ajax.
     $radio_button = $this->getSession()->getPage()->findField('Visa ending in 9999');
     $radio_button->click();
-    $this->waitForAjaxToFinish();
+    $this->assertSession()->assertWaitOnAjaxRequest();
 
     $this->submitForm([], 'Continue to review');
     $this->assertSession()->pageTextContains('Visa ending in 9999');
@@ -304,7 +304,7 @@ class CouponRedemptionPaneTest extends CommerceWebDriverTestBase {
     // Start checkout, and enter billing information.
     $this->drupalGet(Url::fromRoute('commerce_checkout.form', ['commerce_order' => $this->cart->id()]));
     $this->getSession()->getPage()->findField('Example')->click();
-    $this->waitForAjaxToFinish();
+    $this->assertSession()->assertWaitOnAjaxRequest();
     $this->submitForm([
       'payment_information[billing_information][address][0][address][given_name]' => 'Johnny',
       'payment_information[billing_information][address][0][address][family_name]' => 'Appleseed',
@@ -317,7 +317,7 @@ class CouponRedemptionPaneTest extends CommerceWebDriverTestBase {
     // Go back and edit the billing information, but don't submit it.
     $this->getSession()->getPage()->clickLink('Go back');
     $this->getSession()->getPage()->pressButton('billing_edit');
-    $this->waitForAjaxToFinish();
+    $this->assertSession()->assertWaitOnAjaxRequest();
     $address_prefix = 'payment_information[billing_information][address][0][address]';
     $this->getSession()->getPage()->fillField($address_prefix . '[given_name]', 'John');
     $this->getSession()->getPage()->fillField($address_prefix . '[family_name]', 'Smith');
@@ -328,7 +328,7 @@ class CouponRedemptionPaneTest extends CommerceWebDriverTestBase {
     $page = $this->getSession()->getPage();
     $page->fillField('Coupon code', $coupon->getCode());
     $page->pressButton('Apply coupon');
-    $this->waitForAjaxToFinish();
+    $this->assertSession()->assertWaitOnAjaxRequest();
     $this->assertSession()->pageTextContains($coupon->getCode());
     $this->assertSession()->fieldNotExists('Coupon code');
     $this->assertSession()->buttonNotExists('Apply coupon');

@@ -84,18 +84,18 @@ class OrderAdminTest extends OrderWebDriverTestBase {
     $page->fillField('order_items[form][inline_entity_form][quantity][0][value]', '1');
     $page->fillField('order_items[form][inline_entity_form][unit_price][0][amount][number]', '9.99');
     $this->getSession()->getPage()->pressButton('Create order item');
-    $this->waitForAjaxToFinish();
+    $this->assertSession()->assertWaitOnAjaxRequest();
     $this->assertSession()->pageTextContains('9.99');
 
     // Test editing an order item.
     $edit_buttons = $this->xpath('//div[@data-drupal-selector="edit-order-items-wrapper"]//input[@value="Edit"]');
     $edit_button = reset($edit_buttons);
     $edit_button->click();
-    $this->waitForAjaxToFinish();
+    $this->assertSession()->assertWaitOnAjaxRequest();
     $page->fillField('order_items[form][inline_entity_form][entities][0][form][quantity][0][value]', '3');
     $page->fillField('order_items[form][inline_entity_form][entities][0][form][unit_price][0][amount][number]', '1.11');
     $this->getSession()->getPage()->pressButton('Update order item');
-    $this->waitForAjaxToFinish();
+    $this->assertSession()->assertWaitOnAjaxRequest();
     $this->assertSession()->pageTextContains('1.11');
 
     // There is no adjustment - the order should save successfully.
@@ -192,11 +192,11 @@ class OrderAdminTest extends OrderWebDriverTestBase {
     $this->assertRenderedAddress($address, 'billing_profile[0][profile]');
     // Select the default profile instead.
     $this->getSession()->getPage()->fillField('billing_profile[0][profile][select_address]', $this->defaultProfile->id());
-    $this->waitForAjaxToFinish();
+    $this->assertSession()->assertWaitOnAjaxRequest();
     $this->assertRenderedAddress($this->defaultAddress, 'billing_profile[0][profile]');
     // Edit the default profile and change the street.
     $this->getSession()->getPage()->pressButton('billing_edit');
-    $this->waitForAjaxToFinish();
+    $this->assertSession()->assertWaitOnAjaxRequest();
     foreach ($this->defaultAddress as $property => $value) {
       $prefix = 'billing_profile[0][profile][address][0][address]';
       $this->assertSession()->fieldValueEquals($prefix . '[' . $property . ']', $value);

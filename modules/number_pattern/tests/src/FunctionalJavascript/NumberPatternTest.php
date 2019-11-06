@@ -44,7 +44,7 @@ class NumberPatternTest extends CommerceWebDriverTestBase {
 
     $page->fillField('label', 'Foo');
     $page->selectFieldOption('plugin', 'monthly');
-    $this->waitForAjaxToFinish();
+    $this->assertSession()->assertWaitOnAjaxRequest();
     $this->submitForm([], 'Save');
     $this->assertSession()->pageTextContains('Saved the Foo number pattern.');
 
