@@ -3,6 +3,7 @@
 namespace Drupal\Tests\commerce_number_pattern\FunctionalJavascript;
 
 use Drupal\commerce_number_pattern\Entity\NumberPattern;
+use Drupal\commerce_number_pattern_test\Entity\EntityTestWithStore;
 use Drupal\Tests\commerce\FunctionalJavascript\CommerceWebDriverTestBase;
 
 /**
@@ -61,6 +62,7 @@ class NumberPatternTest extends CommerceWebDriverTestBase {
     $number_pattern = NumberPattern::create([
       'id' => 'foo',
       'label' => 'Foo',
+      'targetEntityType' => 'entity_test_with_store',
       'plugin' => 'yearly',
       'configuration' => [
         'initial_number' => 10,
@@ -94,6 +96,7 @@ class NumberPatternTest extends CommerceWebDriverTestBase {
     $number_pattern = NumberPattern::create([
       'id' => 'foo',
       'label' => 'Foo',
+      'targetEntityType' => 'entity_test_with_store',
       'plugin' => 'yearly',
       'configuration' => [
         'initial_number' => 10,
@@ -104,11 +107,56 @@ class NumberPatternTest extends CommerceWebDriverTestBase {
 
     $this->drupalGet($number_pattern->toUrl('delete-form'));
     $this->assertSession()->pageTextContains(t('Are you sure you want to delete the number pattern @type?', ['@type' => $number_pattern->label()]));
-    $this->saveHtmlOutput();
     $this->assertSession()->pageTextContains('This action cannot be undone.');
     $this->submitForm([], 'Delete');
     $number_pattern_exists = (bool) NumberPattern::load($number_pattern->id());
     $this->assertEmpty($number_pattern_exists);
+  }
+
+  /**
+   * Tests resetting a number pattern's sequence.
+   */
+  public function testResetSequence() {
+    $number_pattern = NumberPattern::create([
+      'id' => 'foo',
+      'label' => 'Foo',
+      'targetEntityType' => 'entity_test_with_store',
+      'plugin' => 'infinite',
+      'configuration' => [
+        'initial_number' => 1,
+        'padding' => 2,
+      ],
+    ]);
+    $number_pattern->save();
+
+    $entity = EntityTestWithStore::create([
+      'store_id' => $this->store,
+    ]);
+    $entity->save();
+
+    $number = $number_pattern->getPlugin()->generate($entity);
+    $this->assertEquals(1, $number);
+
+    $entity = EntityTestWithStore::create([
+      'store_id' => $this->store,
+    ]);
+    $entity->save();
+
+    $number = $number_pattern->getPlugin()->generate($entity);
+    $this->assertEquals(2, $number);
+
+    $this->drupalGet($number_pattern->toUrl('reset-sequence-form'));
+    $this->assertSession()->pageTextContains(t('Are you sure you want to reset the sequence for the @type number pattern?', ['@type' => $number_pattern->label()]));
+    $this->assertSession()->pageTextContains('This action cannot be undone.');
+    $this->submitForm([], 'Reset sequence');
+
+    $entity = EntityTestWithStore::create([
+      'store_id' => $this->store,
+    ]);
+    $entity->save();
+
+    $number = $number_pattern->getPlugin()->generate($entity);
+    $this->assertEquals(1, $number);
   }
 
 }

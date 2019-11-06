@@ -52,6 +52,23 @@ class NumberPatternListBuilder extends ConfigEntityListBuilder {
   /**
    * {@inheritdoc}
    */
+  public function getDefaultOperations(EntityInterface $entity) {
+    $operations = parent::getDefaultOperations($entity);
+
+    if ($entity->access('reset_sequence')) {
+      $operations['reset-sequence'] = [
+        'title' => $this->t('Reset sequence'),
+        'weight' => 200,
+        'url' => $this->ensureDestination($entity->toUrl('reset-sequence-form')),
+      ];
+    }
+
+    return $operations;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function buildHeader() {
     $header['label'] = $this->t('Number pattern');
     $header['id'] = $this->t('Machine name');

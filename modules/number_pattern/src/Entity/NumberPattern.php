@@ -19,17 +19,19 @@ use Drupal\Core\Config\Entity\ConfigEntityBase;
  *     plural = "@count number patterns",
  *   ),
  *   handlers = {
+ *     "access" = "Drupal\commerce_number_pattern\NumberPatternAccessControlHandler",
  *     "form" = {
  *       "add" = "Drupal\commerce_number_pattern\Form\NumberPatternForm",
  *       "duplicate" = "Drupal\commerce_number_pattern\Form\NumberPatternForm",
  *       "edit" = "Drupal\commerce_number_pattern\Form\NumberPatternForm",
- *       "delete" = "Drupal\Core\Entity\EntityDeleteForm"
+ *       "delete" = "Drupal\Core\Entity\EntityDeleteForm",
+ *       "reset-sequence" = "Drupal\commerce_number_pattern\Form\NumberPatternResetSequenceForm",
  *     },
  *     "local_task_provider" = {
  *       "default" = "Drupal\entity\Menu\DefaultEntityLocalTaskProvider",
  *     },
  *     "route_provider" = {
- *       "default" = "Drupal\entity\Routing\DefaultHtmlRouteProvider",
+ *       "default" = "Drupal\commerce_number_pattern\NumberPatternRouteProvider",
  *     },
  *     "list_builder" = "Drupal\commerce_number_pattern\NumberPatternListBuilder",
  *   },
@@ -52,6 +54,7 @@ use Drupal\Core\Config\Entity\ConfigEntityBase;
  *     "edit-form" = "/admin/commerce/config/number-patterns/{commerce_number_pattern}/edit",
  *     "duplicate-form" = "/admin/commerce/config/number-patterns/{commerce_number_pattern}/duplicate",
  *     "delete-form" = "/admin/commerce/config/number-patterns/{commerce_number_pattern}/delete",
+ *     "reset-sequence-form" = "/admin/commerce/config/number-patterns/{commerce_number_pattern}/reset-sequence",
  *     "collection" = "/admin/commerce/config/number-patterns"
  *   }
  * )
