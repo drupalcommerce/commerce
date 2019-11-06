@@ -2,9 +2,12 @@
 
 namespace Drupal\commerce_tax\Plugin\Field\FieldFormatter;
 
+use Drupal\commerce\UrlData;
+use Drupal\Component\Serialization\Json;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Field\FormatterBase;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Url;
 
 /**
  * Plugin implementation of the 'commerce_tax_number_default' formatter.
@@ -66,6 +69,7 @@ class TaxNumberDefaultFormatter extends FormatterBase {
       'failure' => $this->t('Failure'),
       'unknown' => $this->t('Unknown'),
     ];
+    $entity = $items->getEntity();
 
     $elements = [];
     foreach ($items as $delta => $item) {
@@ -75,6 +79,33 @@ class TaxNumberDefaultFormatter extends FormatterBase {
       ];
       if ($this->getSetting('show_verification')) {
         $element['#attached']['library'][] = 'commerce_tax/tax_number';
+        $context = UrlData::encode([
+          $entity->getEntityTypeId(),
+          $entity->id(),
+          $this->fieldDefinition->getName(),
+          $this->viewMode,
+        ]);
+
+        if ($item->verification_result) {
+          $element['value'] = [
+            '#type' => 'link',
+            '#title' => $item->value,
+            '#url' => Url::fromRoute('commerce_tax.verification_result', [
+              'tax_number' => $item->value,
+              'context' => $context,
+            ]),
+            '#attributes' => [
+              'class' => [
+                'use-ajax',
+              ],
+              'data-dialog-type' => 'modal',
+              'data-dialog-options' => Json::encode([
+                'width' => 500,
+                'title' => $item->value,
+              ]),
+            ],
+          ];
+        }
         if ($item->verification_state && isset($states[$item->verification_state])) {
           $element['verification_state'] = [
             '#type' => 'html_tag',

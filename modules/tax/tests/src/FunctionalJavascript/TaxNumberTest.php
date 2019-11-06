@@ -2,9 +2,11 @@
 
 namespace Drupal\Tests\commerce_tax\FunctionalJavascript;
 
+use Drupal\commerce\UrlData;
 use Drupal\commerce_order\Entity\Order;
 use Drupal\commerce_order\Entity\OrderItem;
 use Drupal\commerce_tax\Plugin\Commerce\TaxNumberType\VerificationResult;
+use Drupal\Core\Url;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\profile\Entity\Profile;
 use Drupal\Tests\commerce\FunctionalJavascript\CommerceWebDriverTestBase;
@@ -113,7 +115,7 @@ class TaxNumberTest extends CommerceWebDriverTestBase {
   public function testWidget() {
     $this->drupalGet($this->order->toUrl('edit-form'));
     $this->getSession()->getPage()->pressButton('billing_edit');
-    $this->waitForAjaxToFinish();
+    $this->assertSession()->assertWaitOnAjaxRequest();
 
     // Confirm that the field is present for the allowed country (RS).
     $this->assertSession()->fieldExists('Tax number');
@@ -131,7 +133,7 @@ class TaxNumberTest extends CommerceWebDriverTestBase {
     // Confirm that not changing the tax number does not re-verify the number.
     $this->drupalGet($this->order->toUrl('edit-form'));
     $this->getSession()->getPage()->pressButton('billing_edit');
-    $this->waitForAjaxToFinish();
+    $this->assertSession()->assertWaitOnAjaxRequest();
     $this->assertSession()->fieldValueEquals('Tax number', '601');
     $this->submitForm([], 'Save');
 
@@ -142,7 +144,7 @@ class TaxNumberTest extends CommerceWebDriverTestBase {
     // Confirm that changing the tax number re-verifies the number.
     $this->drupalGet($this->order->toUrl('edit-form'));
     $this->getSession()->getPage()->pressButton('billing_edit');
-    $this->waitForAjaxToFinish();
+    $this->assertSession()->assertWaitOnAjaxRequest();
     $this->assertSession()->fieldValueEquals('Tax number', '601');
     $this->getSession()->getPage()->fillField('Tax number', '603');
     $this->submitForm([], 'Save');
@@ -158,9 +160,9 @@ class TaxNumberTest extends CommerceWebDriverTestBase {
     // Confirm that changing the country changes the tax number type.
     $this->drupalGet($this->order->toUrl('edit-form'));
     $this->getSession()->getPage()->pressButton('billing_edit');
-    $this->waitForAjaxToFinish();
+    $this->assertSession()->assertWaitOnAjaxRequest();
     $this->getSession()->getPage()->selectFieldOption('Country', 'ME');
-    $this->waitForAjaxToFinish();
+    $this->assertSession()->assertWaitOnAjaxRequest();
     $this->getSession()->getPage()->fillField('City', 'Podgorica');
     $this->assertSession()->fieldValueEquals('Tax number', '603');
     $this->submitForm([], 'Save');
@@ -176,9 +178,9 @@ class TaxNumberTest extends CommerceWebDriverTestBase {
     // Confirm that selecting a non-allowed country removes the field.
     $this->drupalGet($this->order->toUrl('edit-form'));
     $this->getSession()->getPage()->pressButton('billing_edit');
-    $this->waitForAjaxToFinish();
+    $this->assertSession()->assertWaitOnAjaxRequest();
     $this->getSession()->getPage()->selectFieldOption('Country', 'MK');
-    $this->waitForAjaxToFinish();
+    $this->assertSession()->assertWaitOnAjaxRequest();
     $this->getSession()->getPage()->fillField('City', 'Skopje');
     $this->assertSession()->fieldNotExists('Tax number');
     $this->submitForm([], 'Save');
@@ -201,6 +203,7 @@ class TaxNumberTest extends CommerceWebDriverTestBase {
     $rendered_field = $this->getSession()->getPage()->find('css', '.field--name-tax-number');
     $this->assertContains('Tax number', $rendered_field->getHtml());
     $this->assertContains('122', $rendered_field->getHtml());
+    $this->assertFalse($rendered_field->hasLink('122'));
     $state_field = $rendered_field->find('css', '.commerce-tax-number__verification-icon');
     $this->assertEmpty($state_field);
 
@@ -209,54 +212,69 @@ class TaxNumberTest extends CommerceWebDriverTestBase {
       'value' => '123',
       'verification_state' => VerificationResult::STATE_SUCCESS,
       'verification_timestamp' => strtotime('2019/08/08'),
-      'verification_result' => ['verification_id' => '123456'],
+      'verification_result' => ['name' => 'Centarro LLC'],
     ]);
     $this->customerProfile->save();
 
     $this->drupalGet($this->order->toUrl('canonical'));
     $rendered_field = $this->getSession()->getPage()->find('css', '.field--name-tax-number');
     $this->assertContains('Tax number', $rendered_field->getHtml());
-    $this->assertContains('123', $rendered_field->getHtml());
+    $this->assertTrue($rendered_field->hasLink('123'));
     $state_field = $rendered_field->find('css', '.commerce-tax-number__verification-icon');
     $this->assertNotEmpty($state_field);
     $this->assertEquals('Verification state: Success', $state_field->getAttribute('title'));
     $this->assertTrue($state_field->hasClass('commerce-tax-number__verification-icon--success'));
+
+    // Confirm that the verification result can be viewed.
+    $this->clickLink('123');
+    $this->assertSession()->pageTextContains('August 8, 2019 - 00:00');
+    $this->assertSession()->pageTextContains('Centarro LLC');
 
     $this->customerProfile->set('tax_number', [
       'type' => 'serbian_vat',
       'value' => '124',
       'verification_state' => VerificationResult::STATE_FAILURE,
       'verification_timestamp' => strtotime('2019/08/09'),
-      'verification_result' => ['verification_id' => '123457'],
+      'verification_result' => ['name' => 'Google LLC'],
     ]);
     $this->customerProfile->save();
 
     $this->drupalGet($this->order->toUrl('canonical'));
     $rendered_field = $this->getSession()->getPage()->find('css', '.field--name-tax-number');
     $this->assertContains('Tax number', $rendered_field->getHtml());
-    $this->assertContains('124', $rendered_field->getHtml());
+    $this->assertTrue($rendered_field->hasLink('124'));
     $state_field = $rendered_field->find('css', '.commerce-tax-number__verification-icon');
     $this->assertNotEmpty($state_field);
     $this->assertEquals('Verification state: Failure', $state_field->getAttribute('title'));
     $this->assertTrue($state_field->hasClass('commerce-tax-number__verification-icon--failure'));
+
+    // Confirm that the verification result can be viewed.
+    $this->clickLink('124');
+    $this->assertSession()->pageTextContains('August 9, 2019 - 00:00');
+    $this->assertSession()->pageTextContains('Google LLC');
 
     $this->customerProfile->set('tax_number', [
       'type' => 'serbian_vat',
       'value' => '125',
       'verification_state' => VerificationResult::STATE_UNKNOWN,
       'verification_timestamp' => strtotime('2019/08/10'),
-      'verification_result' => ['verification_id' => '123458'],
+      'verification_result' => ['error' => 'http_429'],
     ]);
     $this->customerProfile->save();
 
     $this->drupalGet($this->order->toUrl('canonical'));
     $rendered_field = $this->getSession()->getPage()->find('css', '.field--name-tax-number');
     $this->assertContains('Tax number', $rendered_field->getHtml());
-    $this->assertContains('125', $rendered_field->getHtml());
+    $this->assertTrue($rendered_field->hasLink('125'));
     $state_field = $rendered_field->find('css', '.commerce-tax-number__verification-icon');
     $this->assertNotEmpty($state_field);
     $this->assertEquals('Verification state: Unknown', $state_field->getAttribute('title'));
     $this->assertTrue($state_field->hasClass('commerce-tax-number__verification-icon--unknown'));
+
+    // Confirm that the verification result can be viewed.
+    $this->clickLink('125');
+    $this->assertSession()->pageTextContains('August 10, 2019 - 00:00');
+    $this->assertSession()->pageTextContains('Too many requests.');
 
     // Confirm that invalid verification states are ignored.
     $this->customerProfile->set('tax_number', [
@@ -274,6 +292,92 @@ class TaxNumberTest extends CommerceWebDriverTestBase {
     $this->assertContains('126', $rendered_field->getHtml());
     $state_field = $rendered_field->find('css', '.commerce-tax-number__verification-icon');
     $this->assertEmpty($state_field);
+  }
+
+  /**
+   * Tests access control for the verification endpoints.
+   */
+  public function testVerificationEndpointAccess() {
+    $this->customerProfile->set('tax_number', [
+      'type' => 'serbian_vat',
+      'value' => '124',
+      'verification_state' => VerificationResult::STATE_FAILURE,
+      'verification_timestamp' => strtotime('2019/08/09'),
+      'verification_result' => ['name' => 'Google LLC'],
+    ]);
+    $this->customerProfile->save();
+
+    // Valid url.
+    $this->drupalGet(Url::fromRoute('commerce_tax.verification_result', [
+      'tax_number' => '124',
+      'context' => UrlData::encode([
+        'profile', $this->customerProfile->id(), 'tax_number', 'default',
+      ]),
+    ]));
+    $this->assertSession()->pageTextNotContains('Access Denied');
+    $this->assertSession()->pageTextContains('Google LLC');
+
+    // The tax_number doesn't match the one on the parent entity.
+    $this->drupalGet(Url::fromRoute('commerce_tax.verification_result', [
+      'tax_number' => '125',
+      'context' => UrlData::encode([
+        'profile', $this->customerProfile->id(), 'tax_number', 'default',
+      ]),
+    ]));
+    $this->assertSession()->pageTextContains('Access Denied');
+
+    // Invalid context.
+    $this->drupalGet(Url::fromRoute('commerce_tax.verification_result', [
+      'tax_number' => '124',
+      'context' => 'INVALID',
+    ]));
+    $this->assertSession()->pageTextContains('Access Denied');
+
+    // Incorrect number of parameters.
+    $this->drupalGet(Url::fromRoute('commerce_tax.verification_result', [
+      'tax_number' => '124',
+      'context' => UrlData::encode([
+        'profile',
+      ]),
+    ]));
+    $this->assertSession()->pageTextContains('Access Denied');
+
+    // Invalid entity type.
+    $this->drupalGet(Url::fromRoute('commerce_tax.verification_result', [
+      'tax_number' => '124',
+      'context' => UrlData::encode([
+        'profile2', $this->customerProfile->id(), 'tax_number', 'default',
+      ]),
+    ]));
+    $this->assertSession()->pageTextContains('Access Denied');
+
+    // Invalid entity.
+    $this->drupalGet(Url::fromRoute('commerce_tax.verification_result', [
+      'tax_number' => '124',
+      'context' => UrlData::encode([
+        'profile', '99', 'tax_number', 'default',
+      ]),
+    ]));
+    $this->assertSession()->pageTextContains('Access Denied');
+
+    // Invalid field.
+    $this->drupalGet(Url::fromRoute('commerce_tax.verification_result', [
+      'tax_number' => '124',
+      'context' => UrlData::encode([
+        'profile', $this->customerProfile->id(), 'address', 'default',
+      ]),
+    ]));
+    $this->assertSession()->pageTextContains('Access Denied');
+
+    // No access to parent entity.
+    $this->drupalLogout();
+    $this->drupalGet(Url::fromRoute('commerce_tax.verification_result', [
+      'tax_number' => '124',
+      'context' => UrlData::encode([
+        'profile', $this->customerProfile->id(), 'tax_number', 'default',
+      ]),
+    ]));
+    $this->assertSession()->pageTextContains('Access Denied');
   }
 
 }
