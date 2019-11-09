@@ -546,7 +546,7 @@ class Order extends CommerceContentEntityBase implements OrderInterface {
    * {@inheritdoc}
    */
   public function isLocked() {
-    return !empty($this->get('locked')->value);
+    return (bool) $this->get('locked')->value;
   }
 
   /**

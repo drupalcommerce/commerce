@@ -139,7 +139,7 @@ class OrderItem extends CommerceContentEntityBase implements OrderItemInterface 
    * {@inheritdoc}
    */
   public function isUnitPriceOverridden() {
-    return $this->get('overridden_unit_price')->value;
+    return (bool) $this->get('overridden_unit_price')->value;
   }
 
   /**
@@ -198,7 +198,7 @@ class OrderItem extends CommerceContentEntityBase implements OrderItemInterface 
    * {@inheritdoc}
    */
   public function usesLegacyAdjustments() {
-    return $this->get('uses_legacy_adjustments')->value;
+    return (bool) $this->get('uses_legacy_adjustments')->value;
   }
 
   /**

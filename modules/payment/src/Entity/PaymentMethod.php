@@ -168,7 +168,7 @@ class PaymentMethod extends ContentEntityBase implements PaymentMethodInterface 
    * {@inheritdoc}
    */
   public function isReusable() {
-    return $this->get('reusable')->value;
+    return (bool) $this->get('reusable')->value;
   }
 
   /**
@@ -183,7 +183,7 @@ class PaymentMethod extends ContentEntityBase implements PaymentMethodInterface 
    * {@inheritdoc}
    */
   public function isDefault() {
-    return $this->get('is_default')->value;
+    return (bool) $this->get('is_default')->value;
   }
 
   /**
