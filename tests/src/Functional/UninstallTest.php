@@ -48,6 +48,11 @@ class UninstallTest extends BrowserTestBase {
   ];
 
   /**
+   * {@inheritdoc}
+   */
+  protected $defaultTheme = 'stark';
+
+  /**
    * Tests module uninstallation.
    */
   public function testUninstall() {

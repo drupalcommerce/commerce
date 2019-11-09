@@ -236,7 +236,7 @@ class PaymentCheckoutTest extends CommerceWebDriverTestBase {
       $this->assertNotNull($radio_button);
     }
     $default_radio_button = $page->findField('Visa ending in 9999');
-    $this->assertTrue($default_radio_button->getAttribute('checked'));
+    $this->assertNotEmpty($default_radio_button->getAttribute('checked'));
 
     /** @var \Drupal\commerce_payment\Entity\PaymentGatewayInterface $payment_gateway */
     $payment_gateway = PaymentGateway::create([

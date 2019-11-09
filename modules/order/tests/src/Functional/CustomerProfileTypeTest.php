@@ -68,8 +68,8 @@ class CustomerProfileTypeTest extends OrderBrowserTestBase {
     $this->drupalGet($profile_type->toUrl('edit-form'));
     $checkbox = $this->getSession()->getPage()->findField('commerce_order[customer_profile_type]');
     $this->assertNotEmpty($checkbox);
-    $this->assertTrue($checkbox->getAttribute('checked'));
-    $this->assertTrue($checkbox->getAttribute('disabled'));
+    $this->assertNotEmpty($checkbox->getAttribute('checked'));
+    $this->assertNotEmpty($checkbox->getAttribute('disabled'));
     $this->submitForm([], 'Save');
     // Confirm that saving the form doesn't unset the flag.
     /** @var \Drupal\profile\Entity\ProfileTypeInterface $profile_type */
@@ -80,8 +80,8 @@ class CustomerProfileTypeTest extends OrderBrowserTestBase {
     $this->drupalGet('admin/config/people/profile-types/add');
     $checkbox = $this->getSession()->getPage()->findField('commerce_order[customer_profile_type]');
     $this->assertNotEmpty($checkbox);
-    $this->assertFalse($checkbox->getAttribute('checked'));
-    $this->assertFalse($checkbox->getAttribute('disabled'));
+    $this->assertEmpty($checkbox->getAttribute('checked'));
+    $this->assertEmpty($checkbox->getAttribute('disabled'));
 
     $this->submitForm([
       'label' => 'Customer (Shipping information)',
@@ -111,8 +111,8 @@ class CustomerProfileTypeTest extends OrderBrowserTestBase {
     $this->drupalGet($profile_type->toUrl('edit-form'));
     $checkbox = $this->getSession()->getPage()->findField('commerce_order[customer_profile_type]');
     $this->assertNotEmpty($checkbox);
-    $this->assertTrue($checkbox->getAttribute('checked'));
-    $this->assertFalse($checkbox->getAttribute('disabled'));
+    $this->assertNotEmpty($checkbox->getAttribute('checked'));
+    $this->assertEmpty($checkbox->getAttribute('disabled'));
 
     // Confirm that the flag can't be unset once there's data.
     $profile = Profile::create([
@@ -131,8 +131,8 @@ class CustomerProfileTypeTest extends OrderBrowserTestBase {
     $this->drupalGet($profile_type->toUrl('edit-form'));
     $checkbox = $this->getSession()->getPage()->findField('commerce_order[customer_profile_type]');
     $this->assertNotEmpty($checkbox);
-    $this->assertTrue($checkbox->getAttribute('checked'));
-    $this->assertTrue($checkbox->getAttribute('disabled'));
+    $this->assertNotEmpty($checkbox->getAttribute('checked'));
+    $this->assertNotEmpty($checkbox->getAttribute('disabled'));
 
     // Confirm that unsetting the flag removes the address field.
     $profile->delete();

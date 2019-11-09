@@ -83,7 +83,7 @@ class CustomerProfileTest extends OrderWebDriverTestBase {
     $this->assertEquals('RS', $options[1]->getValue());
     $this->assertEquals('US', $options[2]->getValue());
     // Confirm that the store default is selected when available.
-    $this->assertTrue($options[1]->getAttribute('selected'));
+    $this->assertNotEmpty($options[1]->getAttribute('selected'));
 
     // Confirm that it is possible to change the country and submit the form.
     $this->getSession()->getPage()->fillField('profile[address][0][address][country_code]', 'FR');
@@ -141,7 +141,7 @@ class CustomerProfileTest extends OrderWebDriverTestBase {
     $this->assertEquals($this->usAddress['address_line1'], $options[0]->getText());
     $this->assertEquals($this->frenchAddress['address_line1'], $options[1]->getText());
     $this->assertEquals('+ Enter a new address', $options[2]->getText());
-    $this->assertTrue($options[0]->getAttribute('selected'));
+    $this->assertNotEmpty($options[0]->getAttribute('selected'));
 
     // Confirm that the US profile is shown rendered.
     $this->assertRenderedAddress($this->usAddress);
@@ -300,7 +300,7 @@ class CustomerProfileTest extends OrderWebDriverTestBase {
     $this->assertEquals($this->frenchAddress['address_line1'], $options[1]->getText());
     $this->assertEquals('+ Enter a new address', $options[2]->getText());
     // Confirm that the address book profile is selected.
-    $this->assertTrue($options[1]->getAttribute('selected'));
+    $this->assertNotEmpty($options[1]->getAttribute('selected'));
 
     $this->assertRenderedAddress($this->frenchAddress);
     $this->submitForm([], 'Submit');
@@ -348,7 +348,7 @@ class CustomerProfileTest extends OrderWebDriverTestBase {
     $this->assertEquals($new_french_address['address_line1'], $options[1]->getText());
     $this->assertEquals($this->frenchAddress['address_line1'], $options[2]->getText());
     $this->assertEquals('+ Enter a new address', $options[3]->getText());
-    $this->assertTrue($options[2]->getAttribute('selected'));
+    $this->assertNotEmpty($options[2]->getAttribute('selected'));
     $this->assertEquals('_original', $options[2]->getValue());
 
     $this->assertRenderedAddress($this->frenchAddress);
@@ -419,7 +419,7 @@ class CustomerProfileTest extends OrderWebDriverTestBase {
     $this->assertEquals($this->frenchAddress['address_line1'] . ' (updated version)', $options[1]->getText());
     $this->assertEquals($this->frenchAddress['address_line1'] . ' (original version)', $options[2]->getText());
     $this->assertEquals('+ Enter a new address', $options[3]->getText());
-    $this->assertTrue($options[2]->getAttribute('selected'));
+    $this->assertNotEmpty($options[2]->getAttribute('selected'));
     $this->assertEquals('_original', $options[2]->getValue());
 
     $this->assertRenderedAddress($new_french_address);
@@ -567,7 +567,7 @@ class CustomerProfileTest extends OrderWebDriverTestBase {
     $this->assertEquals('37 Rue du Sentier', $options[0]->getText());
     $this->assertEquals('Cetinjska 13', $options[1]->getText());
     $this->assertEquals('+ Enter a new address', $options[2]->getText());
-    $this->assertTrue($options[1]->getAttribute('selected'));
+    $this->assertNotEmpty($options[1]->getAttribute('selected'));
 
     // Confirm that a deleted address book profile is detected.
     $new_address_book_profile->delete();
@@ -577,7 +577,7 @@ class CustomerProfileTest extends OrderWebDriverTestBase {
     $this->assertEquals('37 Rue du Sentier', $options[0]->getText());
     $this->assertEquals('Cetinjska 13', $options[1]->getText());
     $this->assertEquals('+ Enter a new address', $options[2]->getText());
-    $this->assertTrue($options[1]->getAttribute('selected'));
+    $this->assertNotEmpty($options[1]->getAttribute('selected'));
     $this->assertEquals('_original', $options[1]->getValue());
 
     $rendered_address = [

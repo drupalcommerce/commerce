@@ -46,6 +46,11 @@ abstract class CommerceBrowserTestBase extends BrowserTestBase {
   ];
 
   /**
+   * {@inheritdoc}
+   */
+  protected $defaultTheme = 'stark';
+
+  /**
    * A test user with administrative privileges.
    *
    * @var \Drupal\user\UserInterface

@@ -46,6 +46,11 @@ class CheckoutOrderTest extends CommerceBrowserTestBase {
   /**
    * {@inheritdoc}
    */
+  protected $defaultTheme = 'classy';
+
+  /**
+   * {@inheritdoc}
+   */
   protected function getAdministratorPermissions() {
     return array_merge([
       'administer commerce_checkout_flow',

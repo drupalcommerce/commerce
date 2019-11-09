@@ -42,6 +42,11 @@ class AddToCartFieldReplacementTest extends CartWebDriverTestBase {
   /**
    * {@inheritdoc}
    */
+  protected $defaultTheme = 'classy';
+
+  /**
+   * {@inheritdoc}
+   */
   protected function setUp() {
     parent::setUp();
 

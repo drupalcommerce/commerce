@@ -54,6 +54,11 @@ abstract class CommerceWebDriverTestBase extends WebDriverTestBase {
   ];
 
   /**
+   * {@inheritdoc}
+   */
+  protected $defaultTheme = 'stark';
+
+  /**
    * A test user with administrative privileges.
    *
    * @var \Drupal\user\UserInterface
