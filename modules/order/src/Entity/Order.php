@@ -8,6 +8,7 @@ use Drupal\commerce_order\Event\OrderEvents;
 use Drupal\commerce_order\Event\OrderProfilesEvent;
 use Drupal\commerce_price\Price;
 use Drupal\commerce_store\Entity\StoreInterface;
+use Drupal\Core\Datetime\DrupalDateTime;
 use Drupal\Core\Entity\EntityChangedTrait;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
@@ -608,6 +609,16 @@ class Order extends CommerceContentEntityBase implements OrderInterface {
   public function setCompletedTime($timestamp) {
     $this->set('completed', $timestamp);
     return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getCalculationDate() {
+    $timestamp = $this->getPlacedTime() ?: \Drupal::time()->getRequestTime();
+    $date = DrupalDateTime::createFromTimestamp($timestamp);
+
+    return $date;
   }
 
   /**

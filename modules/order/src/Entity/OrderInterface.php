@@ -438,4 +438,16 @@ interface OrderInterface extends ContentEntityInterface, EntityAdjustableInterfa
    */
   public function setCompletedTime($timestamp);
 
+  /**
+   * Gets the calculation date/time for the order.
+   *
+   * Used during order processing, for determining promotion/tax availability.
+   * Matches the placed timestamp, if the order has been placed.
+   * Otherwise, falls back to the current request date/time.
+   *
+   * @return \Drupal\Core\Datetime\DrupalDateTime
+   *   The calculation date/time.
+   */
+  public function getCalculationDate();
+
 }

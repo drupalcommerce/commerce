@@ -435,12 +435,13 @@ class Promotion extends CommerceContentEntityBase implements PromotionInterface 
     if (!in_array($order->getStoreId(), $this->getStoreIds())) {
       return FALSE;
     }
-    $time = \Drupal::time()->getRequestTime();
-    if ($this->getStartDate()->format('U') > $time) {
+    $date = $order->getCalculationDate();
+    $start_date = $this->getStartDate();
+    if ($start_date->format('U') > $date->format('U')) {
       return FALSE;
     }
     $end_date = $this->getEndDate();
-    if ($end_date && $end_date->format('U') <= $time) {
+    if ($end_date && $end_date->format('U') <= $date->format('U')) {
       return FALSE;
     }
     if ($usage_limit = $this->getUsageLimit()) {

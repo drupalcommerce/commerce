@@ -100,6 +100,7 @@ class OrderTest extends OrderKernelTestBase {
    * @covers ::setPlacedTime
    * @covers ::getCompletedTime
    * @covers ::setCompletedTime
+   * @covers ::getCalculationDate
    */
   public function testOrder() {
     /** @var \Drupal\profile\Entity\ProfileInterface $profile */
@@ -295,6 +296,12 @@ class OrderTest extends OrderKernelTestBase {
 
     $order->setCompletedTime(635879900);
     $this->assertEquals(635879900, $order->getCompletedTime());
+
+    $date = $order->getCalculationDate();
+    $this->assertEquals($order->getPlacedTime(), $date->format('U'));
+    $order->set('placed', NULL);
+    $date = $order->getCalculationDate();
+    $this->assertEquals(\Drupal::time()->getRequestTime(), $date->format('U'));
   }
 
   /**

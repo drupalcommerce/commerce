@@ -9,7 +9,6 @@ use Drupal\commerce_tax\Event\CustomerProfileEvent;
 use Drupal\commerce_tax\TaxableType;
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
-use Drupal\Core\Datetime\DrupalDateTime;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Plugin\PluginBase;
@@ -168,28 +167,6 @@ abstract class TaxTypeBase extends PluginBase implements TaxTypeInterface, Conta
    */
   public function applies(OrderInterface $order) {
     return TRUE;
-  }
-
-  /**
-   * Gets the calculation date for the given order.
-   *
-   * Uses the placed timestamp, if the order has been placed.
-   * Falls back to the current date otherwise.
-   *
-   * @param \Drupal\commerce_order\Entity\OrderInterface $order
-   *   The order.
-   *
-   * @return \Drupal\Core\Datetime\DrupalDateTime
-   *   The calculation date.
-   */
-  protected function getCalculationDate(OrderInterface $order) {
-    if ($timestamp = $order->getPlacedTime()) {
-      $date = DrupalDateTime::createFromTimestamp($timestamp);
-    }
-    else {
-      $date = new DrupalDateTime();
-    }
-    return $date;
   }
 
   /**
