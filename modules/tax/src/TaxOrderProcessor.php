@@ -90,6 +90,7 @@ class TaxOrderProcessor implements OrderProcessorInterface {
     // when selling to customers outside the EU, but only if no other tax
     // was applied (e.g. a Japanese customer paying Japanese tax due to the
     // store being registered to collect tax there).
+    $calculation_date = $order->getCalculationDate();
     $store = $order->getStore();
     if ($store->get('prices_include_tax')->value) {
       foreach ($order->getItems() as $order_item) {
@@ -101,7 +102,7 @@ class TaxOrderProcessor implements OrderProcessorInterface {
           $unit_price = $order_item->getUnitPrice();
           $rates = $this->getDefaultRates($order_item, $store);
           foreach ($rates as $rate) {
-            $percentage = $rate->getPercentage();
+            $percentage = $rate->getPercentage($calculation_date);
             $tax_amount = $percentage->calculateTaxAmount($order_item->getUnitPrice(), TRUE);
             $tax_amount = $this->rounder->round($tax_amount);
             $unit_price = $unit_price->subtract($tax_amount);
