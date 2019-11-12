@@ -22,3 +22,4 @@ hidden:
   default_currency: true
   mail: true
   name: true
+  uid: true

@@ -40,7 +40,6 @@ class StoreTest extends CommerceWebDriverTestBase {
     $this->assertSession()->fieldExists('mail[0][value]');
     $this->assertSession()->fieldExists('address[0][address][country_code]');
     $this->assertSession()->fieldExists('billing_countries[]');
-    $this->assertSession()->fieldExists('uid[0][target_id]');
     $this->assertSession()->fieldExists('default');
 
     $this->getSession()->getPage()->fillField('address[0][address][country_code]', 'US');

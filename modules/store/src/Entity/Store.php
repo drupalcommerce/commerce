@@ -241,10 +241,8 @@ class Store extends ContentEntityBase implements StoreInterface {
       ->setDescription(t('The store owner.'))
       ->setDefaultValueCallback('Drupal\commerce_store\Entity\Store::getCurrentUserId')
       ->setSetting('target_type', 'user')
-      ->setDisplayOptions('form', [
-        'type' => 'entity_reference_autocomplete',
-        'weight' => 50,
-      ]);
+      ->setDisplayConfigurable('view', TRUE)
+      ->setDisplayConfigurable('form', TRUE);
 
     $fields['name'] = BaseFieldDefinition::create('string')
       ->setLabel(t('Name'))
