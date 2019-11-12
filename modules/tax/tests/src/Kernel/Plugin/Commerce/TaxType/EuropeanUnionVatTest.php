@@ -127,7 +127,7 @@ class EuropeanUnionVatTest extends OrderKernelTestBase {
 
     // German customer, French store, digital product before Jan 1st 2015.
     $order = $this->buildOrder('DE', 'FR', '', [], TRUE);
-    $order->setPlacedTime(mktime(1, 1, 1, 1, 1, 2013));
+    $order->setPlacedTime(mktime(1, 1, 1, 1, 1, 2014));
     $order->save();
     $this->assertTrue($plugin->applies($order));
     $plugin->apply($order);

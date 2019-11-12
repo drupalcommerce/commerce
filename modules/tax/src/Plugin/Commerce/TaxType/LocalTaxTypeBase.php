@@ -100,6 +100,7 @@ abstract class LocalTaxTypeBase extends TaxTypeBase implements LocalTaxTypeInter
    * {@inheritdoc}
    */
   public function apply(OrderInterface $order) {
+    $calculation_date = $order->getCalculationDate();
     $store = $order->getStore();
     $prices_include_tax = $store->get('prices_include_tax')->value;
     $zones = $this->getZones();
@@ -112,7 +113,7 @@ abstract class LocalTaxTypeBase extends TaxTypeBase implements LocalTaxTypeInter
       $rates = $this->resolveRates($order_item, $customer_profile);
       foreach ($rates as $zone_id => $rate) {
         $zone = $zones[$zone_id];
-        $percentage = $rate->getPercentage();
+        $percentage = $rate->getPercentage($calculation_date);
         // Stores are allowed to enter prices without tax even if they're
         // going to be displayed with tax, and vice-versa.
         // Now that the rates are known, use them to determine the final
