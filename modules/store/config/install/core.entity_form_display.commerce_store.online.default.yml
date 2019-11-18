@@ -14,12 +14,12 @@ content:
   address:
     type: address_default
     settings: {  }
-    weight: 3
+    weight: 4
     region: content
     third_party_settings: {  }
   billing_countries:
     type: options_select
-    weight: 4
+    weight: 5
     region: content
     settings: {  }
     third_party_settings: {  }
@@ -47,7 +47,7 @@ content:
     third_party_settings: {  }
   path:
     type: path
-    weight: 30
+    weight: 8
     region: content
     settings: {  }
     third_party_settings: {  }
@@ -55,12 +55,18 @@ content:
     type: boolean_checkbox
     settings:
       display_label: true
-    weight: 3
+    weight: 6
     region: content
     third_party_settings: {  }
   tax_registrations:
     type: options_select
-    weight: 4
+    weight: 7
+    region: content
+    settings: {  }
+    third_party_settings: {  }
+  timezone:
+    type: options_select
+    weight: 3
     region: content
     settings: {  }
     third_party_settings: {  }

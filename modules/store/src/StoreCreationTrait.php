@@ -47,6 +47,8 @@ trait StoreCreationTrait {
       'uid' => 1,
       'name' => $name,
       'mail' => $mail,
+      'default_currency' => $currency,
+      'timezone' => 'Australia/Sydney',
       'address' => [
         'country_code' => $country,
         'address_line1' => $this->randomString(),
@@ -54,7 +56,6 @@ trait StoreCreationTrait {
         'administrative_area' => 'WI',
         'postal_code' => '53597',
       ],
-      'default_currency' => $currency,
       'billing_countries' => [
         $country,
       ],

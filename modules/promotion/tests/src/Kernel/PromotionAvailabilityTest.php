@@ -104,12 +104,6 @@ class PromotionAvailabilityTest extends OrderKernelTestBase {
     $promotion->save();
     $this->assertTrue($promotion->available($this->order));
 
-    // The computed ->date property always converts dates to UTC,
-    // causing failures around 8PM EST once the UTC date passes midnight.
-    $now = (new \DateTime())->setTime(20, 00);
-    $this->container->get('request_stack')->getCurrentRequest()->server->set('REQUEST_TIME', $now->getTimestamp());
-    $this->assertTrue($promotion->available($this->order));
-
     // Past start date.
     $date = new DrupalDateTime('2017-01-01');
     $promotion->setStartDate($date);

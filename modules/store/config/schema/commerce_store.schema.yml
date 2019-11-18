@@ -14,6 +14,14 @@ commerce_store.settings:
       type: string
       label: 'Default store UUID'
 
+field.formatter.settings.commerce_store_datetime:
+  type: mapping
+  label: 'Store date/time formatter settings'
+  mapping:
+    date_format:
+      type: string
+      label: 'Date format'
+
 views.field.commerce_store:
   type: views.field.field
   mapping:

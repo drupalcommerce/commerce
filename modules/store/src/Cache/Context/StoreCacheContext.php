@@ -41,7 +41,8 @@ class StoreCacheContext implements CacheContextInterface {
    * {@inheritdoc}
    */
   public function getContext() {
-    return $this->currentStore->getStore()->id();
+    $store = $this->currentStore->getStore();
+    return $store ? $store->id() : '0';
   }
 
   /**

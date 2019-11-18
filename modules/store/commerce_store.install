@@ -5,6 +5,7 @@
  * Contains install and update functions for commerce_store module.
  */
 
+use Drupal\commerce_store\Entity\Store;
 use Drupal\Core\Field\BaseFieldDefinition;
 
 /**
@@ -43,4 +44,30 @@ function commerce_store_update_8202() {
   $entity_type->set('entity_keys', $keys);
   $definition_update_manager->updateEntityType($entity_type);
   $definition_update_manager->updateFieldStorageDefinition($uid_storage_definition);
+}
+
+/**
+ * Add the timezone field to stores.
+ */
+function commerce_store_update_8203() {
+  $site_timezone = Store::getSiteTimezone();
+  $site_timezone = reset($site_timezone);
+  $definition_update_manager = \Drupal::entityDefinitionUpdateManager();
+
+  $storage_definition = BaseFieldDefinition::create('list_string')
+    ->setLabel(t('Timezone'))
+    ->setDescription(t('Used when determining promotion and tax availability.'))
+    ->setInitialValue($site_timezone)
+    ->setCardinality(1)
+    ->setRequired(TRUE)
+    ->setDefaultValueCallback('Drupal\commerce_store\Entity\Store::getSiteTimezone')
+    ->setSetting('allowed_values_function', ['\Drupal\commerce_store\Entity\Store', 'getTimezones'])
+    ->setDisplayOptions('form', [
+      'type' => 'options_select',
+      'weight' => 3,
+    ])
+    ->setDisplayConfigurable('view', TRUE)
+    ->setDisplayConfigurable('form', TRUE);
+
+  $definition_update_manager->installFieldStorageDefinition('timezone', 'commerce_store', 'commerce_store', $storage_definition);
 }

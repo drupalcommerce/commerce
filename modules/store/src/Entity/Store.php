@@ -175,6 +175,21 @@ class Store extends ContentEntityBase implements StoreInterface {
   /**
    * {@inheritdoc}
    */
+  public function getTimezone() {
+    return $this->get('timezone')->value;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setTimezone($timezone) {
+    $this->set('timezone', $timezone);
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function getAddress() {
     return $this->get('address')->first();
   }
@@ -287,6 +302,21 @@ class Store extends ContentEntityBase implements StoreInterface {
       ->setDisplayConfigurable('view', TRUE)
       ->setDisplayConfigurable('form', TRUE);
 
+    $fields['timezone'] = BaseFieldDefinition::create('list_string')
+      ->setLabel(t('Timezone'))
+      ->setDescription(t('Used when determining promotion and tax availability.'))
+      ->setCardinality(1)
+      ->setRequired(TRUE)
+      ->setDefaultValueCallback('Drupal\commerce_store\Entity\Store::getSiteTimezone')
+      ->setSetting('allowed_values_function', ['\Drupal\commerce_store\Entity\Store', 'getTimezones'])
+      ->setDisplayOptions('form', [
+        'type' => 'options_select',
+        'weight' => 3,
+      ])
+      ->setSetting('display_description', TRUE)
+      ->setDisplayConfigurable('view', TRUE)
+      ->setDisplayConfigurable('form', TRUE);
+
     $fields['address'] = BaseFieldDefinition::create('address')
       ->setLabel(t('Address'))
       ->setDescription(t('The store address.'))
@@ -300,7 +330,7 @@ class Store extends ContentEntityBase implements StoreInterface {
       ])
       ->setDisplayOptions('form', [
         'type' => 'address_default',
-        'weight' => 3,
+        'weight' => 4,
       ])
       ->setDisplayConfigurable('view', TRUE)
       ->setDisplayConfigurable('form', TRUE);
@@ -311,7 +341,7 @@ class Store extends ContentEntityBase implements StoreInterface {
       ->setSetting('allowed_values_function', ['\Drupal\commerce_store\Entity\Store', 'getAvailableCountries'])
       ->setDisplayOptions('form', [
         'type' => 'options_select',
-        'weight' => 4,
+        'weight' => 5,
       ])
       ->setDisplayConfigurable('view', TRUE)
       ->setDisplayConfigurable('form', TRUE);
@@ -331,7 +361,7 @@ class Store extends ContentEntityBase implements StoreInterface {
   }
 
   /**
-   * Default value callback for 'uid' base field definition.
+   * Default value callback for the 'uid' base field definition.
    *
    * @see ::baseFieldDefinitions()
    *
@@ -340,6 +370,33 @@ class Store extends ContentEntityBase implements StoreInterface {
    */
   public static function getCurrentUserId() {
     return [\Drupal::currentUser()->id()];
+  }
+
+  /**
+   * Default value callback for the 'timezone' base field definition.
+   *
+   * @see ::baseFieldDefinitions()
+   *
+   * @return array
+   *   An array of default values.
+   */
+  public static function getSiteTimezone() {
+    $site_timezone = \Drupal::config('system.date')->get('timezone.default');
+    if (empty($site_timezone)) {
+      $site_timezone = @date_default_timezone_get();
+    }
+
+    return [$site_timezone];
+  }
+
+  /**
+   * Gets the allowed values for the 'timezone' base field.
+   *
+   * @return array
+   *   The allowed values.
+   */
+  public static function getTimezones() {
+    return system_time_zones(NULL, TRUE);
   }
 
   /**

@@ -446,7 +446,7 @@ interface OrderInterface extends ContentEntityInterface, EntityAdjustableInterfa
    * Otherwise, falls back to the current request date/time.
    *
    * @return \Drupal\Core\Datetime\DrupalDateTime
-   *   The calculation date/time.
+   *   The calculation date/time, in the store timezone.
    */
   public function getCalculationDate();
 

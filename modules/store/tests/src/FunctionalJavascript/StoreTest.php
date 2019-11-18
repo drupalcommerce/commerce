@@ -50,6 +50,7 @@ class StoreTest extends CommerceWebDriverTestBase {
       'name[0][value]' => $name,
       'mail[0][value]' => \Drupal::currentUser()->getEmail(),
       'default_currency' => 'USD',
+      'timezone' => 'UTC',
     ];
     $address = [
       'address_line1' => '1098 Alta Ave',

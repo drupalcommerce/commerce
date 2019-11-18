@@ -126,10 +126,11 @@ class CreateStoreCommand extends Command {
       'uid' => 1,
       'name' => $input->getOption('name'),
       'mail' => $input->getOption('mail'),
+      'default_currency' => $currency_code,
+      'timezone' => 'UTC',
       'address' => [
         'country_code' => $country_code,
       ],
-      'default_currency' => $currency_code,
     ];
     $store = $store_storage->create($values);
     $store->save();

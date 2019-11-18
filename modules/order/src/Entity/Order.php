@@ -615,8 +615,9 @@ class Order extends CommerceContentEntityBase implements OrderInterface {
    * {@inheritdoc}
    */
   public function getCalculationDate() {
+    $timezone = $this->getStore()->getTimezone();
     $timestamp = $this->getPlacedTime() ?: \Drupal::time()->getRequestTime();
-    $date = DrupalDateTime::createFromTimestamp($timestamp);
+    $date = DrupalDateTime::createFromTimestamp($timestamp, $timezone);
 
     return $date;
   }

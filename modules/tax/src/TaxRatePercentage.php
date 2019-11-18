@@ -52,8 +52,8 @@ class TaxRatePercentage {
     }
 
     $this->number = $definition['number'];
-    $this->startDate = new DrupalDateTime($definition['start_date']);
-    $this->endDate = !empty($definition['end_date']) ? new DrupalDateTime($definition['end_date']) : NULL;
+    $this->startDate = $definition['start_date'];
+    $this->endDate = !empty($definition['end_date']) ? $definition['end_date'] : NULL;
   }
 
   /**
@@ -66,15 +66,15 @@ class TaxRatePercentage {
     if ($this->endDate) {
       return t('@number (@start_date - @end_date)', [
         '@number' => $this->number * 100 . '%',
-        '@start_date' => $this->startDate->format('M jS Y'),
-        '@end_date' => $this->endDate->format('M jS Y'),
+        '@start_date' => $this->getStartDate()->format('M jS Y'),
+        '@end_date' => $this->getEndDate()->format('M jS Y'),
       ]);
     }
     else {
       return t('@number (Since @start_date)', [
         '@number' => $this->number * 100 . '%',
-        '@start_date' => $this->startDate->format('M jS Y'),
-        '@end_date' => $this->startDate->format('M jS Y'),
+        '@start_date' => $this->getStartDate()->format('M jS Y'),
+        '@end_date' => $this->getEndDate()->format('M jS Y'),
       ]);
     }
   }
@@ -93,21 +93,29 @@ class TaxRatePercentage {
   /**
    * Gets the start date.
    *
+   * @param string $store_timezone
+   *   The store timezone. E.g. "Europe/Berlin".
+   *
    * @return \Drupal\Core\Datetime\DrupalDateTime
    *   The start date.
    */
-  public function getStartDate() {
-    return $this->startDate;
+  public function getStartDate($store_timezone = 'UTC') {
+    return new DrupalDateTime($this->startDate, $store_timezone);
   }
 
   /**
    * Gets the end date.
    *
+   * @param string $store_timezone
+   *   The store timezone. E.g. "Europe/Berlin".
+   *
    * @return \Drupal\Core\Datetime\DrupalDateTime|null
    *   The end date, or NULL if not known.
    */
-  public function getEndDate() {
-    return $this->endDate;
+  public function getEndDate($store_timezone = 'UTC') {
+    if ($this->endDate) {
+      return new DrupalDateTime($this->endDate, $store_timezone);
+    }
   }
 
   /**

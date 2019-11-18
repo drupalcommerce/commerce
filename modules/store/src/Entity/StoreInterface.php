@@ -85,6 +85,26 @@ interface StoreInterface extends ContentEntityInterface, EntityOwnerInterface {
   public function setDefaultCurrencyCode($currency_code);
 
   /**
+   * Gets the store timezone.
+   *
+   * Used when determining promotion and tax availability.
+   *
+   * @return string
+   *   The timezone.
+   */
+  public function getTimezone();
+
+  /**
+   * Sets the store timezone.
+   *
+   * @param string $timezone
+   *   The timezone.
+   *
+   * @return $this
+   */
+  public function setTimezone($timezone);
+
+  /**
    * Gets the store address.
    *
    * @return \Drupal\address\AddressInterface

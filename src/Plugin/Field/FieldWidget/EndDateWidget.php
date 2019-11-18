@@ -11,6 +11,9 @@ use Drupal\datetime\Plugin\Field\FieldWidget\DateTimeDefaultWidget;
 /**
  * Plugin implementation of the 'commerce_end_date' widget.
  *
+ * @deprecated in commerce:8.x-2.16 and is removed from commerce:3.x.
+ *   Use the the 'commerce_store_datetime' widget instead.
+ *
  * @FieldWidget(
  *   id = "commerce_end_date",
  *   label = @Translation("End date"),

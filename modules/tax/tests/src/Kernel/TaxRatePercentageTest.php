@@ -53,12 +53,12 @@ class TaxRatePercentageTest extends CommerceKernelTestBase {
     $percentage = new TaxRatePercentage($definition);
 
     $this->assertEquals($definition['number'], $percentage->getNumber());
-    $this->assertEquals(new DrupalDateTime($definition['start_date']), $percentage->getStartDate());
+    $this->assertEquals(new DrupalDateTime($definition['start_date'], 'UTC'), $percentage->getStartDate());
     $this->assertNull($percentage->getEndDate());
 
     $definition['end_date'] = '2012-12-31';
     $percentage = new TaxRatePercentage($definition);
-    $this->assertEquals(new DrupalDateTime($definition['end_date']), $percentage->getEndDate());
+    $this->assertEquals(new DrupalDateTime($definition['end_date'], 'UTC'), $percentage->getEndDate());
   }
 
   /**

@@ -344,9 +344,8 @@ class Promotion extends CommerceContentEntityBase implements PromotionInterface 
   /**
    * {@inheritdoc}
    */
-  public function getStartDate() {
-    // Can't use the ->date property because it resets the timezone to UTC.
-    return new DrupalDateTime($this->get('start_date')->value);
+  public function getStartDate($store_timezone = 'UTC') {
+    return new DrupalDateTime($this->get('start_date')->value, $store_timezone);
   }
 
   /**
@@ -360,9 +359,9 @@ class Promotion extends CommerceContentEntityBase implements PromotionInterface 
   /**
    * {@inheritdoc}
    */
-  public function getEndDate() {
+  public function getEndDate($store_timezone = 'UTC') {
     if (!$this->get('end_date')->isEmpty()) {
-      return new DrupalDateTime($this->get('end_date')->value);
+      return new DrupalDateTime($this->get('end_date')->value, $store_timezone);
     }
   }
 
@@ -436,11 +435,12 @@ class Promotion extends CommerceContentEntityBase implements PromotionInterface 
       return FALSE;
     }
     $date = $order->getCalculationDate();
-    $start_date = $this->getStartDate();
+    $store_timezone = $date->getTimezone()->getName();
+    $start_date = $this->getStartDate($store_timezone);
     if ($start_date->format('U') > $date->format('U')) {
       return FALSE;
     }
-    $end_date = $this->getEndDate();
+    $end_date = $this->getEndDate($store_timezone);
     if ($end_date && $end_date->format('U') <= $date->format('U')) {
       return FALSE;
     }
@@ -669,7 +669,7 @@ class Promotion extends CommerceContentEntityBase implements PromotionInterface 
       ->setSetting('datetime_type', 'date')
       ->setDefaultValueCallback('Drupal\commerce_promotion\Entity\Promotion::getDefaultStartDate')
       ->setDisplayOptions('form', [
-        'type' => 'datetime_default',
+        'type' => 'commerce_store_datetime',
         'weight' => 5,
       ]);
 
@@ -678,8 +678,9 @@ class Promotion extends CommerceContentEntityBase implements PromotionInterface 
       ->setDescription(t('The date after which the promotion is invalid.'))
       ->setRequired(FALSE)
       ->setSetting('datetime_type', 'date')
+      ->setSetting('datetime_optional_label', t('Provide an end date'))
       ->setDisplayOptions('form', [
-        'type' => 'commerce_end_date',
+        'type' => 'commerce_store_datetime',
         'weight' => 6,
       ]);
 

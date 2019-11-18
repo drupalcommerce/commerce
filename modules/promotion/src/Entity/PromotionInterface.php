@@ -231,10 +231,21 @@ interface PromotionInterface extends ContentEntityInterface, EntityStoresInterfa
   /**
    * Gets the promotion start date.
    *
+   * The start date/time should always be used in the store timezone.
+   * Since the promotion can belong to multiple stores, the timezone
+   * isn't known at load/save time, and is provided by the caller instead.
+   *
+   * Note that the returned date/time value is the same in any timezone,
+   * the "2019-10-17 10:00" stored value is returned as "2019-10-17 10:00 CET"
+   * for "Europe/Berlin" and "2019-10-17 10:00 ET" for "America/New_York".
+   *
+   * @param string $store_timezone
+   *   The store timezone. E.g. "Europe/Berlin".
+   *
    * @return \Drupal\Core\Datetime\DrupalDateTime
    *   The promotion start date.
    */
-  public function getStartDate();
+  public function getStartDate($store_timezone = 'UTC');
 
   /**
    * Sets the promotion start date.
@@ -249,10 +260,21 @@ interface PromotionInterface extends ContentEntityInterface, EntityStoresInterfa
   /**
    * Gets the promotion end date.
    *
+   * The end date/time should always be used in the store timezone.
+   * Since the promotion can belong to multiple stores, the timezone
+   * isn't known at load/save time, and is provided by the caller instead.
+   *
+   * Note that the returned date/time value is the same in any timezone,
+   * the "2019-10-17 11:00" stored value is returned as "2019-10-17 11:00 CET"
+   * for "Europe/Berlin" and "2019-10-17 11:00 ET" for "America/New_York".
+   *
+   * @param string $store_timezone
+   *   The store timezone. E.g. "Europe/Berlin".
+   *
    * @return \Drupal\Core\Datetime\DrupalDateTime
    *   The promotion end date.
    */
-  public function getEndDate();
+  public function getEndDate($store_timezone = 'UTC');
 
   /**
    * Sets the promotion end date.
