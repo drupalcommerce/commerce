@@ -162,14 +162,4 @@ abstract class CommerceWebDriverTestBase extends WebDriverTestBase {
     $this->assertJsCondition($condition, 10000);
   }
 
-  /**
-   * {@inheritdoc}
-   *
-   * @return \Drupal\FunctionalJavascriptTests\JSWebAssert
-   *   A new web-assert option for asserting the presence of elements with.
-   */
-  public function assertSession($name = NULL) {
-    return new JSWebAssert($this->getSession($name), $this->baseUrl);
-  }
-
 }
