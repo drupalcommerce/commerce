@@ -8,12 +8,12 @@ use Drupal\Component\Datetime\TimeInterface;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Cache\MemoryCache\MemoryCacheInterface;
 use Drupal\Core\Database\Connection;
-use Drupal\Core\Datetime\DrupalDateTime;
 use Drupal\Core\Entity\EntityFieldManagerInterface;
 use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
+use Drupal\datetime\Plugin\Field\FieldType\DateTimeItemInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
@@ -92,17 +92,16 @@ class PromotionStorage extends CommerceContentEntityStorage implements Promotion
    * {@inheritdoc}
    */
   public function loadAvailable(OrderInterface $order) {
-    $date = new DrupalDateTime('now', $order->getStore()->getTimezone());
-    $now = $date->format('Y-m-d');
+    $date = $order->getCalculationDate()->format(DateTimeItemInterface::DATETIME_STORAGE_FORMAT);
 
     $query = $this->getQuery();
     $or_condition = $query->orConditionGroup()
-      ->condition('end_date', $now, '>=')
+      ->condition('end_date', $date, '>')
       ->notExists('end_date');
     $query
       ->condition('stores', [$order->getStoreId()], 'IN')
       ->condition('order_types', [$order->bundle()], 'IN')
-      ->condition('start_date', $now, '<=')
+      ->condition('start_date', $date, '<=')
       ->condition('status', TRUE)
       ->condition($or_condition);
     // Only load promotions without coupons. Promotions with coupons are loaded

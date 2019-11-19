@@ -114,6 +114,23 @@ abstract class CommerceWebDriverTestBase extends WebDriverTestBase {
   }
 
   /**
+   * Sets an input field's raw value.
+   *
+   * HTML5 date and time input elements use locale-specific formats,
+   * making it difficult to test across environments.
+   * Setting the value via JS allows us to bypass this and modify the underling
+   * value, which is always in a consistent format.
+   *
+   * @param string $name
+   *   The input element name.
+   * @param string $value
+   *   The value.
+   */
+  protected function setRawFieldValue($name, $value) {
+    $this->getSession()->executeScript("document.getElementsByName('{$name}')[0].value = '{$value}';");
+  }
+
+  /**
    * Asserts that the given address is rendered on the page.
    *
    * @param array $address

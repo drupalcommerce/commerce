@@ -51,13 +51,15 @@ class PromotionAvailabilityTest extends OrderKernelTestBase {
     $order_item->save();
     $order = Order::create([
       'type' => 'default',
-      'state' => 'draft',
       'mail' => 'test@example.com',
       'ip_address' => '127.0.0.1',
       'order_number' => '6',
       'store_id' => $this->store,
       'uid' => $this->createUser(),
       'order_items' => [$order_item],
+      'state' => 'completed',
+      // Used when determining availability, via $order->getCalculationDate().
+      'placed' => strtotime('2019-11-15 10:14:00'),
     ]);
     $order->setRefreshState(Order::REFRESH_SKIP);
     $order->save();
@@ -72,6 +74,7 @@ class PromotionAvailabilityTest extends OrderKernelTestBase {
       'order_types' => ['default'],
       'stores' => [$this->store->id()],
       'usage_limit' => 2,
+      'start_date' => '2019-01-01T00:00:00',
       'status' => TRUE,
     ]);
     $promotion->save();
@@ -94,7 +97,6 @@ class PromotionAvailabilityTest extends OrderKernelTestBase {
    * Tests the start date logic.
    */
   public function testStartDate() {
-    // Default start date.
     $promotion = Promotion::create([
       'order_types' => ['default'],
       'stores' => [$this->store->id()],
@@ -102,16 +104,19 @@ class PromotionAvailabilityTest extends OrderKernelTestBase {
       'status' => TRUE,
     ]);
     $promotion->save();
+
+    // Start date equal to the order placed date.
+    $date = new DrupalDateTime('2019-11-15 10:14:00');
+    $promotion->setStartDate($date);
     $this->assertTrue($promotion->available($this->order));
 
     // Past start date.
-    $date = new DrupalDateTime('2017-01-01');
+    $date = new DrupalDateTime('2019-11-10 10:14:00');
     $promotion->setStartDate($date);
     $this->assertTrue($promotion->available($this->order));
 
     // Future start date.
-    $date = new DrupalDateTime();
-    $date->modify('+1 week');
+    $date = new DrupalDateTime('2019-11-20 10:14:00');
     $promotion->setStartDate($date);
     $this->assertFalse($promotion->available($this->order));
   }
@@ -125,19 +130,24 @@ class PromotionAvailabilityTest extends OrderKernelTestBase {
       'order_types' => ['default'],
       'stores' => [$this->store->id()],
       'usage_limit' => 1,
+      'start_date' => '2019-01-01T00:00:00',
       'status' => TRUE,
     ]);
     $promotion->save();
     $this->assertTrue($promotion->available($this->order));
 
+    // End date equal to the order placed date.
+    $date = new DrupalDateTime('2019-11-15 10:14:00');
+    $promotion->setEndDate($date);
+    $this->assertFalse($promotion->available($this->order));
+
     // Past end date.
-    $date = new DrupalDateTime('2017-01-01');
+    $date = new DrupalDateTime('2017-01-01 00:00:00');
     $promotion->setEndDate($date);
     $this->assertFalse($promotion->available($this->order));
 
     // Future end date.
-    $date = new DrupalDateTime();
-    $date->modify('+1 week');
+    $date = new DrupalDateTime('2019-11-20 10:14:00');
     $promotion->setEndDate($date);
     $this->assertTrue($promotion->available($this->order));
   }
@@ -150,6 +160,7 @@ class PromotionAvailabilityTest extends OrderKernelTestBase {
       'order_types' => ['default'],
       'stores' => [$this->store->id()],
       'usage_limit' => 2,
+      'start_date' => '2019-01-01T00:00:00',
       'status' => TRUE,
     ]);
     $promotion->save();

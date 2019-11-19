@@ -436,3 +436,53 @@ function commerce_promotion_post_update_10(&$sandbox = NULL) {
     $sandbox['#finished'] = ($sandbox['total_count'] - $sandbox['current_count']) / $sandbox['total_count'];
   }
 }
+
+/**
+ * Allows promotion start and end dates to have a time component.
+ */
+function commerce_promotion_post_update_11(array &$sandbox = NULL) {
+  $promotion_storage = \Drupal::entityTypeManager()->getStorage('commerce_promotion');
+  if (!isset($sandbox['current_count'])) {
+    $query = $promotion_storage->getQuery();
+    $sandbox['total_count'] = $query->count()->execute();
+    $sandbox['current_count'] = 0;
+
+    if (empty($sandbox['total_count'])) {
+      $sandbox['#finished'] = 1;
+      return;
+    }
+  }
+
+  $query = $promotion_storage->getQuery();
+  $query->range($sandbox['current_count'], 50);
+  $result = $query->execute();
+  if (empty($result)) {
+    $sandbox['#finished'] = 1;
+    return;
+  }
+
+  /** @var \Drupal\commerce_promotion\Entity\Promotion[] $promotions */
+  $promotions = $promotion_storage->loadMultiple($result);
+  foreach ($promotions as $promotion) {
+    // Re-set each date to ensure it is stored in the updated format.
+    // Increase the end date by a day to match old inclusive loading
+    // (where an end date was valid until 23:59:59 of that day).
+    $start_date = $promotion->getStartDate();
+    $end_date = $promotion->getEndDate();
+    if ($end_date) {
+      $end_date = $end_date->modify('+1 day');
+    }
+    $promotion->setStartDate($start_date);
+    $promotion->setEndDate($end_date);
+
+    $promotion->save();
+  }
+
+  $sandbox['current_count'] += 50;
+  if ($sandbox['current_count'] >= $sandbox['total_count']) {
+    $sandbox['#finished'] = 1;
+  }
+  else {
+    $sandbox['#finished'] = ($sandbox['total_count'] - $sandbox['current_count']) / $sandbox['total_count'];
+  }
+}

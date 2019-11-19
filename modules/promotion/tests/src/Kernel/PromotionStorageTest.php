@@ -5,7 +5,6 @@ namespace Drupal\Tests\commerce_promotion\Kernel;
 use Drupal\commerce_order\Entity\OrderType;
 use Drupal\commerce_promotion\Entity\Coupon;
 use Drupal\commerce_promotion\Entity\Promotion;
-use Drupal\Core\Datetime\DrupalDateTime;
 use Drupal\commerce_order\Entity\OrderItem;
 use Drupal\commerce_price\Price;
 use Drupal\commerce_order\Entity\Order;
@@ -71,13 +70,15 @@ class PromotionStorageTest extends OrderKernelTestBase {
 
     $this->order = Order::create([
       'type' => 'default',
-      'state' => 'draft',
       'mail' => 'test@example.com',
       'ip_address' => '127.0.0.1',
       'order_number' => '6',
       'store_id' => $this->store,
       'uid' => $this->createUser(),
       'order_items' => [$order_item],
+      'state' => 'completed',
+      // Used when determining availability, via $order->getCalculationDate().
+      'placed' => strtotime('2019-11-15 10:14:00'),
     ]);
   }
 
@@ -85,61 +86,72 @@ class PromotionStorageTest extends OrderKernelTestBase {
    * Tests loadAvailable().
    */
   public function testLoadAvailable() {
-    // Starts now, enabled. No end time.
+    // Starts now. No end date.
     $promotion1 = Promotion::create([
       'name' => 'Promotion 1',
       'order_types' => [$this->orderType],
       'stores' => [$this->store->id()],
+      'start_date' => '2019-11-15T10:14:00',
       'status' => TRUE,
     ]);
-    $this->assertEquals(SAVED_NEW, $promotion1->save());
-
-    // Starts now, disabled. No end time.
-    /** @var \Drupal\commerce_promotion\Entity\Promotion $promotion2 */
+    $promotion1->save();
+    $promotion1 = $this->reloadEntity($promotion1);
+    // Past start date, no end date.
     $promotion2 = Promotion::create([
       'name' => 'Promotion 2',
       'order_types' => [$this->orderType],
       'stores' => [$this->store->id()],
-      'status' => FALSE,
+      'start_date' => '2019-01-01T00:00:00',
+      'status' => TRUE,
     ]);
-    $this->assertEquals(SAVED_NEW, $promotion2->save());
-    // Jan 2014, enabled. No end time.
+    $promotion2->save();
+    $promotion2 = $this->reloadEntity($promotion2);
+    // Past start date, no end date. Disabled.
     $promotion3 = Promotion::create([
-      'name' => 'Promotion 3',
+      'name' => 'Promotion32',
       'order_types' => [$this->orderType],
       'stores' => [$this->store->id()],
-      'status' => TRUE,
-      'start_date' => '2014-01-01T20:00:00Z',
+      'start_date' => '2014-01-01T00:00:00',
+      'status' => FALSE,
     ]);
-    $this->assertEquals(SAVED_NEW, $promotion3->save());
-    // Start in 1 week, end in 1 year. Enabled.
+    $promotion3->save();
+    // Past start date, ends now.
     $promotion4 = Promotion::create([
       'name' => 'Promotion 4',
       'order_types' => [$this->orderType],
       'stores' => [$this->store->id()],
+      'start_date' => '2019-01-01T00:00:00',
+      'end_date' => '2019-11-15T10:14:00',
       'status' => TRUE,
-      'start_date' => gmdate('Y-m-d', time() + 604800),
-      'end_date' => gmdate('Y-m-d', time() + 31536000),
     ]);
-    $this->assertEquals(SAVED_NEW, $promotion4->save());
-
-    // Verify valid promotions load.
-    $valid_promotions = $this->promotionStorage->loadAvailable($this->order);
-    $this->assertEquals(2, count($valid_promotions));
-
-    // Move the 4th promotions start week to a week ago, makes it valid.
-    $promotion4->setStartDate(new DrupalDateTime('-1 week'));
     $promotion4->save();
+    // Past start date, future end date.
+    $promotion5 = Promotion::create([
+      'name' => 'Promotion 5',
+      'order_types' => [$this->orderType],
+      'stores' => [$this->store->id()],
+      'start_date' => '2019-01-01T00:00:00',
+      'end_date' => '2020-01-01T00:00:00',
+      'status' => TRUE,
+    ]);
+    $promotion5->save();
+    $promotion5 = $this->reloadEntity($promotion5);
+    // Past start date, past end date.
+    $promotion6 = Promotion::create([
+      'name' => 'Promotion 6',
+      'order_types' => [$this->orderType],
+      'stores' => [$this->store->id()],
+      'start_date' => '2019-01-01T00:00:00',
+      'end_date' => '2019-10-15T10:14:00',
+      'status' => TRUE,
+    ]);
+    $promotion6->save();
 
-    $valid_promotions = $this->promotionStorage->loadAvailable($this->order);
-    $this->assertEquals(3, count($valid_promotions));
-
-    // Set promotion 3's end date six months ago, making it invalid.
-    $promotion3->setEndDate(new DrupalDateTime('-6 month'));
-    $promotion3->save();
-
-    $valid_promotions = $this->promotionStorage->loadAvailable($this->order);
-    $this->assertEquals(2, count($valid_promotions));
+    $promotions = $this->promotionStorage->loadAvailable($this->order);
+    $this->assertCount(3, $promotions);
+    $this->assertEquals([
+      $promotion1->id(), $promotion2->id(), $promotion5->id(),
+    ], array_keys($promotions));
   }
 
   /**
@@ -150,6 +162,7 @@ class PromotionStorageTest extends OrderKernelTestBase {
       'name' => 'Promotion 1',
       'order_types' => [$this->orderType],
       'stores' => [$this->store->id()],
+      'start_date' => '2019-01-01T00:00:00',
       'status' => TRUE,
     ]);
     $promotion1->save();
@@ -159,6 +172,7 @@ class PromotionStorageTest extends OrderKernelTestBase {
       'name' => 'Promotion 2',
       'order_types' => [$this->orderType],
       'stores' => [$this->store->id()],
+      'start_date' => '2019-01-01T00:00:00',
       'status' => TRUE,
     ]);
     $promotion2->save();
@@ -176,6 +190,7 @@ class PromotionStorageTest extends OrderKernelTestBase {
       'name' => 'Promotion 3',
       'order_types' => [$this->orderType],
       'stores' => [$this->store->id()],
+      'start_date' => '2019-01-01T00:00:00',
       'status' => TRUE,
     ]);
     $promotion3->save();
@@ -193,6 +208,7 @@ class PromotionStorageTest extends OrderKernelTestBase {
       'name' => 'Promotion 1',
       'order_types' => [$this->orderType],
       'stores' => [$this->store->id()],
+      'start_date' => '2019-01-01T00:00:00',
       'status' => TRUE,
       'weight' => 4,
     ]);
@@ -201,6 +217,7 @@ class PromotionStorageTest extends OrderKernelTestBase {
       'name' => 'Promotion 2',
       'order_types' => [$this->orderType],
       'stores' => [$this->store->id()],
+      'start_date' => '2019-01-01T00:00:00',
       'status' => TRUE,
       'weight' => 2,
     ]);
@@ -209,6 +226,7 @@ class PromotionStorageTest extends OrderKernelTestBase {
       'name' => 'Promotion 3',
       'order_types' => [$this->orderType],
       'stores' => [$this->store->id()],
+      'start_date' => '2019-01-01T00:00:00',
       'status' => TRUE,
       'weight' => -10,
     ]);
@@ -217,6 +235,7 @@ class PromotionStorageTest extends OrderKernelTestBase {
       'name' => 'Promotion 4',
       'order_types' => [$this->orderType],
       'stores' => [$this->store->id()],
+      'start_date' => '2019-01-01T00:00:00',
       'status' => TRUE,
     ]);
     $promotion4->save();

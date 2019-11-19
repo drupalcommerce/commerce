@@ -8,6 +8,7 @@ use Drupal\commerce_promotion\Entity\Coupon;
 use Drupal\commerce_promotion\Entity\Promotion;
 use Drupal\commerce_promotion\Plugin\Commerce\PromotionOffer\OrderItemPercentageOff;
 use Drupal\Core\Datetime\DrupalDateTime;
+use Drupal\datetime\Plugin\Field\FieldType\DateTimeItemInterface;
 use Drupal\Tests\commerce_order\Kernel\OrderKernelTestBase;
 
 /**
@@ -136,6 +137,7 @@ class PromotionTest extends OrderKernelTestBase {
 
     // Check Coupon::postDelete() remove Coupon reference from promotion.
     $promotion->save();
+    /** @var \Drupal\commerce_promotion\Entity\PromotionInterface $promotion */
     $promotion = $this->reloadEntity($promotion);
     $this->assertEquals($promotion->id(), 1);
     $coupon1->delete();
@@ -144,11 +146,18 @@ class PromotionTest extends OrderKernelTestBase {
     $promotion->setUsageLimit(10);
     $this->assertEquals(10, $promotion->getUsageLimit());
 
-    $promotion->setStartDate(new DrupalDateTime('2017-01-01'));
-    $this->assertEquals('2017-01-01', $promotion->getStartDate()->format('Y-m-d'));
+    $date_pattern = DateTimeItemInterface::DATETIME_STORAGE_FORMAT;
+    $time = $this->container->get('datetime.time');
+    $default_start_date = gmdate($date_pattern, $time->getRequestTime());
+    $this->assertEquals($default_start_date, $promotion->getStartDate()->format($date_pattern));
+    $promotion->setStartDate(new DrupalDateTime('2017-01-01 12:12:12'));
+    $this->assertEquals('2017-01-01 12:12:12 UTC', $promotion->getStartDate()->format('Y-m-d H:i:s T'));
+    $this->assertEquals('2017-01-01 12:12:12 CET', $promotion->getStartDate('Europe/Berlin')->format('Y-m-d H:i:s T'));
 
-    $promotion->setEndDate(new DrupalDateTime('2017-01-31'));
-    $this->assertEquals('2017-01-31', $promotion->getEndDate()->format('Y-m-d'));
+    $this->assertNull($promotion->getEndDate());
+    $promotion->setEndDate(new DrupalDateTime('2017-01-31 17:15:00'));
+    $this->assertEquals('2017-01-31 17:15:00 UTC', $promotion->getEndDate()->format('Y-m-d H:i:s T'));
+    $this->assertEquals('2017-01-31 17:15:00 CET', $promotion->getEndDate('Europe/Berlin')->format('Y-m-d H:i:s T'));
 
     $promotion->setEnabled(TRUE);
     $this->assertEquals(TRUE, $promotion->isEnabled());

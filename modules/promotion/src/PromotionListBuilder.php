@@ -133,8 +133,8 @@ class PromotionListBuilder extends EntityListBuilder implements FormInterface {
       $row['name'] .= ' (' . $this->t('Disabled') . ')';
     }
     $row['usage'] = $current_usage . ' / ' . $usage_limit;
-    $row['start_date'] = $entity->getStartDate()->format('M jS Y');
-    $row['end_date'] = $entity->getEndDate() ? $entity->getEndDate()->format('M jS Y') : '—';
+    $row['start_date'] = $entity->getStartDate()->format('M jS Y H:i:s');
+    $row['end_date'] = $entity->getEndDate() ? $entity->getEndDate()->format('M jS Y H:i:s') : '—';
     if ($this->hasTableDrag) {
       $row['weight'] = [
         '#type' => 'weight',

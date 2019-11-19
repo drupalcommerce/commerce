@@ -229,7 +229,7 @@ interface PromotionInterface extends ContentEntityInterface, EntityStoresInterfa
   public function setUsageLimit($usage_limit);
 
   /**
-   * Gets the promotion start date.
+   * Gets the promotion start date/time.
    *
    * The start date/time should always be used in the store timezone.
    * Since the promotion can belong to multiple stores, the timezone
@@ -243,22 +243,22 @@ interface PromotionInterface extends ContentEntityInterface, EntityStoresInterfa
    *   The store timezone. E.g. "Europe/Berlin".
    *
    * @return \Drupal\Core\Datetime\DrupalDateTime
-   *   The promotion start date.
+   *   The promotion start date/time.
    */
   public function getStartDate($store_timezone = 'UTC');
 
   /**
-   * Sets the promotion start date.
+   * Sets the promotion start date/time.
    *
    * @param \Drupal\Core\Datetime\DrupalDateTime $start_date
-   *   The promotion start date.
+   *   The promotion start date/time.
    *
    * @return $this
    */
   public function setStartDate(DrupalDateTime $start_date);
 
   /**
-   * Gets the promotion end date.
+   * Gets the promotion end date/time.
    *
    * The end date/time should always be used in the store timezone.
    * Since the promotion can belong to multiple stores, the timezone
@@ -272,15 +272,15 @@ interface PromotionInterface extends ContentEntityInterface, EntityStoresInterfa
    *   The store timezone. E.g. "Europe/Berlin".
    *
    * @return \Drupal\Core\Datetime\DrupalDateTime
-   *   The promotion end date.
+   *   The promotion end date/time.
    */
   public function getEndDate($store_timezone = 'UTC');
 
   /**
-   * Sets the promotion end date.
+   * Sets the promotion end date/time.
    *
    * @param \Drupal\Core\Datetime\DrupalDateTime $end_date
-   *   The promotion end date.
+   *   The promotion end date/time.
    *
    * @return $this
    */

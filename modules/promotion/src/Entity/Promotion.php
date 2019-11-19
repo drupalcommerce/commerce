@@ -13,6 +13,7 @@ use Drupal\Core\Datetime\DrupalDateTime;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
+use Drupal\datetime\Plugin\Field\FieldType\DateTimeItemInterface;
 
 /**
  * Defines the promotion entity class.
@@ -352,7 +353,7 @@ class Promotion extends CommerceContentEntityBase implements PromotionInterface 
    * {@inheritdoc}
    */
   public function setStartDate(DrupalDateTime $start_date) {
-    $this->get('start_date')->value = $start_date->format('Y-m-d');
+    $this->get('start_date')->value = $start_date->format(DateTimeItemInterface::DATETIME_STORAGE_FORMAT);
     return $this;
   }
 
@@ -369,8 +370,10 @@ class Promotion extends CommerceContentEntityBase implements PromotionInterface 
    * {@inheritdoc}
    */
   public function setEndDate(DrupalDateTime $end_date = NULL) {
-    $this->get('end_date')->value = $end_date ? $end_date->format('Y-m-d') : NULL;
-    return $this;
+    $this->get('end_date')->value = NULL;
+    if ($end_date) {
+      $this->get('end_date')->value = $end_date->format(DateTimeItemInterface::DATETIME_STORAGE_FORMAT);
+    }
   }
 
   /**
@@ -666,7 +669,7 @@ class Promotion extends CommerceContentEntityBase implements PromotionInterface 
       ->setLabel(t('Start date'))
       ->setDescription(t('The date the promotion becomes valid.'))
       ->setRequired(TRUE)
-      ->setSetting('datetime_type', 'date')
+      ->setSetting('datetime_type', 'datetime')
       ->setDefaultValueCallback('Drupal\commerce_promotion\Entity\Promotion::getDefaultStartDate')
       ->setDisplayOptions('form', [
         'type' => 'commerce_store_datetime',
@@ -677,7 +680,7 @@ class Promotion extends CommerceContentEntityBase implements PromotionInterface 
       ->setLabel(t('End date'))
       ->setDescription(t('The date after which the promotion is invalid.'))
       ->setRequired(FALSE)
-      ->setSetting('datetime_type', 'date')
+      ->setSetting('datetime_type', 'datetime')
       ->setSetting('datetime_optional_label', t('Provide an end date'))
       ->setDisplayOptions('form', [
         'type' => 'commerce_store_datetime',
@@ -726,21 +729,7 @@ class Promotion extends CommerceContentEntityBase implements PromotionInterface 
    */
   public static function getDefaultStartDate() {
     $timestamp = \Drupal::time()->getRequestTime();
-    return gmdate('Y-m-d', $timestamp);
-  }
-
-  /**
-   * Default value callback for 'end_date' base field definition.
-   *
-   * @see ::baseFieldDefinitions()
-   *
-   * @return int
-   *   The default value (date string).
-   */
-  public static function getDefaultEndDate() {
-    // Today + 1 year.
-    $timestamp = \Drupal::time()->getRequestTime();
-    return gmdate('Y-m-d', $timestamp + 31536000);
+    return gmdate(DateTimeItemInterface::DATETIME_STORAGE_FORMAT, $timestamp);
   }
 
   /**
