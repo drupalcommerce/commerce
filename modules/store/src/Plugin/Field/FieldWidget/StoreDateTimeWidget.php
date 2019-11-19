@@ -42,29 +42,23 @@ class StoreDateTimeWidget extends WidgetBase {
   public function formElement(FieldItemListInterface $items, $delta, array $element, array &$form, FormStateInterface $form_state) {
     $element['value'] = [
       '#type' => 'datetime',
-      '#default_value' => NULL,
-      '#date_increment' => 1,
+      '#title' => $this->fieldDefinition->getLabel(),
+      '#description' => $this->fieldDefinition->getDescription(),
       '#required' => $element['#required'],
+      '#date_increment' => 1,
       '#date_timezone' => DateTimeItemInterface::STORAGE_TIMEZONE,
+      '#default_value' => NULL,
     ];
+    if ($this->getFieldSetting('datetime_type') === DateTimeItem::DATETIME_TYPE_DATE) {
+      $element['value']['#date_time_element'] = 'none';
+      $element['value']['#date_time_format'] = '';
+    }
     if ($items[$delta]->date) {
       $date = new DrupalDateTime($items[$delta]->value, DateTimeItemInterface::STORAGE_TIMEZONE);
       if ($this->getFieldSetting('datetime_type') === DateTimeItem::DATETIME_TYPE_DATE) {
         $date->setDefaultDateTime();
       }
       $element['value']['#default_value'] = $date;
-    }
-
-    // If the field is date-only, make sure the title is displayed. Otherwise,
-    // wrap everything in a fieldset, and the title will be shown in the legend.
-    if ($this->getFieldSetting('datetime_type') === DateTimeItem::DATETIME_TYPE_DATE) {
-      $element['value']['#title'] = $this->fieldDefinition->getLabel();
-      $element['value']['#description'] = $this->fieldDefinition->getDescription();
-      $element['value']['#date_time_element'] = 'none';
-      $element['value']['#date_time_format'] = '';
-    }
-    else {
-      $element['#theme_wrappers'][] = 'fieldset';
     }
 
     // When the field is optional, it is considered more user friendly
