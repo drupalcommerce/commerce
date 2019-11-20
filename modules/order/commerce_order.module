@@ -136,38 +136,16 @@ function commerce_order_theme_suggestions_commerce_order_receipt(array $variable
 /**
  * Adds the default order_items field to an order type.
  *
- * Order items can't be a base field because the Views integration is broken.
- * Instead, it is created as a configurable field for each order type.
- *
  * @param \Drupal\commerce_order\Entity\OrderTypeInterface $order_type
  *   The order type.
+ *
+ * @deprecated in commerce:8.x-2.16 and is removed from commerce:3.x. The order
+ *   items field is now a base field.
+ *
+ * @see https://www.drupal.org/node/3090561
  */
 function commerce_order_add_order_items_field(OrderTypeInterface $order_type) {
-  $field_definition = BundleFieldDefinition::create('entity_reference')
-    ->setTargetEntityTypeId('commerce_order')
-    ->setTargetBundle($order_type->id())
-    ->setName('order_items')
-    ->setLabel('Order items')
-    ->setCardinality(BundleFieldDefinition::CARDINALITY_UNLIMITED)
-    ->setRequired(TRUE)
-    ->setSetting('target_type', 'commerce_order_item')
-    ->setSetting('handler', 'default')
-    ->setDisplayOptions('form', [
-      'type' => 'inline_entity_form_complex',
-      'weight' => 0,
-      'settings' => [
-        'override_labels' => TRUE,
-        'label_singular' => 'order item',
-        'label_plural' => 'order items',
-      ],
-    ])
-    ->setDisplayOptions('view', [
-      'type' => 'commerce_order_item_table',
-      'weight' => 0,
-    ]);
-
-  $configurable_field_manager = \Drupal::service('commerce.configurable_field_manager');
-  $configurable_field_manager->createField($field_definition);
+  @trigger_error('commerce_order_add_order_items_field() function is deprecated in commerce:8.x-2.16 and is removed from commerce:3.x. The order_items field is now a base field. See https://www.drupal.org/node/3090561', E_USER_DEPRECATED);
 }
 
 /**

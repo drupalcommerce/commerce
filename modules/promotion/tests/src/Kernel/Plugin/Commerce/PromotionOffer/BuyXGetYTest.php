@@ -66,8 +66,6 @@ class BuyXGetYTest extends OrderKernelTestBase {
       'variationType' => 'default',
     ]);
     $product_type->save();
-    commerce_product_add_stores_field($product_type);
-    commerce_product_add_variations_field($product_type);
 
     for ($i = 0; $i < 4; $i++) {
       $this->variations[$i] = ProductVariation::create([

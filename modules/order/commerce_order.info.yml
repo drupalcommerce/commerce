@@ -22,8 +22,6 @@ config_devel:
     - core.entity_view_mode.commerce_order.user
     - core.entity_form_display.profile.customer.default
     - core.entity_view_display.profile.customer.default
-    - field.field.commerce_order.default.order_items
-    - field.storage.commerce_order.order_items
     - views.view.commerce_orders
     - views.view.commerce_order_item_table
     - views.view.commerce_user_orders

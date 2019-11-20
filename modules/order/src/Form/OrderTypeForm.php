@@ -196,9 +196,6 @@ class OrderTypeForm extends CommerceBundleEntityFormBase {
     $this->entity->save();
     $this->postSave($this->entity, $this->operation);
     $this->submitTraitForm($form, $form_state);
-    if ($this->operation == 'add') {
-      commerce_order_add_order_items_field($this->entity);
-    }
 
     $this->messenger()->addMessage($this->t('Saved the %label order type.', ['%label' => $this->entity->label()]));
     $form_state->setRedirect('entity.commerce_order_type.collection');

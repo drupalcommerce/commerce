@@ -173,8 +173,6 @@ class ProductAdminTest extends ProductBrowserTestBase {
       'variationType' => 'default',
     ];
     $product_type = $this->createEntity('commerce_product_type', $values);
-    commerce_product_add_stores_field($product_type);
-    commerce_product_add_variations_field($product_type);
 
     /** @var \Drupal\commerce_product\Entity\ProductInterface $second_product */
     $second_product = $this->createEntity('commerce_product', [

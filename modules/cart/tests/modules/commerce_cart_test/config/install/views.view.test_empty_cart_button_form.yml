@@ -433,11 +433,13 @@ display:
         order_items:
           id: order_items
           table: commerce_order__order_items
-          field: order_items
+          field: order_items_target_id
           relationship: none
           group_type: group
           admin_label: 'order_items: Order Item'
           required: true
+          entity_type: commerce_order
+          entity_field: order_items
           plugin_id: standard
       arguments:
         order_id:

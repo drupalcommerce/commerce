@@ -326,6 +326,20 @@ class Product extends CommerceContentEntityBase implements ProductInterface {
     $fields = parent::baseFieldDefinitions($entity_type);
     $fields += static::publishedBaseFieldDefinitions($entity_type);
 
+    $fields['stores'] = BaseFieldDefinition::create('entity_reference')
+      ->setLabel(t('Stores'))
+      ->setDescription(t('The product stores.'))
+      ->setRequired(TRUE)
+      ->setCardinality(BaseFieldDefinition::CARDINALITY_UNLIMITED)
+      ->setSetting('target_type', 'commerce_store')
+      ->setSetting('handler', 'default')
+      ->setDisplayOptions('form', [
+        'type' => 'commerce_entity_select',
+        'weight' => -10,
+      ])
+      ->setDisplayConfigurable('form', TRUE)
+      ->setDisplayConfigurable('view', TRUE);
+
     $fields['uid'] = BaseFieldDefinition::create('entity_reference')
       ->setLabel(t('Author'))
       ->setDescription(t('The product author.'))
@@ -357,6 +371,20 @@ class Product extends CommerceContentEntityBase implements ProductInterface {
       ->setDisplayOptions('form', [
         'type' => 'string_textfield',
         'weight' => -5,
+      ])
+      ->setDisplayConfigurable('form', TRUE)
+      ->setDisplayConfigurable('view', TRUE);
+
+    $fields['variations'] = BaseFieldDefinition::create('entity_reference')
+      ->setLabel(t('Variations'))
+      ->setDescription(t('The product variations.'))
+      ->setRequired(TRUE)
+      ->setCardinality(BaseFieldDefinition::CARDINALITY_UNLIMITED)
+      ->setSetting('target_type', 'commerce_product_variation')
+      ->setSetting('handler', 'default')
+      ->setDisplayOptions('view', [
+        'type' => 'commerce_add_to_cart',
+        'weight' => 10,
       ])
       ->setDisplayConfigurable('form', TRUE)
       ->setDisplayConfigurable('view', TRUE);
@@ -398,6 +426,26 @@ class Product extends CommerceContentEntityBase implements ProductInterface {
       ->setLabel(t('Changed'))
       ->setDescription(t('The time when the product was last edited.'))
       ->setTranslatable(TRUE);
+
+    return $fields;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function bundleFieldDefinitions(EntityTypeInterface $entity_type, $bundle, array $base_field_definitions) {
+    /** @var \Drupal\Core\Field\BaseFieldDefinition[] $fields */
+    $fields = [];
+    $fields['variations'] = clone $base_field_definitions['variations'];
+    /** @var \Drupal\commerce_product\Entity\ProductTypeInterface $product_type */
+    $product_type = ProductType::load($bundle);
+    if ($product_type) {
+      $variation_type_id = $product_type->getVariationTypeId();
+      // Restrict the variations field to the configured variation type.
+      $fields['variations']->setSetting('handler_settings', [
+        'target_bundles' => [$variation_type_id => $variation_type_id],
+      ]);
+    }
 
     return $fields;
   }

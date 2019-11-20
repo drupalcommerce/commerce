@@ -3,7 +3,6 @@ status: true
 dependencies:
   config:
     - commerce_order.commerce_order_type.default
-    - field.field.commerce_order.default.order_items
   module:
     - commerce_order
     - inline_entity_form

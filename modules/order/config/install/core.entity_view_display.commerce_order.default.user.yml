@@ -4,7 +4,6 @@ dependencies:
   config:
     - commerce_order.commerce_order_type.default
     - core.entity_view_mode.commerce_order.user
-    - field.field.commerce_order.default.order_items
   module:
     - commerce_order
     - entity_reference_revisions

@@ -4,8 +4,6 @@ dependencies:
   config:
     - commerce_product.commerce_product_type.default
     - field.field.commerce_product.default.body
-    - field.field.commerce_product.default.stores
-    - field.field.commerce_product.default.variations
   module:
     - commerce_product
     - text

@@ -80,8 +80,6 @@ class ProductVariationGeneratedTitleTest extends CommerceKernelTestBase {
       'variationType' => $variation_type->id(),
     ]);
     $product_type->save();
-    commerce_product_add_stores_field($product_type);
-    commerce_product_add_variations_field($product_type);
     $this->productType = $product_type;
 
     $color_attribute = ProductAttribute::create([

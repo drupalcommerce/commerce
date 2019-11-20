@@ -779,6 +779,29 @@ class Order extends CommerceContentEntityBase implements OrderInterface {
       ->setDisplayConfigurable('form', TRUE)
       ->setDisplayConfigurable('view', TRUE);
 
+    $fields['order_items'] = BaseFieldDefinition::create('entity_reference')
+      ->setLabel(t('Order items'))
+      ->setDescription(t('The order items.'))
+      ->setRequired(TRUE)
+      ->setCardinality(BaseFieldDefinition::CARDINALITY_UNLIMITED)
+      ->setSetting('target_type', 'commerce_order_item')
+      ->setSetting('handler', 'default')
+      ->setDisplayOptions('form', [
+        'type' => 'inline_entity_form_complex',
+        'weight' => 0,
+        'settings' => [
+          'override_labels' => TRUE,
+          'label_singular' => t('order item'),
+          'label_plural' => t('order items'),
+        ],
+      ])
+      ->setDisplayOptions('view', [
+        'type' => 'commerce_order_item_table',
+        'weight' => 0,
+      ])
+      ->setDisplayConfigurable('form', TRUE)
+      ->setDisplayConfigurable('view', TRUE);
+
     $fields['adjustments'] = BaseFieldDefinition::create('commerce_adjustment')
       ->setLabel(t('Adjustments'))
       ->setCardinality(BaseFieldDefinition::CARDINALITY_UNLIMITED)

@@ -68,7 +68,7 @@ display:
         variations:
           id: variations
           table: commerce_product__variations
-          field: variations
+          field: variations_target_id
           relationship: none
           group_type: group
           admin_label: ''

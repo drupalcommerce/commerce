@@ -46,10 +46,6 @@ class OrderTypeTest extends OrderBrowserTestBase {
     $this->assertEmpty($order_type->getNumberPatternId());
     $this->assertEquals($edit['refresh_mode'], $order_type->getRefreshMode());
     $this->assertEquals($edit['refresh_frequency'], $order_type->getRefreshFrequency());
-
-    // Testing the target type of the order_items field.
-    $settings = $this->config('field.storage.commerce_order.order_items')->get('settings');
-    $this->assertEquals('commerce_order_item', $settings['target_type']);
   }
 
   /**
@@ -110,7 +106,6 @@ class OrderTypeTest extends OrderBrowserTestBase {
       'label' => 'Label for foo',
       'workflow' => 'order_default',
     ]);
-    commerce_order_add_order_items_field($order_type);
     $order = $this->createEntity('commerce_order', [
       'type' => $order_type->id(),
       'mail' => $this->loggedInUser->getEmail(),

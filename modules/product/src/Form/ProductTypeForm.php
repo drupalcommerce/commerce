@@ -213,9 +213,7 @@ class ProductTypeForm extends CommerceBundleEntityFormBase {
     $this->submitTraitForm($form, $form_state);
     // Create the needed fields.
     if ($this->operation == 'add') {
-      commerce_product_add_stores_field($product_type);
       commerce_product_add_body_field($product_type);
-      commerce_product_add_variations_field($product_type);
     }
     // Update the widget for the variations field.
     $form_display = commerce_get_entity_display('commerce_product', $product_type->id(), 'form');

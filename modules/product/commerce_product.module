@@ -182,30 +182,16 @@ function template_preprocess_commerce_product_attribute_value(array &$variables)
 /**
  * Adds the default stores field to a product.
  *
- * A product can belong to multiple stores.
- * Store id can't be a base field because the Views integration is broken.
- * Instead, it is created as a configurable field for each order type.
- *
  * @param \Drupal\commerce_product\Entity\ProductTypeInterface $product_type
  *   The product type.
+ *
+ * @deprecated in commerce:8.x-2.16 and is removed from commerce:3.x. The stores
+ *   field is now a base field.
+ *
+ * @see https://www.drupal.org/node/3090561
  */
 function commerce_product_add_stores_field(ProductTypeInterface $product_type) {
-  $field_definition = BundleFieldDefinition::create('entity_reference')
-    ->setTargetEntityTypeId('commerce_product')
-    ->setTargetBundle($product_type->id())
-    ->setName('stores')
-    ->setLabel('Stores')
-    ->setCardinality(BundleFieldDefinition::CARDINALITY_UNLIMITED)
-    ->setRequired(TRUE)
-    ->setSetting('target_type', 'commerce_store')
-    ->setSetting('handler', 'default')
-    ->setDisplayOptions('form', [
-      'type' => 'commerce_entity_select',
-      'weight' => -10,
-    ]);
-
-  $configurable_field_manager = \Drupal::service('commerce.configurable_field_manager');
-  $configurable_field_manager->createField($field_definition);
+  @trigger_error('commerce_product_add_stores_field() function is deprecated in commerce:8.x-2.16 and is removed from commerce:3.x. The stores field is now a base field. See https://www.drupal.org/node/3090561', E_USER_DEPRECATED);
 }
 
 /**
@@ -240,40 +226,16 @@ function commerce_product_add_body_field(ProductTypeInterface $product_type, $la
 /**
  * Adds the default variations field to a product type.
  *
- * Variations can't be a base field because the Views integration is broken.
- * Instead, it is created as a configurable field for each product type.
- *
  * @param \Drupal\commerce_product\Entity\ProductTypeInterface $product_type
  *   The product type.
+ *
+ * @deprecated in commerce:8.x-2.16 and is removed from commerce:3.x. The
+ *   variations field is now a base field.
+ *
+ * @see https://www.drupal.org/node/3090561
  */
 function commerce_product_add_variations_field(ProductTypeInterface $product_type) {
-  $field_definition = BundleFieldDefinition::create('entity_reference')
-    ->setTargetEntityTypeId('commerce_product')
-    ->setTargetBundle($product_type->id())
-    ->setName('variations')
-    ->setLabel('Variations')
-    ->setCardinality(BundleFieldDefinition::CARDINALITY_UNLIMITED)
-    ->setRequired(TRUE)
-    ->setSetting('target_type', 'commerce_product_variation')
-    ->setSetting('handler', 'default')
-    ->setSetting('handler_settings', [
-      'target_bundles' => [
-        $product_type->getVariationTypeId(),
-      ],
-    ])
-    ->setDisplayOptions('view', [
-      'type' => 'commerce_add_to_cart',
-      'weight' => 10,
-    ]);
-  if (!$product_type->allowsMultipleVariations()) {
-    $field_definition->setDisplayOptions('form', [
-      'type' => 'commerce_product_single_variation',
-      'weight' => 2,
-    ]);
-  }
-
-  $configurable_field_manager = \Drupal::service('commerce.configurable_field_manager');
-  $configurable_field_manager->createField($field_definition);
+  @trigger_error('commerce_product_add_variations_field() function is deprecated in commerce:8.x-2.16 and is removed from commerce:3.x. The variations field is now a base field. See https://www.drupal.org/node/3090561', E_USER_DEPRECATED);
 }
 
 /**
