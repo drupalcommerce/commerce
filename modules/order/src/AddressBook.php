@@ -185,8 +185,9 @@ class AddressBook implements AddressBookInterface {
     }
     /** @var \Drupal\address\Plugin\Field\FieldType\AddressItem $address */
     $address = $profile->get('address')->first();
+    $country_code = $address ? $address->getCountryCode() : 'ZZ';
 
-    return in_array($address->getCountryCode(), $available_countries);
+    return in_array($country_code, $available_countries);
   }
 
 }
