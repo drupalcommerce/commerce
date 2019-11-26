@@ -17,6 +17,17 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Provides improvements to core's generic views integration for entities.
+ *
+ * Contains special handling for the following base field types:
+ * - address, address_country
+ * - commerce_price
+ * - datetime
+ * - list_float, list_integer, list_string
+ * - state
+ * Workaround for core issue #2337515.
+ *
+ * Provides reverse relationships for base entity_reference fields,
+ * as a workaround for core issue #2706431.
  */
 class CommerceEntityViewsData extends EntityViewsData {
 
@@ -103,7 +114,82 @@ class CommerceEntityViewsData extends EntityViewsData {
   }
 
   /**
+   * Corrects the views data for address base fields.
+   *
+   * Based on address_field_views_data().
+   *
+   * @param string $table
+   *   The table name.
+   * @param \Drupal\Core\Field\FieldDefinitionInterface $field_definition
+   *   The field definition.
+   * @param array $views_field
+   *   The views field data.
+   * @param string $field_column_name
+   *   The field column being processed.
+   */
+  protected function processViewsDataForAddress($table, FieldDefinitionInterface $field_definition, array &$views_field, $field_column_name) {
+    $handlers_by_property = [
+      'country_code' => 'country',
+      'administrative_area' => 'subdivision',
+      'locality' => 'subdivision',
+      'dependent_locality' => 'subdivision',
+      'postal_code' => 'standard',
+      'sorting_code' => 'standard',
+      'address_line1' => 'standard',
+      'address_line2' => 'standard',
+      'organization' => 'standard',
+      'given_name' => 'standard',
+      'additional_name' => 'standard',
+      'family_name' => 'standard',
+    ];
+    if (!isset($handlers_by_property[$field_column_name])) {
+      return;
+    }
+
+    $views_field['field'] = [
+      'id' => $handlers_by_property[$field_column_name],
+      'field_name' => $field_definition->getName(),
+      'property' => $field_column_name,
+    ];
+    if ($field_column_name == 'country_code') {
+      $views_field['filter']['id'] = 'country';
+      $views_field['sort']['id'] = 'country';
+    }
+    elseif ($field_column_name == 'administrative_area') {
+      $views_field['filter']['id'] = 'administrative_area';
+    }
+  }
+
+  /**
+   * Corrects the views data for address_country base fields.
+   *
+   * Based on address_field_views_data().
+   *
+   * @param string $table
+   *   The table name.
+   * @param \Drupal\Core\Field\FieldDefinitionInterface $field_definition
+   *   The field definition.
+   * @param array $views_field
+   *   The views field data.
+   * @param string $field_column_name
+   *   The field column being processed.
+   */
+  protected function processViewsDataForAddressCountry($table, FieldDefinitionInterface $field_definition, array &$views_field, $field_column_name) {
+    if ($field_column_name == 'value') {
+      $views_field['field'] = [
+        'id' => 'country',
+        'field_name' => $field_definition->getName(),
+        'property' => 'value',
+      ];
+      $views_field['filter']['id'] = 'country';
+      $views_field['sort']['id'] = 'country';
+    }
+  }
+
+  /**
    * Corrects the views data for commerce_price base fields.
+   *
+   * Based on commerce_price_field_views_data().
    *
    * @param string $table
    *   The table name.
@@ -121,7 +207,101 @@ class CommerceEntityViewsData extends EntityViewsData {
   }
 
   /**
+   * Corrects the views data for datetime base fields.
+   *
+   * Based on datetime_field_views_data().
+   *
+   * @param string $table
+   *   The table name.
+   * @param \Drupal\Core\Field\FieldDefinitionInterface $field_definition
+   *   The field definition.
+   * @param array $views_field
+   *   The views field data.
+   * @param string $field_column_name
+   *   The field column being processed.
+   */
+  protected function processViewsDataForDatetime($table, FieldDefinitionInterface $field_definition, array &$views_field, $field_column_name) {
+    if ($field_column_name == 'value') {
+      $views_field['filter']['id'] = 'datetime';
+      $views_field['argument']['id'] = 'datetime';
+      $views_field['sort']['id'] = 'datetime';
+      // These handlers need "field_name", the default only has "entity field".
+      $views_field['filter']['field_name'] = $field_definition->getName();
+      $views_field['argument']['field_name'] = $field_definition->getName();
+      $views_field['sort']['field_name'] = $field_definition->getName();
+    }
+  }
+
+  /**
+   * Corrects the views data for list_float base fields.
+   *
+   * Based on options_field_views_data().
+   *
+   * @param string $table
+   *   The table name.
+   * @param \Drupal\Core\Field\FieldDefinitionInterface $field_definition
+   *   The field definition.
+   * @param array $views_field
+   *   The views field data.
+   * @param string $field_column_name
+   *   The field column being processed.
+   */
+  protected function processViewsDataForListFloat($table, FieldDefinitionInterface $field_definition, array &$views_field, $field_column_name) {
+    $this->processViewsDataForListInteger($table, $field_definition, $views_field, $field_column_name);
+  }
+
+  /**
+   * Corrects the views data for list_integer base fields.
+   *
+   * Based on options_field_views_data().
+   *
+   * @param string $table
+   *   The table name.
+   * @param \Drupal\Core\Field\FieldDefinitionInterface $field_definition
+   *   The field definition.
+   * @param array $views_field
+   *   The views field data.
+   * @param string $field_column_name
+   *   The field column being processed.
+   */
+  protected function processViewsDataForListInteger($table, FieldDefinitionInterface $field_definition, array &$views_field, $field_column_name) {
+    if ($field_column_name == 'value') {
+      $views_field['filter']['id'] = 'list_field';
+      $views_field['argument']['id'] = 'number_list_field';
+      // These handlers need "field_name", the default only has "entity field".
+      $views_field['filter']['field_name'] = $field_definition->getName();
+      $views_field['argument']['field_name'] = $field_definition->getName();
+    }
+  }
+
+  /**
+   * Corrects the views data for list_string base fields.
+   *
+   * Based on options_field_views_data().
+   *
+   * @param string $table
+   *   The table name.
+   * @param \Drupal\Core\Field\FieldDefinitionInterface $field_definition
+   *   The field definition.
+   * @param array $views_field
+   *   The views field data.
+   * @param string $field_column_name
+   *   The field column being processed.
+   */
+  protected function processViewsDataForListString($table, FieldDefinitionInterface $field_definition, array &$views_field, $field_column_name) {
+    if ($field_column_name == 'value') {
+      $views_field['filter']['id'] = 'list_field';
+      $views_field['argument']['id'] = 'string_list_field';
+      // These handlers need "field_name", the default only has "entity field".
+      $views_field['filter']['field_name'] = $field_definition->getName();
+      $views_field['argument']['field_name'] = $field_definition->getName();
+    }
+  }
+
+  /**
    * Corrects the views data for state base fields.
+   *
+   * Based on state_machine_field_views_data().
    *
    * @param string $table
    *   The table name.
