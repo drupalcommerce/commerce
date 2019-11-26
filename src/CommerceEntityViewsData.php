@@ -121,6 +121,24 @@ class CommerceEntityViewsData extends EntityViewsData {
   }
 
   /**
+   * Corrects the views data for state base fields.
+   *
+   * @param string $table
+   *   The table name.
+   * @param \Drupal\Core\Field\FieldDefinitionInterface $field_definition
+   *   The field definition.
+   * @param array $views_field
+   *   The views field data.
+   * @param string $field_column_name
+   *   The field column being processed.
+   */
+  protected function processViewsDataForState($table, FieldDefinitionInterface $field_definition, array &$views_field, $field_column_name) {
+    if ($field_column_name == 'value') {
+      $views_field['filter']['id'] = 'state_machine_state';
+    }
+  }
+
+  /**
    * Adds reverse relationships for the base entity reference fields.
    *
    * @param array $data
