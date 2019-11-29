@@ -4,6 +4,7 @@ namespace Drupal\commerce;
 
 use Drupal\Core\Entity\ContentEntityType;
 use Drupal\Core\Entity\EntityStorageInterface;
+use Drupal\Core\Entity\Sql\TableMappingInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\entity\BundleFieldDefinition;
@@ -22,6 +23,9 @@ use Drupal\views\EntityViewsData;
  *
  * Provides views data for bundle plugin fields, as a workaround for core
  * issue #2898635.
+ *
+ * Provides the missing delta field for multi-value fields,
+ * as a workaround for core issue #3097568.
  *
  * Provides reverse relationships for base entity_reference fields,
  * as a workaround for core issue #2706431.
@@ -163,6 +167,62 @@ class CommerceEntityViewsData extends EntityViewsData {
       $data[$table_alias]['table']['provider'] = $this->entityType->getProvider();
 
       $this->mapFieldDefinition($table_info['table'], $field_name, $bundle_field, $this->tableMapping, $data[$table_alias]);
+    }
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  protected function mapFieldDefinition($table, $field_name, FieldDefinitionInterface $field_definition, TableMappingInterface $table_mapping, &$table_data) {
+    $field_column_mapping = $table_mapping->getColumnNames($field_name);
+    $field_storage = $this->getFieldStorageDefinitions()[$field_name];
+    $field_schema = $field_storage->getSchema();
+
+    $field_definition_type = $field_definition->getType();
+    // Add all properties to views table data. We need an entry for each
+    // column of each field, with the first one given special treatment.
+    $first = TRUE;
+    foreach ($field_column_mapping as $field_column_name => $schema_field_name) {
+      $table_data[$schema_field_name] = $this->mapSingleFieldViewsData($table, $field_name, $field_definition_type, $field_column_name, $field_schema['columns'][$field_column_name]['type'], $first, $field_definition);
+      $table_data[$schema_field_name]['entity field'] = $field_name;
+      $first = FALSE;
+    }
+
+    // Expose additional delta column for multiple value fields.
+    // Workaround for core issue #3097568.
+    if ($field_storage->isMultiple()) {
+      $label = $field_definition->getLabel();
+
+      $table_data['delta'] = [
+        'title' => t('@label (@name:delta)', ['@label' => $label, '@name' => $field_name]),
+        'title short' => t('@label:delta', ['@label' => $label]),
+      ];
+      $table_data['delta']['field'] = [
+        'id' => 'numeric',
+      ];
+      $table_data['delta']['argument'] = [
+        'field' => 'delta',
+        'table' => $table,
+        'id' => 'numeric',
+        'empty field name' => $this->t('- No value -'),
+        'field_name' => $field_name,
+        'entity_type' => $this->entityType->id(),
+      ];
+      $table_data['delta']['filter'] = [
+        'field' => 'delta',
+        'table' => $table,
+        'id' => 'numeric',
+        'field_name' => $field_name,
+        'entity_type' => $this->entityType->id(),
+        'allow empty' => TRUE,
+      ];
+      $table_data['delta']['sort'] = [
+        'field' => 'delta',
+        'table' => $table,
+        'id' => 'standard',
+        'field_name' => $field_name,
+        'entity_type' => $this->entityType->id(),
+      ];
     }
   }
 
