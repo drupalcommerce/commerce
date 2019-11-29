@@ -21,11 +21,14 @@ use Drupal\views\EntityViewsData;
  * - state
  * Workaround for core issue #2337515.
  *
- * Provides views data for bundle plugin fields, as a workaround for core
- * issue #2898635.
+ * Provides views data for bundle plugin fields,
+ * as a workaround for core issue #2898635.
  *
  * Provides the missing delta field for multi-value fields,
  * as a workaround for core issue #3097568.
+ *
+ * Fixes handling of fields with multiple properties,
+ * as a workaround for core issue #3097636.
  *
  * Provides reverse relationships for base entity_reference fields,
  * as a workaround for core issue #2706431.
@@ -180,12 +183,31 @@ class CommerceEntityViewsData extends EntityViewsData {
 
     $field_definition_type = $field_definition->getType();
     // Add all properties to views table data. We need an entry for each
-    // column of each field, with the first one given special treatment.
-    $first = TRUE;
+    // column of each field, with the main one given special treatment.
+    $main_property = $field_storage->getMainPropertyName();
+    if (!$main_property) {
+      // The mapSingleFieldViewsData() method always expects a main property,
+      // so there must be a fallback to the first defined property.
+      // See #2337517 for the related core issue.
+      $property_names = array_keys($field_column_mapping);
+      $main_property = reset($property_names);
+    }
     foreach ($field_column_mapping as $field_column_name => $schema_field_name) {
+      $first = ($main_property == $field_column_name);
       $table_data[$schema_field_name] = $this->mapSingleFieldViewsData($table, $field_name, $field_definition_type, $field_column_name, $field_schema['columns'][$field_column_name]['type'], $first, $field_definition);
       $table_data[$schema_field_name]['entity field'] = $field_name;
-      $first = FALSE;
+      // By default core makes every property render the entire field, which
+      // confuses users. Fix that so only the property itself is rendered.
+      // Workaround for core issue #3097636.
+      if (!$first && $table_data[$schema_field_name]['field']['id'] == 'field') {
+        $table_data[$schema_field_name]['field']['id'] = 'standard';
+      }
+      // Many handlers (datetime, list) crash without the field_name defined.
+      foreach (['argument', 'filter', 'sort'] as $handler_type) {
+        if (isset($table_data[$schema_field_name][$handler_type])) {
+          $table_data[$schema_field_name][$handler_type]['field_name'] = $field_name;
+        }
+      }
     }
 
     // Expose additional delta column for multiple value fields.
@@ -338,10 +360,6 @@ class CommerceEntityViewsData extends EntityViewsData {
       $views_field['filter']['id'] = 'datetime';
       $views_field['argument']['id'] = 'datetime';
       $views_field['sort']['id'] = 'datetime';
-      // These handlers need "field_name", the default only has "entity field".
-      $views_field['filter']['field_name'] = $field_definition->getName();
-      $views_field['argument']['field_name'] = $field_definition->getName();
-      $views_field['sort']['field_name'] = $field_definition->getName();
     }
   }
 
@@ -381,9 +399,6 @@ class CommerceEntityViewsData extends EntityViewsData {
     if ($field_column_name == 'value') {
       $views_field['filter']['id'] = 'list_field';
       $views_field['argument']['id'] = 'number_list_field';
-      // These handlers need "field_name", the default only has "entity field".
-      $views_field['filter']['field_name'] = $field_definition->getName();
-      $views_field['argument']['field_name'] = $field_definition->getName();
     }
   }
 
@@ -405,9 +420,6 @@ class CommerceEntityViewsData extends EntityViewsData {
     if ($field_column_name == 'value') {
       $views_field['filter']['id'] = 'list_field';
       $views_field['argument']['id'] = 'string_list_field';
-      // These handlers need "field_name", the default only has "entity field".
-      $views_field['filter']['field_name'] = $field_definition->getName();
-      $views_field['argument']['field_name'] = $field_definition->getName();
     }
   }
 
