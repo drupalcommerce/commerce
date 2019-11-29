@@ -3,17 +3,11 @@
 namespace Drupal\commerce;
 
 use Drupal\Core\Entity\ContentEntityType;
-use Drupal\Core\Entity\EntityFieldManagerInterface;
-use Drupal\Core\Entity\EntityManagerInterface;
-use Drupal\Core\Entity\EntityTypeInterface;
-use Drupal\Core\Entity\EntityTypeManagerInterface;
-use Drupal\Core\Entity\Sql\SqlEntityStorageInterface;
-use Drupal\Core\Extension\ModuleHandlerInterface;
+use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Field\FieldDefinitionInterface;
-use Drupal\Core\StringTranslation\TranslationInterface;
+use Drupal\entity\BundleFieldDefinition;
 use Drupal\views\EntityViewsData;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Provides improvements to core's generic views integration for entities.
@@ -26,26 +20,15 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * - state
  * Workaround for core issue #2337515.
  *
+ * Provides views data for bundle plugin fields, as a workaround for core
+ * issue #2898635.
+ *
  * Provides reverse relationships for base entity_reference fields,
  * as a workaround for core issue #2706431.
  */
 class CommerceEntityViewsData extends EntityViewsData {
 
   use EntityManagerBridgeTrait;
-
-  /**
-   * The entity field manager.
-   *
-   * @var \Drupal\Core\Entity\EntityFieldManagerInterface
-   */
-  protected $entityFieldManager;
-
-  /**
-   * The entity type manager.
-   *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
-   */
-  protected $entityTypeManager;
 
   /**
    * The table mapping.
@@ -55,70 +38,132 @@ class CommerceEntityViewsData extends EntityViewsData {
   protected $tableMapping;
 
   /**
-   * Constructs a new CommerceEntityViewsData object.
-   *
-   * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
-   *   The entity type to provide views integration for.
-   * @param \Drupal\Core\Entity\Sql\SqlEntityStorageInterface $storage
-   *   The storage handler used for this entity type.
-   * @param \Drupal\Core\Entity\EntityManagerInterface $entity_manager
-   *   The entity manager.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
-   *   The module handler.
-   * @param \Drupal\Core\StringTranslation\TranslationInterface $translation_manager
-   *   The translation manager.
-   * @param \Drupal\Core\Entity\EntityFieldManagerInterface $entity_field_manager
-   *   The entity field manager.
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
-   *   The entity type manager.
-   */
-  public function __construct(EntityTypeInterface $entity_type, SqlEntityStorageInterface $storage, EntityManagerInterface $entity_manager, ModuleHandlerInterface $module_handler, TranslationInterface $translation_manager, EntityFieldManagerInterface $entity_field_manager, EntityTypeManagerInterface $entity_type_manager) {
-    parent::__construct($entity_type, $storage, $entity_manager, $module_handler, $translation_manager);
-
-    $this->entityFieldManager = $entity_field_manager;
-    $this->entityTypeManager = $entity_type_manager;
-    $this->tableMapping = $storage->getTableMapping();
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public static function createInstance(ContainerInterface $container, EntityTypeInterface $entity_type) {
-    return new static(
-      $entity_type,
-      $container->get('entity_type.manager')->getStorage($entity_type->id()),
-      $container->get('entity.manager'),
-      $container->get('module_handler'),
-      $container->get('string_translation'),
-      $container->get('entity_field.manager'),
-      $container->get('entity_type.manager')
-    );
-  }
-
-  /**
    * {@inheritdoc}
    */
   public function getViewsData() {
     $data = parent::getViewsData();
+
+    $this->tableMapping = $this->storage->getTableMapping();
+    $entity_type_id = $this->entityType->id();
     // Workaround for core issue #3004300.
     if ($this->entityType->isRevisionable()) {
       $revision_table = $this->tableMapping->getRevisionTable();
       $data[$revision_table]['table']['entity revision'] = TRUE;
     }
     // Add missing reverse relationships. Workaround for core issue #2706431.
-    $base_fields = $this->entityFieldManager->getBaseFieldDefinitions($this->entityType->id());
+    $base_fields = $this->getEntityFieldManager()->getBaseFieldDefinitions($entity_type_id);
     $entity_reference_fields = array_filter($base_fields, function (BaseFieldDefinition $field) {
       return $field->getType() == 'entity_reference';
     });
-    if (in_array($this->entityType->id(), ['commerce_order', 'commerce_product'])) {
+    if (in_array($entity_type_id, ['commerce_order', 'commerce_product'])) {
       // Product variations and order items have reference fields pointing
       // to the parent entity, no need for a reverse relationship.
       unset($entity_reference_fields['variations']);
       unset($entity_reference_fields['order_items']);
     }
     $this->addReverseRelationships($data, $entity_reference_fields);
+    // Add views integration for bundle plugin fields.
+    // Workaround for core issue #2898635.
+    if ($this->entityType->hasHandlerClass('bundle_plugin')) {
+      $bundles = $this->getEntityTypeBundleInfo()->getBundleInfo($entity_type_id);
+      foreach (array_keys($bundles) as $bundle) {
+        $field_definitions = $this->getEntityFieldManager()->getFieldDefinitions($entity_type_id, $bundle);
+        foreach ($field_definitions as $field_definition) {
+          if ($field_definition instanceof BundleFieldDefinition) {
+            $this->addBundleFieldData($data, $field_definition);
+          }
+        }
+      }
+    }
 
     return $data;
+  }
+
+  /**
+   * Adds views data for the given bundle field.
+   *
+   * Based on views_field_default_views_data(), which is only invoked
+   * for configurable fields.
+   *
+   * Assumes that the bundle field is not shared between bundles, since
+   * the bundle plugin API doesn't support that.
+   *
+   * @param array $data
+   *   The views data.
+   * @param \Drupal\entity\BundleFieldDefinition $bundle_field
+   *   The bundle field.
+   */
+  protected function addBundleFieldData(array &$data, BundleFieldDefinition $bundle_field) {
+    $field_name = $bundle_field->getName();
+    $entity_type_id = $this->entityType->id();
+    $base_table = $this->getViewsTableForEntityType($this->entityType);
+    $revision_table = '';
+    if ($this->entityType->isRevisionable()) {
+      $revision_table = $this->tableMapping->getRevisionDataTable();
+      if (!$revision_table) {
+        $revision_table = $this->tableMapping->getRevisionTable();
+      }
+    }
+
+    $field_tables = [];
+    $field_tables[EntityStorageInterface::FIELD_LOAD_CURRENT] = [
+      'table' => $this->tableMapping->getDedicatedDataTableName($bundle_field),
+      'alias' => "{$entity_type_id}__{$field_name}",
+    ];
+    if ($this->entityType->isRevisionable()) {
+      $field_tables[EntityStorageInterface::FIELD_LOAD_REVISION] = [
+        'table' => $this->tableMapping->getDedicatedRevisionTableName($bundle_field),
+        'alias' => "{$entity_type_id}_revision__{$field_name}",
+      ];
+    }
+
+    $table_alias = $field_tables[EntityStorageInterface::FIELD_LOAD_CURRENT]['alias'];
+    $data[$table_alias]['table']['group'] = $this->entityType->getLabel();
+    $data[$table_alias]['table']['join'][$base_table] = [
+      'table' => $this->tableMapping->getDedicatedDataTableName($bundle_field),
+      'left_field' => $this->entityType->getKey('id'),
+      'field' => 'entity_id',
+      'extra' => [
+        ['field' => 'deleted', 'value' => 0, 'numeric' => TRUE],
+      ],
+    ];
+    if ($bundle_field->isTranslatable()) {
+      $data[$table_alias]['table']['join'][$base_table]['extra'][] = [
+        'left_field' => 'langcode',
+        'field' => 'langcode',
+      ];
+    }
+
+    if ($this->entityType->isRevisionable()) {
+      $table_alias = $field_tables[EntityStorageInterface::FIELD_LOAD_REVISION]['alias'];
+      $data[$table_alias]['table']['group'] = $this->t('@group (historical data)', [
+        '@group' => $this->entityType->getLabel(),
+      ]);
+      $data[$table_alias]['table']['join'][$revision_table] = [
+        'table' => $this->tableMapping->getDedicatedRevisionTableName($bundle_field),
+        'left_field' => $this->entityType->getKey('revision'),
+        'field' => 'revision_id',
+        'extra' => [
+          ['field' => 'deleted', 'value' => 0, 'numeric' => TRUE],
+        ],
+      ];
+      if ($bundle_field->isTranslatable()) {
+        $data[$table_alias]['table']['join'][$revision_table]['extra'][] = [
+          'left_field' => 'langcode',
+          'field' => 'langcode',
+        ];
+      }
+    }
+
+    foreach ($field_tables as $type => $table_info) {
+      $table_alias = $table_info['alias'];
+      $data[$table_alias]['table']['title'] = $bundle_field->getLabel();
+      $data[$table_alias]['table']['help'] = $bundle_field->getDescription();
+      $data[$table_alias]['table']['entity type'] = $this->entityType->id();
+      $data[$table_alias]['table']['provider'] = $this->entityType->getProvider();
+
+      $this->mapFieldDefinition($table_info['table'], $field_name, $bundle_field, $this->tableMapping, $data[$table_alias]);
+    }
   }
 
   /**
@@ -342,7 +387,7 @@ class CommerceEntityViewsData extends EntityViewsData {
 
     foreach ($fields as $field) {
       $target_entity_type_id = $field->getSettings()['target_type'];
-      $target_entity_type = $this->entityTypeManager->getDefinition($target_entity_type_id);
+      $target_entity_type = $this->getEntityTypeManager()->getDefinition($target_entity_type_id);
       if (!($target_entity_type instanceof ContentEntityType)) {
         continue;
       }
