@@ -48,6 +48,13 @@ class CommerceEntityViewsData extends EntityViewsData {
   protected $entityTypeManager;
 
   /**
+   * The table mapping.
+   *
+   * @var \Drupal\Core\Entity\Sql\DefaultTableMapping
+   */
+  protected $tableMapping;
+
+  /**
    * Constructs a new CommerceEntityViewsData object.
    *
    * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
@@ -70,6 +77,7 @@ class CommerceEntityViewsData extends EntityViewsData {
 
     $this->entityFieldManager = $entity_field_manager;
     $this->entityTypeManager = $entity_type_manager;
+    $this->tableMapping = $storage->getTableMapping();
   }
 
   /**
@@ -94,7 +102,7 @@ class CommerceEntityViewsData extends EntityViewsData {
     $data = parent::getViewsData();
     // Workaround for core issue #3004300.
     if ($this->entityType->isRevisionable()) {
-      $revision_table = $this->entityType->getRevisionTable() ?: $this->entityType->id() . '_revision';
+      $revision_table = $this->tableMapping->getRevisionTable();
       $data[$revision_table]['table']['entity revision'] = TRUE;
     }
     // Add missing reverse relationships. Workaround for core issue #2706431.
@@ -329,8 +337,6 @@ class CommerceEntityViewsData extends EntityViewsData {
   protected function addReverseRelationships(array &$data, array $fields) {
     $entity_type_id = $this->entityType->id();
     $base_table = $this->getViewsTableForEntityType($this->entityType);
-    /** @var \Drupal\Core\Entity\Sql\DefaultTableMapping $table_mapping */
-    $table_mapping = $this->storage->getTableMapping();
     assert($this->entityType instanceof ContentEntityType);
     $revision_metadata_field_names = array_flip($this->entityType->getRevisionMetadataKeys());
 
@@ -345,7 +351,7 @@ class CommerceEntityViewsData extends EntityViewsData {
       $field_storage = $field->getFieldStorageDefinition();
 
       $args = [
-        '@label' => $target_entity_type->getLowercaseLabel(),
+        '@label' => $target_entity_type->getSingularLabel(),
         '@entity' => $this->entityType->getLabel(),
         '@field_name' => $field_name,
       ];
@@ -355,7 +361,7 @@ class CommerceEntityViewsData extends EntityViewsData {
         'group' => $target_entity_type->getLabel(),
         'entity_type' => $entity_type_id,
       ];
-      if ($table_mapping->requiresDedicatedTableStorage($field_storage)) {
+      if ($this->tableMapping->requiresDedicatedTableStorage($field_storage)) {
         $data[$target_table][$pseudo_field_name]['relationship'] = [
           'id' => 'entity_reverse',
           'title' => $this->t('@entity using @field_name', $args),
@@ -363,21 +369,21 @@ class CommerceEntityViewsData extends EntityViewsData {
           'base' => $base_table,
           'base field' => $this->entityType->getKey('id'),
           'field_name' => $field_name,
-          'field table' => $table_mapping->getFieldTableName($field_name),
-          'field field' => $table_mapping->getFieldColumnName($field_storage, 'target_id'),
+          'field table' => $this->tableMapping->getFieldTableName($field_name),
+          'field field' => $this->tableMapping->getFieldColumnName($field_storage, 'target_id'),
         ] + $relationship_data;
       }
       elseif (isset($revision_metadata_field_names[$field_name])) {
         // Revision metadata fields exist only on the revision table, so the
         // relationship has to be to that rather than to the base table.
-        $revision_table = $this->entityType->getRevisionTable() ?: $this->entityType->id() . '_revision';
+        $revision_table = $this->tableMapping->getRevisionTable();
 
         $data[$target_table][$pseudo_field_name]['relationship'] = [
           'id' => 'standard',
           'title' => $this->t('@entity revision using @field_name', $args),
           'help' => $this->t('Relate each @entity revision with a @field_name field set to the @label.', $args),
           'base' => $revision_table,
-          'base field' => $table_mapping->getFieldColumnName($field_storage, 'target_id'),
+          'base field' => $this->tableMapping->getFieldColumnName($field_storage, 'target_id'),
           'relationship field' => $target_entity_type->getKey('id'),
         ] + $relationship_data;
       }
@@ -388,7 +394,7 @@ class CommerceEntityViewsData extends EntityViewsData {
           'title' => $this->t('@entity using @field_name', $args),
           'help' => $this->t('Relate each @entity with a @field_name field set to the @label.', $args),
           'base' => $base_table,
-          'base field' => $table_mapping->getFieldColumnName($field_storage, 'target_id'),
+          'base field' => $this->tableMapping->getFieldColumnName($field_storage, 'target_id'),
           'relationship field' => $target_entity_type->getKey('id'),
         ] + $relationship_data;
       }
