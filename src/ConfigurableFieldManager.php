@@ -118,9 +118,20 @@ class ConfigurableFieldManager implements ConfigurableFieldManagerInterface {
     if (empty($field)) {
       throw new \RuntimeException(sprintf('The field "%s" does not exist on bundle "%s" of entity type "%s".', $field_name, $bundle, $entity_type_id));
     }
-    // EntityQuery crashes if the field doesn't declare a main property.
-    $properties = $field->getFieldStorageDefinition()->getPropertyNames();
-    $property = reset($properties);
+    $property = $field->getFieldStorageDefinition()->getMainPropertyName();
+    if (!$property) {
+      // EntityQuery crashes if the field doesn't declare a main property.
+      // Using the first defined property is a safe fallback for most field
+      // types except address, where the first property is "langcode" and
+      // potentially empty.
+      if ($field_definition->getType() == 'address') {
+        $property = 'country_code';
+      }
+      else {
+        $properties = $field->getFieldStorageDefinition()->getPropertyNames();
+        $property = reset($properties);
+      }
+    }
 
     $query = $this->entityTypeManager->getStorage($entity_type_id)->getQuery();
     $query

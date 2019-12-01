@@ -198,14 +198,10 @@ function commerce_order_form_profile_type_form_alter(array &$form, FormStateInte
   $customer_flag = $profile_type->getThirdPartySetting('commerce_order', 'customer_profile_type');
   $address_has_data = FALSE;
   if ($customer_flag && !$profile_type->isNew()) {
-    // Workaround for #3072156.
-    $query = \Drupal::entityTypeManager()->getStorage('profile')->getQuery();
-    $query
-      ->condition('type', $profile_type->id())
-      ->exists('address.country_code')
-      ->range(0, 1);
-    $result = $query->execute();
-    $address_has_data = !empty($result);
+    /** @var \Drupal\commerce\ConfigurableFieldManagerInterface $configurable_field_manager */
+    $configurable_field_manager = \Drupal::service('commerce.configurable_field_manager');
+    $address_field_definition = commerce_order_build_address_field_definition($profile_type->id());
+    $address_has_data = $configurable_field_manager->hasData($address_field_definition);
   }
 
   $form['#tree'] = TRUE;
