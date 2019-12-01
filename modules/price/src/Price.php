@@ -296,7 +296,7 @@ final class Price {
    */
   protected function assertCurrencyCodeFormat($currency_code) {
     if (strlen($currency_code) != '3') {
-      throw new \InvalidArgumentException();
+      throw new \InvalidArgumentException(sprintf('Invalid currency code "%s".', $currency_code));
     }
   }
 
@@ -313,7 +313,7 @@ final class Price {
    */
   protected function assertSameCurrency(Price $first_price, Price $second_price) {
     if ($first_price->getCurrencyCode() != $second_price->getCurrencyCode()) {
-      throw new CurrencyMismatchException();
+      throw new CurrencyMismatchException(sprintf('The provided prices have mismatched currencies: %s, %s.', $first_price->__toString(), $second_price->__toString()));
     }
   }
 
