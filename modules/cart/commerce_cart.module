@@ -205,9 +205,7 @@ function commerce_cart_form_commerce_order_type_form_alter(array &$form, FormSta
     '#weight' => 5,
     '#open' => TRUE,
     '#attached' => [
-      'library' => [
-        'commerce_cart/admin',
-      ],
+      'library' => ['commerce_cart/admin'],
     ],
   ];
   $form['commerce_cart']['cart_form_view'] = [
@@ -235,8 +233,7 @@ function commerce_cart_form_commerce_order_type_form_alter(array &$form, FormSta
     ],
     '#states' => [
       'visible' => [
-        ':input[name="commerce_cart[cart_expiration_enable]"]' =>
-          ['checked' => TRUE],
+        ':input[name="commerce_cart[cart_expiration_enable]"]' => ['checked' => TRUE],
       ],
     ],
     '#open' => TRUE,
