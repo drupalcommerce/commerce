@@ -64,8 +64,8 @@ class Cron implements CronInterface {
       }
 
       $interval = new Interval($cart_expiration['number'], $cart_expiration['unit']);
-      $order_ids = $this->getOrderIds($order_type->id(), $interval);
-      if (!empty($order_ids)) {
+      $all_order_ids = $this->getOrderIds($order_type->id(), $interval);
+      foreach (array_chunk($all_order_ids, 50) as $order_ids) {
         $this->queue->createItem($order_ids);
       }
     }
@@ -89,7 +89,7 @@ class Cron implements CronInterface {
       ->condition('type', $order_type_id)
       ->condition('changed', $expiration_date->getTimestamp(), '<=')
       ->condition('cart', TRUE)
-      ->range(0, 50)
+      ->range(0, 250)
       ->accessCheck(FALSE)
       ->execute();
 
