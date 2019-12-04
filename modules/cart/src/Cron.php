@@ -91,6 +91,7 @@ class Cron implements CronInterface {
       ->condition('cart', TRUE)
       ->range(0, 250)
       ->accessCheck(FALSE)
+      ->addTag('commerce_cart_expiration')
       ->execute();
 
     return $ids;
