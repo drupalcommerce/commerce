@@ -1,3 +1,9 @@
+admin:
+  version: VERSION
+  css:
+    theme:
+      css/commerce_cart.admin.css: {}
+
 cart_block:
   version: VERSION
   css:

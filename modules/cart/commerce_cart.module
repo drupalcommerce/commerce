@@ -12,6 +12,13 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Session\AnonymousUserSession;
 
 /**
+ * Implements hook_cron().
+ */
+function commerce_cart_cron() {
+  \Drupal::service('commerce_cart.cron')->run();
+}
+
+/**
  * Implements hook_menu_links_discovered_alter().
  */
 function commerce_cart_menu_links_discovered_alter(&$links) {
@@ -179,6 +186,7 @@ function commerce_cart_form_commerce_order_type_form_alter(array &$form, FormSta
   $order_type = $form_state->getFormObject()->getEntity();
   $cart_form_view = $order_type->getThirdPartySetting('commerce_cart', 'cart_form_view', 'commerce_cart_form');
   $cart_block_view = $order_type->getThirdPartySetting('commerce_cart', 'cart_block_view', 'commerce_cart_block');
+  $cart_expiration = $order_type->getThirdPartySetting('commerce_cart', 'cart_expiration');
   $view_storage = \Drupal::entityTypeManager()->getStorage('view');
   $available_form_views = [];
   $available_block_views = [];
@@ -196,6 +204,11 @@ function commerce_cart_form_commerce_order_type_form_alter(array &$form, FormSta
     '#title' => t('Shopping cart settings'),
     '#weight' => 5,
     '#open' => TRUE,
+    '#attached' => [
+      'library' => [
+        'commerce_cart/admin',
+      ],
+    ],
   ];
   $form['commerce_cart']['cart_form_view'] = [
     '#type' => 'select',
@@ -210,6 +223,44 @@ function commerce_cart_form_commerce_order_type_form_alter(array &$form, FormSta
     '#default_value' => $cart_block_view,
   ];
 
+  $form['commerce_cart']['cart_expiration_enable'] = [
+    '#type' => 'checkbox',
+    '#title' => t('Delete abandoned carts'),
+    '#default_value' => !empty($cart_expiration['number']),
+  ];
+  $form['commerce_cart']['cart_expiration'] = [
+    '#type' => 'container',
+    '#attributes' => [
+      'class' => ['interval'],
+    ],
+    '#states' => [
+      'visible' => [
+        ':input[name="commerce_cart[cart_expiration_enable]"]' =>
+          ['checked' => TRUE],
+      ],
+    ],
+    '#open' => TRUE,
+  ];
+  $form['commerce_cart']['cart_expiration']['number'] = [
+    '#type' => 'number',
+    '#title' => t('Interval'),
+    '#default_value' => !empty($cart_expiration['number']) ? $cart_expiration['number'] : 30,
+    '#required' => TRUE,
+    '#min' => 1,
+  ];
+  $form['commerce_cart']['cart_expiration']['unit'] = [
+    '#type' => 'select',
+    '#title' => t('Unit'),
+    '#title_display' => 'invisible',
+    '#default_value' => !empty($cart_expiration['unit']) ? $cart_expiration['unit'] : 'day',
+    '#options' => [
+      'hour' => t('Hour'),
+      'day' => t('Day'),
+      'month' => t('Month'),
+    ],
+    '#required' => TRUE,
+  ];
+
   $form['actions']['submit']['#submit'][] = 'commerce_cart_order_type_form_submit';
 }
 
@@ -222,6 +273,15 @@ function commerce_cart_order_type_form_submit($form, FormStateInterface $form_st
   $settings = &$form_state->getValue('commerce_cart');
   $order_type->setThirdPartySetting('commerce_cart', 'cart_form_view', $settings['cart_form_view']);
   $order_type->setThirdPartySetting('commerce_cart', 'cart_block_view', $settings['cart_block_view']);
+
+  $cart_expiration = [];
+  if (!empty($settings['cart_expiration_enable'])) {
+    $cart_expiration = [
+      'unit' => $settings['cart_expiration']['unit'],
+      'number' => $settings['cart_expiration']['number'],
+    ];
+  }
+  $order_type->setThirdPartySetting('commerce_cart', 'cart_expiration', $cart_expiration);
   $order_type->save();
 }
 

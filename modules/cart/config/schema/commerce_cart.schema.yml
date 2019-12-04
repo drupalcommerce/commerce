@@ -8,6 +8,16 @@ commerce_order.commerce_order_type.*.third_party.commerce_cart:
     cart_form_view:
       type: string
       label: 'Shopping cart form view'
+    cart_expiration:
+      type: mapping
+      label: 'Shopping cart expiration'
+      mapping:
+        number:
+          type: integer
+          label: 'Interval'
+        unit:
+          type: string
+          label: 'Unit'
 
 block.settings.commerce_cart:
   type: block_settings

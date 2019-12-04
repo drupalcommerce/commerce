@@ -5,6 +5,10 @@ services:
     tags:
       - { name: cache.context }
 
+  commerce_cart.cron:
+    class: Drupal\commerce_cart\Cron
+    arguments: ['@entity_type.manager', '@queue']
+
   commerce_cart.cart_session:
     class: Drupal\commerce_cart\CartSession
     arguments: ['@session']
