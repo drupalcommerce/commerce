@@ -28,3 +28,9 @@ views.field.commerce_store:
     hide_single_store:
       type: boolean
       label: 'Hide if there''s only one store.'
+
+views.filter_value.commerce_store_datetime:
+  type: views.filter_value.date
+
+views.filter.commerce_store_datetime:
+  type: views.filter.date

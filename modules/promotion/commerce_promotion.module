@@ -10,6 +10,7 @@ use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\Element;
 use Drupal\user\UserInterface;
+use Drupal\views\Plugin\views\field\EntityField;
 
 /**
  * Implements hook_commerce_condition_info_alter().
@@ -83,6 +84,31 @@ function template_preprocess_commerce_promotion(array &$variables) {
   $variables['promotion'] = [];
   foreach (Element::children($variables['elements']) as $key) {
     $variables['promotion'][$key] = $variables['elements'][$key];
+  }
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ *
+ * Removes core's built-in formatters from views field options for
+ * promotion start_date and end_date fields, since they perform timezone
+ * conversion. The "Default (Store timezone)" formatter should be used instead.
+ */
+function commerce_promotion_form_views_ui_config_item_form_alter(&$form, FormStateInterface $form_state) {
+  /** @var \Drupal\views\Plugin\views\field\EntityField $handler */
+  $handler = $form_state->get('handler');
+  if ($handler instanceof EntityField && !empty($handler->definition['entity_type'])) {
+    $entity_type_id = $handler->definition['entity_type'];
+    $field_name = $handler->definition['field_name'];
+    /** @var \Drupal\Core\Entity\EntityFieldManagerInterface $field_manager */
+    $field_manager = \Drupal::service('entity_field.manager');
+    $field_definitions = $field_manager->getFieldStorageDefinitions($entity_type_id);
+    $field_definition = $field_definitions[$field_name];
+    if ($entity_type_id == 'commerce_promotion' && $field_definition->getType() == 'datetime') {
+      unset($form['options']['type']['#options']['datetime_custom']);
+      unset($form['options']['type']['#options']['datetime_default']);
+      unset($form['options']['type']['#options']['datetime_plain']);
+    }
   }
 }
 
