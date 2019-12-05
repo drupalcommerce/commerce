@@ -82,6 +82,13 @@ class CommerceEntityViewsData extends EntityViewsData {
         }
       }
     }
+    // Use custom bundle handlers which know how to handle non-config bundles.
+    // Workaround for core issue #3056998.
+    if ($bundle_key = $this->entityType->getKey('bundle')) {
+      $base_table = $this->getViewsTableForEntityType($this->entityType);
+      $data[$base_table][$bundle_key]['field']['id'] = 'commerce_entity_bundle';
+      $data[$base_table][$bundle_key]['filter']['id'] = 'commerce_entity_bundle';
+    }
 
     return $data;
   }

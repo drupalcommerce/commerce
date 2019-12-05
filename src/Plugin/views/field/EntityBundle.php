@@ -13,6 +13,7 @@ use Drupal\Core\Render\RendererInterface;
 use Drupal\views\Plugin\views\field\EntityField;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Session\AccountInterface;
+use Drupal\views\ResultRow;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -117,6 +118,28 @@ class EntityBundle extends EntityField {
     }
 
     return parent::access($account);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getItems(ResultRow $values) {
+    $items = parent::getItems($values);
+    // Show the bundle label for entity types which don't use a bundle
+    // entity type (i.e. they use bundle plugins).
+    $entity_type_id = $this->getEntityType();
+    $entity_type = $this->entityTypeManager->getDefinition($entity_type_id);
+    if (!$entity_type->getBundleEntityType()) {
+      $bundles = $this->entityTypeBundleInfo->getBundleInfo($entity_type_id);
+      foreach ($items as &$item) {
+        $bundle = $item['raw']->get('value')->getValue();
+        if (isset($bundles[$bundle])) {
+          $item['rendered']['#context']['value'] = $bundles[$bundle]['label'];
+        }
+      }
+    }
+
+    return $items;
   }
 
 }
