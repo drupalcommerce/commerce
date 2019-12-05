@@ -155,6 +155,11 @@ function commerce_order_update_8209() {
   $config_factory = \Drupal::configFactory();
   foreach ($config_factory->listAll('views.view.') as $view_config_name) {
     $view = $config_factory->getEditable($view_config_name);
+    if ($view->get('base_field') != 'order_id') {
+      // Not a commerce_order SQL view.
+      continue;
+    }
+
     $displays = $view->get('display');
     foreach ($displays as $display_name => $display) {
       if (!empty($display['display_options']['relationships'])) {

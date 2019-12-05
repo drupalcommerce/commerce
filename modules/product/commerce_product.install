@@ -202,6 +202,11 @@ function commerce_product_update_8209() {
   $config_factory = \Drupal::configFactory();
   foreach ($config_factory->listAll('views.view.') as $view_config_name) {
     $view = $config_factory->getEditable($view_config_name);
+    if (!in_array($view->get('base_field'), ['product_id', 'variation_id'])) {
+      // Not a commerce_product / commerce_product_variation SQL view.
+      continue;
+    }
+
     $displays = $view->get('display');
     foreach ($displays as $display_name => $display) {
       if (!empty($display['display_options']['relationships'])) {
