@@ -66,6 +66,39 @@ class EntityBundle extends Bundle {
 
   /**
    * {@inheritdoc}
+   */
+  public function getValueOptions() {
+    if (!isset($this->valueOptions)) {
+      $types = $this->bundleInfoService->getBundleInfo($this->entityTypeId);
+      // When the filter is exposed, filter out bundles that the user is
+      // not allowed to see. Workaround for core issue #3099068.
+      $storage = $this->getEntityTypeManager()->getStorage($this->entityTypeId);
+      foreach ($types as $type => $info) {
+        if ($this->isExposed()) {
+          $stub_entity = $storage->create([
+            $this->entityType->getKey('bundle') => $type,
+          ]);
+          if (!$stub_entity->access('view')) {
+            unset($types[$type]);
+          }
+        }
+      }
+
+      $this->valueTitle = $this->t('@entity types', ['@entity' => $this->entityType->getLabel()]);
+      $options = [];
+      foreach ($types as $type => $info) {
+        $options[$type] = $info['label'];
+      }
+
+      asort($options);
+      $this->valueOptions = $options;
+    }
+
+    return $this->valueOptions;
+  }
+
+  /**
+   * {@inheritdoc}
    *
    * We override the parent method so that it does not cause an unhandled
    * PluginNotFoundException to be thrown, due to entities which use bundle
