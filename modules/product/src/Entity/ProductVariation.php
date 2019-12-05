@@ -36,7 +36,7 @@ use Symfony\Component\Routing\Exception\RouteNotFoundException;
  *     "permission_provider" = "Drupal\commerce_product\ProductVariationPermissionProvider",
  *     "view_builder" = "Drupal\Core\Entity\EntityViewBuilder",
  *     "list_builder" = "Drupal\commerce_product\ProductVariationListBuilder",
- *     "views_data" = "Drupal\commerce\CommerceEntityViewsData",
+ *     "views_data" = "Drupal\commerce_product\ProductVariationViewsData",
  *     "form" = {
  *       "add" = "Drupal\commerce_product\Form\ProductVariationForm",
  *       "edit" = "Drupal\commerce_product\Form\ProductVariationForm",

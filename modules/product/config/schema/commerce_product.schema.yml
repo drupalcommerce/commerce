@@ -147,6 +147,9 @@ action.configuration.commerce_unpublish_product:
   type: action_configuration_default
   label: 'Configuration for the Unpublish product action'
 
+views.field.commerce_product_variation_view_link:
+  type: views.field.entity_link
+
 views.filter.commerce_product_attribute_value:
   type: views.filter.in_operator
   label: 'Product attribute filter'
