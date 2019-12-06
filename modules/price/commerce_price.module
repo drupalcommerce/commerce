@@ -6,6 +6,7 @@
  */
 
 use Drupal\commerce_price\Plugin\Field\FieldFormatter\PriceCalculatedFormatter;
+use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\views\Plugin\views\field\EntityField;
@@ -55,7 +56,11 @@ function commerce_price_form_views_ui_config_item_form_alter(&$form, FormStateIn
     $field_manager = \Drupal::service('entity_field.manager');
     $field_definitions = $field_manager->getFieldStorageDefinitions($entity_type_id);
     $field_definition = $field_definitions[$field_name];
-    if ($field_definition->getType() === 'commerce_price' && !PriceCalculatedFormatter::isApplicable($field_definition)) {
+    if ($field_definition->getType() != 'commerce_price') {
+      return;
+    }
+    // Remove the formatter from configurable fields, and non-applicable ones.
+    if (!($field_definition instanceof BaseFieldDefinition) || !PriceCalculatedFormatter::isApplicable($field_definition)) {
       unset($form['options']['type']['#options']['commerce_price_calculated']);
     }
   }
