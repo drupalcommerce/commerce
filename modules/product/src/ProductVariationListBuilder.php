@@ -67,7 +67,11 @@ class ProductVariationListBuilder extends EntityListBuilder implements FormInter
 
     $this->formBuilder = $form_builder;
     $this->product = $route_match->getParameter('commerce_product');
-    $this->product = $entity_repository->getTranslationFromContext($this->product);
+    // The product might not be available when the list builder is
+    // instantiated by Views to build the list of operations.
+    if (!empty($this->product)) {
+      $this->product = $entity_repository->getTranslationFromContext($this->product);
+    }
   }
 
   /**
