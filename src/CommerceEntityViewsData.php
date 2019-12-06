@@ -346,6 +346,9 @@ class CommerceEntityViewsData extends EntityViewsData {
     if ($field_column_name == 'number') {
       $views_field['filter']['id'] = 'numeric';
     }
+    elseif ($field_column_name == 'currency_code') {
+      $views_field['filter']['id'] = 'commerce_currency';
+    }
   }
 
   /**

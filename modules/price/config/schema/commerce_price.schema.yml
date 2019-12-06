@@ -68,3 +68,6 @@ field.formatter.settings.commerce_price_calculated:
       sequence:
         type: string
         label: 'Adjustment type'
+
+views.filter.commerce_currency:
+  type: views.filter.in_operator
