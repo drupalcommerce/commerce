@@ -31,6 +31,7 @@ function commerce_price_field_views_data(FieldStorageConfigInterface $field_stor
         'entity_type' => $table_data[$field_name]['field']['entity_type'],
         'label' => t('currency from @field_name', ['@field_name' => $field_name]),
       ];
+      $data[$table_name][$field_name . '_currency_code']['filter']['id'] = 'commerce_currency';
     }
   }
   return $data;
