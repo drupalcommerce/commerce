@@ -114,7 +114,8 @@ class NumberPattern extends ConfigEntityBase implements NumberPatternInterface {
    * {@inheritdoc}
    */
   public function setTargetEntityTypeId($entity_type_id) {
-    return $this->targetEntityType = $entity_type_id;
+    $this->targetEntityType = $entity_type_id;
+    return $this;
   }
 
   /**
