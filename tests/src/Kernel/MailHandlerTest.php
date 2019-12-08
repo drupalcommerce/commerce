@@ -48,6 +48,7 @@ class MailHandlerTest extends CommerceKernelTestBase {
     $this->assertEquals('text/html; charset=UTF-8;', $email['headers']['Content-Type']);
     $this->assertEquals('commerce_mail', $email['id']);
     $this->assertEquals('customer@example.com', $email['to']);
+    $this->assertFalse(isset($email['headers']['Cc']));
     $this->assertFalse(isset($email['headers']['Bcc']));
     $this->assertEquals($this->store->getEmail(), $email['from']);
     $this->assertEquals('Test subject', $email['subject']);
@@ -69,6 +70,7 @@ class MailHandlerTest extends CommerceKernelTestBase {
     $params = [
       'id' => 'custom',
       'from' => 'me@example.com',
+      'cc' => 'billing@example.com',
       'bcc' => 'other@example.com',
       'langcode' => 'fr',
       // Custom parameters are passed through.
@@ -81,6 +83,7 @@ class MailHandlerTest extends CommerceKernelTestBase {
     $email = end($emails);
     $this->assertEquals('commerce_custom', $email['id']);
     $this->assertEquals('you@example.com', $email['to']);
+    $this->assertEquals('billing@example.com', $email['headers']['Cc']);
     $this->assertEquals('other@example.com', $email['headers']['Bcc']);
     $this->assertEquals('me@example.com', $email['from']);
     $this->assertEquals('Hello', $email['subject']);

@@ -72,6 +72,9 @@ class MailHandler implements MailHandlerInterface {
       // setup until then.
       'body' => $body,
     ];
+    if (!empty($params['cc'])) {
+      $default_params['headers']['Cc'] = $params['cc'];
+    }
     if (!empty($params['bcc'])) {
       $default_params['headers']['Bcc'] = $params['bcc'];
     }
