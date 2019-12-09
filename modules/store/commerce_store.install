@@ -71,3 +71,25 @@ function commerce_store_update_8203() {
 
   $definition_update_manager->installFieldStorageDefinition('timezone', 'commerce_store', 'commerce_store', $storage_definition);
 }
+
+/**
+ * Add the 'is_default' field to stores.
+ */
+function commerce_store_update_8204() {
+  $storage_definition = BaseFieldDefinition::create('boolean')
+    ->setLabel(t('Default'))
+    ->setDescription(t('Whether this is the default store.'))
+    ->setDefaultValue(FALSE)
+    ->setDisplayOptions('form', [
+      'type' => 'boolean_checkbox',
+      'settings' => [
+        'display_label' => TRUE,
+      ],
+      'weight' => 90,
+    ])
+    ->setDisplayConfigurable('view', TRUE)
+    ->setDisplayConfigurable('form', TRUE);
+
+  $update_manager = \Drupal::entityDefinitionUpdateManager();
+  $update_manager->installFieldStorageDefinition('is_default', 'commerce_store', 'commerce_store', $storage_definition);
+}

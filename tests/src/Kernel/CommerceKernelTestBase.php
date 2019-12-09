@@ -67,7 +67,6 @@ abstract class CommerceKernelTestBase extends EntityKernelTestBase {
     $currency_importer->import('USD');
 
     $this->store = $this->createStore('Default store', 'admin@example.com');
-    \Drupal::entityTypeManager()->getStorage('commerce_store')->markAsDefault($this->store);
   }
 
   /**

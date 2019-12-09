@@ -99,3 +99,21 @@ function commerce_store_post_update_3() {
 
   return $message;
 }
+
+/**
+ * Set the default store and remove the default_store config key.
+ */
+function commerce_store_post_update_4() {
+  /** @var \Drupal\Core\Config\ConfigFactoryInterface $config_factory */
+  $config_factory = \Drupal::service('config.factory');
+  $uuid = $config_factory->get('commerce_store.settings')->get('default_store');
+  if ($uuid) {
+    $store_storage = \Drupal::entityTypeManager()->getStorage('commerce_store');
+    /** @var \Drupal\commerce_store\Entity\StoreInterface[] $stores */
+    $stores = $store_storage->loadByProperties(['uuid' => $uuid]);
+    $store = reset($stores);
+    $store->setDefault(TRUE);
+    $store->save();
+  }
+  $config_factory->getEditable('commerce_store.settings')->delete();
+}

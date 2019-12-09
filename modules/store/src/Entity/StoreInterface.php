@@ -142,4 +142,22 @@ interface StoreInterface extends ContentEntityInterface, EntityOwnerInterface {
    */
   public function setBillingCountries(array $countries);
 
+  /**
+   * Gets whether this is the default store.
+   *
+   * @return bool
+   *   TRUE if this is the default store, FALSE otherwise.
+   */
+  public function isDefault();
+
+  /**
+   * Sets whether this is the default store.
+   *
+   * @param bool $is_default
+   *   Whether this is the default store.
+   *
+   * @return $this
+   */
+  public function setDefault($is_default);
+
 }

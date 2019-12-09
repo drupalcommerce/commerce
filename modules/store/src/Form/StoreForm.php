@@ -34,20 +34,18 @@ class StoreForm extends ContentEntityForm {
     ];
     $form['path']['#group'] = 'path_settings';
 
-    /** @var \Drupal\commerce_store\StoreStorageInterface $store_storage */
-    $store_storage = $this->entityTypeManager->getStorage('commerce_store');
-    $default_store = $store_storage->loadDefault();
-    $isDefault = TRUE;
-    if ($default_store && $default_store->uuid() != $store->uuid()) {
-      $isDefault = FALSE;
+    if (isset($form['is_default'])) {
+      $form['is_default']['#group'] = 'footer';
+      $form['is_default']['#disabled'] = $store->isDefault();
+      if (!$store->isDefault()) {
+        /** @var \Drupal\commerce_store\StoreStorageInterface $store_storage */
+        $store_storage = $this->entityTypeManager->getStorage('commerce_store');
+        $default_store = $store_storage->loadDefault();
+        if (!$default_store || $default_store->id() == $store->id()) {
+          $form['is_default']['widget']['value']['#default_value'] = TRUE;
+        }
+      }
     }
-    $form['default'] = [
-      '#type' => 'checkbox',
-      '#title' => $this->t('Default'),
-      '#default_value' => $isDefault,
-      '#disabled' => $isDefault || empty($default_store),
-      '#weight' => 98,
-    ];
 
     return $form;
   }
@@ -58,11 +56,6 @@ class StoreForm extends ContentEntityForm {
   public function save(array $form, FormStateInterface $form_state) {
     $this->entity->save();
     $this->postSave($this->entity, $this->operation);
-    if ($form_state->getValue('default')) {
-      /** @var \Drupal\commerce_store\StoreStorageInterface $store_storage */
-      $store_storage = $this->entityTypeManager->getStorage('commerce_store');
-      $store_storage->markAsDefault($this->entity);
-    }
     $this->messenger()->addMessage($this->t('Saved the %label store.', [
       '%label' => $this->entity->label(),
     ]));

@@ -226,6 +226,21 @@ class Store extends ContentEntityBase implements StoreInterface {
   /**
    * {@inheritdoc}
    */
+  public function isDefault() {
+    return (bool) $this->get('is_default')->value;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setDefault($is_default) {
+    $this->set('is_default', (bool) $is_default);
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function preSave(EntityStorageInterface $storage) {
     parent::preSave($storage);
 
@@ -235,6 +250,31 @@ class Store extends ContentEntityBase implements StoreInterface {
       // If no owner has been set explicitly, make the anonymous user the owner.
       if (!$translation->getOwner()) {
         $translation->setOwnerId(0);
+      }
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function postSave(EntityStorageInterface $storage, $update = TRUE) {
+    /** @var \Drupal\commerce_store\StoreStorage $storage */
+    parent::postSave($storage, $update);
+
+    $default = $this->isDefault();
+    $original_default = $this->original ? $this->original->isDefault() : FALSE;
+    if ($default && !$original_default) {
+      // The store was set as default, remove the flag from other stores.
+      $store_ids = $storage->getQuery()
+        ->condition('store_id', $this->id(), '<>')
+        ->condition('is_default', TRUE)
+        ->accessCheck(FALSE)
+        ->execute();
+      foreach ($store_ids as $store_id) {
+        /** @var \Drupal\commerce_store\Entity\StoreInterface $store */
+        $store = $storage->load($store_id);
+        $store->setDefault(FALSE);
+        $store->save();
       }
     }
   }
@@ -356,6 +396,21 @@ class Store extends ContentEntityBase implements StoreInterface {
       ])
       ->setDisplayConfigurable('form', TRUE)
       ->setCustomStorage(TRUE);
+
+    // 'default' is a reserved SQL word, hence the 'is_' prefix.
+    $fields['is_default'] = BaseFieldDefinition::create('boolean')
+      ->setLabel(t('Default'))
+      ->setDescription(t('Whether this is the default store.'))
+      ->setDefaultValue(FALSE)
+      ->setDisplayOptions('form', [
+        'type' => 'boolean_checkbox',
+        'settings' => [
+          'display_label' => TRUE,
+        ],
+        'weight' => 90,
+      ])
+      ->setDisplayConfigurable('view', TRUE)
+      ->setDisplayConfigurable('form', TRUE);
 
     return $fields;
   }

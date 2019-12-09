@@ -29,6 +29,13 @@ content:
     region: content
     settings: {  }
     third_party_settings: {  }
+  is_default:
+    type: boolean_checkbox
+    settings:
+      display_label: true
+    weight: 9
+    region: content
+    third_party_settings: {  }
   mail:
     type: email_default
     weight: 1

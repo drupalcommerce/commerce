@@ -40,7 +40,7 @@ class StoreTest extends CommerceWebDriverTestBase {
     $this->assertSession()->fieldExists('mail[0][value]');
     $this->assertSession()->fieldExists('address[0][address][country_code]');
     $this->assertSession()->fieldExists('billing_countries[]');
-    $this->assertSession()->fieldExists('default');
+    $this->assertSession()->fieldExists('is_default[value]');
 
     $this->getSession()->getPage()->fillField('address[0][address][country_code]', 'US');
     $this->getSession()->wait(4000, 'jQuery(\'select[name="address[0][address][administrative_area]"]\').length > 0 && jQuery.active == 0;');

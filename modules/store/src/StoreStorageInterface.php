@@ -23,6 +23,8 @@ interface StoreStorageInterface extends ContentEntityStorageInterface {
    *
    * @param \Drupal\commerce_store\Entity\StoreInterface $store
    *   The new default store.
+   *
+   * @deprecated in commerce:8.x-2.16 and is removed from commerce:3.x.
    */
   public function markAsDefault(StoreInterface $store);
 

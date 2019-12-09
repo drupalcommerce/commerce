@@ -56,17 +56,10 @@ trait StoreCreationTrait {
         'administrative_area' => 'WI',
         'postal_code' => '53597',
       ],
-      'billing_countries' => [
-        $country,
-      ],
+      'billing_countries' => [$country],
+      'is_default' => $default,
     ]);
     $store->save();
-
-    if ($default) {
-      /** @var \Drupal\commerce_store\StoreStorage $store_storage */
-      $store_storage = \Drupal::service('entity_type.manager')->getStorage('commerce_store');
-      $store_storage->markAsDefault($store);
-    }
 
     $store = Store::load($store->id());
 

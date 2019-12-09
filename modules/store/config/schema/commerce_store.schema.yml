@@ -6,14 +6,6 @@ commerce_store.commerce_store_type.*:
       type: text
       label: 'Description'
 
-commerce_store.settings:
-  type: config_object
-  label: 'Commerce Store settings'
-  mapping:
-    default_store:
-      type: string
-      label: 'Default store UUID'
-
 field.formatter.settings.commerce_store_datetime:
   type: mapping
   label: 'Store date/time formatter settings'

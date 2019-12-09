@@ -133,11 +133,11 @@ class CreateStoreCommand extends Command {
       ],
     ];
     $store = $store_storage->create($values);
-    $store->save();
     // Make this the default store, since there's no other.
     if (!$store_storage->loadDefault()) {
-      $store_storage->markAsDefault($store);
+      $store->setDefault(TRUE);
     }
+    $store->save();
 
     $link = $this->urlGenerator->generate('entity.commerce_store.edit_form', ['commerce_store' => $store->id()], TRUE);
     $io->writeln(sprintf('The store has been created. Go to %s to complete the store address and manage other settings.', $link));
