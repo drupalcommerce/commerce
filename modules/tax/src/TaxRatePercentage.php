@@ -74,7 +74,6 @@ class TaxRatePercentage {
       return t('@number (Since @start_date)', [
         '@number' => $this->number * 100 . '%',
         '@start_date' => $this->getStartDate()->format('M jS Y'),
-        '@end_date' => $this->getEndDate()->format('M jS Y'),
       ]);
     }
   }
