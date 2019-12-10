@@ -3,6 +3,7 @@
 namespace Drupal\Tests\commerce_number_pattern\Kernel\Plugin\Commerce\NumberPattern;
 
 use Drupal\commerce\Interval;
+use Drupal\commerce_number_pattern\Entity\NumberPattern;
 use Drupal\commerce_number_pattern_test\Entity\EntityTestWithStore;
 use Drupal\Core\Datetime\DrupalDateTime;
 use Drupal\Tests\commerce_number_pattern\Kernel\NumberPatternKernelTestBase;
@@ -25,11 +26,15 @@ class YearlyTest extends NumberPatternKernelTestBase {
     ]);
     $entity->save();
 
-    /** @var \Drupal\commerce_number_pattern\Plugin\Commerce\NumberPattern\SequentialNumberPatternInterface $number_pattern_plugin */
-    $number_pattern_plugin = $this->pluginManager->createInstance('yearly', [
-      '_entity_id' => 'test',
-      'per_store_sequence' => FALSE,
+    $number_pattern = NumberPattern::create([
+      'id' => 'test',
+      'plugin' => 'yearly',
+      'configuration' => [
+        'per_store_sequence' => FALSE,
+      ],
     ]);
+    /** @var \Drupal\commerce_number_pattern\Plugin\Commerce\NumberPattern\SequentialNumberPatternInterface $number_pattern_plugin */
+    $number_pattern_plugin = $number_pattern->getPlugin();
     $this->assertEquals($current_date->format('Y') . '-1', $number_pattern_plugin->generate($entity));
     $this->assertEquals($current_date->format('Y') . '-2', $number_pattern_plugin->generate($entity));
 
@@ -48,10 +53,15 @@ class YearlyTest extends NumberPatternKernelTestBase {
     $next_date = $interval->add($current_date);
     $this->rewindTime($next_date->getTimestamp());
 
-    $number_pattern_plugin = $this->pluginManager->createInstance('yearly', [
-      '_entity_id' => 'test',
-      'per_store_sequence' => FALSE,
+    $number_pattern = NumberPattern::create([
+      'id' => 'test',
+      'plugin' => 'yearly',
+      'configuration' => [
+        'per_store_sequence' => FALSE,
+      ],
     ]);
+    /** @var \Drupal\commerce_number_pattern\Plugin\Commerce\NumberPattern\SequentialNumberPatternInterface $number_pattern_plugin */
+    $number_pattern_plugin = $number_pattern->getPlugin();
     $this->assertEquals($next_date->format('Y') . '-1', $number_pattern_plugin->generate($entity));
   }
 

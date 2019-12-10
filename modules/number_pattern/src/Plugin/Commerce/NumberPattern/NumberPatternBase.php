@@ -23,13 +23,13 @@ abstract class NumberPatternBase extends PluginBase implements NumberPatternInte
   protected $token;
 
   /**
-   * The ID of the parent config entity.
+   * The parent config entity.
    *
    * Not available while the plugin is being configured.
    *
-   * @var string
+   * @var \Drupal\commerce_number_pattern\Entity\NumberPatternInterface
    */
-  protected $entityId;
+  protected $parentEntity;
 
   /**
    * Constructs a new NumberPatternBase object.
@@ -47,9 +47,9 @@ abstract class NumberPatternBase extends PluginBase implements NumberPatternInte
     parent::__construct($configuration, $plugin_id, $plugin_definition);
 
     $this->token = $token;
-    if (array_key_exists('_entity_id', $configuration)) {
-      $this->entityId = $configuration['_entity_id'];
-      unset($configuration['_entity_id']);
+    if (array_key_exists('_entity', $configuration)) {
+      $this->parentEntity = $configuration['_entity'];
+      unset($configuration['_entity']);
     }
     $this->setConfiguration($configuration);
   }

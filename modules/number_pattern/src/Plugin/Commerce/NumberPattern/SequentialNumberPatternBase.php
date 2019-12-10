@@ -211,7 +211,7 @@ abstract class SequentialNumberPatternBase extends NumberPatternBase implements 
     $query = $this->connection->select('commerce_number_pattern_sequence', 'cnps');
     $query->fields('cnps', ['store_id', 'number', 'generated']);
     $query
-      ->condition('entity_id', $this->entityId)
+      ->condition('entity_id', $this->parentEntity->id())
       ->condition('store_id', $this->getStoreId($entity));
     $result = $query->execute()->fetchAssoc();
     if (empty($result)) {
@@ -229,7 +229,7 @@ abstract class SequentialNumberPatternBase extends NumberPatternBase implements 
    * {@inheritdoc}
    */
   public function getNextSequence(ContentEntityInterface $entity) {
-    $lock_name = "commerce_number_pattern.plugin.{$this->entityId}";
+    $lock_name = 'commerce_number_pattern.plugin.' . $this->parentEntity->id();
     while (!$this->lock->acquire($lock_name)) {
       $this->lock->wait($lock_name);
     }
@@ -248,13 +248,13 @@ abstract class SequentialNumberPatternBase extends NumberPatternBase implements 
     }
     $this->connection->merge('commerce_number_pattern_sequence')
       ->fields([
-        'entity_id' => $this->entityId,
+        'entity_id' => $this->parentEntity->id(),
         'store_id' => $store_id,
         'number' => $sequence->getNumber(),
         'generated' => $sequence->getGeneratedTime(),
       ])
       ->keys([
-        'entity_id' => $this->entityId,
+        'entity_id' => $this->parentEntity->id(),
         'store_id' => $store_id,
       ])
       ->execute();
@@ -268,7 +268,7 @@ abstract class SequentialNumberPatternBase extends NumberPatternBase implements 
    */
   public function resetSequence() {
     return $this->connection->delete('commerce_number_pattern_sequence')
-      ->condition('entity_id', $this->entityId)
+      ->condition('entity_id', $this->parentEntity->id())
       ->execute();
   }
 

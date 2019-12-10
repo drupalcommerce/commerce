@@ -80,7 +80,7 @@ class OffsiteRedirect extends OffsitePaymentGatewayBase {
     $payment = $payment_storage->create([
       'state' => 'completed',
       'amount' => $order->getBalance(),
-      'payment_gateway' => $this->entityId,
+      'payment_gateway' => $this->parentEntity->id(),
       'order_id' => $order->id(),
       'remote_id' => $request->query->get('txn_id'),
       'remote_state' => $request->query->get('payment_status'),

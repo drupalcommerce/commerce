@@ -3,6 +3,7 @@
 namespace Drupal\Tests\commerce_number_pattern\Kernel\Plugin\Commerce\NumberPattern;
 
 use Drupal\commerce\Interval;
+use Drupal\commerce_number_pattern\Entity\NumberPattern;
 use Drupal\commerce_number_pattern_test\Entity\EntityTestWithStore;
 use Drupal\Core\Datetime\DrupalDateTime;
 use Drupal\Tests\commerce_number_pattern\Kernel\NumberPatternKernelTestBase;
@@ -25,10 +26,13 @@ class MonthlyTest extends NumberPatternKernelTestBase {
     ]);
     $entity->save();
 
-    /** @var \Drupal\commerce_number_pattern\Plugin\Commerce\NumberPattern\SequentialNumberPatternInterface $number_pattern_plugin */
-    $number_pattern_plugin = $this->pluginManager->createInstance('monthly', [
-      '_entity_id' => 'test',
+    $number_pattern = NumberPattern::create([
+      'id' => 'test',
+      'plugin' => 'monthly',
+      'configuration' => [],
     ]);
+    /** @var \Drupal\commerce_number_pattern\Plugin\Commerce\NumberPattern\SequentialNumberPatternInterface $number_pattern_plugin */
+    $number_pattern_plugin = $number_pattern->getPlugin();
     $this->assertEquals($current_date->format('Y-m') . '-1', $number_pattern_plugin->generate($entity));
     $this->assertEquals($current_date->format('Y-m') . '-2', $number_pattern_plugin->generate($entity));
 
@@ -37,9 +41,13 @@ class MonthlyTest extends NumberPatternKernelTestBase {
     $next_date = $interval->add($current_date);
     $this->rewindTime($next_date->getTimestamp());
 
-    $number_pattern_plugin = $this->pluginManager->createInstance('monthly', [
-      '_entity_id' => 'test',
+    $number_pattern = NumberPattern::create([
+      'id' => 'test',
+      'plugin' => 'monthly',
+      'configuration' => [],
     ]);
+    /** @var \Drupal\commerce_number_pattern\Plugin\Commerce\NumberPattern\SequentialNumberPatternInterface $number_pattern_plugin */
+    $number_pattern_plugin = $number_pattern->getPlugin();
     $this->assertEquals($next_date->format('Y-m') . '-1', $number_pattern_plugin->generate($entity));
   }
 

@@ -49,13 +49,13 @@ abstract class CheckoutFlowBase extends PluginBase implements CheckoutFlowInterf
   protected $order;
 
   /**
-   * The ID of the parent config entity.
+   * The parent config entity.
    *
    * Not available while the plugin is being configured.
    *
-   * @var string
+   * @var \Drupal\commerce_checkout\Entity\CheckoutFlowInterface
    */
-  protected $entityId;
+  protected $parentEntity;
 
   /**
    * Constructs a new CheckoutFlowBase object.
@@ -79,9 +79,9 @@ abstract class CheckoutFlowBase extends PluginBase implements CheckoutFlowInterf
     $this->entityTypeManager = $entity_type_manager;
     $this->eventDispatcher = $event_dispatcher;
     $this->order = $route_match->getParameter('commerce_order');
-    if (array_key_exists('_entity_id', $configuration)) {
-      $this->entityId = $configuration['_entity_id'];
-      unset($configuration['_entity_id']);
+    if (array_key_exists('_entity', $configuration)) {
+      $this->parentEntity = $configuration['_entity'];
+      unset($configuration['_entity']);
     }
     $this->setConfiguration($configuration);
   }
@@ -98,6 +98,31 @@ abstract class CheckoutFlowBase extends PluginBase implements CheckoutFlowInterf
       $container->get('event_dispatcher'),
       $container->get('current_route_match')
     );
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function __sleep() {
+    if (!empty($this->parentEntity)) {
+      $this->_parentEntityId = $this->parentEntity->id();
+      unset($this->parentEntity);
+    }
+
+    return parent::__sleep();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function __wakeup() {
+    parent::__wakeup();
+
+    if (!empty($this->_parentEntityId)) {
+      $checkout_flow_storage = $this->entityTypeManager->getStorage('commerce_checkout_flow');
+      $this->parentEntity = $checkout_flow_storage->load($this->_parentEntityId);
+      unset($this->_parentEntityId);
+    }
   }
 
   /**
@@ -280,9 +305,8 @@ abstract class CheckoutFlowBase extends PluginBase implements CheckoutFlowInterf
     $form['actions'] = $this->actions($form, $form_state);
 
     // Make sure the cache is removed if the parent entity or the order change.
-    $parent_entity = $this->entityTypeManager->getStorage('commerce_checkout_flow')->load($this->entityId);
     CacheableMetadata::createFromRenderArray($form)
-      ->addCacheableDependency($parent_entity)
+      ->addCacheableDependency($this->parentEntity)
       ->addCacheableDependency($this->order)
       ->applyTo($form);
 

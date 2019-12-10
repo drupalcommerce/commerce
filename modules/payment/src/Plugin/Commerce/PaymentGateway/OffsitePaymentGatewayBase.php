@@ -16,7 +16,7 @@ abstract class OffsitePaymentGatewayBase extends PaymentGatewayBase implements O
    */
   public function getNotifyUrl() {
     return Url::fromRoute('commerce_payment.notify', [
-      'commerce_payment_gateway' => $this->entityId,
+      'commerce_payment_gateway' => $this->parentEntity->id(),
     ], ['absolute' => TRUE]);
   }
 

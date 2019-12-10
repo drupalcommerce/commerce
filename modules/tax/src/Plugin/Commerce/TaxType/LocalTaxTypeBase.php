@@ -142,7 +142,7 @@ abstract class LocalTaxTypeBase extends TaxTypeBase implements LocalTaxTypeInter
           'label' => $zone->getDisplayLabel(),
           'amount' => $tax_amount,
           'percentage' => $percentage->getNumber(),
-          'source_id' => $this->entityId . '|' . $zone->getId() . '|' . $rate->getId(),
+          'source_id' => $this->parentEntity->id() . '|' . $zone->getId() . '|' . $rate->getId(),
           'included' => $this->isDisplayInclusive(),
         ]));
       }
@@ -232,10 +232,7 @@ abstract class LocalTaxTypeBase extends TaxTypeBase implements LocalTaxTypeInter
     }
 
     // Provide the tax type entity to the resolvers.
-    $tax_type_storage = $this->entityTypeManager->getStorage('commerce_tax_type');
-    $tax_type = $tax_type_storage->load($this->entityId);
-    $this->chainRateResolver->setTaxType($tax_type);
-
+    $this->chainRateResolver->setTaxType($this->parentEntity);
     $rates = [];
     foreach ($zones as $zone) {
       $rate = $this->chainRateResolver->resolve($zone, $order_item, $customer_profile);
