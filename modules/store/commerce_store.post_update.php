@@ -112,8 +112,10 @@ function commerce_store_post_update_4() {
     /** @var \Drupal\commerce_store\Entity\StoreInterface[] $stores */
     $stores = $store_storage->loadByProperties(['uuid' => $uuid]);
     $store = reset($stores);
-    $store->setDefault(TRUE);
-    $store->save();
+    if ($store) {
+      $store->setDefault(TRUE);
+      $store->save();
+    }
   }
   $config_factory->getEditable('commerce_store.settings')->delete();
 }
