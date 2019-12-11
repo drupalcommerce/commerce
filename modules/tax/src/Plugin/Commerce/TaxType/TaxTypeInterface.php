@@ -29,6 +29,16 @@ interface TaxTypeInterface extends ConfigurableInterface, DependentPluginInterfa
   public function getLabel();
 
   /**
+   * Gets the tax type weight.
+   *
+   * Used to determine the order in which tax type plugins should run.
+   *
+   * @return int
+   *   The tax type weight.
+   */
+  public function getWeight();
+
+  /**
    * Gets whether the tax type is display inclusive.
    *
    * E.g. US sales tax is not display inclusive, a $5 price is shown as $5

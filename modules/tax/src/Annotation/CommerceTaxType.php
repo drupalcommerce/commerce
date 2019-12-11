@@ -21,12 +21,21 @@ class CommerceTaxType extends Plugin {
   public $id;
 
   /**
-   * The human-readable name of the plugin.
+   * The tax type label.
    *
    * @var \Drupal\Core\Annotation\Translation
    *
    * @ingroup plugin_translatable
    */
   public $label;
+
+  /**
+   * The tax type weight.
+   *
+   * Used to determine the order in which tax type plugins should run.
+   *
+   * @var int
+   */
+  public $weight = 0;
 
 }

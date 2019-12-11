@@ -13,16 +13,6 @@ use Drupal\Core\Plugin\DefaultPluginManager;
 class TaxTypeManager extends DefaultPluginManager {
 
   /**
-   * Default values for each tax type plugin.
-   *
-   * @var array
-   */
-  protected $defaults = [
-    'id' => '',
-    'label' => '',
-  ];
-
-  /**
    * Constructs a new TaxTypeManager object.
    *
    * @param \Traversable $namespaces

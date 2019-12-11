@@ -83,6 +83,7 @@ class CustomTest extends OrderKernelTestBase {
   }
 
   /**
+   * @covers ::getWeight
    * @covers ::isDisplayInclusive
    * @covers ::shouldRound
    * @covers ::getZones
@@ -90,6 +91,7 @@ class CustomTest extends OrderKernelTestBase {
   public function testGetters() {
     $plugin = $this->taxType->getPlugin();
     assert($plugin instanceof Custom);
+    $this->assertEquals(0, $plugin->getWeight());
     $this->assertTrue($plugin->isDisplayInclusive());
     $this->assertTrue($plugin->shouldRound());
 

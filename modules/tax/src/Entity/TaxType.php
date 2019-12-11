@@ -4,6 +4,7 @@ namespace Drupal\commerce_tax\Entity;
 
 use Drupal\commerce\CommerceSinglePluginCollection;
 use Drupal\Core\Config\Entity\ConfigEntityBase;
+use Drupal\Core\Config\Entity\ConfigEntityInterface;
 
 /**
  * Defines the tax type entity class.
@@ -169,6 +170,24 @@ class TaxType extends ConfigEntityBase implements TaxTypeInterface {
       $this->pluginCollection = new CommerceSinglePluginCollection($plugin_manager, $this->plugin, $this->configuration, $this);
     }
     return $this->pluginCollection;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function sort(ConfigEntityInterface $a, ConfigEntityInterface $b) {
+    /** @var \Drupal\commerce_tax\Entity\TaxTypeInterface $a */
+    /** @var \Drupal\commerce_tax\Entity\TaxTypeInterface $b */
+    $a_plugin = $a->getPlugin();
+    $b_plugin = $b->getPlugin();
+    $a_weight = $a_plugin ? $a_plugin->getWeight() : 0;
+    $b_weight = $b_plugin ? $b_plugin->getWeight() : 0;
+    if ($a_weight == $b_weight) {
+      $a_label = $a->label();
+      $b_label = $b->label();
+      return strnatcasecmp($a_label, $b_label);
+    }
+    return ($a_weight < $b_weight) ? -1 : 1;
   }
 
 }

@@ -195,6 +195,13 @@ abstract class TaxTypeBase extends PluginBase implements TaxTypeInterface, Conta
   /**
    * {@inheritdoc}
    */
+  public function getWeight() {
+    return $this->pluginDefinition['weight'];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function isDisplayInclusive() {
     return !empty($this->configuration['display_inclusive']);
   }

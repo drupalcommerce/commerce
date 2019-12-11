@@ -7,6 +7,7 @@ use Drupal\commerce_order\Entity\OrderItemInterface;
 use Drupal\commerce_order\OrderProcessorInterface;
 use Drupal\commerce_price\RounderInterface;
 use Drupal\commerce_store\Entity\StoreInterface;
+use Drupal\commerce_tax\Entity\TaxType;
 use Drupal\commerce_tax\Entity\TaxTypeInterface;
 use Drupal\commerce_tax\Plugin\Commerce\TaxType\LocalTaxTypeInterface;
 use Drupal\commerce_tax\Resolver\ChainTaxRateResolverInterface;
@@ -208,6 +209,7 @@ class TaxOrderProcessor implements OrderProcessorInterface {
     if (empty($this->taxTypes)) {
       $tax_type_storage = $this->entityTypeManager->getStorage('commerce_tax_type');
       $this->taxTypes = $tax_type_storage->loadByProperties(['status' => TRUE]);
+      uasort($this->taxTypes, [TaxType::class, 'sort']);
     }
 
     return $this->taxTypes;
