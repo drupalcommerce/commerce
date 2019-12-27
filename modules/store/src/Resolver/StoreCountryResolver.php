@@ -41,8 +41,9 @@ class StoreCountryResolver implements CountryResolverInterface {
    */
   public function resolve() {
     $store = $this->currentStore->getStore();
-    if ($store) {
-      return new Country($store->getAddress()->getCountryCode());
+    $address = $store ? $store->getAddress() : NULL;
+    if ($address) {
+      return new Country($address->getCountryCode());
     }
   }
 
