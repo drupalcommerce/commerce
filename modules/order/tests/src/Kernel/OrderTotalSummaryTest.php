@@ -122,7 +122,9 @@ class OrderTotalSummaryTest extends OrderKernelTestBase {
     $this->order->save();
 
     $totals = $this->orderTotalSummary->buildTotals($this->order);
+    // The two subtotals are identical because there is no tax.
     $this->assertEquals(new Price('12.00', 'USD'), $totals['subtotal']);
+    $this->assertEquals(new Price('12.00', 'USD'), $totals['subtotal_without_tax']);
     $this->assertEquals(new Price('7.00', 'USD'), $totals['total']);
 
     $this->assertCount(1, $totals['adjustments']);
@@ -150,21 +152,38 @@ class OrderTotalSummaryTest extends OrderKernelTestBase {
       'percentage' => '0.1',
       'source_id' => '1',
     ]));
+    $order_item->addAdjustment(new Adjustment([
+      'type' => 'tax',
+      'label' => 'Sales tax',
+      'amount' => new Price('2.20', 'USD'),
+      'percentage' => '0.2',
+      'source_id' => 'sales_tax|default|default',
+    ]));
     $order_item->save();
     $order_item = $this->reloadEntity($order_item);
     $this->order->addItem($order_item);
     $this->order->save();
 
     $totals = $this->orderTotalSummary->buildTotals($this->order);
+    // The two subtotals are identical because there is no included tax.
     $this->assertEquals(new Price('12.00', 'USD'), $totals['subtotal']);
-    $this->assertEquals(new Price('11.00', 'USD'), $totals['total']);
+    $this->assertEquals(new Price('12.00', 'USD'), $totals['subtotal_without_tax']);
+    $this->assertEquals(new Price('13.20', 'USD'), $totals['total']);
 
-    $this->assertCount(1, $totals['adjustments']);
+    $this->assertCount(2, $totals['adjustments']);
     $first = array_shift($totals['adjustments']);
     $this->assertEquals('promotion', $first['type']);
     $this->assertEquals('Back to school discount', $first['label']);
     $this->assertEquals(new Price('-1', 'USD'), $first['amount']);
     $this->assertEquals('0.1', $first['percentage']);
+    $this->assertEquals('1', $first['source_id']);
+
+    $second = array_shift($totals['adjustments']);
+    $this->assertEquals('tax', $second['type']);
+    $this->assertEquals('Sales tax', $second['label']);
+    $this->assertEquals(new Price('2.20', 'USD'), $second['amount']);
+    $this->assertEquals('0.2', $second['percentage']);
+    $this->assertEquals('sales_tax|default|default', $second['source_id']);
   }
 
   /**
@@ -190,6 +209,14 @@ class OrderTotalSummaryTest extends OrderKernelTestBase {
       'label' => '50 cent item fee',
       'amount' => new Price('0.50', 'USD'),
     ]));
+    $order_item->addAdjustment(new Adjustment([
+      'type' => 'tax',
+      'label' => 'VAT',
+      'amount' => new Price('2.00', 'USD'),
+      'percentage' => '0.2',
+      'source_id' => 'serbian_vat|default|default',
+      'included' => TRUE,
+    ]));
     $order_item->save();
     $order_item = $this->reloadEntity($order_item);
     $this->order->addItem($order_item);
@@ -210,9 +237,10 @@ class OrderTotalSummaryTest extends OrderKernelTestBase {
 
     $totals = $this->orderTotalSummary->buildTotals($this->order);
     $this->assertEquals(new Price('24.00', 'USD'), $totals['subtotal']);
+    $this->assertEquals(new Price('22.00', 'USD'), $totals['subtotal_without_tax']);
     $this->assertEquals(new Price('28.50', 'USD'), $totals['total']);
 
-    $this->assertCount(3, $totals['adjustments']);
+    $this->assertCount(4, $totals['adjustments']);
     $first = array_shift($totals['adjustments']);
     $this->assertEquals('test_adjustment_type', $first['type']);
     $this->assertEquals('50 cent item fee', $first['label']);
@@ -230,6 +258,12 @@ class OrderTotalSummaryTest extends OrderKernelTestBase {
     $this->assertEquals('Handling fee', $third['label']);
     $this->assertEquals(new Price('10', 'USD'), $third['amount']);
     $this->assertNull($third['percentage']);
+
+    $fourth = array_shift($totals['adjustments']);
+    $this->assertEquals('tax', $fourth['type']);
+    $this->assertEquals('VAT', $fourth['label']);
+    $this->assertEquals(new Price('2.00', 'USD'), $fourth['amount']);
+    $this->assertEquals('0.2', $fourth['percentage']);
   }
 
 }
