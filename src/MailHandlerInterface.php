@@ -29,6 +29,7 @@ interface MailHandlerInterface {
    *       Defaults to "mail". Automatically prefixed with "commerce_".
    *     - from: The address the email will be marked as being from.
    *       Defaults to the current store email.
+   *     - reply-to: The address to which the reply will be sent. No default.
    *     - cc: The CC address or addresses (separated by a comma). No default.
    *     - bcc: The BCC address or addresses (separated by a comma). No default.
    *     - langcode: The email langcode. Every translatable string and entity

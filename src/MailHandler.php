@@ -65,6 +65,7 @@ class MailHandler implements MailHandlerInterface {
       'id' => 'mail',
       // The 'from' address will be set by commerce_store_mail_alter().
       'from' => '',
+      'reply-to' => NULL,
       'subject' => $subject,
       'langcode' => $this->languageManager->getCurrentLanguage()->getId(),
       // The body will be rendered in commerce_mail(), because that's what
@@ -85,7 +86,7 @@ class MailHandler implements MailHandlerInterface {
       $this->changeActiveLanguage($params['langcode']);
     }
 
-    $message = $this->mailManager->mail('commerce', $params['id'], $to, $params['langcode'], $params);
+    $message = $this->mailManager->mail('commerce', $params['id'], $to, $params['langcode'], $params, $params['reply-to']);
 
     // Revert back to the original active language.
     if ($params['langcode'] != $default_params['langcode']) {
