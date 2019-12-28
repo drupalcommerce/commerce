@@ -123,13 +123,13 @@ class PriceSplitterTest extends OrderKernelTestBase {
    *
    * @param \Drupal\commerce_price\Price[] $unit_prices
    *   The unit prices.
-   * @param int $quantity
+   * @param string $quantity
    *   The quantity. Same for all items.
    *
    * @return \Drupal\commerce_order\Entity\OrderItemInterface[]
    *   The order items.
    */
-  protected function buildOrderItems(array $unit_prices, $quantity = 1) {
+  protected function buildOrderItems(array $unit_prices, $quantity = '1') {
     $order_items = [];
     foreach ($unit_prices as $unit_price) {
       $order_item = OrderItem::create([

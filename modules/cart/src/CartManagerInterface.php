@@ -28,7 +28,7 @@ interface CartManagerInterface {
    *   The cart order.
    * @param \Drupal\commerce\PurchasableEntityInterface $entity
    *   The purchasable entity.
-   * @param int $quantity
+   * @param string $quantity
    *   The quantity.
    * @param bool $combine
    *   Whether the order item should be combined with an existing matching one.
@@ -38,20 +38,20 @@ interface CartManagerInterface {
    * @return \Drupal\commerce_order\Entity\OrderItemInterface
    *   The saved order item.
    */
-  public function addEntity(OrderInterface $cart, PurchasableEntityInterface $entity, $quantity = 1, $combine = TRUE, $save_cart = TRUE);
+  public function addEntity(OrderInterface $cart, PurchasableEntityInterface $entity, $quantity = '1', $combine = TRUE, $save_cart = TRUE);
 
   /**
    * Creates an order item for the given purchasable entity.
    *
    * @param \Drupal\commerce\PurchasableEntityInterface $entity
    *   The purchasable entity.
-   * @param int $quantity
+   * @param string $quantity
    *   The quantity.
    *
    * @return \Drupal\commerce_order\Entity\OrderItemInterface
    *   The created order item. Unsaved.
    */
-  public function createOrderItem(PurchasableEntityInterface $entity, $quantity = 1);
+  public function createOrderItem(PurchasableEntityInterface $entity, $quantity = '1');
 
   /**
    * Adds the given order item to the given cart order.

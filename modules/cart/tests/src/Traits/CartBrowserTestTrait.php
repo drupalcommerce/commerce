@@ -72,10 +72,10 @@ trait CartBrowserTestTrait {
    *   The purchased product variation.
    * @param \Drupal\commerce_order\Entity\OrderItemInterface $order_item
    *   The order item.
-   * @param int $quantity
+   * @param string $quantity
    *   The quantity.
    */
-  protected function assertOrderItemInOrder(ProductVariationInterface $variation, OrderItemInterface $order_item, $quantity = 1) {
+  protected function assertOrderItemInOrder(ProductVariationInterface $variation, OrderItemInterface $order_item, $quantity = '1') {
     $this->assertEquals($order_item->getTitle(), $variation->getOrderItemTitle());
     $this->assertNotEmpty(($order_item->getQuantity() == $quantity), t('The product @product has been added to cart with quantity of @quantity.', [
       '@product' => $order_item->getTitle(),

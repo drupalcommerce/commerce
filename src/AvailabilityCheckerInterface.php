@@ -24,7 +24,7 @@ interface AvailabilityCheckerInterface {
    *
    * @param \Drupal\commerce\PurchasableEntityInterface $entity
    *   The purchasable entity.
-   * @param int $quantity
+   * @param string $quantity
    *   The quantity.
    * @param \Drupal\commerce\Context $context
    *   The context.
