@@ -70,7 +70,8 @@ class TaxZone {
       $this->territories[] = new ZoneTerritory($territory_definition);
     }
     foreach ($definition['rates'] as $rate_definition) {
-      $this->rates[] = new TaxRate($rate_definition);
+      $tax_rate = new TaxRate($rate_definition);
+      $this->rates[$tax_rate->getId()] = $tax_rate;
     }
   }
 
@@ -120,10 +121,23 @@ class TaxZone {
    * Gets the tax rates.
    *
    * @return \Drupal\commerce_tax\TaxRate[]
-   *   The tax rates.
+   *   The tax rates, keyed by ID.
    */
   public function getRates() {
     return $this->rates;
+  }
+
+  /**
+   * Gets the tax rate with the given ID.
+   *
+   * @param string $rate_id
+   *   The tax rate ID.
+   *
+   * @return \Drupal\commerce_tax\TaxRate|null
+   *   The tax rate, or NULL if none found.
+   */
+  public function getRate($rate_id) {
+    return isset($this->rates[$rate_id]) ? $this->rates[$rate_id] : NULL;
   }
 
   /**

@@ -96,18 +96,21 @@ class CustomTest extends OrderKernelTestBase {
     $this->assertTrue($plugin->shouldRound());
 
     $zones = $plugin->getZones();
+    /** @var \Drupal\commerce_tax\TaxZone $zone */
     $zone = reset($zones);
     $rates = $zone->getRates();
     $this->assertCount(1, $zones);
     $this->assertCount(2, $rates);
-    $this->assertEquals('standard', $rates[0]->getId());
-    $this->assertEquals('Standard', $rates[0]->getLabel());
-    $this->assertEquals('0.2', $rates[0]->getPercentage()->getNumber());
-    $this->assertTrue($rates[0]->isDefault());
-    $this->assertEquals('reduced', $rates[1]->getId());
-    $this->assertEquals('Reduced', $rates[1]->getLabel());
-    $this->assertEquals('0.1', $rates[1]->getPercentage()->getNumber());
-    $this->assertFalse($rates[1]->isDefault());
+    $this->assertArrayHasKey('standard', $rates);
+    $this->assertArrayHasKey('reduced', $rates);
+    $this->assertEquals('standard', $rates['standard']->getId());
+    $this->assertEquals('Standard', $rates['standard']->getLabel());
+    $this->assertEquals('0.2', $rates['standard']->getPercentage()->getNumber());
+    $this->assertTrue($rates['standard']->isDefault());
+    $this->assertEquals('reduced', $rates['reduced']->getId());
+    $this->assertEquals('Reduced', $rates['reduced']->getLabel());
+    $this->assertEquals('0.1', $rates['reduced']->getPercentage()->getNumber());
+    $this->assertFalse($rates['reduced']->isDefault());
   }
 
   /**

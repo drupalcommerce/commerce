@@ -22,7 +22,7 @@ interface LocalTaxTypeInterface extends TaxTypeInterface {
    * Gets the tax zones.
    *
    * @return \Drupal\commerce_tax\TaxZone[]
-   *   The tax zones.
+   *   The tax zones, keyed by ID.
    */
   public function getZones();
 

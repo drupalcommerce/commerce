@@ -341,7 +341,7 @@ abstract class LocalTaxTypeBase extends TaxTypeBase implements LocalTaxTypeInter
    * Builds the tax zones.
    *
    * @return \Drupal\commerce_tax\TaxZone[]
-   *   The tax zones.
+   *   The tax zones, keyed by ID.
    */
   abstract protected function buildZones();
 
