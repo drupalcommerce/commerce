@@ -17,6 +17,26 @@ function commerce_order_install() {
 }
 
 /**
+ * Implements hook_update_dependencies().
+ */
+function commerce_order_update_dependencies() {
+  if (!\Drupal::moduleHandler()->moduleExists('commerce_product')) {
+    return [];
+  }
+
+  $dependencies = [];
+  // Make sure commerce_order_update_8207 is executed after
+  // commerce_product_update_8209, so that the 'stores' and 'variations'
+  // configurable fields are converted to base fields before the
+  // commerce_number_pattern module is enabled.
+  $dependencies['commerce_order'][8207] = [
+    'commerce_product' => 8209,
+  ];
+
+  return $dependencies;
+}
+
+/**
  * Add the 'data' field to 'commerce_order_item' entities.
  */
 function commerce_order_update_8201() {
