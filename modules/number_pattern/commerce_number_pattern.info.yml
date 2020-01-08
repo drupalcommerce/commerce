@@ -2,7 +2,7 @@ name: Commerce Number Pattern
 type: module
 description: 'Provides configurable patterns for generating sequential numbers.'
 package: Commerce
-core: 8.x
+core_version_requirement: ^8.7.7 || ^9
 configure: entity.commerce_number_pattern.collection
 dependencies:
   - commerce:commerce

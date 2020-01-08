@@ -2,7 +2,7 @@ name: Commerce
 type: module
 description: 'Defines common functionality for all Commerce modules.'
 package: Commerce
-core: 8.x
+core_version_requirement: ^8.7.7 || ^9
 configure: commerce.configuration
 dependencies:
   - address:address
@@ -11,4 +11,3 @@ dependencies:
   - token:token
   - drupal:datetime
   - drupal:views
-  - drupal:system (>=8.7.0)

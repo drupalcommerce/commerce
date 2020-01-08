@@ -2,7 +2,7 @@ name: Commerce Product
 type: module
 description: 'Defines the Product entity and associated features.'
 package: Commerce
-core: 8.x
+core_version_requirement: ^8.7.7 || ^9
 configure: commerce_product.configuration
 dependencies:
   - commerce:commerce

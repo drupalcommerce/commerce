@@ -7,7 +7,7 @@
     "require": {
         "php": ">=7.0.8",
         "ext-bcmath": "*",
-        "drupal/core": "^8.7",
+        "drupal/core": "^8.7.7 || ^9",
         "drupal/address": "^1.7",
         "drupal/entity": "^1.0-rc2",
         "drupal/entity_reference_revisions": "~1.0",

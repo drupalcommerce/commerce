@@ -2,6 +2,6 @@ name: 'Commerce update test'
 type: module
 description: 'Module for testing extension updates to configuration.'
 package: Testing
-core: 8.x
+core_version_requirement: ^8.7.7 || ^9
 dependencies:
   - commerce:commerce_store
