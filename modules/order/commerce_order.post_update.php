@@ -255,9 +255,14 @@ function commerce_order_post_update_10() {
  * Add the "admin" view mode to profiles.
  */
 function commerce_order_post_update_11() {
+  if (!ProfileType::load('customer')) {
+    // Commerce expects the "customer" profile type to always be present,
+    // but some sites have still succeeded in removing it.
+    return '';
+  }
+
   /** @var \Drupal\commerce\Config\ConfigUpdaterInterface $config_updater */
   $config_updater = \Drupal::service('commerce.config_updater');
-
   $config_names = [
     'core.entity_view_mode.profile.admin',
     'core.entity_view_display.profile.customer.admin',

@@ -5,6 +5,8 @@
  * Post update functions for Tax.
  */
 
+use Drupal\profile\Entity\ProfileType;
+
 /**
  * Add the tax_number field to customer profiles.
  */
@@ -12,6 +14,12 @@ function commerce_tax_post_update_1() {
   if (!\Drupal::moduleHandler()->moduleExists('commerce_order')) {
     return '';
   }
+  if (!ProfileType::load('customer')) {
+    // Commerce expects the "customer" profile type to always be present,
+    // but some sites have still succeeded in removing it.
+    return '';
+  }
+
   /** @var \Drupal\commerce\Config\ConfigUpdaterInterface $config_updater */
   $config_updater = \Drupal::service('commerce.config_updater');
   $config_names = [
