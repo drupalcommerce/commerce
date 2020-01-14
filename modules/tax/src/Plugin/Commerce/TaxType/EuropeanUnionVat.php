@@ -554,8 +554,8 @@ class EuropeanUnionVat extends LocalTaxTypeBase {
       'label' => $this->t('Greece'),
       'display_label' => $labels['vat'],
       'territories' => [
-        // Greece without Thassos, Samothrace, Skiros, Northern Sporades, Lesbos, Chios, The Cyclades, The Dodecanese.
-        ['country_code' => 'GR', 'excluded_postal_codes' => '/640 ?04|680 ?02|340 ?07|((370|811|821|840|851) ?[0-9]{2})/'],
+        // Greece without Leros, Lesbos, Kos, Samos, Chios.
+        ['country_code' => 'GR', 'excluded_postal_codes' => '/(811|821|831|853|854) ?[0-9]{2}/'],
       ],
       'rates' => [
         [
@@ -579,6 +579,39 @@ class EuropeanUnionVat extends LocalTaxTypeBase {
           'label' => $labels['reduced'],
           'percentages' => [
             ['number' => '0.06', 'start_date' => '2015-07-01'],
+          ],
+        ],
+      ],
+    ]);
+    $zones['gr_x'] = new TaxZone([
+      'id' => 'gr_x',
+      'label' => $this->t('Greek Islands (Leros, Lesbos, Kos, Samos, Chios)'),
+      'display_label' => $labels['vat'],
+      'territories' => [
+        // Leros, Lesbos, Kos, Samos, Chios.
+        ['country_code' => 'GR', 'included_postal_codes' => '/(811|821|831|853|854) ?[0-9]{2}/'],
+      ],
+      'rates' => [
+        [
+          'id' => 'standard',
+          'label' => $labels['standard'],
+          'percentages' => [
+            ['number' => '0.17', 'start_date' => '2016-06-01'],
+          ],
+          'default' => TRUE,
+        ],
+        [
+          'id' => 'intermediate',
+          'label' => $labels['intermediate'],
+          'percentages' => [
+            ['number' => '0.09', 'start_date' => '2011-01-01'],
+          ],
+        ],
+        [
+          'id' => 'reduced',
+          'label' => $labels['reduced'],
+          'percentages' => [
+            ['number' => '0.04', 'start_date' => '2015-07-01'],
           ],
         ],
       ],
