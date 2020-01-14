@@ -47,7 +47,7 @@ abstract class TaxTypeBase extends PluginBase implements TaxTypeInterface, Conta
    * The ID of the parent config entity.
    *
    * @deprecated in commerce:8.x-2.16 and is removed from commerce:3.x.
-   *   Use $this->>parentEntity->id() instead.
+   *   Use $this->parentEntity->id() instead.
    *
    * @var string
    */

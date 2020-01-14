@@ -27,7 +27,7 @@ abstract class EntityInlineFormBase extends InlineFormBase implements EntityInli
    * {@inheritdoc}
    */
   public function setEntity(EntityInterface $entity) {
-    // Modifying $this->>entity must not modify the entity in the storage
+    // Modifying $this->entity must not modify the entity in the storage
     // static cache, since that can persist between form builds.
     $this->entity = clone $entity;
     return $this;

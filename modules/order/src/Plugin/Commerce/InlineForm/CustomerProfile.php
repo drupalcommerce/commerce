@@ -550,7 +550,7 @@ class CustomerProfile extends EntityInlineFormBase {
       ]);
     }
     elseif ($option_id == '_original') {
-      // The inline form is built with the original $this->>entity,
+      // The inline form is built with the original $this->entity,
       // there is no need to update it in this case.
       $address_book_profile = NULL;
     }
