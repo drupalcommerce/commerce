@@ -14,7 +14,7 @@ build:
         testgroups: '--all'
         suppress-deprecations: false
       run_tests.javascript:
-        concurrency: 1
+        concurrency: 15
         types: 'PHPUnit-FunctionalJavascript'
         testgroups: '--all'
         suppress-deprecations: false
