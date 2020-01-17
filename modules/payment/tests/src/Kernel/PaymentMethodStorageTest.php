@@ -37,6 +37,13 @@ class PaymentMethodStorageTest extends OrderKernelTestBase {
   protected $storage;
 
   /**
+   * A future expiration timestamp.
+   *
+   * @var int
+   */
+  protected $futureExpire;
+
+  /**
    * Modules to enable.
    *
    * @var array
@@ -73,6 +80,9 @@ class PaymentMethodStorageTest extends OrderKernelTestBase {
     $this->user = $this->reloadEntity($user);
 
     $this->storage = $this->container->get('entity_type.manager')->getStorage('commerce_payment_method');
+
+    // Always 2 years in the future.
+    $this->futureExpire = time() + 2 * 365 * 24 * 60 * 60;
   }
 
   /**
@@ -94,8 +104,7 @@ class PaymentMethodStorageTest extends OrderKernelTestBase {
       'type' => 'credit_card',
       'payment_gateway' => 'example',
       'payment_gateway_mode' => 'test',
-      // Thu, 16 Jan 2020.
-      'expires' => '1579132800',
+      'expires' => $this->futureExpire,
       'uid' => $this->user->id(),
     ]);
     $payment_method_active->save();
@@ -153,7 +162,7 @@ class PaymentMethodStorageTest extends OrderKernelTestBase {
     $payment_method_fr = PaymentMethod::create([
       'type' => 'credit_card',
       'payment_gateway' => 'example',
-      'expires' => '1579132800',
+      'expires' => $this->futureExpire,
       'uid' => $this->user->id(),
       'billing_profile' => $profile_fr,
     ]);
@@ -178,7 +187,7 @@ class PaymentMethodStorageTest extends OrderKernelTestBase {
     $payment_method_us = PaymentMethod::create([
       'type' => 'credit_card',
       'payment_gateway' => 'example',
-      'expires' => '1579132800',
+      'expires' => $this->futureExpire,
       'uid' => $this->user->id(),
       'billing_profile' => $profile_us,
     ]);
