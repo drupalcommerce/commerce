@@ -13,6 +13,7 @@ use Drupal\Tests\commerce_order\Kernel\OrderKernelTestBase;
  * Tests the coupon valid constraint on coupons fields.
  *
  * @group commerce
+ * @coversDefaultClass \Drupal\commerce_promotion\Plugin\Validation\Constraint\CouponValidConstraintValidator
  */
 class CouponValidConstraintValidatorTest extends OrderKernelTestBase {
 
@@ -39,6 +40,8 @@ class CouponValidConstraintValidatorTest extends OrderKernelTestBase {
 
   /**
    * Tests the validator.
+   *
+   * @covers ::validate
    */
   public function testValidator() {
     $order_item = OrderItem::create([
@@ -118,77 +121,6 @@ class CouponValidConstraintValidatorTest extends OrderKernelTestBase {
     // Placed orders should not validate coupons, as price calculation is done.
     $constraints = $order->validate();
     $this->assertCount(0, $constraints);
-  }
-
-  /**
-   * Tests the order refresh to remove coupons from an order when invalid.
-   */
-  public function testCouponRemoval() {
-    $order_item = OrderItem::create([
-      'type' => 'test',
-      'quantity' => 1,
-      'unit_price' => new Price('12.00', 'USD'),
-    ]);
-    $order_item->save();
-    /** @var \Drupal\commerce_order\Entity\Order $order */
-    $order = Order::create([
-      'type' => 'default',
-      'state' => 'draft',
-      'mail' => 'test@example.com',
-      'ip_address' => '127.0.0.1',
-      'order_number' => '6',
-      'store_id' => $this->store,
-      'uid' => $this->createUser(),
-      'order_items' => [$order_item],
-    ]);
-    $order->setRefreshState(Order::REFRESH_SKIP);
-    $order->save();
-
-    $promotion = Promotion::create([
-      'order_types' => ['default'],
-      'stores' => [$this->store->id()],
-      'usage_limit' => 1,
-      'start_date' => '2017-01-01',
-      'status' => TRUE,
-      'offer' => [
-        'target_plugin_id' => 'order_percentage_off',
-        'target_plugin_configuration' => [
-          'amount' => '0.10',
-        ],
-      ],
-    ]);
-    $promotion->save();
-
-    $coupon = Coupon::create([
-      'promotion_id' => $promotion->id(),
-      'code' => 'coupon_code',
-      'usage_limit' => 1,
-      'status' => TRUE,
-    ]);
-    $coupon->save();
-
-    $order->get('coupons')->appendItem($coupon);
-
-    $this->container->get('commerce_order.order_refresh')->refresh($order);
-    $this->assertCount(1, $order->get('coupons')->getValue());
-
-    $coupon->setEnabled(FALSE);
-    $coupon->save();
-
-    $this->container->get('commerce_order.order_refresh')->refresh($order);
-    $this->assertCount(0, $order->get('coupons')->getValue());
-
-    $coupon->setEnabled(TRUE);
-    $coupon->save();
-    $order->get('coupons')->appendItem($coupon);
-
-    $this->container->get('commerce_order.order_refresh')->refresh($order);
-    $this->assertCount(1, $order->get('coupons')->getValue());
-
-    $coupon->delete();
-
-    $this->container->get('commerce_order.order_refresh')->refresh($order);
-    $this->assertCount(0, $order->get('coupons')->getValue());
   }
 
 }

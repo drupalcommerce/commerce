@@ -32,8 +32,9 @@ class PromotionOrderProcessor implements OrderProcessorInterface {
    * {@inheritdoc}
    */
   public function process(OrderInterface $order) {
-    $constraints = $order->get('coupons')->validate();
+    // Remove coupons that are no longer valid (due to availability/conditions.)
     $coupons_field_list = $order->get('coupons');
+    $constraints = $coupons_field_list->validate();
     /** @var \Symfony\Component\Validator\ConstraintViolationInterface $constraint */
     foreach ($constraints as $constraint) {
       list($delta, $property_name) = explode('.', $constraint->getPropertyPath());
