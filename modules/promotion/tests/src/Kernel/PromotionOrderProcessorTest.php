@@ -47,7 +47,7 @@ class PromotionOrderProcessorTest extends OrderKernelTestBase {
 
     $this->order = Order::create([
       'type' => 'default',
-      'state' => 'completed',
+      'state' => 'draft',
       'mail' => 'test@example.com',
       'ip_address' => '127.0.0.1',
       'order_number' => '6',
@@ -171,6 +171,13 @@ class PromotionOrderProcessorTest extends OrderKernelTestBase {
 
     $this->assertEquals(1, count($this->order->collectAdjustments()));
     $this->assertEquals(new Price('36.00', 'USD'), $this->order->getTotalPrice());
+
+    $coupon->setEnabled(FALSE);
+    $coupon->save();
+    $this->container->get('commerce_order.order_refresh')->refresh($this->order);
+    $this->order->recalculateTotalPrice();
+
+    $this->assertEquals(0, count($this->order->collectAdjustments()));
   }
 
 }

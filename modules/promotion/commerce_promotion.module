@@ -140,6 +140,7 @@ function commerce_promotion_entity_base_field_info(EntityTypeInterface $entity_t
       ->setSetting('target_type', 'commerce_promotion_coupon')
       ->setSetting('handler', 'default')
       ->setTranslatable(FALSE)
+      ->addConstraint('CouponValid')
       ->setDisplayOptions('form', [
         'type' => 'entity_reference_autocomplete',
         'weight' => 5,

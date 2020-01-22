@@ -32,17 +32,19 @@ class PromotionOrderProcessor implements OrderProcessorInterface {
    * {@inheritdoc}
    */
   public function process(OrderInterface $order) {
+    $constraints = $order->get('coupons')->validate();
+    $coupons_field_list = $order->get('coupons');
+    /** @var \Symfony\Component\Validator\ConstraintViolationInterface $constraint */
+    foreach ($constraints as $constraint) {
+      list($delta, $property_name) = explode('.', $constraint->getPropertyPath());
+      $coupons_field_list->removeItem($delta);
+    }
+
     /** @var \Drupal\commerce_promotion\Entity\CouponInterface[] $coupons */
     $coupons = $order->get('coupons')->referencedEntities();
     foreach ($coupons as $index => $coupon) {
       $promotion = $coupon->getPromotion();
-      if ($coupon->available($order) && $promotion->applies($order)) {
-        $promotion->apply($order);
-      }
-      else {
-        // The promotion is no longer available (end date, usage, etc).
-        $order->get('coupons')->removeItem($index);
-      }
+      $promotion->apply($order);
     }
 
     // Non-coupon promotions are loaded and applied separately.
