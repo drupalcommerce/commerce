@@ -141,6 +141,24 @@ class TaxZone {
   }
 
   /**
+   * Gets the default tax rate.
+   *
+   * @return \Drupal\commerce_tax\TaxRate
+   *   The default rate.
+   */
+  public function getDefaultRate() {
+    $default_rate = reset($this->rates);
+    foreach ($this->rates as $rate) {
+      if ($rate->isDefault()) {
+        $default_rate = $rate;
+        break;
+      }
+    }
+
+    return $default_rate;
+  }
+
+  /**
    * Checks whether the given address belongs to the zone.
    *
    * @param \CommerceGuys\Addressing\AddressInterface $address

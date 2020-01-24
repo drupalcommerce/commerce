@@ -15,16 +15,7 @@ class DefaultTaxRateResolver implements TaxRateResolverInterface {
    * {@inheritdoc}
    */
   public function resolve(TaxZone $zone, OrderItemInterface $order_item, ProfileInterface $customer_profile) {
-    $rates = $zone->getRates();
-    // Take the default rate, or fallback to the first rate.
-    $resolved_rate = reset($rates);
-    foreach ($rates as $rate) {
-      if ($rate->isDefault()) {
-        $resolved_rate = $rate;
-        break;
-      }
-    }
-    return $resolved_rate;
+    return $zone->getDefaultRate();
   }
 
 }
