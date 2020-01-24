@@ -2,9 +2,9 @@
 
 namespace Drupal\commerce_order\Plugin\Commerce\Condition;
 
+use Drupal\commerce\EntityUuidMapperInterface;
 use Drupal\commerce\Plugin\Commerce\Condition\ConditionBase;
 use Drupal\Core\Entity\EntityInterface;
-use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -23,11 +23,11 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class OrderStore extends ConditionBase implements ContainerFactoryPluginInterface {
 
   /**
-   * The store storage.
+   * The entity UUID mapper.
    *
-   * @var \Drupal\Core\Entity\EntityStorageInterface
+   * @var \Drupal\commerce\EntityUuidMapperInterface
    */
-  protected $storeStorage;
+  protected $entityUuidMapper;
 
   /**
    * Constructs a new OrderStore object.
@@ -39,13 +39,13 @@ class OrderStore extends ConditionBase implements ContainerFactoryPluginInterfac
    *   The plugin_id for the plugin instance.
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
-   *   The entity type manager.
+   * @param \Drupal\commerce\EntityUuidMapperInterface $entity_uuid_mapper
+   *   The entity UUID mapper.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityTypeManagerInterface $entity_type_manager) {
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityUuidMapperInterface $entity_uuid_mapper) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
 
-    $this->storeStorage = $entity_type_manager->getStorage('commerce_store');
+    $this->entityUuidMapper = $entity_uuid_mapper;
   }
 
   /**
@@ -56,7 +56,7 @@ class OrderStore extends ConditionBase implements ContainerFactoryPluginInterfac
       $configuration,
       $plugin_id,
       $plugin_definition,
-      $container->get('entity_type.manager')
+      $container->get('commerce.entity_uuid_mapper')
     );
   }
 
@@ -77,19 +77,12 @@ class OrderStore extends ConditionBase implements ContainerFactoryPluginInterfac
     $form = parent::buildConfigurationForm($form, $form_state);
 
     // Map the UUIDs back to IDs for the form element.
-    $default_value = [];
-    foreach ($this->configuration['stores'] as $store_uuid) {
-      $stores = $this->storeStorage->loadByProperties(['uuid' => $store_uuid]);
-      if ($stores) {
-        $store = reset($stores);
-        $default_value[] = $store->id();
-      }
-    }
+    $store_ids = $this->entityUuidMapper->mapToIds('commerce_store', $this->configuration['stores']);
 
     $form['stores'] = [
       '#type' => 'commerce_entity_select',
       '#title' => $this->t('Stores'),
-      '#default_value' => $default_value,
+      '#default_value' => $store_ids,
       '#target_type' => 'commerce_store',
       '#hide_single_entity' => FALSE,
       '#multiple' => TRUE,
@@ -106,12 +99,7 @@ class OrderStore extends ConditionBase implements ContainerFactoryPluginInterfac
     parent::submitConfigurationForm($form, $form_state);
 
     $values = $form_state->getValue($form['#parents']);
-    $stores = $this->storeStorage->loadMultiple($values['stores']);
-    // Map the IDs to UUIDs.
-    $this->configuration['stores'] = [];
-    foreach ($stores as $store) {
-      $this->configuration['stores'][] = $store->uuid();
-    }
+    $this->configuration['stores'] = $this->entityUuidMapper->mapFromIds('commerce_store', $values['stores']);
   }
 
   /**
