@@ -3,12 +3,12 @@
 namespace Drupal\commerce_cart\Form;
 
 use Drupal\commerce\Context;
-use Drupal\commerce\PurchasableEntityInterface;
 use Drupal\commerce_cart\CartManagerInterface;
 use Drupal\commerce_cart\CartProviderInterface;
 use Drupal\commerce_order\Resolver\OrderTypeResolverInterface;
 use Drupal\commerce_price\Resolver\ChainPriceResolverInterface;
 use Drupal\commerce_store\CurrentStoreInterface;
+use Drupal\commerce_store\SelectStoreTrait;
 use Drupal\Component\Datetime\TimeInterface;
 use Drupal\Core\Entity\ContentEntityForm;
 use Drupal\Core\Entity\EntityInterface;
@@ -22,6 +22,8 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * Provides the order item add to cart form.
  */
 class AddToCartForm extends ContentEntityForm implements AddToCartFormInterface {
+
+  use SelectStoreTrait;
 
   /**
    * The cart manager.
@@ -230,42 +232,6 @@ class AddToCartForm extends ContentEntityForm implements AddToCartFormInterface 
     }
 
     return $entity;
-  }
-
-  /**
-   * Selects the store for the given purchasable entity.
-   *
-   * If the entity is sold from one store, then that store is selected.
-   * If the entity is sold from multiple stores, and the current store is
-   * one of them, then that store is selected.
-   *
-   * @param \Drupal\commerce\PurchasableEntityInterface $entity
-   *   The entity being added to cart.
-   *
-   * @throws \Exception
-   *   When the entity can't be purchased from the current store.
-   *
-   * @return \Drupal\commerce_store\Entity\StoreInterface
-   *   The selected store.
-   */
-  protected function selectStore(PurchasableEntityInterface $entity) {
-    $stores = $entity->getStores();
-    if (count($stores) === 1) {
-      $store = reset($stores);
-    }
-    elseif (count($stores) === 0) {
-      // Malformed entity.
-      throw new \Exception('The given entity is not assigned to any store.');
-    }
-    else {
-      $store = $this->currentStore->getStore();
-      if (!in_array($store, $stores)) {
-        // Indicates that the site listings are not filtered properly.
-        throw new \Exception("The given entity can't be purchased from the current store.");
-      }
-    }
-
-    return $store;
   }
 
 }
