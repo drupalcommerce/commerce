@@ -17,6 +17,15 @@ use Drupal\field\Entity\FieldConfig;
 class AddToCartFormTest extends CartBrowserTestBase {
 
   /**
+   * Modules to enable.
+   *
+   * @var array
+   */
+  public static $modules = [
+    'commerce_test',
+  ];
+
+  /**
    * Test adding a product to the cart.
    */
   public function testProductAddToCartForm() {
@@ -35,6 +44,20 @@ class AddToCartFormTest extends CartBrowserTestBase {
     $order_items = $this->cart->getItems();
     $this->assertNotEmpty(count($order_items) == 1, 'No additional order items were created');
     $this->assertOrderItemInOrder($this->variation, $order_items[0], 2);
+  }
+
+  /**
+   * Test adding an unavailable product to the cart.
+   */
+  public function testProductAddToCartFormValidations() {
+    $this->variation->setSku('TEST_SKU1234')->save();
+    // Confirm that the initial add to cart submit works.
+    $this->postAddToCart($this->variation->getProduct());
+    $this->cart = Order::load($this->cart->id());
+    $order_items = $this->cart->getItems();
+    $this->assertCount(0, $order_items);
+    $this->assertSession()->pageTextContains(sprintf('%s is not available with a quantity of %s.', $this->variation->label(), 1
+    ));
   }
 
   /**

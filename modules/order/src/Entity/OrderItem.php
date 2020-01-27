@@ -351,6 +351,7 @@ class OrderItem extends CommerceContentEntityBase implements OrderItemInterface 
       ->setLabel(t('Purchased entity'))
       ->setDescription(t('The purchased entity.'))
       ->setRequired(TRUE)
+      ->addConstraint('PurchasedEntityAvailable')
       ->setDisplayOptions('form', [
         'type' => 'entity_reference_autocomplete',
         'weight' => -1,
