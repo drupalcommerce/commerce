@@ -29,6 +29,12 @@ class OrderTotalSummary implements OrderTotalSummaryInterface {
   public function buildTotals(OrderInterface $order) {
     $adjustments = $order->collectAdjustments();
     $adjustments = $this->adjustmentTransformer->processAdjustments($adjustments);
+    // Included adjustments are not displayed to the customer, they
+    // exist to allow the developer to know what the price is made of.
+    // The one exception is taxes, which need to be shown for legal reasons.
+    $adjustments = array_filter($adjustments, function (Adjustment $adjustment) {
+      return $adjustment->getType() == 'tax' || !$adjustment->isIncluded();
+    });
     // Convert the adjustments to arrays.
     $adjustments = array_map(function (Adjustment $adjustment) {
       return $adjustment->toArray();

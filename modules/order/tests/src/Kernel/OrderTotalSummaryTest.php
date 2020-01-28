@@ -232,4 +232,50 @@ class OrderTotalSummaryTest extends OrderKernelTestBase {
     $this->assertNull($third['percentage']);
   }
 
+  /**
+   * Tests the order total summary with included adjustments.
+   */
+  public function testIncludedAdjustments() {
+    /** @var \Drupal\commerce_order\Entity\OrderItemInterface $order_item */
+    $order_item = OrderItem::create([
+      'type' => 'default',
+      'quantity' => 1,
+      'unit_price' => new Price('12.00', 'USD'),
+    ]);
+    $order_item->save();
+    $order_item = $this->reloadEntity($order_item);
+    $this->order->addItem($order_item);
+
+    $this->order->addAdjustment(new Adjustment([
+      'type' => 'promotion',
+      'label' => 'Back to school discount',
+      'amount' => new Price('-5.00', 'USD'),
+      'source_id' => '1',
+      'included' => TRUE,
+    ]));
+    $this->order->save();
+    $this->order->addAdjustment(new Adjustment([
+      'type' => 'tax',
+      'label' => 'VAT',
+      'amount' => new Price('2.00', 'USD'),
+      'source_id' => 'us_vat|default|reduced',
+      'percentage' => '0.2',
+      'included' => TRUE,
+    ]));
+    $this->order->save();
+
+    $totals = $this->orderTotalSummary->buildTotals($this->order);
+    $this->assertEquals(new Price('12.00', 'USD'), $totals['subtotal']);
+    $this->assertEquals(new Price('12.00', 'USD'), $totals['total']);
+    // Confirm that the promotion adjustment was filtered out,
+    // but the tax one wasn't.
+    $this->assertCount(1, $totals['adjustments']);
+    $first = array_shift($totals['adjustments']);
+    $this->assertEquals('tax', $first['type']);
+    $this->assertEquals('VAT', $first['label']);
+    $this->assertEquals(new Price('2.00', 'USD'), $first['amount']);
+    $this->assertEquals('us_vat|default|reduced', $first['source_id']);
+    $this->assertEquals('0.2', $first['percentage']);
+  }
+
 }

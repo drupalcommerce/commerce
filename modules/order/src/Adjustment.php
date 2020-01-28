@@ -175,10 +175,10 @@ final class Adjustment {
   }
 
   /**
-   * Gets whether the adjustment is included in the base price.
+   * Gets whether the adjustment is included in the price.
    *
    * @return bool
-   *   TRUE if the adjustment is included in the base price, FALSE otherwise.
+   *   TRUE if the adjustment is included in the price, FALSE otherwise.
    */
   public function isIncluded() : bool {
     return $this->included;
