@@ -91,6 +91,15 @@ class PromotionStorageTest extends OrderKernelTestBase {
       'name' => 'Promotion 1',
       'order_types' => [$this->orderType],
       'stores' => [$this->store->id()],
+      'offer' => [
+        'target_plugin_id' => 'order_fixed_amount_off',
+        'target_plugin_configuration' => [
+          'amount' => [
+            'number' => '25.00',
+            'currency_code' => 'USD',
+          ],
+        ],
+      ],
       'start_date' => '2019-11-15T10:14:00',
       'status' => TRUE,
     ]);
@@ -101,6 +110,12 @@ class PromotionStorageTest extends OrderKernelTestBase {
       'name' => 'Promotion 2',
       'order_types' => [$this->orderType],
       'stores' => [$this->store->id()],
+      'offer' => [
+        'target_plugin_id' => 'order_percentage_off',
+        'target_plugin_configuration' => [
+          'percentage' => '0.20',
+        ],
+      ],
       'start_date' => '2019-01-01T00:00:00',
       'status' => TRUE,
     ]);
@@ -111,6 +126,12 @@ class PromotionStorageTest extends OrderKernelTestBase {
       'name' => 'Promotion32',
       'order_types' => [$this->orderType],
       'stores' => [$this->store->id()],
+      'offer' => [
+        'target_plugin_id' => 'order_percentage_off',
+        'target_plugin_configuration' => [
+          'percentage' => '0.30',
+        ],
+      ],
       'start_date' => '2014-01-01T00:00:00',
       'status' => FALSE,
     ]);
@@ -120,6 +141,12 @@ class PromotionStorageTest extends OrderKernelTestBase {
       'name' => 'Promotion 4',
       'order_types' => [$this->orderType],
       'stores' => [$this->store->id()],
+      'offer' => [
+        'target_plugin_id' => 'order_percentage_off',
+        'target_plugin_configuration' => [
+          'percentage' => '0.40',
+        ],
+      ],
       'start_date' => '2019-01-01T00:00:00',
       'end_date' => '2019-11-15T10:14:00',
       'status' => TRUE,
@@ -130,9 +157,16 @@ class PromotionStorageTest extends OrderKernelTestBase {
       'name' => 'Promotion 5',
       'order_types' => [$this->orderType],
       'stores' => [$this->store->id()],
+      'offer' => [
+        'target_plugin_id' => 'order_percentage_off',
+        'target_plugin_configuration' => [
+          'percentage' => '0.50',
+        ],
+      ],
       'start_date' => '2019-01-01T00:00:00',
       'end_date' => '2020-01-01T00:00:00',
       'status' => TRUE,
+      'weight' => -10,
     ]);
     $promotion5->save();
     $promotion5 = $this->reloadEntity($promotion5);
@@ -141,17 +175,40 @@ class PromotionStorageTest extends OrderKernelTestBase {
       'name' => 'Promotion 6',
       'order_types' => [$this->orderType],
       'stores' => [$this->store->id()],
+      'offer' => [
+        'target_plugin_id' => 'order_percentage_off',
+        'target_plugin_configuration' => [
+          'percentage' => '0.60',
+        ],
+      ],
       'start_date' => '2019-01-01T00:00:00',
       'end_date' => '2019-10-15T10:14:00',
       'status' => TRUE,
     ]);
     $promotion6->save();
 
+    // Confirm that the promotions were filtered by date and status,
+    // and sorted by weight.
     $promotions = $this->promotionStorage->loadAvailable($this->order);
     $this->assertCount(3, $promotions);
     $this->assertEquals([
-      $promotion1->id(), $promotion2->id(), $promotion5->id(),
+      $promotion5->id(), $promotion1->id(), $promotion2->id(),
     ], array_keys($promotions));
+
+    // Test filtering by offer ID.
+    $promotions = $this->promotionStorage->loadAvailable($this->order, ['order_fixed_amount_off', 'order_percentage_off']);
+    $this->assertCount(3, $promotions);
+    $this->assertEquals([
+      $promotion5->id(), $promotion1->id(), $promotion2->id(),
+    ], array_keys($promotions));
+
+    $promotions = $this->promotionStorage->loadAvailable($this->order, ['order_fixed_amount_off']);
+    $this->assertCount(1, $promotions);
+    $this->assertEquals([$promotion1->id()], array_keys($promotions));
+
+    $promotions = $this->promotionStorage->loadAvailable($this->order, ['order_percentage_off']);
+    $this->assertCount(2, $promotions);
+    $this->assertEquals([$promotion5->id(), $promotion2->id()], array_keys($promotions));
   }
 
   /**
@@ -195,60 +252,8 @@ class PromotionStorageTest extends OrderKernelTestBase {
     ]);
     $promotion3->save();
 
-    $this->assertEquals(2, count($this->promotionStorage->loadAvailable($this->order)));
-  }
-
-  /**
-   * Tests that promotions are loaded by weight.
-   *
-   * @group debug
-   */
-  public function testWeight() {
-    $promotion1 = Promotion::create([
-      'name' => 'Promotion 1',
-      'order_types' => [$this->orderType],
-      'stores' => [$this->store->id()],
-      'start_date' => '2019-01-01T00:00:00',
-      'status' => TRUE,
-      'weight' => 4,
-    ]);
-    $promotion1->save();
-    $promotion2 = Promotion::create([
-      'name' => 'Promotion 2',
-      'order_types' => [$this->orderType],
-      'stores' => [$this->store->id()],
-      'start_date' => '2019-01-01T00:00:00',
-      'status' => TRUE,
-      'weight' => 2,
-    ]);
-    $promotion2->save();
-    $promotion3 = Promotion::create([
-      'name' => 'Promotion 3',
-      'order_types' => [$this->orderType],
-      'stores' => [$this->store->id()],
-      'start_date' => '2019-01-01T00:00:00',
-      'status' => TRUE,
-      'weight' => -10,
-    ]);
-    $promotion3->save();
-    $promotion4 = Promotion::create([
-      'name' => 'Promotion 4',
-      'order_types' => [$this->orderType],
-      'stores' => [$this->store->id()],
-      'start_date' => '2019-01-01T00:00:00',
-      'status' => TRUE,
-    ]);
-    $promotion4->save();
-
     $promotions = $this->promotionStorage->loadAvailable($this->order);
-    $promotion = array_shift($promotions);
-    $this->assertEquals($promotion3->label(), $promotion->label());
-    $promotion = array_shift($promotions);
-    $this->assertEquals($promotion4->label(), $promotion->label());
-    $promotion = array_shift($promotions);
-    $this->assertEquals($promotion2->label(), $promotion->label());
-    $promotion = array_shift($promotions);
-    $this->assertEquals($promotion1->label(), $promotion->label());
+    $this->assertEquals(2, count($promotions));
   }
 
 }

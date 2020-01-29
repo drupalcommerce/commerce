@@ -15,10 +15,12 @@ interface PromotionStorageInterface extends ContentEntityStorageInterface {
    *
    * @param \Drupal\commerce_order\Entity\OrderInterface $order
    *   The order.
+   * @param string[] $offer_ids
+   *   (Optional) A list of offer IDs to filter by.
    *
    * @return \Drupal\commerce_promotion\Entity\PromotionInterface[]
    *   The available promotions.
    */
-  public function loadAvailable(OrderInterface $order);
+  public function loadAvailable(OrderInterface $order, array $offer_ids = []);
 
 }

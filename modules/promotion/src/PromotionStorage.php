@@ -91,7 +91,7 @@ class PromotionStorage extends CommerceContentEntityStorage implements Promotion
   /**
    * {@inheritdoc}
    */
-  public function loadAvailable(OrderInterface $order) {
+  public function loadAvailable(OrderInterface $order, array $offer_ids = []) {
     $date = $order->getCalculationDate()->format(DateTimeItemInterface::DATETIME_STORAGE_FORMAT);
 
     $query = $this->getQuery();
@@ -104,6 +104,9 @@ class PromotionStorage extends CommerceContentEntityStorage implements Promotion
       ->condition('start_date', $date, '<=')
       ->condition('status', TRUE)
       ->condition($or_condition);
+    if ($offer_ids) {
+      $query->condition('offer.target_plugin_id', $offer_ids, 'IN');
+    }
     // Only load promotions without coupons. Promotions with coupons are loaded
     // coupon-first in a different process.
     $query->notExists('coupons');
