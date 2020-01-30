@@ -51,12 +51,17 @@ use Drupal\datetime\Plugin\Field\FieldType\DateTimeItemInterface;
  *       "default" = "Drupal\entity\Routing\AdminHtmlRouteProvider",
  *       "delete-multiple" = "Drupal\entity\Routing\DeleteMultipleRouteProvider",
  *     },
- *     "translation" = "Drupal\content_translation\ContentTranslationHandler"
+ *     "translation" = "Drupal\commerce_promotion\PromotionTranslationHandler",
  *   },
  *   base_table = "commerce_promotion",
  *   data_table = "commerce_promotion_field_data",
  *   admin_permission = "administer commerce_promotion",
  *   translatable = TRUE,
+ *   translation = {
+ *     "content_translation" = {
+ *       "access_callback" = "content_translation_translate_access"
+ *     },
+ *   },
  *   entity_keys = {
  *     "id" = "promotion_id",
  *     "label" = "name",
@@ -71,10 +76,24 @@ use Drupal\datetime\Plugin\Field\FieldType\DateTimeItemInterface;
  *     "delete-form" = "/promotion/{commerce_promotion}/delete",
  *     "delete-multiple-form" = "/admin/commerce/promotions/delete",
  *     "collection" = "/admin/commerce/promotions",
+ *     "drupal:content-translation-overview" = "/promotion/{commerce_promotion}/translations",
+ *     "drupal:content-translation-add" = "/promotion/{commerce_promotion}/translations/add/{source}/{target}",
+ *     "drupal:content-translation-edit" = "/promotion/{commerce_promotion}/translations/edit/{language}",
+ *     "drupal:content-translation-delete" = "/promotion/{commerce_promotion}/translations/delete/{language}",
  *   },
  * )
  */
 class Promotion extends CommerceContentEntityBase implements PromotionInterface {
+
+  /**
+   * {@inheritdoc}
+   */
+  public function toUrl($rel = 'canonical', array $options = []) {
+    if ($rel == 'canonical') {
+      $rel = 'edit-form';
+    }
+    return parent::toUrl($rel, $options);
+  }
 
   /**
    * {@inheritdoc}
@@ -593,7 +612,6 @@ class Promotion extends CommerceContentEntityBase implements PromotionInterface 
       ->setRequired(TRUE)
       ->setSetting('target_type', 'commerce_order_type')
       ->setSetting('handler', 'default')
-      ->setTranslatable(TRUE)
       ->setDisplayOptions('form', [
         'type' => 'commerce_entity_select',
         'weight' => 2,
@@ -606,7 +624,6 @@ class Promotion extends CommerceContentEntityBase implements PromotionInterface 
       ->setRequired(TRUE)
       ->setSetting('target_type', 'commerce_store')
       ->setSetting('handler', 'default')
-      ->setTranslatable(TRUE)
       ->setDisplayOptions('form', [
         'type' => 'commerce_entity_select',
         'weight' => 2,
