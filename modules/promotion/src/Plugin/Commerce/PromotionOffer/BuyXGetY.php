@@ -349,10 +349,6 @@ class BuyXGetY extends OrderPromotionOfferBase {
       else {
         $result = $b->getUnitPrice()->compareTo($a->getUnitPrice());
       }
-      // PHP5 workaround, maintain existing sort order when items are equal.
-      if ($result === 0) {
-        $result = ($a->id() < $b->id()) ? -1 : 1;
-      }
 
       return $result;
     });
