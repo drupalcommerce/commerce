@@ -39,7 +39,6 @@ class EndDateWidget extends DateTimeDefaultWidget {
     $element['value']['#description'] = '';
     // Workaround for #2419131.
     $field_name = $this->fieldDefinition->getName();
-    $element['container']['#type'] = 'container';
     $element['container'] = [
       '#type' => 'container',
       '#states' => [
