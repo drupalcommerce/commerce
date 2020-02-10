@@ -27,3 +27,12 @@ order_assigned:
   category: commerce_order
   label: 'Order assigned'
   template: '<p>The order was assigned to {{ user }}.</p>'
+
+payment_log:
+  category: commerce_payment
+  label: 'Payment log'
+  template: '<p>{% if new %} New payment {% else %} Payment {% endif %} {% if remote_id %} {{ remote_id }} {% else %} {{ id }} {% endif %} {% if not previous_amount %} of {{ amount|commerce_price_format }} {% endif %} in state {{ state}} {% if previous_amount %} was changed from {{ previous_amount|commerce_price_format }} to {{ amount|commerce_price_format }} {% endif %}.</p>'
+payment_refunded:
+  category: commerce_payment
+  label: 'Payment refunded'
+  template: '<p>{% if new %} New payment {% else %} Payment {% endif %} {% if remote_id %} {{ remote_id }} {% else %} {{ id }} {% endif %} was refunded {{ refunded_amount|commerce_price_format }}  and is now in state {{ state }}.</p>'

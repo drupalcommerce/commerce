@@ -5,6 +5,8 @@
  * Provides activity logs for Commerce entities.
  */
 
+use Drupal\commerce_log\PaymentListBuilder;
+
 /**
  * Implements hook_preprocess_commerce_order().
  */
@@ -19,4 +21,14 @@ function commerce_log_preprocess_commerce_order(&$variables) {
     '#embed' => TRUE,
     '#title' => t('Order activity'),
   ];
+}
+
+/**
+ * Implements hook_entity_type_alter() for commerce_payment.
+ */
+function commerce_log_entity_type_alter(array &$entity_types) {
+  if (isset($entity_types['commerce_payment'])) {
+    /** @var \Drupal\Core\Entity\EntityTypeInterface[] $entity_types */
+    $entity_types['commerce_payment']->setListBuilderClass(PaymentListBuilder::class);
+  }
 }

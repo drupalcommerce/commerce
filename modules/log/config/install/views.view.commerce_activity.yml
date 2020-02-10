@@ -288,7 +288,7 @@ display:
           entity_type: commerce_log
           entity_field: log_id
           plugin_id: standard
-      title: 'Order logs'
+      title: 'Order activity'
       header: {  }
       footer: {  }
       empty:
