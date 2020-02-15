@@ -112,10 +112,10 @@ abstract class InlineFormBase extends PluginBase implements InlineFormInterface,
     $inline_form['#element_validate'][] = [CommerceElementTrait::class, 'validateElementSubmit'];
     $inline_form['#element_validate'][] = [get_class($this), 'runValidate'];
     $inline_form['#commerce_element_submit'][] = [get_class($this), 'runSubmit'];
-    // Allow inline forms to be altered.
-    $inline_form['#process'][] = [get_class($this), 'alterInlineForm'];
     // Allow inline forms to modify the page title.
     $inline_form['#process'][] = [get_class($this), 'updatePageTitle'];
+    // Tell commerce_form_alter() to fire inline form alter hooks.
+    $form_state->set('has_commerce_inline_forms', TRUE);
 
     return $inline_form;
   }
@@ -156,33 +156,6 @@ abstract class InlineFormBase extends PluginBase implements InlineFormInterface,
     /** @var \Drupal\commerce\Plugin\Commerce\InlineForm\InlineFormInterface $plugin */
     $plugin = $inline_form['#inline_form'];
     $plugin->submitInlineForm($inline_form, $form_state);
-  }
-
-  /**
-   * Alters the inline form.
-   *
-   * @param array $inline_form
-   *   The inline form.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
-   *   The current state of the form.
-   * @param array $complete_form
-   *   The complete form structure.
-   *
-   * @return array
-   *   The form element.
-   */
-  public static function alterInlineForm(array &$inline_form, FormStateInterface $form_state, array &$complete_form) {
-    /** @var \Drupal\commerce\Plugin\Commerce\InlineForm\InlineFormInterface $plugin */
-    $plugin = $inline_form['#inline_form'];
-    // Invoke hook_commerce_inline_form_alter() and
-    // hook_commerce_inline_form_PLUGIN_ID_alter() implementations.
-    $hooks = [
-      'commerce_inline_form',
-      'commerce_inline_form_' . $plugin->getPluginId(),
-    ];
-    \Drupal::moduleHandler()->alter($hooks, $inline_form, $form_state, $complete_form);
-
-    return $inline_form;
   }
 
   /**

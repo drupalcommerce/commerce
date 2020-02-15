@@ -36,6 +36,44 @@ function commerce_toolbar_alter(&$items) {
 }
 
 /**
+ * Implements hook_form_alter().
+ */
+function commerce_form_alter(&$form, FormStateInterface $form_state, $form_id) {
+  if ($form_state->get('has_commerce_inline_forms')) {
+    commerce_alter_inline_forms($form, $form_state, $form);
+  }
+}
+
+/**
+ * Invokes inline form alter hooks for the given element's inline forms.
+ *
+ * @param array $element
+ *   The form element.
+ * @param \Drupal\Core\Form\FormStateInterface $form_state
+ *   The current state of the form.
+ * @param array $complete_form
+ *   The complete form structure.
+ */
+function commerce_alter_inline_forms(array &$element, FormStateInterface $form_state, array &$complete_form) {
+  foreach (Element::children($element) as $key) {
+    if (isset($element[$key]['#inline_form'])) {
+      $inline_form = &$element[$key];
+      /** @var \Drupal\commerce\Plugin\Commerce\InlineForm\InlineFormInterface $plugin */
+      $plugin = $inline_form['#inline_form'];
+      // Invoke hook_commerce_inline_form_alter() and
+      // hook_commerce_inline_form_PLUGIN_ID_alter() implementations.
+      $hooks = [
+        'commerce_inline_form',
+        'commerce_inline_form_' . $plugin->getPluginId(),
+      ];
+      \Drupal::moduleHandler()->alter($hooks, $inline_form, $form_state, $complete_form);
+    }
+
+    commerce_alter_inline_forms($element[$key], $form_state, $complete_form);
+  }
+}
+
+/**
  * Implements hook_field_widget_info_alter().
  *
  * Exposes the commerce_plugin_item widgets for each of the field type's
