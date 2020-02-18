@@ -298,7 +298,7 @@ class Product extends CommerceContentEntityBase implements ProductInterface {
    * {@inheritdoc}
    */
   public function getCacheContexts() {
-    return Cache::mergeContexts(parent::getCacheContexts(), ['url.query_args:v']);
+    return Cache::mergeContexts(parent::getCacheContexts(), ['url.query_args:v', 'store']);
   }
 
   /**

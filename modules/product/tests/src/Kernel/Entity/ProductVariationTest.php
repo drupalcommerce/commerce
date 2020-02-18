@@ -141,6 +141,10 @@ class ProductVariationTest extends CommerceKernelTestBase {
     $this->assertEmpty($variation->getAttributeFieldNames());
     $this->assertEmpty($variation->getAttributeValueIds());
     $this->assertEmpty($variation->getAttributeValues());
+
+    $this->assertEquals([
+      'store',
+    ], $variation->getCacheContexts());
   }
 
   /**

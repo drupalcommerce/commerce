@@ -100,9 +100,9 @@ class ProductVariationFieldInjectionTest extends ProductBrowserTestBase {
 
     $variation_view_display->save();
 
-    // Have to call this save to get the cache to clear, we set the tags correctly in a hook,
-    // but unless you trigger the submit it doesn't seem to clear. Something additional happens
-    // on save that we're missing.
+    // Have to call this save to get the cache to clear, we set the tags
+    // correctly in a hook, but unless you trigger the submit it doesn't seem
+    // to clear. Something additional happens on save that we're missing.
     $this->drupalGet('admin/commerce/config/product-variation-types/default/edit/display');
     $this->submitForm([], 'Save');
 
@@ -141,6 +141,26 @@ class ProductVariationFieldInjectionTest extends ProductBrowserTestBase {
       $this->drupalGet($variation->toUrl());
       $this->assertSession()->pageTextContains($variation->label());
     }
+  }
+
+  /**
+   * Tests caching of injected fields.
+   */
+  public function testStoreCacheContext() {
+    $this->drupalGet($this->product->toUrl());
+    $this->assertSession()->responseHeaderContains('X-Drupal-Cache-Contexts', 'store');
+    $this->assertSession()->responseHeaderContains('X-Drupal-Dynamic-Cache', 'MISS');
+
+    $this->drupalGet($this->product->toUrl());
+    $this->assertSession()->responseHeaderContains('X-Drupal-Dynamic-Cache', 'HIT');
+
+    // Change the default store which will change the cache context.
+    $this->assertFalse($this->stores[0]->isDefault());
+    $this->stores[0]->setDefault(TRUE);
+    $this->stores[0]->save();
+
+    $this->drupalGet($this->product->toUrl());
+    $this->assertSession()->responseHeaderContains('X-Drupal-Dynamic-Cache', 'MISS');
   }
 
 }

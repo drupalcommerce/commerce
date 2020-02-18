@@ -90,6 +90,11 @@ class ProductTest extends CommerceKernelTestBase {
     $product->setOwnerId($this->user->id());
     $this->assertEquals($this->user, $product->getOwner());
     $this->assertEquals($this->user->id(), $product->getOwnerId());
+
+    $this->assertEquals([
+      'store',
+      'url.query_args:v',
+    ], $product->getCacheContexts());
   }
 
   /**

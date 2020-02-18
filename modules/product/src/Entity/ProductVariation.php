@@ -372,6 +372,13 @@ class ProductVariation extends CommerceContentEntityBase implements ProductVaria
   /**
    * {@inheritdoc}
    */
+  public function getCacheContexts() {
+    return Cache::mergeContexts(parent::getCacheContexts(), ['store']);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function getCacheTagsToInvalidate() {
     $tags = parent::getCacheTagsToInvalidate();
     // Invalidate the variations view builder and product caches.
