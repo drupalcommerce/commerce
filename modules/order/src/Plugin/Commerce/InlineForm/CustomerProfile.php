@@ -378,7 +378,8 @@ class CustomerProfile extends EntityInlineFormBase {
    *   The form display.
    */
   protected function loadFormDisplay() {
-    $form_display = EntityFormDisplay::collectRenderDisplay($this->entity, 'default');
+    $form_mode = $this->configuration['profile_scope'];
+    $form_display = EntityFormDisplay::collectRenderDisplay($this->entity, $form_mode);
     // The log message field should never be shown to customers.
     $form_display->removeComponent('revision_log_message');
 
