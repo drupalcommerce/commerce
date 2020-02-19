@@ -114,13 +114,13 @@ class OrderAdminTest extends OrderWebDriverTestBase {
 
     // Second item without overriding the price.
     $entity2 = $this->secondVariation->getSku() . ' (' . $this->secondVariation->id() . ')';
-    $this->waitForAjaxToFinish();
+    $this->assertSession()->assertWaitOnAjaxRequest();
     $this->getSession()->getPage()->pressButton('Add new order item');
-    $this->waitForAjaxToFinish();
+    $this->assertSession()->assertWaitOnAjaxRequest();
     $page->fillField('order_items[form][inline_entity_form][purchased_entity][0][target_id]', $entity2);
     $page->fillField('order_items[form][inline_entity_form][quantity][0][value]', '1');
     $this->getSession()->getPage()->pressButton('Create order item');
-    $this->waitForAjaxToFinish();
+    $this->assertSession()->assertWaitOnAjaxRequest();
     $this->assertSession()->pageTextContains('5.55');
 
     // Test editing an order item.
