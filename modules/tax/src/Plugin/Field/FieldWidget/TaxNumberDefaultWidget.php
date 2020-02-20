@@ -7,6 +7,7 @@ use Drupal\address\Element\Country;
 use Drupal\commerce_tax\TaxNumberTypeManagerInterface;
 use Drupal\Component\Utility\Html;
 use Drupal\Component\Utility\NestedArray;
+use Drupal\Core\Entity\FieldableEntityInterface;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Field\WidgetBase;
@@ -80,7 +81,7 @@ class TaxNumberDefaultWidget extends WidgetBase implements ContainerFactoryPlugi
     $this->prepareForm($form);
     /** @var \Drupal\commerce_tax\Plugin\Field\FieldType\TaxNumberItemInterface $item */
     $item = $items[$delta];
-    $selected_country = $this->getSelectedCountry($form, $form_state);
+    $selected_country = $this->getSelectedCountry($item->getEntity(), $form, $form_state);
     $allowed_countries = $item->getAllowedCountries();
     if ($selected_country && !in_array($selected_country, $allowed_countries)) {
       // Tax numbers are not being collected for the selected country.
@@ -234,6 +235,8 @@ class TaxNumberDefaultWidget extends WidgetBase implements ContainerFactoryPlugi
   /**
    * Gets the selected country from the parent entity's address field.
    *
+   * @param \Drupal\Core\Entity\FieldableEntityInterface $entity
+   *   The parent entity.
    * @param array $form
    *   The entity form.
    * @param \Drupal\Core\Form\FormStateInterface $form_state
@@ -242,25 +245,22 @@ class TaxNumberDefaultWidget extends WidgetBase implements ContainerFactoryPlugi
    * @return string|null
    *   The country code, or NULL if not found.
    */
-  protected function getSelectedCountry(array $form, FormStateInterface $form_state) {
-    if (empty($form['address']['widget'][0]['address']['#required'])) {
-      // The address field is missing, optional, or using a non-standard widget.
+  protected function getSelectedCountry(FieldableEntityInterface $entity, array $form, FormStateInterface $form_state) {
+    if (!$entity->hasField('address')) {
       return NULL;
     }
 
+    // Priority: 1) Submitted value 2) Entity value 3) Default country.
     $parents = array_merge($form['#parents'], ['address', 0, 'address', 'country_code']);
     $selected_country = NestedArray::getValue($form_state->getUserInput(), $parents);
-    if (!$selected_country) {
-      // The form hasn't been submitted yet, use the default value.
+    if (!$selected_country && !$entity->get('address')->isEmpty()) {
+      /** @var \Drupal\address\AddressInterface $address */
+      $address = $entity->get('address')->first();
+      $selected_country = $address->getCountryCode();
+    }
+    elseif (!$selected_country && !empty($form['address']['widget'][0]['address'])) {
       $address_element = $form['address']['widget'][0]['address'];
-      $address_element += ['#available_countries' => []];
-      if (!empty($address_element['#default_value']['country_code'])) {
-        $selected_country = $address_element['#default_value']['country_code'];
-      }
-      else {
-        // The Address::valueCallback() logic hasn't fired yet, simulate it.
-        $selected_country = Country::getDefaultCountry($address_element['#available_countries']);
-      }
+      $selected_country = Country::getDefaultCountry($address_element['#available_countries']);
     }
 
     return $selected_country;
