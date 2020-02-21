@@ -124,6 +124,7 @@ class OrderItemPercentageOffTest extends OrderKernelTestBase {
     $this->assertEquals(new Price('9.98', 'USD'), $order_item->getAdjustedTotalPrice());
     $this->assertEquals(1, count($order_item->getAdjustments()));
     $adjustment = $order_item->getAdjustments()[0];
+    $this->assertEquals('Discount', $adjustment->getLabel());
     $this->assertEquals(new Price('-10.00', 'USD'), $adjustment->getAmount());
     $this->assertEquals('0.50', $adjustment->getPercentage());
     $this->assertTrue($adjustment->isIncluded());
@@ -150,6 +151,7 @@ class OrderItemPercentageOffTest extends OrderKernelTestBase {
     // Starts now, enabled. No end time.
     $promotion = Promotion::create([
       'name' => 'Promotion 1',
+      'display_name'=> '50% off',
       'order_types' => [$this->order->bundle()],
       'stores' => [$this->store->id()],
       'status' => TRUE,
@@ -173,6 +175,7 @@ class OrderItemPercentageOffTest extends OrderKernelTestBase {
     $this->assertEquals(new Price('9.99', 'USD'), $order_item->getAdjustedTotalPrice());
     $this->assertEquals(1, count($order_item->getAdjustments()));
     $adjustment = $order_item->getAdjustments()[0];
+    $this->assertEquals('50% off', $adjustment->getLabel());
     $this->assertEquals(new Price('-9.99', 'USD'), $adjustment->getAmount());
     $this->assertEquals('0.50', $adjustment->getPercentage());
     $this->assertFalse($adjustment->isIncluded());

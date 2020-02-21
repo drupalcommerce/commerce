@@ -44,8 +44,10 @@ class PromotionTest extends CommerceWebDriverTestBase {
 
     // Check the integrity of the form.
     $this->assertSession()->fieldExists('name[0][value]');
+    $this->assertSession()->fieldExists('display_name[0][value]');
     $name = $this->randomMachineName(8);
     $this->getSession()->getPage()->fillField('name[0][value]', $name);
+    $this->getSession()->getPage()->fillField('display_name[0][value]', 'Discount');
     $this->getSession()->getPage()->selectFieldOption('offer[0][target_plugin_id]', 'order_item_percentage_off');
     $this->assertSession()->assertWaitOnAjaxRequest();
     $this->getSession()->getPage()->fillField('offer[0][target_plugin_configuration][order_item_percentage_off][percentage]', '10.0');
@@ -86,6 +88,8 @@ class PromotionTest extends CommerceWebDriverTestBase {
 
     /** @var \Drupal\commerce_promotion\Entity\PromotionInterface $promotion */
     $promotion = Promotion::load(1);
+    $this->assertEquals($name, $promotion->getName());
+    $this->assertEquals('Discount', $promotion->getDisplayName());
     $offer = $promotion->getOffer();
     $this->assertEquals('0.10', $offer->getConfiguration()['percentage']);
     $conditions = $promotion->getConditions();

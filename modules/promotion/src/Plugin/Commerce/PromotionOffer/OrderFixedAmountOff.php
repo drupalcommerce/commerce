@@ -45,8 +45,7 @@ class OrderFixedAmountOff extends OrderPromotionOfferBase {
       if (isset($amounts[$order_item->id()])) {
         $order_item->addAdjustment(new Adjustment([
           'type' => 'promotion',
-          // @todo Change to label from UI when added in #2770731.
-          'label' => t('Discount'),
+          'label' => $promotion->getDisplayName() ?: $this->t('Discount'),
           'amount' => $amounts[$order_item->id()]->multiply('-1'),
           'source_id' => $promotion->id(),
         ]));

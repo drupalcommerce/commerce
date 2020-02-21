@@ -102,12 +102,15 @@ class OrderFixedAmountOffTest extends OrderKernelTestBase {
     // Offer amount larger than the order subtotal.
     $this->assertEquals(0, count($this->order->getAdjustments()));
     $this->assertEquals(1, count($order_item->getAdjustments()));
+    $this->assertEquals('Discount', $adjustment->getLabel());
+    $this->assertEquals(new Price('-20.00', 'USD'), $adjustment->getAmount());
     $this->assertEquals(new Price('20.00', 'USD'), $order_item->getTotalPrice());
     $this->assertEquals(new Price('0.00', 'USD'), $order_item->getAdjustedTotalPrice());
-    $this->assertEquals(new Price('-20.00', 'USD'), $adjustment->getAmount());
     $this->assertEquals(new Price('0.00', 'USD'), $this->order->getTotalPrice());
 
     // Offer amount smaller than the order subtotal.
+    $promotion->setDisplayName('$25 off');
+    $promotion->save();
     $order_item->setQuantity(2);
     $order_item->save();
     $this->order->save();
@@ -122,9 +125,10 @@ class OrderFixedAmountOffTest extends OrderKernelTestBase {
     // Offer amount larger than the order subtotal.
     $this->assertEquals(0, count($this->order->getAdjustments()));
     $this->assertEquals(1, count($order_item->getAdjustments()));
+    $this->assertEquals('$25 off', $adjustment->getLabel());
+    $this->assertEquals(new Price('-25.00', 'USD'), $adjustment->getAmount());
     $this->assertEquals(new Price('40.00', 'USD'), $order_item->getTotalPrice());
     $this->assertEquals(new Price('15.00', 'USD'), $order_item->getAdjustedTotalPrice());
-    $this->assertEquals(new Price('-25.00', 'USD'), $adjustment->getAmount());
     $this->assertEquals(new Price('15.00', 'USD'), $this->order->getTotalPrice());
   }
 

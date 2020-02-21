@@ -205,6 +205,7 @@ class PromotionOrderProcessorTest extends OrderKernelTestBase {
     $order->save();
 
     $promotion = Promotion::create([
+      'name' => 'Promotion',
       'order_types' => ['default'],
       'stores' => [$this->store->id()],
       'usage_limit' => 1,

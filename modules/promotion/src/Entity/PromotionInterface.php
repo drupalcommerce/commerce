@@ -19,6 +19,8 @@ interface PromotionInterface extends ContentEntityInterface, EntityStoresInterfa
   /**
    * Gets the promotion name.
    *
+   * This name is admin-facing.
+   *
    * @return string
    *   The promotion name.
    */
@@ -33,6 +35,27 @@ interface PromotionInterface extends ContentEntityInterface, EntityStoresInterfa
    * @return $this
    */
   public function setName($name);
+
+  /**
+   * Gets the promotion display name.
+   *
+   * This name is user-facing.
+   * Shown in the order total summary.
+   *
+   * @return string
+   *   The promotion display name. If empty, use t('Discount').
+   */
+  public function getDisplayName();
+
+  /**
+   * Sets the promotion display name.
+   *
+   * @param string $display_name
+   *   The promotion display name.
+   *
+   * @return $this
+   */
+  public function setDisplayName($display_name);
 
   /**
    * Gets the promotion description.

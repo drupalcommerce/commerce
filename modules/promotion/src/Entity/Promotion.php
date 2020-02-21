@@ -121,6 +121,21 @@ class Promotion extends CommerceContentEntityBase implements PromotionInterface 
     return $this;
   }
 
+ /**
+  * {@inheritdoc}
+  */
+  public function getDisplayName() {
+    return $this->get('display_name')->value;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setDisplayName($display_name) {
+    $this->set('display_name', $display_name);
+    return $this;
+  }
+
   /**
    * {@inheritdoc}
    */
@@ -580,6 +595,24 @@ class Promotion extends CommerceContentEntityBase implements PromotionInterface 
       ->setRequired(TRUE)
       ->setTranslatable(TRUE)
       ->setSettings([
+        'default_value' => '',
+        'max_length' => 255,
+      ])
+      ->setDisplayOptions('form', [
+        'type' => 'string_textfield',
+        'weight' => 0,
+      ])
+      ->setDisplayConfigurable('view', TRUE)
+      ->setDisplayConfigurable('form', TRUE);
+
+    $fields['display_name'] = BaseFieldDefinition::create('string')
+      ->setLabel(t('Display name'))
+      ->setDescription(t('If provided, shown on the order instead of "@translated".', [
+        '@translated' => t('Discount'),
+      ]))
+      ->setTranslatable(TRUE)
+      ->setSettings([
+        'display_description' => TRUE,
         'default_value' => '',
         'max_length' => 255,
       ])

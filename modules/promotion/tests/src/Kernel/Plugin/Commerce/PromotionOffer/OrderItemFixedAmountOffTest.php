@@ -127,6 +127,7 @@ class OrderItemFixedAmountOffTest extends OrderKernelTestBase {
     $this->assertEquals(new Price('0.00', 'USD'), $order_item->getAdjustedTotalPrice());
     $this->assertEquals(1, count($order_item->getAdjustments()));
     $adjustment = $order_item->getAdjustments()[0];
+    $this->assertEquals('Discount', $adjustment->getLabel());
     $this->assertEquals(new Price('-20.00', 'USD'), $adjustment->getAmount());
     $this->assertTrue($adjustment->isIncluded());
 
@@ -141,6 +142,7 @@ class OrderItemFixedAmountOffTest extends OrderKernelTestBase {
     $this->assertEquals(new Price('10.00', 'USD'), $order_item->getAdjustedTotalPrice());
     $this->assertEquals(1, count($order_item->getAdjustments()));
     $adjustment = $order_item->getAdjustments()[0];
+    $this->assertEquals('Discount', $adjustment->getLabel());
     $this->assertEquals(new Price('-30.00', 'USD'), $adjustment->getAmount());
     $this->assertTrue($adjustment->isIncluded());
   }
@@ -154,6 +156,7 @@ class OrderItemFixedAmountOffTest extends OrderKernelTestBase {
     // Starts now, enabled. No end time.
     $promotion = Promotion::create([
       'name' => 'Promotion 1',
+      'display_name' => '$15 off',
       'order_types' => [$this->order->bundle()],
       'stores' => [$this->store->id()],
       'status' => TRUE,
@@ -190,6 +193,7 @@ class OrderItemFixedAmountOffTest extends OrderKernelTestBase {
     $this->assertEquals(new Price('0.00', 'USD'), $order_item->getAdjustedTotalPrice());
     $this->assertEquals(1, count($order_item->getAdjustments()));
     $adjustment = $order_item->getAdjustments()[0];
+    $this->assertEquals('$15 off', $adjustment->getLabel());
     $this->assertEquals(new Price('-20.00', 'USD'), $adjustment->getAmount());
     $this->assertFalse($adjustment->isIncluded());
 
@@ -205,6 +209,7 @@ class OrderItemFixedAmountOffTest extends OrderKernelTestBase {
     $this->assertEquals(new Price('10.00', 'USD'), $order_item->getAdjustedTotalPrice());
     $this->assertEquals(1, count($order_item->getAdjustments()));
     $adjustment = $order_item->getAdjustments()[0];
+    $this->assertEquals('$15 off', $adjustment->getLabel());
     $this->assertEquals(new Price('-30.00', 'USD'), $adjustment->getAmount());
     $this->assertFalse($adjustment->isIncluded());
   }

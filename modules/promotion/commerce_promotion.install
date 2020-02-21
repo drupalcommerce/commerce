@@ -115,3 +115,29 @@ function commerce_promotion_update_8203() {
     ]);
   $entity_definition_update->installFieldStorageDefinition('usage_limit', 'commerce_promotion_coupon', 'commerce_promotion', $storage_definition);
 }
+
+/**
+ * Add the display_name field to promotions.
+ */
+function commerce_promotion_update_8204() {
+  $entity_definition_update = \Drupal::entityDefinitionUpdateManager();
+
+  $storage_definition = BaseFieldDefinition::create('string')
+    ->setLabel(t('Display name'))
+    ->setDescription(t('If provided, shown on the order instead of "@translated".', [
+      '@translated' => t('Discount'),
+    ]))
+    ->setTranslatable(TRUE)
+    ->setSettings([
+      'display_description' => TRUE,
+      'default_value' => '',
+      'max_length' => 255,
+    ])
+    ->setDisplayOptions('form', [
+      'type' => 'string_textfield',
+      'weight' => 0,
+    ])
+    ->setDisplayConfigurable('view', TRUE)
+    ->setDisplayConfigurable('form', TRUE);
+  $entity_definition_update->installFieldStorageDefinition('display_name', 'commerce_promotion', 'commerce_promotion', $storage_definition);
+}

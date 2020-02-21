@@ -44,6 +44,8 @@ class PromotionTest extends OrderKernelTestBase {
   /**
    * @covers ::getName
    * @covers ::setName
+   * @covers ::getDisplayName
+   * @covers ::setDisplayName
    * @covers ::getDescription
    * @covers ::setDescription
    * @covers ::getOrderTypes
@@ -82,6 +84,9 @@ class PromotionTest extends OrderKernelTestBase {
 
     $promotion->setName('My Promotion');
     $this->assertEquals('My Promotion', $promotion->getName());
+
+    $promotion->setDisplayName('50% off');
+    $this->assertEquals('50% off', $promotion->getDisplayName());
 
     $promotion->setDescription('My Promotion Description');
     $this->assertEquals('My Promotion Description', $promotion->getDescription());

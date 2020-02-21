@@ -43,8 +43,7 @@ class OrderItemPercentageOff extends OrderItemPromotionOfferBase {
 
     $order_item->addAdjustment(new Adjustment([
       'type' => 'promotion',
-      // @todo Change to label from UI when added in #2770731.
-      'label' => t('Discount'),
+      'label' => $promotion->getDisplayName() ?: $this->t('Discount'),
       'amount' => $adjustment_amount->multiply('-1'),
       'percentage' => $percentage,
       'source_id' => $promotion->id(),
