@@ -184,6 +184,7 @@ class PaymentInformation extends CheckoutPaneBase {
       $default_option = $this->paymentOptionsBuilder->selectDefaultOption($this->order, $options);
     }
 
+    $pane_form['#after_build'][] = [get_class($this), 'clearValues'];
     $pane_form['payment_method'] = [
       '#type' => 'radios',
       '#title' => $this->t('Payment method'),
@@ -298,6 +299,29 @@ class PaymentInformation extends CheckoutPaneBase {
     $parents = $form_state->getTriggeringElement()['#parents'];
     array_pop($parents);
     return NestedArray::getValue($form, $parents);
+  }
+
+  /**
+   * Clears dependent form input when the payment_method changes.
+   *
+   * Without this Drupal considers the rebuilt form to already be submitted,
+   * ignoring default values.
+   */
+  public static function clearValues(array $element, FormStateInterface $form_state) {
+    $triggering_element = $form_state->getTriggeringElement();
+    if (!$triggering_element) {
+      return $element;
+    }
+    $triggering_element_name = end($triggering_element['#parents']);
+    if ($triggering_element_name == 'payment_method') {
+      $user_input = &$form_state->getUserInput();
+      $pane_input = NestedArray::getValue($user_input, $element['#parents']);
+      unset($pane_input['billing_information']);
+      unset($pane_input['add_payment_method']);
+      NestedArray::setValue($user_input, $element['#parents'], $pane_input);
+    }
+
+    return $element;
   }
 
   /**
