@@ -30,7 +30,7 @@ class OrderListBuilder extends EntityListBuilder {
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
    * @param \Drupal\Core\Datetime\DateFormatterInterface $date_formatter
-   *   The date service.
+   *   The date formatter.
    */
   public function __construct(EntityTypeInterface $entity_type, EntityTypeManagerInterface $entity_type_manager, DateFormatterInterface $date_formatter) {
     parent::__construct($entity_type, $entity_type_manager->getStorage($entity_type->id()));
