@@ -52,11 +52,12 @@ class CurrencyTest extends CommerceBrowserTestBase {
     $edit = [
       'name' => 'Test currency',
       'currencyCode' => 'XXX',
-      'numericCode' => 999,
+      'numericCode' => '999',
       'symbol' => '§',
       'fractionDigits' => 2,
     ];
     $this->submitForm($edit, 'Save');
+    $this->assertSession()->pageTextContains(t('Saved the @name currency.', ['@name' => $edit['name']]));
 
     $currency = Currency::load('XXX');
     $this->assertEquals('XXX', $currency->getCurrencyCode());
@@ -64,7 +65,6 @@ class CurrencyTest extends CommerceBrowserTestBase {
     $this->assertEquals('999', $currency->getNumericCode());
     $this->assertEquals('§', $currency->getSymbol());
     $this->assertEquals('2', $currency->getFractionDigits());
-    $this->assertSession()->pageTextContains(t("Saved the @name currency.", ['@name' => $edit['name']]));
   }
 
   /**
