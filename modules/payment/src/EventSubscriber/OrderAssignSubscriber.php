@@ -54,11 +54,11 @@ class OrderAssignSubscriber implements EventSubscriberInterface {
       $payment_method_profile = $payment_method->getBillingProfile();
       if ($payment_method_profile && $this->addressBook->needsCopy($payment_method_profile)) {
         $this->addressBook->copy($payment_method_profile, $customer);
-        // Transfer the address book profile ID to the order billing profile.
+        // The data field is not copied by default but needs to be.
+        // For example, both profiles need to have an address_book_profile_id.
         $billing_profile = $order->getBillingProfile();
         if ($payment_method_profile->equalToProfile($billing_profile)) {
-          $address_book_profile_id = $payment_method_profile->getData('address_book_profile_id');
-          $billing_profile->setData('address_book_profile_id', $address_book_profile_id);
+          $billing_profile->populateFromProfile($payment_method_profile, ['data']);
           $billing_profile->save();
         }
       }
