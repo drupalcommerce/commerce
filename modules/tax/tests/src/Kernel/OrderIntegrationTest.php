@@ -30,6 +30,7 @@ class OrderIntegrationTest extends OrderKernelTestBase {
    */
   public static $modules = [
     'commerce_tax',
+    'commerce_tax_test',
   ];
 
   /**

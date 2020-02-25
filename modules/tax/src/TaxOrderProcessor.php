@@ -40,11 +40,11 @@ class TaxOrderProcessor implements OrderProcessorInterface {
   protected $chainRateResolver;
 
   /**
-   * The store's tax zones, keyed by store ID.
+   * The store tax types, keyed by store ID.
    *
-   * @var array
+   * @var \Drupal\commerce_tax\Entity\TaxTypeInterface[]
    */
-  protected $storeZones = [];
+  protected $storeTaxTypes = [];
 
   /**
    * The loaded tax types.
@@ -126,9 +126,11 @@ class TaxOrderProcessor implements OrderProcessorInterface {
    *   The tax rates, keyed by tax zone ID.
    */
   protected function getDefaultRates(OrderItemInterface $order_item, StoreInterface $store) {
+    $tax_type = $this->getDefaultTaxType($store);
     $store_profile = $this->buildStoreProfile($store);
     $rates = [];
-    foreach ($this->getStoreZones($store) as $zone) {
+    foreach ($this->getDefaultZones($store) as $zone) {
+      $this->chainRateResolver->setTaxType($tax_type);
       $rate = $this->chainRateResolver->resolve($zone, $order_item, $store_profile);
       if (is_object($rate)) {
         $rates[$zone->getId()] = $rate;
@@ -139,7 +141,42 @@ class TaxOrderProcessor implements OrderProcessorInterface {
   }
 
   /**
-   * Gets the tax zones for the given store.
+   * Gets the default tax type for the given store.
+   *
+   * @param \Drupal\commerce_store\Entity\StoreInterface $store
+   *   The store.
+   *
+   * @return \Drupal\commerce_tax\Entity\TaxTypeInterface|null
+   *   The default tax type, or NULL if none apply.
+   */
+  protected function getDefaultTaxType(StoreInterface $store) {
+    $store_id = $store->id();
+    if (!array_key_exists($store_id, $this->storeTaxTypes)) {
+      $store_address = $store->getAddress();
+      $tax_types = $this->getTaxTypes();
+      $tax_types = array_filter($tax_types, function (TaxTypeInterface $tax_type) {
+        $tax_type_plugin = $tax_type->getPlugin();
+        return ($tax_type_plugin instanceof LocalTaxTypeInterface) && $tax_type_plugin->isDisplayInclusive();
+      });
+
+      $this->storeTaxTypes[$store_id] = NULL;
+      foreach ($tax_types as $tax_type) {
+        /** @var \Drupal\commerce_tax\Plugin\Commerce\TaxType\LocalTaxTypeInterface $tax_type_plugin */
+        $tax_type_plugin = $tax_type->getPlugin();
+        foreach ($tax_type_plugin->getZones() as $zone) {
+          if ($zone->match($store_address)) {
+            $this->storeTaxTypes[$store_id] = $tax_type;
+            break;
+          }
+        }
+      }
+    }
+
+    return $this->storeTaxTypes[$store_id];
+  }
+
+  /**
+   * Gets the default tax zones for the given store.
    *
    * @param \Drupal\commerce_store\Entity\StoreInterface $store
    *   The store.
@@ -147,33 +184,19 @@ class TaxOrderProcessor implements OrderProcessorInterface {
    * @return \Drupal\commerce_tax\TaxZone[]
    *   The tax zones.
    */
-  protected function getStoreZones(StoreInterface $store) {
-    $store_id = $store->id();
-    if (!isset($this->storeZones[$store_id])) {
-      $tax_types = $this->getTaxTypes();
-      $tax_types = array_filter($tax_types, function (TaxTypeInterface $tax_type) {
-        $tax_type_plugin = $tax_type->getPlugin();
-        return ($tax_type_plugin instanceof LocalTaxTypeInterface) && $tax_type_plugin->isDisplayInclusive();
-      });
-
-      $this->storeZones[$store_id] = [];
-      $store_address = $store->getAddress();
-      foreach ($tax_types as $tax_type) {
-        /** @var \Drupal\commerce_tax\Plugin\Commerce\TaxType\LocalTaxTypeInterface $tax_type_plugin */
-        $tax_type_plugin = $tax_type->getPlugin();
-        foreach ($tax_type_plugin->getZones() as $zone) {
-          if ($zone->match($store_address)) {
-            $this->storeZones[$store_id][] = $zone;
-          }
-        }
-        // Assume that only a single tax type's zones will match.
-        if (count($this->storeZones[$store_id]) > 0) {
-          break;
-        }
+  protected function getDefaultZones(StoreInterface $store) {
+    $store_address = $store->getAddress();
+    $tax_type = $this->getDefaultTaxType($store);
+    /** @var \Drupal\commerce_tax\Plugin\Commerce\TaxType\LocalTaxTypeInterface $tax_type_plugin */
+    $tax_type_plugin = $tax_type->getPlugin();
+    $store_zones = [];
+    foreach ($tax_type_plugin->getZones() as $zone) {
+      if ($zone->match($store_address)) {
+        $store_zones[] = $zone;
       }
     }
 
-    return $this->storeZones[$store_id];
+    return $store_zones;
   }
 
   /**
