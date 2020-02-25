@@ -3,6 +3,7 @@
 namespace Drupal\commerce_tax\Plugin\Commerce\TaxType;
 
 use CommerceGuys\Addressing\Address;
+use CommerceGuys\Addressing\AddressInterface;
 use Drupal\commerce_order\Adjustment;
 use Drupal\commerce_order\Entity\OrderInterface;
 use Drupal\commerce_order\Entity\OrderItemInterface;
@@ -40,6 +41,13 @@ abstract class LocalTaxTypeBase extends TaxTypeBase implements LocalTaxTypeInter
    * @var \Drupal\commerce_tax\TaxZone[]
    */
   protected $zones;
+
+  /**
+   * The matched zones.
+   *
+   * @var array
+   */
+  protected $matchedZones;
 
   /**
    * Constructs a new LocalTaxTypeBase object.
@@ -159,12 +167,9 @@ abstract class LocalTaxTypeBase extends TaxTypeBase implements LocalTaxTypeInter
    *   TRUE if the tax type matches the billing address, FALSE otherwise.
    */
   protected function matchesAddress(StoreInterface $store) {
-    foreach ($this->getZones() as $zone) {
-      if ($zone->match($store->getAddress())) {
-        return TRUE;
-      }
-    }
-    return FALSE;
+    $zones = $this->getMatchingZones($store->getAddress());
+
+    return !empty($zones);
   }
 
   /**
@@ -256,12 +261,8 @@ abstract class LocalTaxTypeBase extends TaxTypeBase implements LocalTaxTypeInter
    */
   protected function resolveZones(OrderItemInterface $order_item, ProfileInterface $customer_profile) {
     $customer_address = $customer_profile->get('address')->first();
-    $resolved_zones = [];
-    foreach ($this->getZones() as $zone) {
-      if ($zone->match($customer_address)) {
-        $resolved_zones[] = $zone;
-      }
-    }
+    $resolved_zones = $this->getMatchingZones($customer_address);
+
     return $resolved_zones;
   }
 
@@ -335,6 +336,23 @@ abstract class LocalTaxTypeBase extends TaxTypeBase implements LocalTaxTypeInter
     }
 
     return $this->zones;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getMatchingZones(AddressInterface $address) {
+    $address_hash = spl_object_hash($address);
+    if (!isset($this->matchedZones[$address_hash])) {
+      $this->matchedZones[$address_hash] = [];
+      foreach ($this->getZones() as $zone) {
+        if ($zone->match($address)) {
+          $this->matchedZones[$address_hash][] = $zone;
+        }
+      }
+    }
+
+    return $this->matchedZones[$address_hash];
   }
 
   /**

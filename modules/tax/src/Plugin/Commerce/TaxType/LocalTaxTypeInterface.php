@@ -2,6 +2,8 @@
 
 namespace Drupal\commerce_tax\Plugin\Commerce\TaxType;
 
+use CommerceGuys\Addressing\AddressInterface;
+
 /**
  * Defines the interface for local tax type plugins.
  *
@@ -25,5 +27,16 @@ interface LocalTaxTypeInterface extends TaxTypeInterface {
    *   The tax zones, keyed by ID.
    */
   public function getZones();
+
+  /**
+   * Gets the tax zones which match the given address.
+   *
+   * @param \CommerceGuys\Addressing\AddressInterface $address
+   *   The address.
+   *
+   * @return \Drupal\commerce_tax\TaxZone[]
+   *   The tax zones, keyed by ID.
+   */
+  public function getMatchingZones(AddressInterface $address);
 
 }

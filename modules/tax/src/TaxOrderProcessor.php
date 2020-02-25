@@ -163,11 +163,10 @@ class TaxOrderProcessor implements OrderProcessorInterface {
       foreach ($tax_types as $tax_type) {
         /** @var \Drupal\commerce_tax\Plugin\Commerce\TaxType\LocalTaxTypeInterface $tax_type_plugin */
         $tax_type_plugin = $tax_type->getPlugin();
-        foreach ($tax_type_plugin->getZones() as $zone) {
-          if ($zone->match($store_address)) {
-            $this->storeTaxTypes[$store_id] = $tax_type;
-            break;
-          }
+        $matching_zones = $tax_type_plugin->getMatchingZones($store_address);
+        if ($matching_zones) {
+          $this->storeTaxTypes[$store_id] = $tax_type;
+          break;
         }
       }
     }
@@ -185,18 +184,12 @@ class TaxOrderProcessor implements OrderProcessorInterface {
    *   The tax zones.
    */
   protected function getDefaultZones(StoreInterface $store) {
-    $store_address = $store->getAddress();
     $tax_type = $this->getDefaultTaxType($store);
     /** @var \Drupal\commerce_tax\Plugin\Commerce\TaxType\LocalTaxTypeInterface $tax_type_plugin */
     $tax_type_plugin = $tax_type->getPlugin();
-    $store_zones = [];
-    foreach ($tax_type_plugin->getZones() as $zone) {
-      if ($zone->match($store_address)) {
-        $store_zones[] = $zone;
-      }
-    }
+    $zones = $tax_type_plugin->getMatchingZones($store->getAddress());
 
-    return $store_zones;
+    return $zones;
   }
 
   /**

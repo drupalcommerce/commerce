@@ -41,10 +41,7 @@ class EuropeanUnionVat extends LocalTaxTypeBase {
     /** @var \Drupal\address\AddressInterface $customer_address */
     $customer_address = $customer_profile->get('address')->first();
     $customer_country = $customer_address->getCountryCode();
-    $customer_zones = array_filter($zones, function ($zone) use ($customer_address) {
-      /** @var \Drupal\commerce_tax\TaxZone $zone */
-      return $zone->match($customer_address);
-    });
+    $customer_zones = $this->getMatchingZones($customer_address);
     if (empty($customer_zones)) {
       // The customer is not in the EU.
       return [];
@@ -53,10 +50,7 @@ class EuropeanUnionVat extends LocalTaxTypeBase {
     $store = $order->getStore();
     $store_address = $store->getAddress();
     $store_country = $store_address->getCountryCode();
-    $store_zones = array_filter($zones, function ($zone) use ($store_address) {
-      /** @var \Drupal\commerce_tax\TaxZone $zone */
-      return $zone->match($store_address);
-    });
+    $store_zones = $this->getMatchingZones($store_address);
     $store_registration_zones = array_filter($zones, function ($zone) use ($store) {
       /** @var \Drupal\commerce_tax\TaxZone $zone */
       return $this->checkRegistrations($store, $zone);
