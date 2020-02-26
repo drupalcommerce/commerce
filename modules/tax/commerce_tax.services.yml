@@ -7,6 +7,10 @@ services:
     class: Drupal\commerce_tax\TaxTypeManager
     parent: default_plugin_manager
 
+  commerce_tax.store_tax:
+    class: Drupal\commerce_tax\StoreTax
+    arguments: ['@entity_type.manager', '@commerce_tax.chain_tax_rate_resolver']
+
   commerce_tax.chain_tax_rate_resolver:
     class: Drupal\commerce_tax\Resolver\ChainTaxRateResolver
     tags:
@@ -19,6 +23,6 @@ services:
 
   commerce_tax.tax_order_processor:
     class: Drupal\commerce_tax\TaxOrderProcessor
-    arguments: ['@entity_type.manager', '@commerce_price.rounder', '@commerce_tax.chain_tax_rate_resolver']
+    arguments: ['@entity_type.manager', '@commerce_price.rounder', '@commerce_tax.store_tax']
     tags:
       - { name: commerce_order.order_processor, priority: 50, adjustment_type: tax }
