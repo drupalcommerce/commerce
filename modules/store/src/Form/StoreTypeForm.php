@@ -38,8 +38,9 @@ class StoreTypeForm extends CommerceBundleEntityFormBase {
 
     ];
     $form['description'] = [
-      '#type' => 'textfield',
+      '#type' => 'textarea',
       '#title' => $this->t('Description'),
+      '#description' => $this->t('This text will be displayed on the <em>Add store</em> page.'),
       '#default_value' => $store_type->getDescription(),
     ];
     $form = $this->buildTraitForm($form, $form_state);
