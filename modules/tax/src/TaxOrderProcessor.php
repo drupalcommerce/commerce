@@ -127,6 +127,9 @@ class TaxOrderProcessor implements OrderProcessorInterface {
    */
   protected function getDefaultRates(OrderItemInterface $order_item, StoreInterface $store) {
     $tax_type = $this->getDefaultTaxType($store);
+    if (!$tax_type) {
+      return [];
+    }
     $store_profile = $this->buildStoreProfile($store);
     $rates = [];
     foreach ($this->getDefaultZones($store) as $zone) {
@@ -185,6 +188,9 @@ class TaxOrderProcessor implements OrderProcessorInterface {
    */
   protected function getDefaultZones(StoreInterface $store) {
     $tax_type = $this->getDefaultTaxType($store);
+    if (!$tax_type) {
+      return [];
+    }
     /** @var \Drupal\commerce_tax\Plugin\Commerce\TaxType\LocalTaxTypeInterface $tax_type_plugin */
     $tax_type_plugin = $tax_type->getPlugin();
     $zones = $tax_type_plugin->getMatchingZones($store->getAddress());
