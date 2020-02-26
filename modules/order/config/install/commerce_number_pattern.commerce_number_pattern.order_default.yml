@@ -1,6 +1,9 @@
 langcode: en
 status: true
-dependencies: {  }
+dependencies:
+  enforced:
+    module:
+      - commerce_order
 id: order_default
 label: Default
 targetEntityType: commerce_order
