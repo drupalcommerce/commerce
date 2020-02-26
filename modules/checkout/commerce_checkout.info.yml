@@ -8,9 +8,3 @@ dependencies:
   - commerce:commerce
   - commerce:commerce_order
   - commerce:commerce_cart
-config_devel:
-  install:
-    - commerce_checkout.commerce_checkout_flow.default
-    - core.entity_view_display.commerce_product_variation.default.summary
-    - core.entity_view_mode.commerce_product_variation.summary
-    - views.view.commerce_checkout_order_summary

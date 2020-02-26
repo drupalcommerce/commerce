@@ -9,7 +9,3 @@ dependencies:
   - commerce:commerce_order
   - entity_reference_revisions:entity_reference_revisions
   - drupal:filter
-config_devel:
-  install:
-    - field.storage.user.commerce_remote_id
-    - field.field.user.user.commerce_remote_id.yml

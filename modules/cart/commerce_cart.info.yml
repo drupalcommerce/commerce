@@ -7,8 +7,3 @@ dependencies:
   - commerce:commerce
   - commerce:commerce_order
   - commerce:commerce_product
-config_devel:
-  install:
-    - core.entity_form_mode.commerce_order_item.add_to_cart
-    - views.view.commerce_cart_form
-    - views.view.commerce_carts
