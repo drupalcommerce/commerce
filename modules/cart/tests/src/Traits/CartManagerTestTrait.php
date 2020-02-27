@@ -2,15 +2,14 @@
 
 namespace Drupal\Tests\commerce_cart\Traits;
 
+/**
+ * @deprecated in commerce:8.x-2.17 and is removed from commerce:3.x.
+ *   Use CartKernelTestBase instead.
+ */
 trait CartManagerTestTrait {
 
   /**
    * Installs commerce cart.
-   *
-   * Due to issues with hook_entity_bundle_create, we need to run this manually
-   * and cannot add commerce_cart to the $modules property.
-   *
-   * @todo patch core so it doesn't explode in Kernel tests.
    */
   protected function installCommerceCart() {
     $this->enableModules(['commerce_cart']);

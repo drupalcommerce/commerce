@@ -6,17 +6,14 @@ use Drupal\commerce_order\Entity\OrderItem;
 use Drupal\commerce_price\Price;
 use Drupal\commerce_product\Entity\ProductVariation;
 use Drupal\commerce_product\Entity\ProductVariationType;
-use Drupal\Tests\commerce_cart\Traits\CartManagerTestTrait;
-use Drupal\Tests\commerce_order\Kernel\OrderKernelTestBase;
+use Drupal\Tests\commerce_cart\Kernel\CartKernelTestBase;
 
 /**
  * Tests integration with cart events.
  *
  * @group commerce
  */
-class CartIntegrationTest extends OrderKernelTestBase {
-
-  use CartManagerTestTrait;
+class CartIntegrationTest extends CartKernelTestBase {
 
   /**
    * A sample user.
@@ -31,20 +28,6 @@ class CartIntegrationTest extends OrderKernelTestBase {
    * @var \Drupal\commerce_product\Entity\ProductVariation
    */
   protected $variation;
-
-  /**
-   * The cart manager.
-   *
-   * @var \Drupal\commerce_cart\CartManagerInterface
-   */
-  protected $cartManager;
-
-  /**
-   * The cart provider.
-   *
-   * @var \Drupal\commerce_cart\CartProviderInterface
-   */
-  protected $cartProvider;
 
   /**
    * The log storage.
@@ -98,7 +81,6 @@ class CartIntegrationTest extends OrderKernelTestBase {
    * Tests that a log is generated when an order is placed.
    */
   public function testAddedToCart() {
-    $this->installCommerceCart();
     $cart = $this->cartProvider->createCart('default', $this->store, $this->user);
     $this->cartManager->addEntity($cart, $this->variation);
 
@@ -117,7 +99,6 @@ class CartIntegrationTest extends OrderKernelTestBase {
    * unless there is a purchasable entity.
    */
   public function testAddedToCartNoPurchasableEntity() {
-    $this->installCommerceCart();
     $cart = $this->cartProvider->createCart('default', $this->store, $this->user);
     $order_item = OrderItem::create([
       'title' => 'Membership subscription',
@@ -139,7 +120,6 @@ class CartIntegrationTest extends OrderKernelTestBase {
    * Tests that a log is generated when an order is placed.
    */
   public function testRemovedFromCart() {
-    $this->installCommerceCart();
     $cart = $this->cartProvider->createCart('default', $this->store, $this->user);
     $order_item = $this->cartManager->addEntity($cart, $this->variation);
     $this->cartManager->removeOrderItem($cart, $order_item);
@@ -157,7 +137,6 @@ class CartIntegrationTest extends OrderKernelTestBase {
    * Tests that a log generated when a non-purchasable entity removed.
    */
   public function testRemovedFromCartNoPurchasableEntity() {
-    $this->installCommerceCart();
     $cart = $this->cartProvider->createCart('default', $this->store, $this->user);
     $order_item = OrderItem::create([
       'title' => 'Membership subscription',

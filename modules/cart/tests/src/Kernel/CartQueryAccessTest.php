@@ -4,8 +4,6 @@ namespace Drupal\Tests\commerce_cart\Kernel;
 
 use Drupal\commerce_order\OrderQueryAccessHandler;
 use Drupal\entity\QueryAccess\Condition;
-use Drupal\Tests\commerce_cart\Traits\CartManagerTestTrait;
-use Drupal\Tests\commerce_order\Kernel\OrderKernelTestBase;
 
 /**
  * Tests query access filtering for carts.
@@ -13,9 +11,7 @@ use Drupal\Tests\commerce_order\Kernel\OrderKernelTestBase;
  * @coversDefaultClass \Drupal\commerce_cart\EventSubscriber\QueryAccessSubscriber
  * @group commerce
  */
-class CartQueryAccessTest extends OrderKernelTestBase {
-
-  use CartManagerTestTrait;
+class CartQueryAccessTest extends CartKernelTestBase {
 
   /**
    * The query access handler.
@@ -23,13 +19,6 @@ class CartQueryAccessTest extends OrderKernelTestBase {
    * @var \Drupal\commerce_order\OrderQueryAccessHandler
    */
   protected $handler;
-
-  /**
-   * The cart provider.
-   *
-   * @var \Drupal\commerce_cart\CartProviderInterface
-   */
-  protected $cartProvider;
 
   /**
    * {@inheritdoc}
@@ -40,11 +29,9 @@ class CartQueryAccessTest extends OrderKernelTestBase {
     // Create uid: 1 here so that it's skipped in test cases.
     $admin_user = $this->createUser();
 
-    $this->installCommerceCart();
     $entity_type_manager = $this->container->get('entity_type.manager');
     $entity_type = $entity_type_manager->getDefinition('commerce_order');
     $this->handler = OrderQueryAccessHandler::createInstance($this->container, $entity_type);
-    $this->cartProvider = $this->container->get('commerce_cart.cart_provider');
   }
 
   /**

@@ -5,31 +5,13 @@ namespace Drupal\Tests\commerce_cart\Kernel;
 use Drupal\commerce_order\Entity\Order;
 use Drupal\commerce_order\Entity\OrderType;
 use Drupal\Core\Database\Database;
-use Drupal\Tests\commerce_cart\Traits\CartManagerTestTrait;
-use Drupal\Tests\commerce_order\Kernel\OrderKernelTestBase;
 
 /**
  * Tests cart expiration.
  *
  * @group commerce
  */
-class CartExpirationTest extends OrderKernelTestBase {
-
-  use CartManagerTestTrait;
-
-  /**
-   * The cart manager.
-   *
-   * @var \Drupal\commerce_cart\CartManager
-   */
-  protected $cartManager;
-
-  /**
-   * The cart provider.
-   *
-   * @var \Drupal\commerce_cart\CartProvider
-   */
-  protected $cartProvider;
+class CartExpirationTest extends CartKernelTestBase {
 
   /**
    * The order storage.
@@ -51,7 +33,6 @@ class CartExpirationTest extends OrderKernelTestBase {
   protected function setUp() {
     parent::setUp();
 
-    $this->installCommerceCart();
     $user = $this->createUser();
     $this->user = $this->reloadEntity($user);
     $this->orderStorage = $this->container->get('entity_type.manager')->getStorage('commerce_order');

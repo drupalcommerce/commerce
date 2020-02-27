@@ -3,8 +3,6 @@
 namespace Drupal\Tests\commerce_cart\Kernel;
 
 use Drupal\Component\Render\FormattableMarkup;
-use Drupal\Tests\commerce_cart\Traits\CartManagerTestTrait;
-use Drupal\Tests\commerce_order\Kernel\OrderKernelTestBase;
 
 /**
  * Tests the unsetting of the cart flag when order is placed.
@@ -12,9 +10,7 @@ use Drupal\Tests\commerce_order\Kernel\OrderKernelTestBase;
  * @covers \Drupal\commerce_cart\CartProvider::finalizeCart()
  * @group commerce
  */
-class CartOrderPlacedTest extends OrderKernelTestBase {
-
-  use CartManagerTestTrait;
+class CartOrderPlacedTest extends CartKernelTestBase {
 
   /**
    * The variation to test against.
@@ -24,19 +20,11 @@ class CartOrderPlacedTest extends OrderKernelTestBase {
   protected $variation;
 
   /**
-   * The cart manager.
-   *
-   * @var \Drupal\commerce_cart\CartManagerInterface
-   */
-  protected $cartManager;
-
-  /**
    * {@inheritdoc}
    */
   protected function setUp() {
     parent::setUp();
 
-    $this->installCommerceCart();
     $this->createUser();
 
     // Create a product variation.

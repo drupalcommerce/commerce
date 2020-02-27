@@ -6,31 +6,14 @@ use Drupal\commerce_price\Price;
 use Drupal\commerce_product\Entity\Product;
 use Drupal\commerce_product\Entity\ProductVariation;
 use Drupal\commerce_promotion\Entity\Promotion;
-use Drupal\Tests\commerce_cart\Traits\CartManagerTestTrait;
-use Drupal\Tests\commerce_order\Kernel\OrderKernelTestBase;
+use Drupal\Tests\commerce_cart\Kernel\CartKernelTestBase;
 
 /**
  * Tests the integration between promotions and carts.
  *
  * @group commerce
  */
-class PromotionCartTest extends OrderKernelTestBase {
-
-  use CartManagerTestTrait;
-
-  /**
-   * The cart manager.
-   *
-   * @var \Drupal\commerce_cart\CartManager
-   */
-  protected $cartManager;
-
-  /**
-   * The cart provider.
-   *
-   * @var \Drupal\commerce_cart\CartProvider
-   */
-  protected $cartProvider;
+class PromotionCartTest extends CartKernelTestBase {
 
   /**
    * Modules to enable.
@@ -50,7 +33,6 @@ class PromotionCartTest extends OrderKernelTestBase {
     $this->installEntitySchema('commerce_promotion');
     $this->installConfig(['commerce_promotion']);
     $this->installSchema('commerce_promotion', ['commerce_promotion_usage']);
-    $this->installCommerceCart();
   }
 
   /**

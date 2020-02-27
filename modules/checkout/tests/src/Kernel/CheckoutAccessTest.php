@@ -8,8 +8,7 @@ use Drupal\commerce_product\Entity\Product;
 use Drupal\commerce_product\Entity\ProductVariation;
 use Drupal\commerce_store\StoreCreationTrait;
 use Drupal\Core\Url;
-use Drupal\Tests\commerce_cart\Traits\CartManagerTestTrait;
-use Drupal\Tests\commerce_order\Kernel\OrderKernelTestBase;
+use Drupal\Tests\commerce_cart\Kernel\CartKernelTestBase;
 use Drupal\user\UserInterface;
 use Symfony\Cmf\Component\Routing\RouteObjectInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -19,9 +18,8 @@ use Symfony\Component\HttpFoundation\Request;
  *
  * @group commerce
  */
-class CheckoutAccessTest extends OrderKernelTestBase {
+class CheckoutAccessTest extends CartKernelTestBase {
 
-  use CartManagerTestTrait;
   use StoreCreationTrait;
 
   /**
@@ -69,7 +67,6 @@ class CheckoutAccessTest extends OrderKernelTestBase {
 
     $this->installConfig('commerce_checkout');
     $this->createUser();
-    $this->installCommerceCart();
     $this->accessManager = $this->container->get('access_manager');
     $this->orderItemStorage = $this->container->get('entity_type.manager')->getStorage('commerce_order_item');
 

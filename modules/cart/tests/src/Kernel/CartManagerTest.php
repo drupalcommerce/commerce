@@ -6,8 +6,6 @@ use Drupal\commerce_order\Entity\OrderItem;
 use Drupal\commerce_price\Price;
 use Drupal\commerce_order\Entity\OrderInterface;
 use Drupal\commerce_product\Entity\ProductVariation;
-use Drupal\Tests\commerce_cart\Traits\CartManagerTestTrait;
-use Drupal\Tests\commerce_order\Kernel\OrderKernelTestBase;
 
 /**
  * Tests the cart manager.
@@ -15,23 +13,7 @@ use Drupal\Tests\commerce_order\Kernel\OrderKernelTestBase;
  * @coversDefaultClass \Drupal\commerce_cart\CartManager
  * @group commerce
  */
-class CartManagerTest extends OrderKernelTestBase {
-
-  use CartManagerTestTrait;
-
-  /**
-   * The cart manager.
-   *
-   * @var \Drupal\commerce_cart\CartManager
-   */
-  protected $cartManager;
-
-  /**
-   * The cart provider.
-   *
-   * @var \Drupal\commerce_cart\CartProvider
-   */
-  protected $cartProvider;
+class CartManagerTest extends CartKernelTestBase {
 
   /**
    * A sample user.
@@ -70,7 +52,6 @@ class CartManagerTest extends OrderKernelTestBase {
     parent::setUp();
 
     $this->installConfig(['extra_order_item_field']);
-    $this->installCommerceCart();
 
     $this->variation1 = ProductVariation::create([
       'type' => 'default',
@@ -142,7 +123,6 @@ class CartManagerTest extends OrderKernelTestBase {
    * Tests that order items without purchasable entities do not cause crashes.
    */
   public function testAddOrderItem() {
-    $this->installCommerceCart();
     $cart = $this->cartProvider->createCart('default', $this->store, $this->user);
 
     $order_item = OrderItem::create([
@@ -159,8 +139,6 @@ class CartManagerTest extends OrderKernelTestBase {
    * Tests that duplicate order items are combined.
    */
   public function testAddDuplicateOrderItem() {
-    $this->installCommerceCart();
-
     $cart = $this->cartProvider->createCart('default', $this->store, $this->user);
     $this->assertInstanceOf(OrderInterface::class, $cart);
     $this->assertEmpty($cart->getItems());
@@ -196,8 +174,6 @@ class CartManagerTest extends OrderKernelTestBase {
    * Tests that adding duplicate order items with extra fields results in merging.
    */
   public function testAddDuplicateOrderItemExtraField() {
-    $this->installCommerceCart();
-
     // Add an extra field to the default order item type form display.
     $form_display = \Drupal::entityTypeManager()
       ->getStorage('entity_form_display')
