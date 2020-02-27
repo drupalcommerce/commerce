@@ -147,8 +147,13 @@ class CompletionRegister extends CheckoutPaneBase implements CheckoutPaneInterfa
     if ($this->currentUser->isAuthenticated()) {
       return FALSE;
     }
+    $mail = $this->order->getEmail();
+    if (!$mail) {
+      // An email is required, but wasn't collected.
+      return FALSE;
+    }
     $existing_user = $this->userStorage->loadByProperties([
-      'mail' => $this->order->getEmail(),
+      'mail' => $mail,
     ]);
     if ($existing_user) {
       // The anonymous customer already has an account on the site.
