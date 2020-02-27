@@ -412,12 +412,12 @@ class CustomerProfileTest extends OrderWebDriverTestBase {
 
     $this->drupalGet('/commerce_order_test/customer_profile_test_form/' . $profile->id());
     // Confirm that the _original option is present and selected, and that it
-    // has the expected suffix, as does the source address book profile.
+    // has the expected suffix.
     $options = $this->xpath('//select[@name="profile[select_address]"]/option');
     $this->assertCount(4, $options);
     $this->assertEquals($this->usAddress['address_line1'], $options[0]->getText());
-    $this->assertEquals($this->frenchAddress['address_line1'] . ' (updated version)', $options[1]->getText());
-    $this->assertEquals($this->frenchAddress['address_line1'] . ' (original version)', $options[2]->getText());
+    $this->assertEquals($this->frenchAddress['address_line1'], $options[1]->getText());
+    $this->assertEquals($this->frenchAddress['address_line1'] . ' (current version)', $options[2]->getText());
     $this->assertEquals('+ Enter a new address', $options[3]->getText());
     $this->assertNotEmpty($options[2]->getAttribute('selected'));
     $this->assertEquals('_original', $options[2]->getValue());

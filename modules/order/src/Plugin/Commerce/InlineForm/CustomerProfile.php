@@ -491,14 +491,10 @@ class CustomerProfile extends EntityInlineFormBase {
         }
         else {
           // There are two identical options in the list, but their profiles
-          // are not identical, most likely because the source address book
-          // was updated after it was used to populate the customer profile.
-          // Add a suffix to both to help the customer differentiate.
+          // are no longer identical. Add a suffix to the _original version
+          // to help the customer differentiate.
           if ($profile_options['_original'] == $source_address_book_profile->label()) {
-            $profile_options['_original'] = $this->t('@profile (original version)', [
-              '@profile' => $this->entity->label(),
-            ]);
-            $profile_options[$address_book_profile_id] = $this->t('@profile (updated version)', [
+            $profile_options['_original'] = $this->t('@profile (current version)', [
               '@profile' => $this->entity->label(),
             ]);
           }
