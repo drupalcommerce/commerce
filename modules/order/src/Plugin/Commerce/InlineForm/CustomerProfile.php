@@ -192,6 +192,7 @@ class CustomerProfile extends EntityInlineFormBase {
         }
       }
 
+      $inline_form['#after_build'][] = [get_called_class(), 'clearValues'];
       $inline_form['select_address'] = [
         '#type' => 'select',
         '#title' => $this->t('Select an address'),
@@ -309,6 +310,24 @@ class CustomerProfile extends EntityInlineFormBase {
   }
 
   /**
+   * Clears form input when "Enter a new address" is selected.
+   */
+  public static function clearValues(array $element, FormStateInterface $form_state) {
+    $triggering_element_name = static::getTriggeringElementName($element, $form_state);
+    if ($triggering_element_name != 'select_address') {
+      return $element;
+    }
+    $user_input = &$form_state->getUserInput();
+    $inline_form_input = NestedArray::getValue($user_input, $element['#parents']);
+    if ($inline_form_input['select_address'] == '_new') {
+      $inline_form_input = array_intersect_assoc($inline_form_input, ['select_address' => '_new']);
+      NestedArray::setValue($user_input, $element['#parents'], $inline_form_input);
+    }
+
+    return $element;
+  }
+
+  /**
    * {@inheritdoc}
    */
   public function validateInlineForm(array &$inline_form, FormStateInterface $form_state) {
@@ -398,18 +417,8 @@ class CustomerProfile extends EntityInlineFormBase {
    *   TRUE if the profile should be shown rendered, FALSE otherwise.
    */
   protected function shouldRender(array $inline_form, FormStateInterface $form_state) {
-    // Determine the name of the triggering element, if the form was rebuilt
-    // by an element from the current inline form.
-    $triggering_element_name = '';
-    $triggering_element = $form_state->getTriggeringElement();
-    if ($triggering_element) {
-      $parents = array_slice($triggering_element['#parents'], 0, count($inline_form['#parents']));
-      if ($inline_form['#parents'] === $parents) {
-        $triggering_element_name = end($triggering_element['#parents']);
-      }
-    }
-
     $render_parents = array_merge($inline_form['#parents'], ['render']);
+    $triggering_element_name = static::getTriggeringElementName($inline_form, $form_state);
     if ($triggering_element_name == 'select_address') {
       // Reset the render flag to re-evaluate the newly selected profile.
       $form_state->set($render_parents, NULL);
@@ -632,6 +641,31 @@ class CustomerProfile extends EntityInlineFormBase {
     }
 
     return $copy_label;
+  }
+
+  /**
+   * Determines the name of the triggering element.
+   *
+   * @param array $inline_form
+   *   The inline form.
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   *   The form state of the complete form.
+   *
+   * @return string
+   *   The name of the triggering element, if the triggering element is
+   *   a part of the inline form.
+   */
+  protected static function getTriggeringElementName(array $inline_form, FormStateInterface $form_state) {
+    $triggering_element_name = '';
+    $triggering_element = $form_state->getTriggeringElement();
+    if ($triggering_element) {
+      $parents = array_slice($triggering_element['#parents'], 0, count($inline_form['#parents']));
+      if ($inline_form['#parents'] === $parents) {
+        $triggering_element_name = end($triggering_element['#parents']);
+      }
+    }
+
+    return $triggering_element_name;
   }
 
 }

@@ -75,7 +75,6 @@ class CustomerProfileTest extends OrderWebDriverTestBase {
    */
   public function testCountries() {
     // Confirm that the country list has been restricted to available countries.
-    // The store default "US" is not present because it is not available.
     $this->drupalGet('/commerce_order_test/customer_profile_test_form');
     $options = $this->xpath('//select[@name="profile[address][0][address][country_code]"]/option');
     $this->assertCount(3, $options);
@@ -161,6 +160,27 @@ class CustomerProfileTest extends OrderWebDriverTestBase {
       'profile[address][0][address][address_line1]' => '10 Drupal Ave',
     ], 'Submit');
     $this->assertSession()->pageTextContains('The street is "10 Drupal Ave" and the country code is US. Address book: Yes');
+
+    // Confirm that selecting "Enter a new address" clears the form.
+    $this->drupalGet('/commerce_order_test/customer_profile_test_form');
+    $this->getSession()->getPage()->pressButton('billing_edit');
+    $this->assertSession()->assertWaitOnAjaxRequest();
+    foreach ($this->usAddress as $property => $value) {
+      $this->assertSession()->fieldValueEquals("profile[address][0][address][$property]", $value);
+    }
+    $this->getSession()->getPage()->fillField('profile[select_address]', '_new');
+    $this->assertSession()->assertWaitOnAjaxRequest();
+    $this->saveHtmlOutput();
+    foreach ($this->emptyAddress as $property => $value) {
+      $this->assertSession()->fieldValueEquals("profile[address][0][address][$property]", $value);
+    }
+    $this->submitForm([
+      'profile[address][0][address][given_name]' => 'John',
+      'profile[address][0][address][family_name]' => 'Smith',
+      'profile[address][0][address][address_line1]' => 'Cetinjska 13',
+      'profile[address][0][address][locality]' => 'Belgrade',
+    ], 'Submit');
+    $this->assertSession()->pageTextContains('The street is "Cetinjska 13" and the country code is RS. Address book: Yes');
 
     // Confirm that it is possible to select the French profile.
     $this->drupalGet('/commerce_order_test/customer_profile_test_form');
