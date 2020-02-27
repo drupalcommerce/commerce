@@ -151,7 +151,7 @@ class OrderItemPercentageOffTest extends OrderKernelTestBase {
     // Starts now, enabled. No end time.
     $promotion = Promotion::create([
       'name' => 'Promotion 1',
-      'display_name'=> '50% off',
+      'display_name' => '50% off',
       'order_types' => [$this->order->bundle()],
       'stores' => [$this->store->id()],
       'status' => TRUE,

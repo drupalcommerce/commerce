@@ -121,9 +121,9 @@ class Promotion extends CommerceContentEntityBase implements PromotionInterface 
     return $this;
   }
 
- /**
-  * {@inheritdoc}
-  */
+  /**
+   * {@inheritdoc}
+   */
   public function getDisplayName() {
     return $this->get('display_name')->value;
   }
