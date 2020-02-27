@@ -6,6 +6,8 @@
  */
 
 use Drupal\commerce_order\Entity\OrderInterface;
+use Drupal\Core\Entity\Display\EntityFormDisplayInterface;
+use Drupal\Core\Entity\EntityForm;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Form\FormStateInterface;
@@ -82,30 +84,6 @@ function commerce_cart_entity_base_field_info(EntityTypeInterface $entity_type) 
       ->setDefaultValue(FALSE);
 
     return $fields;
-  }
-}
-
-/**
- * Implements hook_entity_bundle_create().
- *
- * Creates an 'add_to_cart' form display for each new order item type.
- */
-function commerce_cart_entity_bundle_create($entity_type_id, $bundle) {
-  if ($entity_type_id == 'commerce_order_item' && !\Drupal::isConfigSyncing()) {
-    $storage = \Drupal::entityTypeManager()->getStorage('entity_form_display');
-    $form_display = $storage->load('commerce_order_item.' . $bundle . '.add_to_cart');
-    if (!$form_display) {
-      /** @var \Drupal\Core\Entity\Display\EntityFormDisplayInterface $form_display */
-      $form_display = $storage->create([
-        'targetEntityType' => 'commerce_order_item',
-        'bundle' => $bundle,
-        'mode' => 'add_to_cart',
-        'status' => TRUE,
-      ]);
-      // Hide the unit price by default.
-      $form_display->removeComponent('unit_price');
-      $form_display->save();
-    }
   }
 }
 
@@ -280,6 +258,49 @@ function commerce_cart_order_type_form_submit($form, FormStateInterface $form_st
   }
   $order_type->setThirdPartySetting('commerce_cart', 'cart_expiration', $cart_expiration);
   $order_type->save();
+}
+
+/**
+ * Implements hook_form_BASE_FORM_ID_alter() for 'commerce_order_item_type_form'.
+ */
+function commerce_cart_form_commerce_order_item_type_form_alter(array &$form, FormStateInterface $form_state) {
+  $form['actions']['submit']['#submit'][] = 'commerce_cart_order_item_type_form_submit';
+}
+
+/**
+ * Form submission handler for 'commerce_order_item_type_form'.
+ */
+function commerce_cart_order_item_type_form_submit($form, FormStateInterface $form_state) {
+  $form_object = $form_state->getFormObject();
+  assert($form_object instanceof EntityForm);
+  if ($form_object->getOperation() == 'add') {
+    // Help merchants navigate the admin UI by ensuring the order item type
+    // has a matching 'add_to_cart' form display.
+    $storage = \Drupal::entityTypeManager()->getStorage('entity_form_display');
+    /** @var \Drupal\Core\Entity\Display\EntityFormDisplayInterface $form_display */
+    $form_display = $storage->create([
+      'targetEntityType' => 'commerce_order_item',
+      'bundle' => $form_object->getEntity()->id(),
+      'mode' => 'add_to_cart',
+      'status' => TRUE,
+    ]);
+    $form_display->removeComponent('unit_price');
+    $form_display->save();
+  }
+}
+
+/**
+ * Implements hook_entity_form_display_alter().
+ */
+function commerce_cart_entity_form_display_alter(EntityFormDisplayInterface $form_display, array $context) {
+  if ($context['entity_type'] != 'commerce_order_item') {
+    return;
+  }
+  // The "add_to_cart" form mode doesn't have a form display yet.
+  // Default to hiding the unit_price field.
+  if ($context['form_mode'] == 'add_to_cart' && $context['form_mode'] != $form_display->getMode()) {
+    $form_display->removeComponent('unit_price');
+  }
 }
 
 /**

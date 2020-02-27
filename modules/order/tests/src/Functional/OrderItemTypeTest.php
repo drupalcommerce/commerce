@@ -12,6 +12,17 @@ use Drupal\commerce_order\Entity\OrderItemType;
 class OrderItemTypeTest extends OrderBrowserTestBase {
 
   /**
+   * Modules to enable.
+   *
+   * @var array
+   */
+  public static $modules = [
+    // The cart module is installed to confirm that it doesn't cause problems
+    // when creating an add_to_cart form display for new order item types.
+    'commerce_cart',
+  ];
+
+  /**
    * Tests adding an order item type.
    */
   public function testAdd() {
