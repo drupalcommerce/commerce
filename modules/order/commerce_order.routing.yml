@@ -62,7 +62,7 @@ commerce_order.address_book.overview:
 commerce_order.address_book.add_form:
   path: '/user/{user}/address-book/add/{profile_type}'
   defaults:
-    _entity_form: 'profile.address-book-add'
+    _controller: '\Drupal\commerce_order\Controller\AddressBookController::addForm'
     _title: 'Add address'
   options:
     parameters:

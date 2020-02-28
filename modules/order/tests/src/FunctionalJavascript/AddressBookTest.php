@@ -3,6 +3,7 @@
 namespace Drupal\Tests\commerce_order\FunctionalJavascript;
 
 use Drupal\Core\Url;
+use Drupal\profile\Entity\Profile;
 use Drupal\profile\Entity\ProfileType;
 
 /**
@@ -83,6 +84,7 @@ class AddressBookTest extends OrderWebDriverTestBase {
       'view the administration theme',
       'access administration pages',
       'access commerce administration pages',
+      'access user profiles',
       'administer commerce_currency',
       'administer commerce_store',
       'administer commerce_store_type',
@@ -102,9 +104,9 @@ class AddressBookTest extends OrderWebDriverTestBase {
   }
 
   /**
-   * Tests the access checking.
+   * Tests the overview access checking.
    */
-  public function testAccess() {
+  public function testOverviewAccess() {
     // Confirm that the anonymous user doesn't have an address book.
     $this->drupalGet('user/0/address-book');
     $this->drupalGet(Url::fromRoute('commerce_order.address_book.overview', [
@@ -113,33 +115,128 @@ class AddressBookTest extends OrderWebDriverTestBase {
     $this->assertSession()->pageTextContains('Access Denied');
 
     // Confirm that no address book is available when the user can't view
-    // any profile types.
-    $customer = $this->createUser([]);
+    // the user's canonical page ("/user/{user}").
+    $customer = $this->createUser(['view any customer profile']);
     $this->drupalLogin($customer);
+    $this->drupalGet($this->adminUser->toUrl('canonical'));
+    $this->assertSession()->pageTextContains('Access denied');
     $this->drupalGet(Url::fromRoute('commerce_order.address_book.overview', [
-      'user' => $customer->id(),
+      'user' => $this->adminUser->id(),
+    ]));
+    $this->assertSession()->pageTextContains('Access Denied');
+
+    // Confirm that no address book is available when the user can't view
+    // any profile types.
+    $customer = $this->createUser(['access user profiles']);
+    $this->drupalLogin($customer);
+    $this->drupalGet($this->adminUser->toUrl('canonical'));
+    $this->assertSession()->pageTextNotContains('Access denied');
+    $this->drupalGet(Url::fromRoute('commerce_order.address_book.overview', [
+      'user' => $this->adminUser->id(),
     ]));
     $this->assertSession()->pageTextContains('Access Denied');
 
     // Confirm that the address book is visible when the user can view
     // at least one profile type.
     $customer = $this->createUser([
-      'view own customer profile',
+      'access user profiles',
+      'view any customer profile',
     ]);
     $this->createEntity('profile', [
       'type' => 'customer',
-      'uid' => $customer->id(),
+      'uid' => $this->adminUser->id(),
       'address' => $this->secondAddress,
     ]);
     $this->drupalLogin($customer);
+    $this->drupalGet($this->adminUser->toUrl('canonical'));
+    $this->assertSession()->pageTextNotContains('Access denied');
     $this->drupalGet(Url::fromRoute('commerce_order.address_book.overview', [
-      'user' => $customer->id(),
+      'user' => $this->adminUser->id(),
     ]));
     $this->assertSession()->pageTextNotContains('Access Denied');
     $this->assertSession()->pageTextContains('1098 Alta Ave');
     // Confirm that the local task is present.
     $this->assertSession()->linkExists('Address book');
     $this->assertSession()->linkNotExists('Billing information');
+  }
+
+  /**
+   * Tests the add form access checking.
+   */
+  public function testCreateAccess() {
+    $first_user = $this->createUser(['view own customer profile']);
+    $second_user = $this->createUser([
+      'create customer profile',
+      'view any profile',
+      'access user profiles',
+    ]);
+    $third_user = $this->createUser([
+      'administer profile',
+      'access user profiles',
+    ]);
+
+    $this->createEntity('profile', [
+      'type' => 'customer',
+      'uid' => $first_user->id(),
+      'address' => $this->firstAddress,
+      'status' => TRUE,
+    ]);
+
+    $overview_url = Url::fromRoute('commerce_order.address_book.overview', [
+      'user' => $first_user->id(),
+    ]);
+    // Confirm that the user with only "view" permissions can see
+    // the overview page, but not the "add" page.
+    $this->drupalLogin($first_user);
+    $this->drupalGet($overview_url);
+    $this->assertSession()->pageTextNotContains('Access Denied');
+    $this->assertSession()->pageTextContains('9 Drupal Ave');
+    $this->assertSession()->linkNotExists('Add address');
+
+    $add_url = Url::fromRoute('commerce_order.address_book.add_form', [
+      'user' => $first_user->id(),
+      'profile_type' => 'customer',
+    ]);
+    $this->drupalGet($add_url);
+    $this->assertSession()->pageTextContains('Access denied');
+
+    // Confirm that the second user can't add a profile for the first user.
+    $this->drupalLogin($second_user);
+    $this->drupalGet($overview_url);
+    $this->assertSession()->pageTextNotContains('Access Denied');
+    $this->assertSession()->pageTextContains('9 Drupal Ave');
+    $this->assertSession()->linkNotExists('Add address');
+
+    $this->drupalGet($add_url);
+    $this->assertSession()->pageTextContains('Access denied');
+
+    // Confirm that the third user can add a profile for the first user.
+    $this->drupalLogin($third_user);
+    $this->drupalGet($overview_url);
+    $this->assertSession()->pageTextContains('9 Drupal Ave');
+    $this->assertSession()->linkExists('Add address');
+    $this->getSession()->getPage()->clickLink('Add address');
+    $this->getSession()->getPage()->fillField('address[0][address][country_code]', 'FR');
+    $this->assertSession()->assertWaitOnAjaxRequest();
+    foreach ($this->fourthAddress as $property => $value) {
+      $this->getSession()->getPage()->fillField("address[0][address][$property]", $value);
+    }
+    $this->submitForm([], 'Save');
+    $this->assertSession()->pageTextContains('Saved the 38 Rue du Sentier address.');
+    $profile = Profile::load('2');
+    $this->assertNotEmpty($profile);
+    $this->assertEquals('38 Rue du Sentier', $profile->get('address')->address_line1);
+    $this->assertEquals($first_user->id(), $profile->getOwnerId());
+
+    $this->drupalGet($add_url);
+    $this->assertSession()->pageTextNotContains('Access denied');
+    // Confirm that no further profiles can be added if the profile type
+    // only allows a single profile per user.
+    $profile = ProfileType::load('customer');
+    $profile->setMultiple(FALSE);
+    $profile->save();
+    $this->drupalGet($add_url);
+    $this->assertSession()->pageTextContains('Access denied');
   }
 
   /**
@@ -156,6 +253,7 @@ class AddressBookTest extends OrderWebDriverTestBase {
     \Drupal::service('router.builder')->rebuild();
 
     $customer = $this->createUser([
+      'access user profiles',
       'view own customer profile',
       'update own customer profile',
     ]);
@@ -194,6 +292,7 @@ class AddressBookTest extends OrderWebDriverTestBase {
    */
   public function testDefaultOverview() {
     $customer = $this->createUser([
+      'access user profiles',
       'create customer profile',
       'update own customer profile',
       'delete own customer profile',
@@ -293,6 +392,7 @@ class AddressBookTest extends OrderWebDriverTestBase {
     ]);
 
     $customer = $this->createUser([
+      'access user profiles',
       'create customer profile',
       'update own customer profile',
       'delete own customer profile',

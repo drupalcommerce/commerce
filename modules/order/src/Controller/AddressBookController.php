@@ -6,9 +6,10 @@ use Drupal\commerce_order\AddressBookInterface;
 use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
+use Drupal\Core\Entity\EntityFormBuilderInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Messenger\MessengerTrait;
-use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\Url;
 use Drupal\profile\Entity\ProfileInterface;
@@ -38,6 +39,13 @@ class AddressBookController implements ContainerInjectionInterface {
   protected $addressBook;
 
   /**
+   * The entity form builder.
+   *
+   * @var \Drupal\Core\Entity\EntityFormBuilderInterface
+   */
+  protected $entityFormBuilder;
+
+  /**
    * The entity type manager.
    *
    * @var \Drupal\Core\Entity\EntityTypeManagerInterface
@@ -49,11 +57,14 @@ class AddressBookController implements ContainerInjectionInterface {
    *
    * @param \Drupal\commerce_order\AddressBookInterface $address_book
    *   The address book.
+   * @param \Drupal\Core\Entity\EntityFormBuilderInterface $entity_form_builder
+   *   The entity form builder.
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
    */
-  public function __construct(AddressBookInterface $address_book, EntityTypeManagerInterface $entity_type_manager) {
+  public function __construct(AddressBookInterface $address_book, EntityFormBuilderInterface $entity_form_builder, EntityTypeManagerInterface $entity_type_manager) {
     $this->addressBook = $address_book;
+    $this->entityFormBuilder = $entity_form_builder;
     $this->entityTypeManager = $entity_type_manager;
   }
 
@@ -63,6 +74,7 @@ class AddressBookController implements ContainerInjectionInterface {
   public static function create(ContainerInterface $container) {
     return new static(
       $container->get('commerce_order.address_book'),
+      $container->get('entity.form_builder'),
       $container->get('entity_type.manager')
     );
   }
@@ -117,14 +129,13 @@ class AddressBookController implements ContainerInjectionInterface {
   /**
    * Builds the overview page.
    *
-   * @param \Drupal\Core\Routing\RouteMatchInterface $route_match
-   *   The route match.
+   * @param \Drupal\user\UserInterface $user
+   *   The user account.
    *
    * @return array
    *   The response.
    */
-  public function overviewPage(RouteMatchInterface $route_match) {
-    $user = $route_match->getParameter('user');
+  public function overviewPage(UserInterface $user) {
     $profile_types = $this->addressBook->loadTypes();
     $profile_types = $this->filterTypesByViewAccess($profile_types, $user);
     $profile_entity_type = $this->entityTypeManager->getDefinition('profile');
@@ -213,21 +224,47 @@ class AddressBookController implements ContainerInjectionInterface {
   }
 
   /**
+   * Builds the add form.
+   *
+   * @param \Drupal\user\UserInterface $user
+   *   The user account.
+   * @param \Drupal\profile\Entity\ProfileTypeInterface $profile_type
+   *   The profile type.
+   *
+   * @return array
+   *   The response.
+   */
+  public function addForm(UserInterface $user, ProfileTypeInterface $profile_type) {
+    $profile = $this->entityTypeManager->getStorage('profile')->create([
+      'uid' => $user->id(),
+      'type' => $profile_type->id(),
+    ]);
+    return $this->entityFormBuilder->getForm($profile, 'address-book-add');
+  }
+
+  /**
    * Checks access for the overview page.
    *
    * Grants access if the current user is allowed to view at least one
    * customer profile type.
    *
-   * @param \Drupal\Core\Routing\RouteMatchInterface $route_match
-   *   The route match.
+   * @param \Drupal\user\UserInterface $user
+   *   The user account.
+   * @param \Drupal\Core\Session\AccountInterface $account
+   *   The currently logged in account.
    *
    * @return \Drupal\Core\Access\AccessResultInterface
    *   The access result.
    */
-  public function checkOverviewAccess(RouteMatchInterface $route_match) {
-    $user = $route_match->getParameter('user');
+  public function checkOverviewAccess(UserInterface $user, AccountInterface $account) {
+    $user_access = $user->access('view', $account, TRUE);
+    if (!$user_access->isAllowed()) {
+      // The account does not have access to the user's canonical page
+      // ("/user/{user}"), don't allow access to any sub-pages either.
+      return $user_access;
+    }
     $profile_types = $this->addressBook->loadTypes();
-    $profile_types = $this->filterTypesByViewAccess($profile_types, $user);
+    $profile_types = $this->filterTypesByViewAccess($profile_types, $user, $account);
 
     return AccessResult::allowedIf(!empty($profile_types))->addCacheTags(['config:profile_type_list']);
   }
@@ -235,23 +272,38 @@ class AddressBookController implements ContainerInjectionInterface {
   /**
    * Checks access for the add form.
    *
-   * @param \Drupal\Core\Routing\RouteMatchInterface $route_match
-   *   The route match.
+   * @param \Drupal\user\UserInterface $user
+   *   The user account.
+   * @param \Drupal\profile\Entity\ProfileTypeInterface $profile_type
+   *   The profile type.
+   * @param \Drupal\Core\Session\AccountInterface $account
+   *   The currently logged in account.
    *
    * @return \Drupal\Core\Access\AccessResultInterface
    *   The access result.
    */
-  public function checkCreateAccess(RouteMatchInterface $route_match) {
-    $user = $route_match->getParameter('user');
-    /** @var \Drupal\profile\Entity\ProfileTypeInterface $profile_type */
-    $profile_type = $route_match->getParameter('profile_type');
+  public function checkCreateAccess(UserInterface $user, ProfileTypeInterface $profile_type, AccountInterface $account) {
+    $user_access = $user->access('view', $account, TRUE);
+    if (!$user_access->isAllowed()) {
+      // The account does not have access to the user's canonical page
+      // ("/user/{user}"), don't allow access to any sub-pages either.
+      return $user_access;
+    }
     $access_control_handler = $this->entityTypeManager->getAccessControlHandler('profile');
 
     /** @var \Drupal\Core\Access\AccessResult $result */
-    $result = $access_control_handler->createAccess($profile_type->id(), NULL, [
+    $result = $access_control_handler->createAccess($profile_type->id(), $account, [
       'profile_owner' => $user,
     ], TRUE);
     if ($result->isAllowed()) {
+      // There is no create any/own permission, confirm that the account is
+      // either an administrator, or they're creating a profile for themselves.
+      $admin_permission = $this->entityTypeManager->getDefinition('profile')->getAdminPermission();
+      $owner_result = AccessResult::allowedIfHasPermission($account, $admin_permission)
+        ->orIf(AccessResult::allowedIf($account->id() == $user->id()))
+        ->cachePerUser();
+      $result = $result->andIf($owner_result);
+
       // Deny access when the profile type only allows a single profile
       // per user, and such a profile already exists.
       if (!$profile_type->allowsMultiple()) {
@@ -274,11 +326,13 @@ class AddressBookController implements ContainerInjectionInterface {
    *   The profile types.
    * @param \Drupal\user\UserInterface $owner
    *   The profile owner.
+   * @param \Drupal\Core\Session\AccountInterface $account
+   *   The currently logged in account.
    *
    * @return \Drupal\profile\Entity\ProfileTypeInterface[]
    *   The filtered profile types.
    */
-  protected function filterTypesByViewAccess(array $profile_types, UserInterface $owner) {
+  protected function filterTypesByViewAccess(array $profile_types, UserInterface $owner, AccountInterface $account = NULL) {
     $storage = $this->entityTypeManager->getStorage('profile');
     $access_control_handler = $this->entityTypeManager->getAccessControlHandler('profile');
     foreach ($profile_types as $profile_type_id => $profile_type) {
@@ -286,7 +340,7 @@ class AddressBookController implements ContainerInjectionInterface {
         'type' => $profile_type_id,
         'uid' => $owner->id(),
       ]);
-      if (!$access_control_handler->access($profile_stub, 'view')) {
+      if (!$access_control_handler->access($profile_stub, 'view', $account)) {
         unset($profile_types[$profile_type_id]);
       }
     }
