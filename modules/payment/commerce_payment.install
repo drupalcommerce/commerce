@@ -5,6 +5,7 @@
  * Install, update and uninstall functions for the commerce_payment module.
  */
 
+use Drupal\commerce_payment\Event\PaymentEvent;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Session\AccountInterface;
 
@@ -85,4 +86,14 @@ function commerce_payment_update_8203() {
   $entity_type->set('entity_keys', $keys);
   $definition_update_manager->updateEntityType($entity_type);
   $definition_update_manager->updateFieldStorageDefinition($uid_storage_definition);
+}
+
+/**
+ * Add the event handler to the payment entity type.
+ */
+function commerce_payment_update_8204() {
+  $entity_definition_update = \Drupal::entityDefinitionUpdateManager();
+  $entity_type = $entity_definition_update->getEntityType('commerce_payment');
+  $entity_type->setHandlerClass('event', PaymentEvent::class);
+  $entity_definition_update->updateEntityType($entity_type);
 }

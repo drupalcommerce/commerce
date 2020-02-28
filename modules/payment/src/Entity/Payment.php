@@ -26,6 +26,7 @@ use Drupal\Core\Field\BaseFieldDefinition;
  *   bundle_plugin_type = "commerce_payment_type",
  *   handlers = {
  *     "access" = "Drupal\commerce_payment\PaymentAccessControlHandler",
+ *     "event" = "Drupal\commerce_payment\Event\PaymentEvent",
  *     "list_builder" = "Drupal\commerce_payment\PaymentListBuilder",
  *     "storage" = "Drupal\commerce_payment\PaymentStorage",
  *     "form" = {
