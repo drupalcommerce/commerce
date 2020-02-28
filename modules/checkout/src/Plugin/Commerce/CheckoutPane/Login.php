@@ -117,16 +117,16 @@ class Login extends CheckoutPaneBase implements CheckoutPaneInterface, Container
    */
   public function buildConfigurationSummary() {
     if (!empty($this->configuration['allow_guest_checkout'])) {
-      $summary = $this->t('Guest checkout: Allowed');
+      $summary = $this->t('Guest checkout: Allowed') . '<br>';
     }
     else {
       $summary = $this->t('Guest checkout: Not allowed') . '<br>';
-      if (!empty($this->configuration['allow_registration'])) {
-        $summary .= $this->t('Registration: Allowed');
-      }
-      else {
-        $summary .= $this->t('Registration: Not allowed');
-      }
+    }
+    if (!empty($this->configuration['allow_registration'])) {
+      $summary .= $this->t('Registration: Allowed');
+    }
+    else {
+      $summary .= $this->t('Registration: Not allowed');
     }
 
     return $summary;
@@ -146,11 +146,6 @@ class Login extends CheckoutPaneBase implements CheckoutPaneInterface, Container
       '#type' => 'checkbox',
       '#title' => $this->t('Allow registration'),
       '#default_value' => $this->configuration['allow_registration'],
-      '#states' => [
-        'visible' => [
-          ':input[name="configuration[panes][login][configuration][allow_guest_checkout]"]' => ['checked' => FALSE],
-        ],
-      ],
     ];
 
     return $form;
