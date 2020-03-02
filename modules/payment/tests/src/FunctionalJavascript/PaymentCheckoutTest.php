@@ -293,7 +293,7 @@ class PaymentCheckoutTest extends CommerceWebDriverTestBase {
     $this->submitForm([
       'payment_information[add_payment_method][payment_details][number]' => '4012888888881881',
       'payment_information[add_payment_method][payment_details][expiration][month]' => '02',
-      'payment_information[add_payment_method][payment_details][expiration][year]' => '2020',
+      'payment_information[add_payment_method][payment_details][expiration][year]' => '2024',
       'payment_information[add_payment_method][payment_details][security_code]' => '123',
       'payment_information[add_payment_method][billing_information][address][0][address][given_name]' => 'Johnny',
       'payment_information[add_payment_method][billing_information][address][0][address][family_name]' => 'Appleseed',
@@ -304,7 +304,7 @@ class PaymentCheckoutTest extends CommerceWebDriverTestBase {
     ], 'Continue to review');
     $this->assertSession()->pageTextContains('Payment information');
     $this->assertSession()->pageTextContains('Visa ending in 1881');
-    $this->assertSession()->pageTextContains('Expires 2/2020');
+    $this->assertSession()->pageTextContains('Expires 2/2024');
     $this->assertSession()->pageTextContains('Johnny Appleseed');
     $this->assertSession()->pageTextContains('123 New York Drive');
     $this->submitForm([], 'Pay and complete purchase');
@@ -423,7 +423,7 @@ class PaymentCheckoutTest extends CommerceWebDriverTestBase {
     $this->submitForm([
       'payment_information[add_payment_method][payment_details][number]' => '4111111111111111',
       'payment_information[add_payment_method][payment_details][expiration][month]' => '02',
-      'payment_information[add_payment_method][payment_details][expiration][year]' => '2020',
+      'payment_information[add_payment_method][payment_details][expiration][year]' => '2024',
       'payment_information[add_payment_method][payment_details][security_code]' => '123',
       'payment_information[add_payment_method][billing_information][address][0][address][given_name]' => 'Johnny',
       'payment_information[add_payment_method][billing_information][address][0][address][family_name]' => 'Appleseed',
@@ -434,7 +434,7 @@ class PaymentCheckoutTest extends CommerceWebDriverTestBase {
     ], 'Continue to review');
     $this->assertSession()->pageTextContains('Payment information');
     $this->assertSession()->pageTextContains('Visa ending in 1111');
-    $this->assertSession()->pageTextContains('Expires 2/2020');
+    $this->assertSession()->pageTextContains('Expires 2/2024');
     $this->submitForm([], 'Pay and complete purchase');
     $this->assertSession()->pageTextNotContains('Your order number is 1. You can view your order on your account page when logged in.');
     $this->assertSession()->pageTextContains('We encountered an error processing your payment method. Please verify your details and try again.');
