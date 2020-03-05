@@ -554,9 +554,7 @@ class Promotion extends CommerceContentEntityBase implements PromotionInterface 
     parent::postSave($storage, $update);
 
     // Ensure there's a back-reference on each coupon.
-    foreach ($this->coupons as $item) {
-      /** @var \Drupal\commerce_promotion\Entity\CouponInterface $coupon */
-      $coupon = $item->entity;
+    foreach ($this->getCoupons() as $coupon) {
       if (!$coupon->getPromotionId()) {
         $coupon->promotion_id = $this->id();
         $coupon->save();
