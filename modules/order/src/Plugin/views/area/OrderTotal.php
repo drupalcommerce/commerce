@@ -79,12 +79,19 @@ class OrderTotal extends AreaPluginBase {
         if (!in_array($argument->getField(), ['commerce_order.order_id', 'commerce_order_item.order_id'])) {
           continue;
         }
+        /** @var \Drupal\commerce_order\Entity\OrderInterface $order */
         if ($order = $this->orderStorage->load($argument->getValue())) {
-          return $order->get('total_price')->view(['label' => 'hidden', 'type' => 'commerce_order_total_summary']);
+          $order_total = $order->get('total_price')->view([
+            'label' => 'hidden',
+            'type' => 'commerce_order_total_summary',
+            'weight' => $this->position,
+          ]);
+          $order_total['#prefix'] = '<div data-drupal-selector="order-total-summary">';
+          $order_total['#suffix'] = '</div>';
+          return $order_total;
         }
       }
     }
-
     return [];
   }
 

@@ -4,3 +4,11 @@ commerce_checkout.commerce_checkout_pane.coupon_redemption:
     allow_multiple:
       type: boolean
       label: 'Allow multiple coupons'
+
+views.area.commerce_coupon_redemption:
+  type: views_area
+  label: 'Coupon redemption'
+  mapping:
+    allow_multiple:
+      type: boolean
+      label: 'Allow multiple coupons to be redeemed'

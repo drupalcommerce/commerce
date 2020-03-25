@@ -14,12 +14,17 @@ use Drupal\Core\Form\FormStateInterface;
 function commerce_promotion_test_form_views_form_commerce_cart_form_default_alter(&$form, FormStateInterface $form_state, $form_id) {
   // We know that view forms are build on the base ID plus arguments.
   $order_id = substr($form_id, strlen('views_form_commerce_cart_form_default_'));
+
+  $inline_form_manager = \Drupal::getContainer()->get('plugin.manager.commerce_inline_form');
+  $inline_form = $inline_form_manager->createInstance('coupon_redemption', [
+    'order_id' => $order_id,
+    'max_coupons' => Drupal::request()->query->get('coupon_cardinality'),
+  ]);
+
   // Workaround for core bug #2897377.
   $form['#id'] = Html::getId($form_state->getBuildInfo()['form_id']);
-
   $form['coupons'] = [
-    '#type' => 'commerce_coupon_redemption_form',
-    '#order_id' => $order_id,
-    '#cardinality' => Drupal::request()->query->get('coupon_cardinality'),
+    '#parents' => ['coupons'],
   ];
+  $form['coupons'] = $inline_form->buildInlineForm($form['coupons'], $form_state);
 }
