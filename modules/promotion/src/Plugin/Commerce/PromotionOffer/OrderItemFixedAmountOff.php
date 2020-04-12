@@ -26,14 +26,14 @@ class OrderItemFixedAmountOff extends OrderItemPromotionOfferBase {
     $this->assertEntity($entity);
     /** @var \Drupal\commerce_order\Entity\OrderItemInterface $order_item */
     $order_item = $entity;
-    $total_price = $order_item->getTotalPrice();
+    $adjusted_total_price = $order_item->getAdjustedTotalPrice(['promotion']);
     $amount = $this->getAmount();
-    if ($total_price->getCurrencyCode() != $amount->getCurrencyCode()) {
+    if ($adjusted_total_price->getCurrencyCode() != $adjusted_total_price->getCurrencyCode()) {
       return;
     }
     if ($this->configuration['display_inclusive']) {
       // Display-inclusive promotions must first be applied to the unit price.
-      $unit_price = $order_item->getUnitPrice();
+      $unit_price = $order_item->getAdjustedUnitPrice(['promotion']);
       if ($amount->greaterThan($unit_price)) {
         // Don't reduce the unit price past zero.
         $amount = $unit_price;
@@ -46,10 +46,15 @@ class OrderItemFixedAmountOff extends OrderItemPromotionOfferBase {
     else {
       $adjustment_amount = $amount->multiply($order_item->getQuantity());
       $adjustment_amount = $this->rounder->round($adjustment_amount);
-      if ($adjustment_amount->greaterThan($total_price)) {
+      if ($adjustment_amount->greaterThan($adjusted_total_price)) {
         // Don't reduce the order item total price past zero.
-        $adjustment_amount = $total_price;
+        $adjustment_amount = $adjusted_total_price;
       }
+    }
+
+    // Skip applying the promotion if there's no amount to discount.
+    if ($adjustment_amount->isZero()) {
+      return;
     }
 
     $order_item->addAdjustment(new Adjustment([

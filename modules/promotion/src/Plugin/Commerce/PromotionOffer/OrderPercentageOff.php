@@ -32,6 +32,14 @@ class OrderPercentageOff extends OrderPromotionOfferBase {
     // Calculate the order-level discount and split it between order items.
     $amount = $order->getSubtotalPrice()->multiply($percentage);
     $amount = $this->rounder->round($amount);
+
+    if ($amount->greaterThan($order->getTotalPrice())) {
+      $amount = $order->getTotalPrice();
+    }
+    // Skip applying the promotion if there's no amount to discount.
+    if ($amount->isZero()) {
+      return;
+    }
     $amounts = $this->splitter->split($order, $amount, $percentage);
 
     foreach ($order->getItems() as $order_item) {

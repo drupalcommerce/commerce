@@ -122,7 +122,6 @@ class OrderFixedAmountOffTest extends OrderKernelTestBase {
     /** @var \Drupal\commerce_order\Adjustment $adjustment */
     $adjustment = reset($adjustments);
 
-    // Offer amount larger than the order subtotal.
     $this->assertEquals(0, count($this->order->getAdjustments()));
     $this->assertEquals(1, count($order_item->getAdjustments()));
     $this->assertEquals('$25 off', $adjustment->getLabel());
@@ -130,6 +129,34 @@ class OrderFixedAmountOffTest extends OrderKernelTestBase {
     $this->assertEquals(new Price('40.00', 'USD'), $order_item->getTotalPrice());
     $this->assertEquals(new Price('15.00', 'USD'), $order_item->getAdjustedTotalPrice());
     $this->assertEquals(new Price('15.00', 'USD'), $this->order->getTotalPrice());
+
+    // Tests with multiple promotions.
+    // Starts now, enabled. No end time.
+    $another_promotion = Promotion::create([
+      'name' => 'Promotion 2',
+      'order_types' => [$this->order->bundle()],
+      'stores' => [$this->store->id()],
+      'status' => TRUE,
+      'offer' => [
+        'target_plugin_id' => 'order_fixed_amount_off',
+        'target_plugin_configuration' => [
+          'amount' => [
+            'number' => '25.00',
+            'currency_code' => 'USD',
+          ],
+        ],
+      ],
+    ]);
+    $another_promotion->save();
+    $this->order->save();
+    $order_item_adjustments = $order_item->getAdjustments();
+    $this->assertEquals(2, count($order_item_adjustments));
+    $this->assertEquals('$25 off', $order_item_adjustments[0]->getLabel());
+    $this->assertEquals(new Price('-25.00', 'USD'), $order_item_adjustments[0]->getAmount());
+    $this->assertEquals(new Price('-15.00', 'USD'), $order_item_adjustments[1]->getAmount());
+    $this->assertEquals(new Price('40.00', 'USD'), $order_item->getTotalPrice());
+    $this->assertEquals(new Price('0', 'USD'), $order_item->getAdjustedTotalPrice());
+    $this->assertEquals(new Price('0', 'USD'), $this->order->getTotalPrice());
   }
 
 }
