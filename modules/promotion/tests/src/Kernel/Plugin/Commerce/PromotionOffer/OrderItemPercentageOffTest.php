@@ -217,7 +217,7 @@ class OrderItemPercentageOffTest extends OrderKernelTestBase {
 
     // Test with multiple promotions.
     $another_promotion = Promotion::create([
-      'name' => 'Promotion 1',
+      'name' => 'Promotion 2',
       'display_name' => '100% off',
       'order_types' => [$this->order->bundle()],
       'stores' => [$this->store->id()],
@@ -229,6 +229,7 @@ class OrderItemPercentageOffTest extends OrderKernelTestBase {
           'percentage' => '1',
         ],
       ],
+      'weight' => 10,
     ]);
     $another_promotion->save();
     $this->container->get('commerce_order.order_refresh')->refresh($this->order);
