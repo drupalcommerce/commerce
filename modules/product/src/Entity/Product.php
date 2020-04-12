@@ -3,13 +3,13 @@
 namespace Drupal\commerce_product\Entity;
 
 use Drupal\commerce\Entity\CommerceContentEntityBase;
+use Drupal\commerce\EntityOwnerTrait;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Entity\EntityPublishedTrait;
 use Drupal\Core\Entity\EntityChangedTrait;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
-use Drupal\user\UserInterface;
 
 /**
  * Defines the product entity class.
@@ -80,6 +80,7 @@ use Drupal\user\UserInterface;
 class Product extends CommerceContentEntityBase implements ProductInterface {
 
   use EntityChangedTrait;
+  use EntityOwnerTrait;
   use EntityPublishedTrait;
 
   /**
@@ -143,36 +144,6 @@ class Product extends CommerceContentEntityBase implements ProductInterface {
    */
   public function setStoreIds(array $store_ids) {
     $this->set('stores', $store_ids);
-    return $this;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getOwner() {
-    return $this->get('uid')->entity;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function setOwner(UserInterface $account) {
-    $this->set('uid', $account->id());
-    return $this;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getOwnerId() {
-    return $this->getEntityKey('owner');
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function setOwnerId($uid) {
-    $this->set('uid', $uid);
     return $this;
   }
 
@@ -271,8 +242,10 @@ class Product extends CommerceContentEntityBase implements ProductInterface {
     foreach (array_keys($this->getTranslationLanguages()) as $langcode) {
       $translation = $this->getTranslation($langcode);
 
-      // If no owner has been set explicitly, make the anonymous user the owner.
-      if (!$translation->getOwner()) {
+      // Explicitly set the owner ID to 0 if the translation owner is anonymous
+      // (This will ensure we don't store a broken reference in case the user
+      // no longer exists).
+      if ($translation->getOwner()->isAnonymous()) {
         $translation->setOwnerId(0);
       }
     }
@@ -324,6 +297,7 @@ class Product extends CommerceContentEntityBase implements ProductInterface {
    */
   public static function baseFieldDefinitions(EntityTypeInterface $entity_type) {
     $fields = parent::baseFieldDefinitions($entity_type);
+    $fields += static::ownerBaseFieldDefinitions($entity_type);
     $fields += static::publishedBaseFieldDefinitions($entity_type);
 
     $fields['stores'] = BaseFieldDefinition::create('entity_reference')
@@ -340,13 +314,9 @@ class Product extends CommerceContentEntityBase implements ProductInterface {
       ->setDisplayConfigurable('form', TRUE)
       ->setDisplayConfigurable('view', TRUE);
 
-    $fields['uid'] = BaseFieldDefinition::create('entity_reference')
+    $fields['uid']
       ->setLabel(t('Author'))
       ->setDescription(t('The product author.'))
-      ->setSetting('target_type', 'user')
-      ->setSetting('handler', 'default')
-      ->setDefaultValueCallback('Drupal\commerce_product\Entity\Product::getCurrentUserId')
-      ->setTranslatable(TRUE)
       ->setDisplayConfigurable('view', TRUE)
       ->setDisplayOptions('form', [
         'type' => 'entity_reference_autocomplete',
@@ -448,18 +418,6 @@ class Product extends CommerceContentEntityBase implements ProductInterface {
     }
 
     return $fields;
-  }
-
-  /**
-   * Default value callback for 'uid' base field definition.
-   *
-   * @see ::baseFieldDefinitions()
-   *
-   * @return array
-   *   An array of default values.
-   */
-  public static function getCurrentUserId() {
-    return [\Drupal::currentUser()->id()];
   }
 
 }

@@ -8,6 +8,7 @@ use Drupal\commerce_product\Entity\ProductAttributeValue;
 use Drupal\commerce_product\Entity\ProductVariation;
 use Drupal\commerce_product\Entity\Product;
 use Drupal\Tests\commerce\Kernel\CommerceKernelTestBase;
+use Drupal\user\UserInterface;
 
 /**
  * Tests the Product variation entity.
@@ -125,7 +126,13 @@ class ProductVariationTest extends CommerceKernelTestBase {
     $this->assertEquals($this->user, $variation->getOwner());
     $this->assertEquals($this->user->id(), $variation->getOwnerId());
     $variation->setOwnerId(0);
-    $this->assertEquals(NULL, $variation->getOwner());
+    $this->assertInstanceOf(UserInterface::class, $variation->getOwner());
+    $this->assertTrue($variation->getOwner()->isAnonymous());
+    // Non-existent/deleted user ID.
+    $variation->setOwnerId(892);
+    $this->assertInstanceOf(UserInterface::class, $variation->getOwner());
+    $this->assertTrue($variation->getOwner()->isAnonymous());
+    $this->assertEquals(892, $variation->getOwnerId());
     $variation->setOwnerId($this->user->id());
     $this->assertEquals($this->user, $variation->getOwner());
     $this->assertEquals($this->user->id(), $variation->getOwnerId());
