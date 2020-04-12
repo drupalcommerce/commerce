@@ -310,7 +310,7 @@ class CustomerProfile extends EntityInlineFormBase {
   }
 
   /**
-   * Clears form input when "Enter a new address" is selected.
+   * Clears form input when select_address is used.
    */
   public static function clearValues(array $element, FormStateInterface $form_state) {
     $triggering_element_name = static::getTriggeringElementName($element, $form_state);
@@ -319,10 +319,9 @@ class CustomerProfile extends EntityInlineFormBase {
     }
     $user_input = &$form_state->getUserInput();
     $inline_form_input = NestedArray::getValue($user_input, $element['#parents']);
-    if ($inline_form_input['select_address'] == '_new') {
-      $inline_form_input = array_intersect_assoc($inline_form_input, ['select_address' => '_new']);
-      NestedArray::setValue($user_input, $element['#parents'], $inline_form_input);
-    }
+    $inline_form_input = array_intersect_assoc($inline_form_input, ['select_address' => $inline_form_input['select_address']]);
+    NestedArray::setValue($user_input, $element['#parents'], $inline_form_input);
+
 
     return $element;
   }
