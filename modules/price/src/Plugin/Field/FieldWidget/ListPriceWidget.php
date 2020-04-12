@@ -24,7 +24,6 @@ class ListPriceWidget extends WidgetBase {
    * {@inheritdoc}
    */
   public function formElement(FieldItemListInterface $items, $delta, array $element, array &$form, FormStateInterface $form_state) {
-    $field_name = $this->fieldDefinition->getName();
     $checkbox_parents = array_merge($form['#parents'], [$this->fieldDefinition->getName(), 0, 'has_value']);
     $checkbox_path = array_shift($checkbox_parents);
     $checkbox_path .= '[' . implode('][', $checkbox_parents) . ']';
