@@ -55,6 +55,18 @@ class PriceTwigExtensionTest extends CommerceKernelTestBase {
     ];
     $this->render($theme);
     $this->assertText('$20.99');
+
+    $theme = [
+      '#theme' => 'commerce_price_test',
+      '#price' => new Price('20', 'USD'),
+      '#options' => [
+        'currency_display' => 'code',
+        'minimum_fraction_digits' => 0,
+      ],
+    ];
+    $this->render($theme);
+    $this->assertNoText('USD20.00');
+    $this->assertText('USD20');
   }
 
   /**
