@@ -5,7 +5,10 @@
  * Install, update and uninstall functions for the Product module.
  */
 
+use Drupal\commerce_product\Entity\Product;
+use Drupal\commerce_product\Entity\ProductVariation;
 use Drupal\Core\Field\BaseFieldDefinition;
+use Drupal\Core\Field\Entity\BaseFieldOverride;
 use Drupal\Core\Session\AccountInterface;
 
 /**
@@ -232,5 +235,36 @@ function commerce_product_update_8209() {
       }
     }
     $view->save(TRUE);
+  }
+}
+
+/**
+ * Update the 'uid' field for products and variations.
+ */
+function commerce_product_update_8210() {
+  $definition_update_manager = \Drupal::entityDefinitionUpdateManager();
+  $base_field_override_storage = \Drupal::entityTypeManager()->getStorage('base_field_override');
+
+  foreach (['commerce_product', 'commerce_product_variation'] as $entity_type_id) {
+    $storage_definition = $definition_update_manager->getFieldStorageDefinition('uid', $entity_type_id);
+    $default_value_callback = $entity_type_id === 'commerce_product' ? Product::class . '::getDefaultEntityOwner' : ProductVariation::class . '::getDefaultEntityOwner';
+
+    $base_field_overrides = $base_field_override_storage->loadByProperties([
+      'entity_type' => $entity_type_id,
+      'field_name' => 'uid',
+    ]);
+    /** @var \Drupal\Core\Field\FieldDefinitionInterface $base_field_override */
+    foreach ($base_field_overrides as $base_field_override) {
+      if ($base_field_override->getDefaultValueCallback() !== $storage_definition->getDefaultValueCallback()) {
+        continue;
+      }
+      // Update the "default_value_callback" for base field overrides, as long
+      // as they're using the default one.
+      $base_field_override->setDefaultValueCallback($default_value_callback);
+      $base_field_override->save();
+    }
+
+    $storage_definition->setDefaultValueCallback($default_value_callback);
+    $definition_update_manager->updateFieldStorageDefinition($storage_definition);
   }
 }

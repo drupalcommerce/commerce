@@ -321,8 +321,6 @@ class CustomerProfile extends EntityInlineFormBase {
     $inline_form_input = NestedArray::getValue($user_input, $element['#parents']);
     $inline_form_input = array_intersect_assoc($inline_form_input, ['select_address' => $inline_form_input['select_address']]);
     NestedArray::setValue($user_input, $element['#parents'], $inline_form_input);
-
-
     return $element;
   }
 
