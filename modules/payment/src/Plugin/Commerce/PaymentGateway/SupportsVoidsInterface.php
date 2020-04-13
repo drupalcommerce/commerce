@@ -12,6 +12,17 @@ use Drupal\commerce_payment\Entity\PaymentInterface;
 interface SupportsVoidsInterface {
 
   /**
+   * Checks whether the given payment can be voided.
+   *
+   * @param \Drupal\commerce_payment\Entity\PaymentInterface $payment
+   *   The payment to void.
+   *
+   * @return bool
+   *   TRUE if the payment can be voided, FALSE otherwise.
+   */
+  public function canVoidPayment(PaymentInterface $payment);
+
+  /**
    * Voids the given payment.
    *
    * @param \Drupal\commerce_payment\Entity\PaymentInterface $payment

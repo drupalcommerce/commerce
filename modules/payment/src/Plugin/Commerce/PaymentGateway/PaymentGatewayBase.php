@@ -387,14 +387,13 @@ abstract class PaymentGatewayBase extends PluginBase implements PaymentGatewayIn
    * {@inheritdoc}
    */
   public function buildPaymentOperations(PaymentInterface $payment) {
-    $payment_state = $payment->getState()->getId();
     $operations = [];
     if ($this instanceof SupportsAuthorizationsInterface) {
       $operations['capture'] = [
         'title' => $this->t('Capture'),
         'page_title' => $this->t('Capture payment'),
         'plugin_form' => 'capture-payment',
-        'access' => $payment_state == 'authorization',
+        'access' => $this->canCapturePayment($payment),
       ];
     }
     if ($this instanceof SupportsVoidsInterface) {
@@ -402,7 +401,7 @@ abstract class PaymentGatewayBase extends PluginBase implements PaymentGatewayIn
         'title' => $this->t('Void'),
         'page_title' => $this->t('Void payment'),
         'plugin_form' => 'void-payment',
-        'access' => $payment_state == 'authorization',
+        'access' => $this->canVoidPayment($payment),
       ];
     }
     if ($this instanceof SupportsRefundsInterface) {
@@ -410,11 +409,32 @@ abstract class PaymentGatewayBase extends PluginBase implements PaymentGatewayIn
         'title' => $this->t('Refund'),
         'page_title' => $this->t('Refund payment'),
         'plugin_form' => 'refund-payment',
-        'access' => in_array($payment_state, ['completed', 'partially_refunded']),
+        'access' => $this->canRefundPayment($payment),
       ];
     }
 
     return $operations;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function canCapturePayment(PaymentInterface $payment) {
+    return $payment->getState()->getId() === 'authorization';
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function canRefundPayment(PaymentInterface $payment) {
+    return in_array($payment->getState()->getId(), ['completed', 'partially_refunded'], TRUE);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function canVoidPayment(PaymentInterface $payment) {
+    return $payment->getState()->getId() === 'authorization';
   }
 
   /**

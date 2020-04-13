@@ -11,6 +11,17 @@ use Drupal\commerce_price\Price;
 interface SupportsRefundsInterface {
 
   /**
+   * Checks whether the given payment can be refunded.
+   *
+   * @param \Drupal\commerce_payment\Entity\PaymentInterface $payment
+   *   The payment to refund.
+   *
+   * @return bool
+   *   TRUE if the payment can be refunded, FALSE otherwise.
+   */
+  public function canRefundPayment(PaymentInterface $payment);
+
+  /**
    * Refunds the given payment.
    *
    * @param \Drupal\commerce_payment\Entity\PaymentInterface $payment
