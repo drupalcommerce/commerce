@@ -162,6 +162,28 @@ class PromotionTest extends CommerceWebDriverTestBase {
   }
 
   /**
+   * Tests updating the offer type when creating a promotion.
+   */
+  public function testCreatePromotionOfferTypeSelection() {
+    $this->drupalGet('admin/commerce/promotions');
+    $this->clickLink('Add promotion');
+
+    $offer_config_xpath = '//div[@data-drupal-selector="edit-offer-0-target-plugin-configuration"]';
+    $offer_config_container = $this->xpath($offer_config_xpath);
+    $this->assertEmpty($offer_config_container);
+
+    $this->getSession()->getPage()->selectFieldOption('offer[0][target_plugin_id]', 'order_item_percentage_off');
+    $this->assertSession()->assertWaitOnAjaxRequest();
+    $offer_config_container = $this->xpath($offer_config_xpath);
+    $this->assertNotEmpty($offer_config_container);
+
+    $this->getSession()->getPage()->selectFieldOption('offer[0][target_plugin_id]', '');
+    $this->assertSession()->assertWaitOnAjaxRequest();
+    $offer_config_container = $this->xpath($offer_config_xpath);
+    $this->assertEmpty($offer_config_container);
+  }
+
+  /**
    * Tests editing a promotion.
    */
   public function testEditPromotion() {

@@ -44,7 +44,7 @@ class PromotionForm extends ContentEntityForm {
       if (!empty($form['offer']['widget'][0]['target_plugin_id'])) {
         $form['offer']['widget'][0]['target_plugin_id']['#empty_value'] = '';
         $form['offer']['widget'][0]['target_plugin_id']['#default_value'] = '';
-        if (!$form_state->isRebuilding()) {
+        if (empty($form_state->getValue(['offer', 0, 'target_plugin_id']))) {
           unset($form['offer']['widget'][0]['target_plugin_configuration']);
         }
       }
