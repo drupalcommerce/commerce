@@ -40,7 +40,7 @@ services:
 
   commerce_order.availability_order_processor:
     class: Drupal\commerce_order\AvailabilityOrderProcessor
-    arguments: ['@commerce.availability_manager']
+    arguments: ['@commerce.availability_manager', '@entity_type.manager']
     tags:
       - { name: commerce_order.order_processor, priority: 100 }
 
