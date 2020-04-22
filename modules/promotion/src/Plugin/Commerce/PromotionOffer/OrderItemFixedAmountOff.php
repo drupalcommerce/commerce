@@ -28,7 +28,7 @@ class OrderItemFixedAmountOff extends OrderItemPromotionOfferBase {
     $order_item = $entity;
     $adjusted_total_price = $order_item->getAdjustedTotalPrice(['promotion']);
     $amount = $this->getAmount();
-    if ($adjusted_total_price->getCurrencyCode() != $adjusted_total_price->getCurrencyCode()) {
+    if ($adjusted_total_price->getCurrencyCode() != $amount->getCurrencyCode()) {
       return;
     }
     if ($this->configuration['display_inclusive']) {
