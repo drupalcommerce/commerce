@@ -123,6 +123,10 @@ class OrderStorage extends CommerceContentEntityStorage {
    *   The order.
    */
   protected function doOrderPreSave(OrderInterface $order) {
+    // Ensure the order doesn't reference any removed order item by resetting
+    // the "order_items" field with order items that were successfully loaded
+    // from the database.
+    //$order->set('order_items', $order->getItems());
     if ($order->getRefreshState() == OrderInterface::REFRESH_ON_SAVE) {
       $this->orderRefresh->refresh($order);
     }

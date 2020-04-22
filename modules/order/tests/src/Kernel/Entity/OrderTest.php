@@ -342,6 +342,30 @@ class OrderTest extends OrderKernelTestBase {
     $order->save();
     $this->assertEquals(0, $order->getBillingProfile()->getOwnerId());
     $this->assertEquals($profile->id(), $order->getBillingProfile()->id());
+
+    /** @var \Drupal\commerce_order\Entity\OrderItemInterface $order_item */
+    $order_item = OrderItem::create([
+      'type' => 'test',
+      'quantity' => '1',
+      'unit_price' => new Price('2.00', 'USD'),
+    ]);
+    $order_item->save();
+    $order_item = $this->reloadEntity($order_item);
+    /** @var \Drupal\commerce_order\Entity\OrderItemInterface $another_order_item */
+    $another_order_item = OrderItem::create([
+      'type' => 'test',
+      'quantity' => '2',
+      'unit_price' => new Price('3.00', 'USD'),
+    ]);
+    $another_order_item->save();
+    $another_order_item = $this->reloadEntity($another_order_item);
+    $order->setItems([$order_item, $another_order_item]);
+    $this->assertCount(2, $order->get('order_items'));
+    $another_order_item->delete();
+    // Assert that saving the order fixes the reference to a deleted order item.
+    $order->save();
+    $this->reloadEntity($order);
+    $this->assertCount(1, $order->get('order_items'));
   }
 
   /**
