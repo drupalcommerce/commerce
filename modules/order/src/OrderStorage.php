@@ -126,7 +126,7 @@ class OrderStorage extends CommerceContentEntityStorage {
     // Ensure the order doesn't reference any removed order item by resetting
     // the "order_items" field with order items that were successfully loaded
     // from the database.
-    //$order->set('order_items', $order->getItems());
+    $order->set('order_items', $order->getItems());
     if ($order->getRefreshState() == OrderInterface::REFRESH_ON_SAVE) {
       $this->orderRefresh->refresh($order);
     }
