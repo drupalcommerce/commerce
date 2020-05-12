@@ -84,6 +84,13 @@ class Product extends CommerceContentEntityBase implements ProductInterface {
   use EntityPublishedTrait;
 
   /**
+   * The default product variation.
+   *
+   * @var \Drupal\commerce_product\Entity\ProductVariationInterface
+   */
+  protected $defaultVariation;
+
+  /**
    * {@inheritdoc}
    */
   public function getTitle() {
@@ -225,12 +232,16 @@ class Product extends CommerceContentEntityBase implements ProductInterface {
    * {@inheritdoc}
    */
   public function getDefaultVariation() {
-    foreach ($this->getVariations() as $variation) {
-      // Return the first active variation.
-      if ($variation->isPublished() && $variation->access('view')) {
-        return $variation;
+    if ($this->defaultVariation === NULL) {
+      foreach ($this->getVariations() as $variation) {
+        // Return the first active variation.
+        if ($variation->isPublished() && $variation->access('view')) {
+          $this->defaultVariation = $variation;
+          break;
+        }
       }
     }
+    return $this->defaultVariation;
   }
 
   /**
