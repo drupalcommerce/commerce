@@ -102,12 +102,12 @@ class OrderAdminTest extends OrderWebDriverTestBase {
     // First item with overriding the price.
     $entity1 = $this->variation->getSku() . ' (' . $this->variation->id() . ')';
     $page->checkField('Override the unit price');
-    $page->fillField('order_items[form][inline_entity_form][purchased_entity][0][target_id]', $entity1);
-    $page->fillField('order_items[form][inline_entity_form][quantity][0][value]', '1');
+    $page->fillField('order_items[form][0][purchased_entity][0][target_id]', $entity1);
+    $page->fillField('order_items[form][0][quantity][0][value]', '1');
     $this->getSession()->getPage()->pressButton('Create order item');
     $this->assertSession()->assertWaitOnAjaxRequest();
     $this->assertSession()->pageTextContainsOnce('Unit price must be a number.');
-    $page->fillField('order_items[form][inline_entity_form][unit_price][0][amount][number]', '9.99');
+    $page->fillField('order_items[form][0][unit_price][0][amount][number]', '9.99');
     $this->getSession()->getPage()->pressButton('Create order item');
     $this->assertSession()->assertWaitOnAjaxRequest();
     $this->assertSession()->pageTextContains('9.99');
@@ -117,8 +117,8 @@ class OrderAdminTest extends OrderWebDriverTestBase {
     $this->assertSession()->assertWaitOnAjaxRequest();
     $this->getSession()->getPage()->pressButton('Add new order item');
     $this->assertSession()->assertWaitOnAjaxRequest();
-    $page->fillField('order_items[form][inline_entity_form][purchased_entity][0][target_id]', $entity2);
-    $page->fillField('order_items[form][inline_entity_form][quantity][0][value]', '1');
+    $page->fillField('order_items[form][1][purchased_entity][0][target_id]', $entity2);
+    $page->fillField('order_items[form][1][quantity][0][value]', '1');
     $this->getSession()->getPage()->pressButton('Create order item');
     $this->assertSession()->assertWaitOnAjaxRequest();
     $this->assertSession()->pageTextContains('5.55');
