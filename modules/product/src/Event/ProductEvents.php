@@ -88,6 +88,17 @@ final class ProductEvents {
   const PRODUCT_TRANSLATION_DELETE = 'commerce_product.commerce_product.translation_delete';
 
   /**
+   * Name of the event fired when getting the default product variation.
+   *
+   * Allows modules to get a default variation for a product.
+   *
+   * @Event
+   *
+   * @see \Drupal\commerce_product\Event\ProductDefaultVariationEvent
+   */
+  const PRODUCT_DEFAULT_VARIATION = 'commerce_product.commerce_product.default_variation';
+
+  /**
    * Name of the event fired after changing the product variation via ajax.
    *
    * Allows modules to add arbitrary ajax commands to the response returned by

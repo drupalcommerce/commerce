@@ -1,0 +1,5 @@
+services:
+  commerce_product_test.default_variation_subscriber:
+    class: Drupal\commerce_product_test\EventSubscriber\DefaultVariationSubscriber
+    tags:
+      - { name: event_subscriber }

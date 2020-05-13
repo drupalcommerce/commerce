@@ -4,6 +4,8 @@ namespace Drupal\commerce_product\Entity;
 
 use Drupal\commerce\Entity\CommerceContentEntityBase;
 use Drupal\commerce\EntityOwnerTrait;
+use Drupal\commerce_product\Event\ProductDefaultVariationEvent;
+use Drupal\commerce_product\Event\ProductEvents;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Entity\EntityPublishedTrait;
 use Drupal\Core\Entity\EntityChangedTrait;
@@ -233,13 +235,19 @@ class Product extends CommerceContentEntityBase implements ProductInterface {
    */
   public function getDefaultVariation() {
     if ($this->defaultVariation === NULL) {
+      $default_variation = NULL;
       foreach ($this->getVariations() as $variation) {
         // Return the first active variation.
         if ($variation->isPublished() && $variation->access('view')) {
-          $this->defaultVariation = $variation;
+          $default_variation = $variation;
           break;
         }
       }
+      // Allow other modules to set the default variation.
+      $event = new ProductDefaultVariationEvent($default_variation, $this);
+      $event_dispatcher = \Drupal::service('event_dispatcher');
+      $event_dispatcher->dispatch(ProductEvents::PRODUCT_DEFAULT_VARIATION, $event);
+      $this->defaultVariation = $event->getDefaultVariation();
     }
     return $this->defaultVariation;
   }
