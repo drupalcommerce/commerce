@@ -154,6 +154,14 @@ class CartManager implements CartManagerInterface {
     $order_item->delete();
     $cart->removeItem($order_item);
     $this->eventDispatcher->dispatch(CartEvents::CART_ORDER_ITEM_REMOVE, new CartOrderItemRemoveEvent($cart, $order_item));
+
+    // If this results in an empty cart call the emptyCart method for
+    // consistency.
+    if ($cart->get('order_items')->isEmpty()) {
+      $this->emptyCart($cart, $save_cart);
+      return;
+    }
+
     $this->resetCheckoutStep($cart);
     if ($save_cart) {
       $cart->save();

@@ -2,6 +2,7 @@
 
 namespace Drupal\Tests\commerce_cart\Kernel;
 
+use Drupal\commerce_order\Adjustment;
 use Drupal\commerce_order\Entity\OrderItem;
 use Drupal\commerce_price\Price;
 use Drupal\commerce_order\Entity\OrderInterface;
@@ -114,9 +115,21 @@ class CartManagerTest extends CartKernelTestBase {
     $this->assertEmpty($cart->hasItem($order_item1));
     $this->assertEquals(new Price('6.00', 'USD'), $cart->getTotalPrice());
 
+    $cart->addAdjustment(new Adjustment([
+      'type' => 'promotion',
+      'label' => 'Discount',
+      'amount' => new Price('-3.00', 'USD'),
+      'locked' => TRUE,
+      'source_id' => '1',
+    ]))->save();
+    $this->assertNotEmpty($cart->getAdjustments());
+    $this->assertEquals(new Price('3.00', 'USD'), $cart->getTotalPrice());
+    $this->assertNotEmpty($cart->getAdjustments());
+
     $this->cartManager->emptyCart($cart);
     $this->assertEmpty($cart->getItems());
     $this->assertEquals(NULL, $cart->getTotalPrice());
+    $this->assertEmpty($cart->getAdjustments());
   }
 
   /**
@@ -224,6 +237,57 @@ class CartManagerTest extends CartKernelTestBase {
     $this->assertEquals(4, $order_item3->getQuantity());
     $this->assertEquals($cart->id(), $order_item3->getOrderId());
     $this->assertEquals(new Price('7.00', 'USD'), $cart->getTotalPrice());
+  }
+
+  /**
+   * Tests removing all order items.
+   *
+   * @covers ::addEntity
+   * @covers ::createOrderItem
+   * @covers ::addOrderItem
+   * @covers ::removeOrderItem
+   * @covers ::emptyCart
+   */
+  public function testRemoveAllOrderItems() {
+    $cart = $this->cartProvider->createCart('default', $this->store, $this->user);
+    $this->assertInstanceOf(OrderInterface::class, $cart);
+    $this->assertEmpty($cart->getItems());
+
+    $order_item1 = $this->cartManager->addEntity($cart, $this->variation1);
+    $order_item1 = $this->reloadEntity($order_item1);
+    $this->assertNotEmpty($cart->hasItem($order_item1));
+    $this->assertEquals(1, $order_item1->getQuantity());
+    $this->assertEquals($cart->id(), $order_item1->getOrderId());
+    $this->assertEquals(new Price('1.00', 'USD'), $cart->getTotalPrice());
+
+    $order_item2 = $this->cartManager->addEntity($cart, $this->variation2, 3);
+    $order_item2 = $this->reloadEntity($order_item2);
+    $this->assertNotEmpty($cart->hasItem($order_item1));
+    $this->assertNotEmpty($cart->hasItem($order_item2));
+    $this->assertEquals(3, $order_item2->getQuantity());
+    $this->assertEquals($cart->id(), $order_item2->getOrderId());
+    $this->assertEquals(new Price('7.00', 'USD'), $cart->getTotalPrice());
+
+    $this->cartManager->removeOrderItem($cart, $order_item1);
+    $this->assertNotEmpty($cart->hasItem($order_item2));
+    $this->assertEmpty($cart->hasItem($order_item1));
+    $this->assertEquals(new Price('6.00', 'USD'), $cart->getTotalPrice());
+
+    $cart->addAdjustment(new Adjustment([
+      'type' => 'promotion',
+      'label' => 'Discount',
+      'amount' => new Price('-5.00', 'USD'),
+      'locked' => TRUE,
+      'source_id' => '1',
+    ]))->save();
+    $this->assertNotEmpty($cart->getAdjustments());
+    $this->assertEquals(new Price('1.00', 'USD'), $cart->getTotalPrice());
+    $this->cartManager->removeOrderItem($cart, $order_item2);
+    $this->assertEmpty($cart->hasItem($order_item2));
+    $this->assertEmpty($cart->hasItem($order_item1));
+    $this->assertEmpty($cart->getItems());
+    $this->assertEquals(NULL, $cart->getTotalPrice());
+    $this->assertEmpty($cart->getAdjustments());
   }
 
 }

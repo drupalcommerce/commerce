@@ -26,6 +26,11 @@ services:
     tags:
       - { name: event_subscriber }
 
+  commerce_promotion.cart_subscriber:
+    class: Drupal\commerce_promotion\EventSubscriber\CartEventSubscriber
+    tags:
+      - { name: event_subscriber }
+
   commerce_promotion.coupon_code_generator:
     class: Drupal\commerce_promotion\CouponCodeGenerator
     arguments: ['@database']
