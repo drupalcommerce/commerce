@@ -108,6 +108,10 @@ abstract class CheckoutFlowBase extends PluginBase implements CheckoutFlowInterf
       $this->_parentEntityId = $this->parentEntity->id();
       unset($this->parentEntity);
     }
+    if (!empty($this->order)) {
+      $this->_orderId = $this->order->id();
+      unset($this->order);
+    }
 
     return parent::__sleep();
   }
@@ -122,6 +126,12 @@ abstract class CheckoutFlowBase extends PluginBase implements CheckoutFlowInterf
       $checkout_flow_storage = $this->entityTypeManager->getStorage('commerce_checkout_flow');
       $this->parentEntity = $checkout_flow_storage->load($this->_parentEntityId);
       unset($this->_parentEntityId);
+    }
+
+    if (!empty($this->_orderId)) {
+      $order_storage = $this->entityTypeManager->getStorage('commerce_order');
+      $this->order = $order_storage->load($this->_orderId);
+      unset($this->_orderId);
     }
   }
 
