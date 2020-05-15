@@ -7,7 +7,6 @@
 
 use Drupal\commerce_store\Entity\Store;
 use Drupal\Core\Field\BaseFieldDefinition;
-use Drupal\Core\Field\Entity\BaseFieldOverride;
 
 /**
  * Add the URL alias path field to stores.

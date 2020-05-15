@@ -8,7 +8,6 @@
 use Drupal\commerce_payment\Entity\PaymentMethod;
 use Drupal\commerce_payment\Event\PaymentEvent;
 use Drupal\Core\Field\BaseFieldDefinition;
-use Drupal\Core\Field\Entity\BaseFieldOverride;
 use Drupal\Core\Session\AccountInterface;
 
 /**

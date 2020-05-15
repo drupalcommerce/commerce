@@ -64,7 +64,7 @@ class AvailabilityOrderProcessor implements OrderProcessorInterface {
       return;
     }
     $order_item_ids = array_keys($order_items_to_remove);
-    $order->get('order_items')->filter(function($item) use ($order_item_ids) {
+    $order->get('order_items')->filter(function ($item) use ($order_item_ids) {
       return !in_array($item->target_id, $order_item_ids);
     });
     $this->orderItemStorage->delete($order_items_to_remove);

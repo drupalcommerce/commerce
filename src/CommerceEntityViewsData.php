@@ -181,7 +181,7 @@ class CommerceEntityViewsData extends EntityViewsData {
   }
 
   /**
-   * {@inheritDoc}
+   * {@inheritdoc}
    */
   protected function mapFieldDefinition($table, $field_name, FieldDefinitionInterface $field_definition, TableMappingInterface $table_mapping, &$table_data) {
     $field_column_mapping = $table_mapping->getColumnNames($field_name);
