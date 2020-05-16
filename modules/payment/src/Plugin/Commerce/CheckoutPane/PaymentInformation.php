@@ -5,6 +5,7 @@ namespace Drupal\commerce_payment\Plugin\Commerce\CheckoutPane;
 use Drupal\commerce\InlineFormManager;
 use Drupal\commerce_checkout\Plugin\Commerce\CheckoutFlow\CheckoutFlowInterface;
 use Drupal\commerce_checkout\Plugin\Commerce\CheckoutPane\CheckoutPaneBase;
+use Drupal\commerce_payment\PaymentMethodStorageInterface;
 use Drupal\commerce_payment\PaymentOption;
 use Drupal\commerce_payment\PaymentOptionsBuilderInterface;
 use Drupal\commerce_payment\Plugin\Commerce\PaymentGateway\SupportsStoredPaymentMethodsInterface;
@@ -235,14 +236,14 @@ class PaymentInformation extends CheckoutPaneBase {
       return $pane_form;
     }
 
-    /** @var \Drupal\commerce_payment\PaymentMethodStorageInterface $payment_method_storage */
     $payment_method_storage = $this->entityTypeManager->getStorage('commerce_payment_method');
-    $payment_method = $payment_method_storage->create([
-      'type' => $payment_option->getPaymentMethodTypeId(),
-      'payment_gateway' => $payment_option->getPaymentGatewayId(),
-      'uid' => $this->order->getCustomerId(),
-      'billing_profile' => $this->order->getBillingProfile(),
-    ]);
+    assert($payment_method_storage instanceof PaymentMethodStorageInterface);
+    $payment_method = $payment_method_storage->createForCustomer(
+      $payment_option->getPaymentMethodTypeId(),
+      $payment_option->getPaymentGatewayId(),
+      $this->order->getCustomerId(),
+      $this->order->getBillingProfile()
+    );
     $inline_form = $this->inlineFormManager->createInstance('payment_gateway_form', [
       'operation' => 'add-payment-method',
     ], $payment_method);

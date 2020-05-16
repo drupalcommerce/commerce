@@ -14,6 +14,7 @@ use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
+use Drupal\profile\Entity\ProfileInterface;
 use Drupal\user\UserInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -123,6 +124,18 @@ class PaymentMethodStorage extends CommerceContentEntityStorage implements Payme
     }
 
     return $payment_methods;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function createForCustomer($payment_method_type, $payment_gateway_id, $customer_id, ProfileInterface $billing_profile = NULL) {
+    return $this->create([
+      'type' => $payment_method_type,
+      'payment_gateway' => $payment_gateway_id,
+      'uid' => $customer_id,
+      'billing_profile' => $billing_profile,
+    ]);
   }
 
 }
