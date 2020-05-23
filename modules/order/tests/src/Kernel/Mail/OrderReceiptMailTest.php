@@ -118,8 +118,8 @@ class OrderReceiptMailTest extends OrderKernelTestBase {
     $this->assertEquals('customer@example.com', $email['to']);
     $this->assertFalse(isset($email['headers']['Bcc']));
     $this->assertEquals('Order #2017/01 confirmed', $email['subject']);
-    $this->assertContains('Thank you for your order!', $email['body']);
-    $this->assertContains('Pabst Blue Ribbon Dr', $email['body']);
+    $this->assertStringContainsString('Thank you for your order!', $email['body']);
+    $this->assertStringContainsString('Pabst Blue Ribbon Dr', $email['body']);
     $this->assertEquals('en', $email['params']['langcode']);
     $this->assertEquals($this->order, $email['params']['order']);
 
@@ -134,8 +134,8 @@ class OrderReceiptMailTest extends OrderKernelTestBase {
     $this->assertEquals('custom@example.com', $email['to']);
     $this->assertEquals('store@example.com', $email['headers']['Bcc']);
     $this->assertEquals('Order #2017/01 confirmed', $email['subject']);
-    $this->assertContains('Thank you for your order!', $email['body']);
-    $this->assertContains('Pabst Blue Ribbon Dr', $email['body']);
+    $this->assertStringContainsString('Thank you for your order!', $email['body']);
+    $this->assertStringContainsString('Pabst Blue Ribbon Dr', $email['body']);
     $this->assertEquals('en', $email['params']['langcode']);
     $this->assertEquals($this->order, $email['params']['order']);
   }

@@ -209,7 +209,7 @@ class CheckoutOrderTest extends CommerceBrowserTestBase {
     ];
     $page = $this->getSession()->getPage();
     foreach ($expected_address as $property => $value) {
-      $this->assertContains($value, $page->find('css', 'p.address')->getText());
+      $this->assertStringContainsString($value, $page->find('css', 'p.address')->getText());
       $this->assertSession()->fieldNotExists("billing_information[profile][address][0][address][$property]");
     }
     $this->assertSession()->fieldNotExists('billing_information[profile][copy_to_address_book]');

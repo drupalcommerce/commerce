@@ -355,7 +355,7 @@ class CouponRedemptionPaneTest extends CommerceWebDriverTestBase {
     // Refresh the page and ensure the billing information hasn't been modified.
     $this->drupalGet(Url::fromRoute('commerce_checkout.form', ['commerce_order' => $this->cart->id(), 'step' => 'order_information']));
     $page = $this->getSession()->getPage();
-    $this->assertContains('Johnny Appleseed', $page->find('css', 'p.address')->getText());
+    $this->assertStringContainsString('Johnny Appleseed', $page->find('css', 'p.address')->getText());
   }
 
 }

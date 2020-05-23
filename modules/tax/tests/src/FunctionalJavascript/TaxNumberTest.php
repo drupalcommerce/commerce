@@ -206,8 +206,8 @@ class TaxNumberTest extends CommerceWebDriverTestBase {
 
     $this->drupalGet($this->order->toUrl('canonical'));
     $rendered_field = $this->getSession()->getPage()->find('css', '.field--name-tax-number');
-    $this->assertContains('Tax number', $rendered_field->getHtml());
-    $this->assertContains('122', $rendered_field->getHtml());
+    $this->assertStringContainsString('Tax number', $rendered_field->getHtml());
+    $this->assertStringContainsString('122', $rendered_field->getHtml());
     $this->assertFalse($rendered_field->hasLink('122'));
     $state_field = $rendered_field->find('css', '.commerce-tax-number__verification-icon');
     $this->assertEmpty($state_field);
@@ -223,7 +223,7 @@ class TaxNumberTest extends CommerceWebDriverTestBase {
 
     $this->drupalGet($this->order->toUrl('canonical'));
     $rendered_field = $this->getSession()->getPage()->find('css', '.field--name-tax-number');
-    $this->assertContains('Tax number', $rendered_field->getHtml());
+    $this->assertStringContainsString('Tax number', $rendered_field->getHtml());
     $this->assertTrue($rendered_field->hasLink('123'));
     $this->assertFalse($rendered_field->hasLink('Reverify'));
     $state_field = $rendered_field->find('css', '.commerce-tax-number__verification-icon');
@@ -247,7 +247,7 @@ class TaxNumberTest extends CommerceWebDriverTestBase {
 
     $this->drupalGet($this->order->toUrl('canonical'));
     $rendered_field = $this->getSession()->getPage()->find('css', '.field--name-tax-number');
-    $this->assertContains('Tax number', $rendered_field->getHtml());
+    $this->assertStringContainsString('Tax number', $rendered_field->getHtml());
     $this->assertTrue($rendered_field->hasLink('124'));
     $this->assertFalse($rendered_field->hasLink('Reverify'));
     $state_field = $rendered_field->find('css', '.commerce-tax-number__verification-icon');
@@ -271,7 +271,7 @@ class TaxNumberTest extends CommerceWebDriverTestBase {
 
     $this->drupalGet($this->order->toUrl('canonical'));
     $rendered_field = $this->getSession()->getPage()->find('css', '.field--name-tax-number');
-    $this->assertContains('Tax number', $rendered_field->getHtml());
+    $this->assertStringContainsString('Tax number', $rendered_field->getHtml());
     $this->assertTrue($rendered_field->hasLink('125'));
     $this->assertTrue($rendered_field->hasLink('Reverify'));
     $state_field = $rendered_field->find('css', '.commerce-tax-number__verification-icon');
@@ -301,8 +301,8 @@ class TaxNumberTest extends CommerceWebDriverTestBase {
 
     $this->drupalGet($this->order->toUrl('canonical'));
     $rendered_field = $this->getSession()->getPage()->find('css', '.field--name-tax-number');
-    $this->assertContains('Tax number', $rendered_field->getHtml());
-    $this->assertContains('126', $rendered_field->getHtml());
+    $this->assertStringContainsString('Tax number', $rendered_field->getHtml());
+    $this->assertStringContainsString('126', $rendered_field->getHtml());
     $state_field = $rendered_field->find('css', '.commerce-tax-number__verification-icon');
     $this->assertEmpty($state_field);
   }

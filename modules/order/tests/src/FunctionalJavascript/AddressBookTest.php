@@ -316,7 +316,7 @@ class AddressBookTest extends OrderWebDriverTestBase {
     $this->assertSession()->pageTextContains('Saved the 38 Rue du Sentier address.');
     $rendered_address = $this->getSession()->getPage()->find('css', 'p.address');
     $this->assertNotEmpty($rendered_address);
-    $this->assertContains('38 Rue du Sentier', $rendered_address->getText());
+    $this->assertStringContainsString('38 Rue du Sentier', $rendered_address->getText());
 
     // Confirm that a profile can be edited.
     $this->getSession()->getPage()->clickLink('Edit');
@@ -329,7 +329,7 @@ class AddressBookTest extends OrderWebDriverTestBase {
     $this->assertSession()->pageTextContains('Saved the 39 Rue du Sentier address.');
     $rendered_address = $this->getSession()->getPage()->find('css', 'p.address');
     $this->assertNotEmpty($rendered_address);
-    $this->assertContains('39 Rue du Sentier', $rendered_address->getText());
+    $this->assertStringContainsString('39 Rue du Sentier', $rendered_address->getText());
 
     // Confirm that a profile can be set as default.
     /** @var \Drupal\profile\Entity\ProfileInterface $second_profile */
@@ -409,7 +409,7 @@ class AddressBookTest extends OrderWebDriverTestBase {
     // Confirm that there is no empty text for billing information, because
     // there is an add link.
     $container = $this->getSession()->getPage()->find('css', '.address-book__container--customer');
-    $this->assertNotContains('There are no addresses yet.', $container->getText());
+    $this->assertStringNotContainsString('There are no addresses yet.', $container->getText());
     $add_link = $this->getSession()->getPage()->find('css', '.address-book__container--customer .address-book__add-link');
     $this->assertNotEmpty($add_link);
     $add_link->click();
@@ -446,7 +446,7 @@ class AddressBookTest extends OrderWebDriverTestBase {
     $add_link = $this->getSession()->getPage()->find('css', '.address-book__container--customer_shipping .address-book__add-link');
     $this->assertEmpty($add_link);
     $container = $this->getSession()->getPage()->find('css', '.address-book__container--customer_shipping');
-    $this->assertContains('There are no addresses yet.', $container->getText());
+    $this->assertStringContainsString('There are no addresses yet.', $container->getText());
 
     $this->createEntity('profile', [
       'type' => 'customer_shipping',
@@ -463,7 +463,7 @@ class AddressBookTest extends OrderWebDriverTestBase {
     ]));
     // Confirm that the empty text is gone.
     $container = $this->getSession()->getPage()->find('css', '.address-book__container--customer_shipping');
-    $this->assertNotContains('There are no addresses yet.', $container->getText());
+    $this->assertStringNotContainsString('There are no addresses yet.', $container->getText());
     // Confirm that there are no edit/set default links, due to lack of access.
     $edit_links = $this->getSession()->getPage()->findAll('css', '.address-book__container--customer_shipping .address-book__edit-link');
     $this->assertEmpty($edit_links);

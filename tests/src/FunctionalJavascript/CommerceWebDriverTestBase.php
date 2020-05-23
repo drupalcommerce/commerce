@@ -141,11 +141,10 @@ abstract class CommerceWebDriverTestBase extends WebDriverTestBase {
     $page = $this->getSession()->getPage();
     $address_text = $page->find('css', 'p.address')->getText();
     foreach ($address as $property => $value) {
-      if ($property == 'country_code') {
+      if ($property === 'country_code') {
         $value = $this->countryList[$value];
       }
-      // Can't use assertContains() while maintaining D9 compatibility.
-      $this->assertTrue(strpos($address_text, $value) !== FALSE);
+      $this->assertStringContainsString($value, $address_text);
       $this->assertSession()->fieldNotExists($container . "[address][0][address][$property]");
     }
     $this->assertSession()->fieldNotExists($container . '[copy_to_address_book]');
