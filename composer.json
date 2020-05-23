@@ -18,7 +18,7 @@
         "commerceguys/intl": "^1.0.0"
     },
     "require-dev": {
-        "drupal/mailsystem": "^4.1"
+        "drupal/mailsystem": "^4.3"
     },
     "minimum-stability": "dev"
 }

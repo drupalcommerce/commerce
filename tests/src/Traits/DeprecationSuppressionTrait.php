@@ -23,8 +23,7 @@ trait DeprecationSuppressionTrait {
 
       $skipped_deprecations = [
         // @see https://www.drupal.org/project/address/issues/3089266
-        "Render #post_render callbacks must be methods of a class that implements \Drupal\Core\Security\TrustedCallbackInterface or be an anonymous function. The callback was Drupal\address\Plugin\Field\FieldFormatter\AddressDefaultFormatter::postRender. Support for this callback implementation is deprecated in 8.8.0 and will be removed in Drupal 9.0.0. See https://www.drupal.org/node/2966725",
-        "There is no `base theme` property specified in the mailsystem_test_theme.info.yml file. The optionality of the `base theme` property is deprecated in drupal:8.8.0 and is removed from drupal:9.0.0. All Drupal 8 themes must add `base theme: stable` to their *.info.yml file for them to continue to work as-is in future versions of Drupal. Drupal 9 requires the `base theme` property to be specified. See https://www.drupal.org/node/3066038",
+        'Theme functions are deprecated in drupal:8.0.0 and are removed from drupal:10.0.0. Use Twig templates instead of theme_inline_entity_form_entity_table(). See https://www.drupal.org/node/1831138',
       ];
 
       if (!in_array($message, $skipped_deprecations, TRUE)) {
