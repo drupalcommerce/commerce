@@ -1,7 +1,7 @@
 name: 'Commerce test theme'
 type: theme
 description: 'Theme for testing commerce email theming'
-core_version_requirement: ^8.7.7 || ^9
+core_version_requirement: ^8.8 || ^9
 base theme: stable
 regions:
   sidebar_first: 'Left sidebar'

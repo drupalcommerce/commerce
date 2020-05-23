@@ -2,7 +2,7 @@ name: Commerce Payment Example
 type: module
 description: 'Provides payment gateway examples.'
 package: Commerce
-core_version_requirement: ^8.7.7 || ^9
+core_version_requirement: ^8.8 || ^9
 dependencies:
   - commerce:commerce
   - commerce:commerce_payment

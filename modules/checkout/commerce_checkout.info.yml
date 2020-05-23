@@ -2,7 +2,7 @@ name: 'Commerce Checkout'
 type: module
 description: 'Provides configurable checkout flows.'
 package: Commerce
-core_version_requirement: ^8.7.7 || ^9
+core_version_requirement: ^8.8 || ^9
 configure: entity.commerce_checkout_flow.collection
 dependencies:
   - commerce:commerce

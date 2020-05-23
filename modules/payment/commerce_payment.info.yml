@@ -2,7 +2,7 @@ name: Commerce Payment
 type: module
 description: 'Provides payment functionality.'
 package: Commerce
-core_version_requirement: ^8.7.7 || ^9
+core_version_requirement: ^8.8 || ^9
 configure: commerce_payment.configuration
 dependencies:
   - commerce:commerce

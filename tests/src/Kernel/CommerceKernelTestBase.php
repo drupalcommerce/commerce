@@ -36,6 +36,7 @@ abstract class CommerceKernelTestBase extends EntityKernelTestBase {
     'commerce_price',
     'commerce_store',
     'path',
+    'path_alias',
   ];
 
   /**
@@ -56,15 +57,7 @@ abstract class CommerceKernelTestBase extends EntityKernelTestBase {
     $factory->register(new NumberComparator());
     $factory->register(new PriceComparator());
 
-    // Drupal 8.8 installs path_alias automatically, but D9 doesn't.
-    // However, we can't add path_alias to modules until 8.7 support is dropped.
-    // @todo Clean up when Drupal 8.7 is no longer supported.
-    if (version_compare(\Drupal::VERSION, '9.0.0-alpha1') >= 0 || version_compare(\Drupal::VERSION, '9.0.0-dev') == 0) {
-      $this->enableModules(['path_alias']);
-    }
-    if (\Drupal::entityTypeManager()->hasDefinition('path_alias')) {
-      $this->installEntitySchema('path_alias');
-    }
+    $this->installEntitySchema('path_alias');
     $this->installEntitySchema('commerce_currency');
     $this->installEntitySchema('commerce_store');
     $this->installConfig(['commerce_store']);
