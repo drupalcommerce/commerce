@@ -14,28 +14,26 @@ class TaxRateTest extends CommerceKernelTestBase {
 
   /**
    * @covers ::__construct
-   *
-   * @expectedException \InvalidArgumentException
    */
   public function testMissingProperty() {
+    $this->expectException(\InvalidArgumentException::class);
     $definition = [
       'id' => 'test',
     ];
-    $rate = new TaxRate($definition);
+    new TaxRate($definition);
   }
 
   /**
    * @covers ::__construct
-   *
-   * @expectedException \InvalidArgumentException
    */
   public function testInvalidPercentages() {
+    $this->expectException(\InvalidArgumentException::class);
     $definition = [
       'id' => 'test',
       'label' => 'Test',
       'percentages' => 'WRONG',
     ];
-    $rate = new TaxRate($definition);
+    new TaxRate($definition);
   }
 
   /**

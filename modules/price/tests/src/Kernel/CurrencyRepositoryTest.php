@@ -3,6 +3,7 @@
 namespace Drupal\Tests\commerce_price\Kernel;
 
 use CommerceGuys\Intl\Currency\Currency;
+use CommerceGuys\Intl\Exception\UnknownCurrencyException;
 use Drupal\Tests\commerce\Kernel\CommerceKernelTestBase;
 
 /**
@@ -35,9 +36,9 @@ class CurrencyRepositoryTest extends CommerceKernelTestBase {
 
   /**
    * @covers ::get
-   * @expectedException \CommerceGuys\Intl\Exception\UnknownCurrencyException
    */
   public function testUnknownGet() {
+    $this->expectException(UnknownCurrencyException::class);
     $this->currencyRepository->get('RSD');
   }
 
