@@ -18,10 +18,10 @@ class UrlDataTest extends UnitTestCase {
   public function testEncodeDecode() {
     $data = ['commerce_product', '1'];
     $encoded_data = UrlData::encode($data);
-    $this->assertInternalType('string', $encoded_data);
+    $this->assertIsString($encoded_data);
 
     $decoded_data = UrlData::decode($encoded_data);
-    $this->assertInternalType('array', $decoded_data);
+    $this->assertIsArray($decoded_data);
     $this->assertSame($data, $decoded_data);
 
     $invalid_data = UrlData::decode('INVALID');

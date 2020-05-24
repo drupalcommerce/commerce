@@ -17,7 +17,7 @@ class CreditCardTest extends UnitTestCase {
    */
   public function testGetTypes() {
     $types = CreditCard::getTypes();
-    $this->assertInternalType('array', $types);
+    $this->assertIsArray($types);
     foreach ($types as $key => $type) {
       $this->assertInstanceOf(CreditCardType::class, $type);
       $this->assertEquals($key, $type->getId());
