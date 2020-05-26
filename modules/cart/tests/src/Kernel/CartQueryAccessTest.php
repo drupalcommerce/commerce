@@ -3,6 +3,7 @@
 namespace Drupal\Tests\commerce_cart\Kernel;
 
 use Drupal\commerce_order\OrderQueryAccessHandler;
+use Drupal\Core\Session\AnonymousUserSession;
 use Drupal\entity\QueryAccess\Condition;
 
 /**
@@ -48,7 +49,8 @@ class CartQueryAccessTest extends CartKernelTestBase {
     }
 
     // Anonymous user with no access other than to their own carts.
-    $cart = $this->cartProvider->createCart('default', $this->store);
+    $anon_user = new AnonymousUserSession();
+    $cart = $this->cartProvider->createCart('default', $this->store, $anon_user);
     $conditions = $this->handler->getConditions('view');
     $expected_conditions = [
       new Condition('order_id', [$cart->id()]),
@@ -60,8 +62,17 @@ class CartQueryAccessTest extends CartKernelTestBase {
 
     // Confirm that finalized carts are also allowed.
     $this->cartProvider->finalizeCart($cart);
-    $another_cart = $this->cartProvider->createCart('default', $this->store);
-    $conditions = $this->handler->getConditions('view');
+    $conditions = $this->handler->getConditions('view', $anon_user);
+    $this->assertEquals(1, $conditions->count());
+    $this->assertEquals(['user.permissions'], $conditions->getCacheContexts());
+    $expected_conditions = [
+      new Condition('order_id', [$cart->id()]),
+    ];
+    $this->assertEquals($expected_conditions, $conditions->getConditions());
+
+    // Create another cart.
+    $another_cart = $this->cartProvider->createCart('default', $this->store, $anon_user);
+    $conditions = $this->handler->getConditions('view', $anon_user);
     $expected_conditions = [
       new Condition('order_id', [$another_cart->id(), $cart->id()]),
     ];

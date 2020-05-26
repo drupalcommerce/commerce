@@ -65,7 +65,6 @@ class QueryAccessSubscriber implements EventSubscriberInterface {
 
     $account = $event->getAccount();
     // Any user can view their own active carts, regardless of any permissions.
-    // Anonymous users can also see their own completed carts.
     $cart_ids = $this->cartProvider->getCartIds($account);
     if ($account->isAnonymous()) {
       $completed_cart_ids = $this->cartSession->getCartIds(CartSessionInterface::COMPLETED);

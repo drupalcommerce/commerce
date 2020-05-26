@@ -5,12 +5,16 @@
  * Implements the shopping cart system and add to cart features.
  */
 
+use Drupal\commerce_cart\CartSessionInterface;
 use Drupal\commerce_order\Entity\OrderInterface;
+use Drupal\commerce_order\Entity\OrderItemInterface;
+use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Entity\Display\EntityFormDisplayInterface;
 use Drupal\Core\Entity\EntityForm;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Session\AnonymousUserSession;
 
 /**
@@ -114,6 +118,61 @@ function commerce_cart_commerce_order_delete(OrderInterface $order) {
   if (!empty($order->cart->value)) {
     \Drupal::service('commerce_cart.cart_session')->deleteCartId($order->id());
   }
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_access().
+ */
+function commerce_cart_commerce_order_access(OrderInterface $order, $operation, AccountInterface $account) {
+  return _commerce_cart_order_access($order, $operation, $account);
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_access().
+ */
+function commerce_cart_commerce_order_item_access(OrderItemInterface $order_item, $operation, AccountInterface $account) {
+  $order = $order_item->getOrder();
+  return $order ? _commerce_cart_order_access($order, $operation, $account) : AccessResult::neutral();
+}
+
+/**
+ * Checks that the account has access to the cart.
+ *
+ * @param \Drupal\commerce_order\Entity\OrderInterface $order
+ *   The cart order.
+ * @param string $operation
+ *   The operation.
+ * @param \Drupal\Core\Session\AccountInterface $account
+ *   The account.
+ *
+ * @return \Drupal\Core\Access\AccessResultInterface
+ *   The access result.
+ */
+function _commerce_cart_order_access(OrderInterface $order, $operation, AccountInterface $account) {
+  if ($operation !== 'view' && $operation !== 'update') {
+    return AccessResult::neutral();
+  }
+  $customer_id = (int) $order->getCustomerId();
+  $order_id = $order->id();
+
+  if ($account->isAuthenticated()) {
+    $customer_check = (int) $account->id() === $customer_id;
+  }
+  else {
+    $cart_session = \Drupal::service('commerce_cart.cart_session');
+    assert($cart_session instanceof CartSessionInterface);
+    $active_cart = $cart_session->hasCartId($order_id, CartSessionInterface::ACTIVE);
+    $completed_cart = $cart_session->hasCartId($order_id, CartSessionInterface::COMPLETED);
+    $customer_check = $active_cart || $completed_cart;
+  }
+
+  $access_result = AccessResult::allowedIf($customer_check);
+  if ($operation === 'update') {
+    $access_result = $access_result->andIf(AccessResult::allowedIf($order->getState()->getId() === 'draft'));
+  }
+  return $access_result
+    ->addCacheableDependency($order)
+    ->cachePerUser();
 }
 
 /**

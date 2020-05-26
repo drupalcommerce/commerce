@@ -40,7 +40,7 @@ class OrderAccessControlHandler extends EntityAccessControlHandler {
 
     /** @var \Drupal\commerce_order\Entity\OrderInterface $entity */
     if ($result->isNeutral() && $operation == 'view') {
-      if ($account->id() == $entity->getCustomerId() && empty($additional_operation)) {
+      if ($account->isAuthenticated() && $account->id() == $entity->getCustomerId() && empty($additional_operation)) {
         $result = AccessResult::allowedIfHasPermissions($account, ['view own commerce_order']);
         $result = $result->cachePerUser()->addCacheableDependency($entity);
       }
