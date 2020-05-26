@@ -10,11 +10,14 @@ use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\user\PermissionHandlerInterface;
+use Drupal\user\UserInterface;
 use Drupal\views\Plugin\views\argument_validator\ArgumentValidatorPluginBase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Validates whether the argument matches the current user.
+ *
+ * Anonymous users will always be considered invalid.
  *
  * @ViewsArgumentValidator(
  *   id = "commerce_current_user",
@@ -135,18 +138,22 @@ class CurrentUser extends ArgumentValidatorPluginBase implements CacheableDepend
       return FALSE;
     }
     $user_storage = $this->entityTypeManager->getStorage('user');
-    /** @var \Drupal\user\UserInterface $user */
     $user = $user_storage->load($argument);
-    if (empty($user)) {
+    if (!$user instanceof UserInterface) {
       return FALSE;
     }
-
+    if ($user->isAnonymous()) {
+      return FALSE;
+    }
     if ($user->id() == $this->currentUser->id()) {
       return TRUE;
     }
-    elseif (!empty($this->options['admin_permission'])) {
+    if (!empty($this->options['admin_permission'])) {
       return $this->currentUser->hasPermission($this->options['admin_permission']);
     }
+
+    // Return false by default.
+    return FALSE;
   }
 
   /**

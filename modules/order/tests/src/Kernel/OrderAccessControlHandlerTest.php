@@ -5,6 +5,7 @@ namespace Drupal\Tests\commerce_order\Kernel;
 use Drupal\commerce_order\Entity\Order;
 use Drupal\commerce_order\Entity\OrderItem;
 use Drupal\commerce_price\Price;
+use Drupal\Core\Session\AnonymousUserSession;
 
 /**
  * Tests the order access control handler.
@@ -29,6 +30,7 @@ class OrderAccessControlHandlerTest extends OrderKernelTestBase {
     $admin_user = $this->createUser(['mail' => $this->randomString() . '@example.com'], ['administer commerce_order']);
     $user = $this->createUser(['mail' => $this->randomString() . '@example.com'], ['view own commerce_order']);
     $different_user = $this->createUser(['mail' => $this->randomString() . '@example.com'], ['view own commerce_order']);
+    $anon_user = new AnonymousUserSession();
 
     $order_item = OrderItem::create([
       'type' => 'test',
@@ -51,6 +53,7 @@ class OrderAccessControlHandlerTest extends OrderKernelTestBase {
     $this->assertTrue($order->access('view', $user));
     $this->assertFalse($order->access('view', $different_user));
     $this->assertTrue($order->access('view', $admin_user));
+    $this->assertFalse($order->access('view', $anon_user));
 
     // Tests the access checking for resending order receipts.
     $this->assertFalse($order->access('resend_receipt', $user));

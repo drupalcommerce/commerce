@@ -19,6 +19,8 @@ class OrderRouteProvider extends AdminHtmlRouteProvider {
     // Replace the 'full' view mode with the 'admin' view mode.
     $route->setDefault('_entity_view', 'commerce_order.admin');
 
+    // The canonical route is the admin view of the order.
+    $route->setOption('_admin_route', TRUE);
     return $route;
   }
 
@@ -31,6 +33,9 @@ class OrderRouteProvider extends AdminHtmlRouteProvider {
     if ($resend_receipt_form_route = $this->getResendReceiptFormRoute($entity_type)) {
       $collection->add("entity.commerce_order.resend_receipt_form", $resend_receipt_form_route);
     }
+    $collection->addRequirements([
+      '_permission' => 'access commerce administration pages',
+    ]);
 
     return $collection;
   }
