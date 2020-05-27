@@ -11,7 +11,6 @@ description: 'Display a set of order items in a table.'
 tag: ''
 base_table: commerce_order_item
 base_field: order_item_id
-core: 8.x
 display:
   default:
     display_plugin: default

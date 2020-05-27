@@ -12,7 +12,6 @@ description: ''
 tag: Commerce
 base_table: commerce_store_field_data
 base_field: store_id
-core: 8.x
 display:
   default:
     display_plugin: default
@@ -357,6 +356,7 @@ display:
           exposed: true
           expose:
             operator_id: type_op
+            operator_limit_selection: false
             label: Type
             description: ''
             use_operator: false
