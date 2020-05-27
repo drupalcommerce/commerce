@@ -1,0 +1,25 @@
+{#
+/**
+ * @file
+ *
+ * Default template for commerce order items.
+ *
+ * Available variables:
+ * - attributes: HTML attributes for the wrapper.
+ * - order_item: The rendered oreder item fields.
+ *   Use 'order_item' to print them all, or print a subset such as
+ *   'order_item.title'. Use the following code to exclude the
+ *   printing of a given field:
+ *   @code
+ *   {{ order_item|without('title') }}
+ *   @endcode
+ * - commerce_order_item_entity: The order item entity.
+ *
+ *   To get some value from product use {{ order_item_entity.getPurchasedEntity.getProduct.something }}.
+ *
+ * @ingroup themeable
+ */
+#}
+<div{{ attributes }}>
+  {{- order_item -}}
+</div>

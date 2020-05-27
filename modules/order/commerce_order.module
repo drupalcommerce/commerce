@@ -51,7 +51,39 @@ function commerce_order_theme($existing, $type, $theme, $path) {
         'totals' => NULL,
       ],
     ],
+    'commerce_order_item' => [
+      'render element' => 'elements',
+    ],
   ];
+}
+
+/**
+ * Implements hook_theme_suggestions_commerce_order_item().
+ */
+function commerce_order_theme_suggestions_commerce_order_item(array $variables) {
+  return _commerce_entity_theme_suggestions('commerce_order_item', $variables);
+}
+
+/**
+ * Prepares variables for commerce order item templates.
+ *
+ * Default template: commerce-order-item.html.twig.
+ *
+ * @param array $variables
+ *   An associative array containing:
+ *   - elements: An associative array containing rendered fields.
+ *   - attributes: HTML attributes for the containing element.
+ */
+function template_preprocess_commerce_order_item(array &$variables) {
+  /** @var Drupal\commerce_order\Entity\OrderItemInterface $product_variation */
+  $commerce_order_item = $variables['elements']['#commerce_order_item'];
+
+  $variables['order_item_entity'] = $commerce_order_item;
+
+  $variables['order_item'] = [];
+  foreach (Element::children($variables['elements']) as $key) {
+    $variables['order_item'][$key] = $variables['elements'][$key];
+  }
 }
 
 /**
