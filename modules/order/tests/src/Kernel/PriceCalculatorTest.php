@@ -40,7 +40,7 @@ class PriceCalculatorTest extends OrderKernelTestBase {
   protected $firstUser;
 
   /**
-   * The first test user.
+   * The second test user.
    *
    * @var \Drupal\user\UserInterface
    */
