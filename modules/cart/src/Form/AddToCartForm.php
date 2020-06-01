@@ -204,10 +204,10 @@ class AddToCartForm extends ContentEntityForm implements AddToCartFormInterface 
     /** @var \Drupal\commerce\PurchasableEntityInterface $purchased_entity */
     $purchased_entity = $order_item->getPurchasedEntity();
 
-    $order_type_id = $this->orderTypeResolver->resolve($order_item);
-    $store = $this->selectStore($purchased_entity);
-    $cart = $this->cartProvider->getCart($order_type_id, $store);
+    $cart = $order_item->getOrder();
     if (!$cart) {
+      $order_type_id = $this->orderTypeResolver->resolve($order_item);
+      $store = $this->selectStore($purchased_entity);
       $cart = $this->cartProvider->createCart($order_type_id, $store);
     }
     $this->entity = $this->cartManager->addOrderItem($cart, $order_item, $form_state->get(['settings', 'combine']));
@@ -229,6 +229,12 @@ class AddToCartForm extends ContentEntityForm implements AddToCartFormInterface 
       $context = new Context($this->currentUser, $store);
       $resolved_price = $this->chainPriceResolver->resolve($purchased_entity, $entity->getQuantity(), $context);
       $entity->setUnitPrice($resolved_price);
+    }
+    $order_type_id = $this->orderTypeResolver->resolve($entity);
+    $store = $this->selectStore($purchased_entity);
+    $cart = $this->cartProvider->getCart($order_type_id, $store);
+    if ($cart) {
+      $entity->set('order_id', $cart->id());
     }
 
     return $entity;
