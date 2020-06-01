@@ -1,9 +1,4 @@
 services:
-  commerce_test.test_availability_checker:
-    class: Drupal\commerce_test\TestAvailabilityChecker
-    tags:
-      - { name: commerce.availability_checker }
-
   commerce_test.referenceable_plugin_types_subscriber:
     class: \Drupal\commerce_test\EventSubscriber\ReferenceablePluginTypesSubscriber
     tags:

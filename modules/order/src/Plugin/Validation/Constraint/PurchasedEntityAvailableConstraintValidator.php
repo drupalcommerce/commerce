@@ -2,9 +2,9 @@
 
 namespace Drupal\commerce_order\Plugin\Validation\Constraint;
 
-use Drupal\commerce\AvailabilityManagerInterface;
 use Drupal\commerce\Context;
 use Drupal\commerce\PurchasableEntityInterface;
+use Drupal\commerce_order\AvailabilityManagerInterface;
 use Drupal\commerce_order\Entity\OrderInterface;
 use Drupal\commerce_order\Entity\OrderItemInterface;
 use Drupal\commerce_store\SelectStoreTrait;
@@ -26,7 +26,7 @@ class PurchasedEntityAvailableConstraintValidator extends ConstraintValidator im
   /**
    * The availability manager.
    *
-   * @var \Drupal\commerce\AvailabilityManagerInterface
+   * @var \Drupal\commerce_order\AvailabilityManagerInterface
    */
   protected $availabilityManager;
 
@@ -40,7 +40,7 @@ class PurchasedEntityAvailableConstraintValidator extends ConstraintValidator im
   /**
    * Constructs a new PurchasedEntityAvailableConstraintValidator object.
    *
-   * @param \Drupal\commerce\AvailabilityManagerInterface $availability_manager
+   * @param \Drupal\commerce_order\AvailabilityManagerInterface $availability_manager
    *   The availability manager.
    * @param \Drupal\commerce_store\CurrentStoreInterface $current_store
    *   The current store.
@@ -58,7 +58,7 @@ class PurchasedEntityAvailableConstraintValidator extends ConstraintValidator im
    */
   public static function create(ContainerInterface $container) {
     return new static(
-      $container->get('commerce.availability_manager'),
+      $container->get('commerce_order.availability_manager'),
       $container->get('commerce_store.current_store'),
       $container->get('current_user')
     );
@@ -105,12 +105,21 @@ class PurchasedEntityAvailableConstraintValidator extends ConstraintValidator im
 
     $quantity = $order_item->getQuantity();
     $context = new Context($customer, $store);
-    $availability = $this->availabilityManager->check($purchased_entity, $quantity, $context);
-    if (!$availability) {
-      $this->context->buildViolation($constraint->message, [
-        '%label' => $purchased_entity->label(),
-        '%quantity' => $quantity,
-      ])->addViolation();
+    $availability_result = $this->availabilityManager->check($order_item, $context);
+    if ($availability_result->isUnavailable()) {
+      // If a reason is provided for the availability result, use it.
+      if (!empty($availability_result->getReason())) {
+        $this->context
+          ->buildViolation($availability_result->getReason())
+          ->addViolation();
+      }
+      else {
+        // Otherwise fallback to the generic error message.
+        $this->context->buildViolation($constraint->message, [
+          '%label' => $purchased_entity->label(),
+          '%quantity' => $quantity,
+        ])->addViolation();
+      }
     }
   }
 

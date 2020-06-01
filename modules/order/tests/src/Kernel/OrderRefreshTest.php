@@ -63,7 +63,7 @@ class OrderRefreshTest extends OrderKernelTestBase {
    * @var array
    */
   public static $modules = [
-    'commerce_test',
+    'commerce_order_test',
   ];
 
   /**

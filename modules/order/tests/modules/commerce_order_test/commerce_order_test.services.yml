@@ -4,6 +4,11 @@ services:
     tags:
       - { name: event_subscriber }
 
+  commerce_order_test.test_availability_checker:
+    class: Drupal\commerce_order_test\TestAvailabilityChecker
+    tags:
+      - { name: commerce_order.availability_checker }
+
   commerce_order_test.test_adjustment_processor:
     class: Drupal\commerce_order_test\TestAdjustmentProcessor
     tags:

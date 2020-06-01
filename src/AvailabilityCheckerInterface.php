@@ -4,6 +4,9 @@ namespace Drupal\commerce;
 
 /**
  * Defines the interface for availability checkers.
+ *
+ * @deprecated in commerce:8.x-2.18 and is removed from commerce:3.x.
+ *   Use \Drupal\commerce_order\AvailabilityCheckerInterface instead.
  */
 interface AvailabilityCheckerInterface {
 
