@@ -152,7 +152,7 @@ class OrderIntegrationTest extends OrderKernelTestBase {
 
     $logs = $this->logStorage->loadMultipleByEntity($this->order);
     $this->assertEquals(2, count($logs));
-    $log = $logs[2];
+    $log = array_pop($logs);
     $build = $this->logViewBuilder->view($log);
     $this->render($build);
 
@@ -164,7 +164,7 @@ class OrderIntegrationTest extends OrderKernelTestBase {
 
     $logs = $this->logStorage->loadMultipleByEntity($this->order);
     $this->assertEquals(3, count($logs));
-    $log = $logs[3];
+    $log = array_pop($logs);
     $build = $this->logViewBuilder->view($log);
     $this->render($build);
 
