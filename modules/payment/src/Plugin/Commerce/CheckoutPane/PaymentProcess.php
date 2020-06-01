@@ -10,7 +10,7 @@ use Drupal\commerce_payment\Exception\DeclineException;
 use Drupal\commerce_payment\Exception\PaymentGatewayException;
 use Drupal\commerce_payment\Plugin\Commerce\PaymentGateway\ManualPaymentGatewayInterface;
 use Drupal\commerce_payment\Plugin\Commerce\PaymentGateway\OffsitePaymentGatewayInterface;
-use Drupal\commerce_payment\Plugin\Commerce\PaymentGateway\OnsitePaymentGatewayInterface;
+use Drupal\commerce_payment\Plugin\Commerce\PaymentGateway\SupportsStoredPaymentMethodsInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Link;
@@ -173,9 +173,9 @@ class PaymentProcess extends CheckoutPaneBase {
     $payment = $this->createPayment($payment_gateway);
     $next_step_id = $this->checkoutFlow->getNextStepId($this->getStepId());
 
-    if ($payment_gateway_plugin instanceof OnsitePaymentGatewayInterface) {
+    if ($payment_gateway_plugin instanceof SupportsStoredPaymentMethodsInterface && !$this->order->get('payment_method')->isEmpty()) {
       try {
-        $payment->payment_method = $this->order->payment_method->entity;
+        $payment->payment_method = $this->order->get('payment_method')->entity;
         $payment_gateway_plugin->createPayment($payment, $this->configuration['capture']);
         $this->checkoutFlow->redirectToStep($next_step_id);
       }
@@ -239,7 +239,12 @@ class PaymentProcess extends CheckoutPaneBase {
       }
     }
     else {
-      $this->checkoutFlow->redirectToStep($next_step_id);
+      $this->logger->error('Unable process payment with :plugin_id', [
+        ':plugin_id' => $payment_gateway_plugin->getPluginId(),
+      ]);
+      $message = $this->t('We encountered an unexpected error processing your payment. Please try again later.');
+      $this->messenger()->addError($message);
+      $this->checkoutFlow->redirectToStep($error_step_id);
     }
   }
 

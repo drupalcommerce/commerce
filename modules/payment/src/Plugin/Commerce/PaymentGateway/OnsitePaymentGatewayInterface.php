@@ -25,6 +25,6 @@ namespace Drupal\commerce_payment\Plugin\Commerce\PaymentGateway;
  * checkout step that contains the PaymentInformation checkout pane, to provide
  * a different payment method.
  */
-interface OnsitePaymentGatewayInterface extends PaymentGatewayInterface, SupportsStoredPaymentMethodsInterface {
+interface OnsitePaymentGatewayInterface extends PaymentGatewayInterface, SupportsStoredPaymentMethodsInterface, SupportsCreatingPaymentMethodsInterface {
 
 }

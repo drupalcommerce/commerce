@@ -11,3 +11,10 @@ commerce_payment.commerce_payment_gateway.plugin.example_offsite_redirect:
     redirect_method:
       type: string
       label: 'Redirect method'
+
+commerce_payment.commerce_payment_gateway.plugin.example_stored_offsite_redirect:
+  type: commerce_payment_gateway_configuration
+  mapping:
+    redirect_method:
+      type: string
+      label: 'Redirect method'

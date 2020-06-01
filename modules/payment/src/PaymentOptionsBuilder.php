@@ -130,7 +130,7 @@ class PaymentOptionsBuilder implements PaymentOptionsBuilderInterface {
       }
     }
 
-    // 4) Add options for the remaining gateways (off-site, manual, etc).
+    // 4) Add options for the remaining gateways.
     /** @var \Drupal\commerce_payment\Entity\PaymentGatewayInterface[] $other_payment_gateways */
     $other_payment_gateways = array_diff_key($payment_gateways, $payment_gateways_with_payment_methods);
     foreach ($other_payment_gateways as $payment_gateway) {

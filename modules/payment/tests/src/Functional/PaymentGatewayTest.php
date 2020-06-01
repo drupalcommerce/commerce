@@ -38,9 +38,9 @@ class PaymentGatewayTest extends CommerceBrowserTestBase {
 
     $edit = [
       'label' => 'Example',
-      'plugin' => 'example_offsite_redirect',
-      'configuration[example_offsite_redirect][redirect_method]' => 'post',
-      'configuration[example_offsite_redirect][mode]' => 'test',
+      'plugin' => 'example_stored_offsite_redirect',
+      'configuration[example_stored_offsite_redirect][redirect_method]' => 'post',
+      'configuration[example_stored_offsite_redirect][mode]' => 'test',
       'status' => '1',
       // Setting the 'id' can fail if focus switches to another field.
       // This is a bug in the machine name JS that can be reproduced manually.
@@ -53,7 +53,7 @@ class PaymentGatewayTest extends CommerceBrowserTestBase {
     $payment_gateway = PaymentGateway::load('example');
     $this->assertEquals('example', $payment_gateway->id());
     $this->assertEquals('Example', $payment_gateway->label());
-    $this->assertEquals('example_offsite_redirect', $payment_gateway->getPluginId());
+    $this->assertEquals('example_stored_offsite_redirect', $payment_gateway->getPluginId());
     $this->assertEmpty($payment_gateway->getConditions());
     $this->assertEquals('AND', $payment_gateway->getConditionOperator());
     $this->assertEquals(TRUE, $payment_gateway->status());
