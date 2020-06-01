@@ -19,3 +19,17 @@ function commerce_log_test_entity_test_insert(EntityInterface $entity) {
   $log = $log_storage->generate($entity, 'entity_test_created', $params);
   $log->save();
 }
+
+/**
+ * Implements hook_mail_alter().
+ */
+function commerce_log_test_mail_alter(&$message) {
+  if (!isset($message['params']['order'])) {
+    return;
+  }
+  /** @var \Drupal\commerce_order\Entity\OrderInterface $order */
+  $order = $message['params']['order'];
+  if ($order->getData('simulate_mail_failure')) {
+    $message['send'] = FALSE;
+  }
+}

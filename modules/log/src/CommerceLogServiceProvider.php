@@ -28,6 +28,11 @@ class CommerceLogServiceProvider extends ServiceProviderBase {
       $container->register('commerce_log.order_subscriber', 'Drupal\commerce_log\EventSubscriber\OrderEventSubscriber')
         ->addTag('event_subscriber')
         ->addArgument(new Reference('entity_type.manager'));
+
+      $container->register('commerce_log.order_mail_subscriber', 'Drupal\commerce_log\EventSubscriber\OrderMailEventSubscriber')
+        ->addTag('event_subscriber')
+        ->addArgument(new Reference('entity_type.manager'))
+        ->addArgument(new Reference('plugin.manager.commerce_log_template'));
     }
   }
 

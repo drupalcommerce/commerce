@@ -27,3 +27,19 @@ order_assigned:
   category: commerce_order
   label: 'Order assigned'
   template: '<p>The order was assigned to {{ user }}.</p>'
+order_mail:
+  category: commerce_order
+  label: 'Order email'
+  template: '<p>Email "{{ id }}" sent to {{ to_email }}.</p>'
+order_mail_failure:
+  category: commerce_order
+  label: 'Order email'
+  template: '<p>Failed to send "{{ id }}" to {{ to_email }}.</p>'
+mail_order_receipt:
+  category: commerce_order
+  label: 'Order receipt email'
+  template: '<p>Order receipt email sent to {{ to_email }}.</p>'
+mail_order_receipt_failure:
+  category: commerce_order
+  label: 'Order receipt email failure'
+  template: '<p>Order receipt email failed to send to {{ to_email }}.</p>'

@@ -27,4 +27,13 @@ final class CommerceEvents {
    */
   const REFERENCEABLE_PLUGIN_TYPES = 'commerce.referenceable_plugin_types';
 
+  /**
+   * Name of the event fired after sending an email via the mail handler.
+   *
+   * @Event
+   *
+   * @see \Drupal\commerce\Event\PostMailSendEvent.php
+   */
+  const POST_MAIL_SEND = 'commerce.post_mail_send';
+
 }
