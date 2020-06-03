@@ -177,6 +177,13 @@ class OrderRefreshTest extends OrderKernelTestBase {
     $order_refresh = $this->createOrderRefresh(mktime(23, 10, 0, 2, 24, 2016));
     $this->order->setChangedTime(mktime(23, 0, 0, 2, 24, 2016));
     $this->assertNotEmpty($order_refresh->needsRefresh($this->order));
+
+    // Locked order.
+    $this->order->lock();
+    $this->assertFalse($order_refresh->needsRefresh($this->order));
+    $this->order->unlock();
+    $this->assertTrue($order_refresh->needsRefresh($this->order));
+
   }
 
   /**
