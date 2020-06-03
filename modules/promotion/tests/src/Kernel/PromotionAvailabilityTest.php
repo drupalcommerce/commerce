@@ -74,6 +74,7 @@ class PromotionAvailabilityTest extends OrderKernelTestBase {
       'order_types' => ['default'],
       'stores' => [$this->store->id()],
       'usage_limit' => 2,
+      'usage_limit_customer' => 0,
       'start_date' => '2019-01-01T00:00:00',
       'status' => TRUE,
     ]);
@@ -101,6 +102,7 @@ class PromotionAvailabilityTest extends OrderKernelTestBase {
       'order_types' => ['default'],
       'stores' => [$this->store->id()],
       'usage_limit' => 1,
+      'usage_limit_customer' => 0,
       'status' => TRUE,
     ]);
     $promotion->save();
@@ -130,6 +132,7 @@ class PromotionAvailabilityTest extends OrderKernelTestBase {
       'order_types' => ['default'],
       'stores' => [$this->store->id()],
       'usage_limit' => 1,
+      'usage_limit_customer' => 0,
       'start_date' => '2019-01-01T00:00:00',
       'status' => TRUE,
     ]);
@@ -160,6 +163,28 @@ class PromotionAvailabilityTest extends OrderKernelTestBase {
       'order_types' => ['default'],
       'stores' => [$this->store->id()],
       'usage_limit' => 2,
+      'usage_limit_customer' => 0,
+      'start_date' => '2019-01-01T00:00:00',
+      'status' => TRUE,
+    ]);
+    $promotion->save();
+    $this->assertTrue($promotion->available($this->order));
+
+    $this->container->get('commerce_promotion.usage')->register($this->order, $promotion);
+    $this->assertTrue($promotion->available($this->order));
+    $this->container->get('commerce_promotion.usage')->register($this->order, $promotion);
+    $this->assertFalse($promotion->available($this->order));
+  }
+
+  /**
+   * Tests the customer usage count logic.
+   */
+  public function testCustomerUsageCount() {
+    $promotion = Promotion::create([
+      'order_types' => ['default'],
+      'stores' => [$this->store->id()],
+      'usage_limit' => 0,
+      'usage_limit_customer' => 2,
       'start_date' => '2019-01-01T00:00:00',
       'status' => TRUE,
     ]);

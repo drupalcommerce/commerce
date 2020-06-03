@@ -119,6 +119,7 @@ class CouponTest extends CommerceBrowserTestBase {
       'code' => $this->randomMachineName(8),
       'status' => FALSE,
       'usage_limit' => 0,
+      'usage_limit_customer' => 0,
     ]);
     $this->drupalGet($coupon->toUrl('delete-form'));
     $this->assertSession()->statusCodeEquals(200);

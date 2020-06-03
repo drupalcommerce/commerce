@@ -112,6 +112,21 @@ class Coupon extends ContentEntityBase implements CouponInterface {
   /**
    * {@inheritdoc}
    */
+  public function getCustomerUsageLimit() {
+    return $this->get('usage_limit_customer')->value;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setCustomerUsageLimit($usage_limit_customer) {
+    $this->set('usage_limit_customer', $usage_limit_customer);
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function isEnabled() {
     return (bool) $this->getEntityKey('status');
   }
@@ -134,10 +149,20 @@ class Coupon extends ContentEntityBase implements CouponInterface {
     if (!$this->getPromotion()->available($order)) {
       return FALSE;
     }
-    if ($usage_limit = $this->getUsageLimit()) {
-      /** @var \Drupal\commerce_promotion\PromotionUsageInterface $usage */
-      $usage = \Drupal::service('commerce_promotion.usage');
-      if ($usage_limit <= $usage->loadByCoupon($this)) {
+
+    $usage_limit = $this->getUsageLimit();
+    $usage_limit_customer = $this->getCustomerUsageLimit();
+    // If there are no usage limits, the coupon is available.
+    if (!$usage_limit && !$usage_limit_customer) {
+      return TRUE;
+    }
+    /** @var \Drupal\commerce_promotion\PromotionUsageInterface $usage */
+    $usage = \Drupal::service('commerce_promotion.usage');
+
+    // Only check customer usage when email address is known.
+    if ($usage_limit_customer) {
+      $email = $order->getEmail();
+      if ($email && $usage_limit_customer <= $usage->loadByCoupon($this, $email)) {
         return FALSE;
       }
     }
@@ -219,6 +244,15 @@ class Coupon extends ContentEntityBase implements CouponInterface {
     $fields['usage_limit'] = BaseFieldDefinition::create('integer')
       ->setLabel(t('Usage limit'))
       ->setDescription(t('The maximum number of times the coupon can be used. 0 for unlimited.'))
+      ->setDefaultValue(0)
+      ->setDisplayOptions('form', [
+        'type' => 'commerce_usage_limit',
+        'weight' => 4,
+      ]);
+
+    $fields['usage_limit_customer'] = BaseFieldDefinition::create('integer')
+      ->setLabel(t('Customer usage limit'))
+      ->setDescription(t('The maximum number of times the coupon can be used by a customer. 0 for unlimited.'))
       ->setDefaultValue(0)
       ->setDisplayOptions('form', [
         'type' => 'commerce_usage_limit',

@@ -73,37 +73,52 @@ class UsageLimitWidget extends WidgetBase implements ContainerFactoryPluginInter
    */
   public function formElement(FieldItemListInterface $items, $delta, array $element, array &$form, FormStateInterface $form_state) {
     $value = isset($items[$delta]->value) ? $items[$delta]->value : NULL;
-    $usage = 0;
-    /** @var \Drupal\Core\Entity\EntityInterface $entity */
-    $entity = $items[$delta]->getEntity();
-    if (!$entity->isNew()) {
-      if ($entity instanceof PromotionInterface) {
-        $usage = $this->usage->load($entity);
-      }
-      elseif ($entity instanceof CouponInterface) {
-        $usage = $this->usage->loadByCoupon($entity);
-      }
+    $field_name = $this->fieldDefinition->getName();
+
+    if ($field_name == 'usage_limit_customer') {
+      $title = $this->t('Total per customer');
+      $default_count = 1;
+      $radios_field = 'limit_customer';
+      $description = '';
     }
-    $formatted_usage = $this->formatPlural($usage, '1 use', '@count uses');
-    $radio_parents = array_merge($form['#parents'], [$this->fieldDefinition->getName(), 0, 'limit']);
+    else {
+      $title = $this->t('Total available');
+      $default_count = 10;
+      $radios_field = 'limit';
+      $usage = 0;
+      /** @var \Drupal\Core\Entity\EntityInterface $entity */
+      $entity = $items[$delta]->getEntity();
+      if (!$entity->isNew()) {
+        if ($entity instanceof PromotionInterface) {
+          $usage = $this->usage->load($entity);
+        }
+        elseif ($entity instanceof CouponInterface) {
+          $usage = $this->usage->loadByCoupon($entity);
+        }
+      }
+      $formatted_usage = $this->formatPlural($usage, '1 use', '@count uses');
+      $description = $this->t('Current usage: @usage.', ['@usage' => $formatted_usage]);
+    }
+
+    $radio_parents = array_merge($form['#parents'], [$field_name, 0, $radios_field]);
     $radio_path = array_shift($radio_parents);
     $radio_path .= '[' . implode('][', $radio_parents) . ']';
 
-    $element['limit'] = [
+    $element[$radios_field] = [
       '#type' => 'radios',
-      '#title' => $this->t('Total available'),
+      '#title' => $title,
       '#options' => [
         0 => $this->t('Unlimited'),
         1 => $this->t('Limited number of uses'),
       ],
       '#default_value' => $value ? 1 : 0,
     ];
-    $element['usage_limit'] = [
+     $element[$field_name] = [
       '#type' => 'number',
       '#title' => $this->t('Number of uses'),
       '#title_display' => 'invisible',
-      '#default_value' => $value ?: 10,
-      '#description' => $this->t('Current usage: @usage.', ['@usage' => $formatted_usage]),
+      '#default_value' => $value ?: $default_count,
+      '#description' => $description,
       '#states' => [
         'invisible' => [
           ':input[name="' . $radio_path . '"]' => ['value' => 0],
@@ -118,12 +133,14 @@ class UsageLimitWidget extends WidgetBase implements ContainerFactoryPluginInter
    * {@inheritdoc}
    */
   public function massageFormValues(array $values, array $form, FormStateInterface $form_state) {
+    $field_name = $this->fieldDefinition->getName();
+    $radios_field = ($field_name == 'usage_limit_customer') ? 'limit_customer' : 'limit';
     $new_values = [];
     foreach ($values as $key => $value) {
-      if (empty($value['limit'])) {
+      if (empty($value[$radios_field])) {
         continue;
       }
-      $new_values[$key] = $value['usage_limit'];
+      $new_values[$key] = $value[$field_name];
     }
     return $new_values;
   }
@@ -134,7 +151,9 @@ class UsageLimitWidget extends WidgetBase implements ContainerFactoryPluginInter
   public static function isApplicable(FieldDefinitionInterface $field_definition) {
     $entity_type = $field_definition->getTargetEntityTypeId();
     $field_name = $field_definition->getName();
-    return in_array($entity_type, ['commerce_promotion', 'commerce_promotion_coupon']) && $field_name == 'usage_limit';
+    $applicable_entity_type = in_array($entity_type, ['commerce_promotion', 'commerce_promotion_coupon']);
+    $applicable_field_name = in_array($field_name, ['usage_limit', 'usage_limit_customer']);
+    return $applicable_entity_type && $applicable_field_name;
   }
 
 }

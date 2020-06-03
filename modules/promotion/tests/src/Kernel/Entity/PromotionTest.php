@@ -69,6 +69,8 @@ class PromotionTest extends OrderKernelTestBase {
    * @covers ::hasCoupon
    * @covers ::getUsageLimit
    * @covers ::setUsageLimit
+   * @covers ::getUsageLimit
+   * @covers ::setUsageLimit
    * @covers ::getStartDate
    * @covers ::setStartDate
    * @covers ::getEndDate
@@ -150,6 +152,9 @@ class PromotionTest extends OrderKernelTestBase {
 
     $promotion->setUsageLimit(10);
     $this->assertEquals(10, $promotion->getUsageLimit());
+
+    $promotion->setCustomerUsageLimit(2);
+    $this->assertEquals(2, $promotion->getCustomerUsageLimit());
 
     $date_pattern = DateTimeItemInterface::DATETIME_STORAGE_FORMAT;
     $time = $this->container->get('datetime.time');

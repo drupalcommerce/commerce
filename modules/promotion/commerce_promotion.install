@@ -141,3 +141,22 @@ function commerce_promotion_update_8204() {
     ->setDisplayConfigurable('form', TRUE);
   $entity_definition_update->installFieldStorageDefinition('display_name', 'commerce_promotion', 'commerce_promotion', $storage_definition);
 }
+
+/**
+ * Add the usage_limit_customer field to promotions and coupons.
+ */
+function commerce_promotion_update_8205() {
+  $entity_definition_update = \Drupal::entityDefinitionUpdateManager();
+
+  $storage_definition = BaseFieldDefinition::create('integer')
+    ->setLabel(t('Customer usage limit'))
+    ->setDescription(t('The maximum number of times the promotion can be used by a customer. 0 for unlimited.'))
+    ->setDefaultValue(0)
+    ->setDisplayOptions('form', [
+      'type' => 'commerce_usage_limit',
+      'weight' => 4,
+    ]);
+
+  $entity_definition_update->installFieldStorageDefinition('usage_limit_customer', 'commerce_promotion', 'commerce_promotion', $storage_definition);
+  $entity_definition_update->installFieldStorageDefinition('usage_limit_customer', 'commerce_promotion_coupon', 'commerce_promotion', $storage_definition);
+}

@@ -140,6 +140,27 @@ class CouponGenerateForm extends FormBase {
         ],
       ],
     ];
+    $form['limit_customer'] = [
+      '#type' => 'radios',
+      '#title' => $this->t('Number of uses per customer per coupon'),
+      '#options' => [
+        0 => $this->t('Unlimited'),
+        1 => $this->t('Limited number of uses'),
+      ],
+      '#default_value' => 1,
+    ];
+    $form['usage_limit_customer'] = [
+      '#type' => 'number',
+      '#title' => $this->t('Number of uses per customer'),
+      '#title_display' => 'invisible',
+      '#default_value' => 1,
+      '#min' => 1,
+      '#states' => [
+        'invisible' => [
+          ':input[name="limit_customer"]' => ['value' => 0],
+        ],
+      ],
+    ];
     $form['actions']['#type'] = 'actions';
     $form['actions']['submit'] = [
       '#type' => 'submit',
@@ -183,6 +204,7 @@ class CouponGenerateForm extends FormBase {
     $coupon_values = [
       'promotion_id' => $this->promotion->id(),
       'usage_limit' => $values['limit'] ? $values['usage_limit'] : 0,
+      'usage_limit_customer' => $values['usage_limit_customer'],
     ];
     $pattern = new CouponCodePattern($values['format'], $values['prefix'], $values['suffix'], $values['length']);
 

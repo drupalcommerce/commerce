@@ -110,6 +110,7 @@ class PromotionListBuilder extends EntityListBuilder implements FormInterface {
   public function buildHeader() {
     $header['name'] = $this->t('Name');
     $header['usage'] = $this->t('Usage');
+    $header['customer_limit'] = $this->t('Per-customer limit');
     $header['start_date'] = $this->t('Start date');
     $header['end_date'] = $this->t('End date');
     if ($this->hasTableDrag) {
@@ -125,6 +126,8 @@ class PromotionListBuilder extends EntityListBuilder implements FormInterface {
     $current_usage = $this->usageCounts[$entity->id()];
     $usage_limit = $entity->getUsageLimit();
     $usage_limit = $usage_limit ?: $this->t('Unlimited');
+    $customer_limit = $entity->getCustomerUsageLimit();
+    $customer_limit = $customer_limit ?: $this->t('Unlimited');
     /** @var \Drupal\commerce_promotion\Entity\PromotionInterface $entity */
     $row['#attributes']['class'][] = 'draggable';
     $row['#weight'] = $entity->getWeight();
@@ -133,6 +136,7 @@ class PromotionListBuilder extends EntityListBuilder implements FormInterface {
       $row['name'] .= ' (' . $this->t('Disabled') . ')';
     }
     $row['usage'] = $current_usage . ' / ' . $usage_limit;
+    $row['customer_limit'] = $customer_limit;
     $row['start_date'] = $entity->getStartDate()->format('M jS Y H:i:s');
     $row['end_date'] = $entity->getEndDate() ? $entity->getEndDate()->format('M jS Y H:i:s') : '—';
     if ($this->hasTableDrag) {
@@ -187,6 +191,7 @@ class PromotionListBuilder extends EntityListBuilder implements FormInterface {
       $row = $this->buildRow($entity);
       $row['name'] = ['#markup' => $row['name']];
       $row['usage'] = ['#markup' => $row['usage']];
+      $row['customer_limit'] = ['#markup' => $row['customer_limit']];
       $row['start_date'] = ['#markup' => $row['start_date']];
       $row['end_date'] = ['#markup' => $row['end_date']];
       if (isset($row['weight'])) {

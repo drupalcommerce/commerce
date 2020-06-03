@@ -69,6 +69,7 @@ class CouponCodeGeneratorTest extends OrderKernelTestBase {
         'promotion_id' => $promotion->id(),
         'code' => 'COUPON' . $i,
         'usage_limit' => 1,
+        'usage_limit_customer' => 1,
         'status' => 1,
       ]);
       $coupon->save();

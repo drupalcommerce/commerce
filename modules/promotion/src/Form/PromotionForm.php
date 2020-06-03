@@ -99,6 +99,7 @@ class PromotionForm extends ContentEntityForm {
       'start_date' => 'date_details',
       'end_date' => 'date_details',
       'usage_limit' => 'usage_details',
+      'usage_limit_customer' => 'usage_details',
       'compatibility' => 'compatibility_details',
     ];
     foreach ($field_details_mapping as $field => $group) {
