@@ -60,7 +60,7 @@ class CommerceEntityViewsData extends EntityViewsData {
     // Add missing reverse relationships. Workaround for core issue #2706431.
     $base_fields = $this->getEntityFieldManager()->getBaseFieldDefinitions($entity_type_id);
     $entity_reference_fields = array_filter($base_fields, function (BaseFieldDefinition $field) {
-      return $field->getType() === 'entity_reference' && strpos($field->getProvider(), 'commerce_') === 0;
+      return $field->getType() === 'entity_reference' && !$field->isComputed();
     });
     if (in_array($entity_type_id, ['commerce_order', 'commerce_product'])) {
       // Product variations and order items have reference fields pointing
