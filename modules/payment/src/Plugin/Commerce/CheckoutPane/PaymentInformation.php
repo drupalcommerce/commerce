@@ -9,7 +9,6 @@ use Drupal\commerce_payment\Entity\PaymentMethodInterface;
 use Drupal\commerce_payment\PaymentMethodStorageInterface;
 use Drupal\commerce_payment\PaymentOption;
 use Drupal\commerce_payment\PaymentOptionsBuilderInterface;
-use Drupal\commerce_payment\Plugin\Commerce\PaymentGateway\PaymentGatewayInterface;
 use Drupal\commerce_payment\Plugin\Commerce\PaymentGateway\SupportsCreatingPaymentMethodsInterface;
 use Drupal\commerce_payment\Plugin\Commerce\PaymentGateway\SupportsStoredPaymentMethodsInterface;
 use Drupal\Component\Utility\NestedArray;

@@ -113,7 +113,7 @@ class UsageLimitWidget extends WidgetBase implements ContainerFactoryPluginInter
       ],
       '#default_value' => $value ? 1 : 0,
     ];
-     $element[$field_name] = [
+    $element[$field_name] = [
       '#type' => 'number',
       '#title' => $this->t('Number of uses'),
       '#title_display' => 'invisible',
