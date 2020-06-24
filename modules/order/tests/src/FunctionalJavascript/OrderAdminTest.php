@@ -100,9 +100,16 @@ class OrderAdminTest extends OrderWebDriverTestBase {
     $page = $this->getSession()->getPage();
 
     // First item with overriding the price.
-    $entity1 = $this->variation->getSku() . ' (' . $this->variation->id() . ')';
     $page->checkField('Override the unit price');
-    $page->fillField('order_items[form][0][purchased_entity][0][target_id]', $entity1);
+    $purchased_entity_field = $this->assertSession()->waitForElement('css', '[name="order_items[form][0][purchased_entity][0][target_id]"].ui-autocomplete-input');
+    $purchased_entity_field->setValue(substr($this->variation->getSku(), 0, 4));
+    $this->getSession()->getDriver()->keyDown($purchased_entity_field->getXpath(), ' ');
+    $this->assertSession()->waitOnAutocomplete();
+    $this->assertSession()->pageTextContains($this->variation->getSku());
+    $this->assertCount(1, $page->findAll('css', '.ui-autocomplete li'));
+    $this->getSession()->getPage()->find('css', '.ui-autocomplete li:first-child a')->click();
+    $this->assertSession()->fieldValueEquals('order_items[form][0][purchased_entity][0][target_id]', $this->variation->getSku() . ': ' . $this->variation->label() . ' (' . $this->variation->id() . ')');
+
     $page->fillField('order_items[form][0][quantity][0][value]', '1');
     $this->getSession()->getPage()->pressButton('Create order item');
     $this->assertSession()->assertWaitOnAjaxRequest();
