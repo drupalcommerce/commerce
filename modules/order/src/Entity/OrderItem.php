@@ -370,6 +370,13 @@ class OrderItem extends CommerceContentEntityBase implements OrderItemInterface 
       ->setDisplayConfigurable('form', TRUE)
       ->setDisplayConfigurable('view', TRUE);
 
+    /** @var \Drupal\commerce\PurchasableEntityTypeRepositoryInterface $purchasable_entity_type_repository */
+    $purchasable_entity_type_repository = \Drupal::service('commerce.purchasable_entity_type_repository');
+    $default_purchasable_entity_type = $purchasable_entity_type_repository->getDefaultPurchasableEntityType();
+    if ($default_purchasable_entity_type) {
+      $fields['purchased_entity']->setSetting('target_type', $default_purchasable_entity_type->id());
+    }
+
     $fields['title'] = BaseFieldDefinition::create('string')
       ->setLabel(t('Title'))
       ->setDescription(t('The order item title.'))
