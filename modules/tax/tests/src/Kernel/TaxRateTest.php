@@ -43,6 +43,7 @@ class TaxRateTest extends CommerceKernelTestBase {
    * @covers ::getPercentages
    * @covers ::getPercentage
    * @covers ::isDefault
+   * @covers ::toArray
    */
   public function testValid() {
     // Can't use a unit test because DrupalDateTime objects use \Drupal.
@@ -75,6 +76,7 @@ class TaxRateTest extends CommerceKernelTestBase {
     $percentage = $rate->getPercentage();
     $this->assertEquals($percentage, $rate->getPercentages()[1]);
     $this->assertEquals($definition['percentages'][1]['number'], $percentage->getNumber());
+    $this->assertEquals($definition, $rate->toArray());
   }
 
 }

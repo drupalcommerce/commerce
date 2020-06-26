@@ -61,4 +61,14 @@ class SwissVatTest extends EuropeanUnionVatTest {
     $this->assertCount(0, $adjustments);
   }
 
+  /**
+   * @covers ::getZones
+   */
+  public function testGetZones() {
+    /** @var \Drupal\commerce_tax\Plugin\Commerce\TaxType\LocalTaxTypeInterface $plugin */
+    $plugin = $this->taxType->getPlugin();
+    $zones = $plugin->getZones();
+    $this->assertArrayHasKey('ch', $zones);
+  }
+
 }

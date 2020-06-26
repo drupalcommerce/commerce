@@ -9,6 +9,8 @@ use Drupal\commerce_order\Entity\OrderInterface;
 use Drupal\commerce_order\Entity\OrderItemInterface;
 use Drupal\commerce_price\RounderInterface;
 use Drupal\commerce_store\Entity\StoreInterface;
+use Drupal\commerce_tax\Event\BuildZonesEvent;
+use Drupal\commerce_tax\Event\TaxEvents;
 use Drupal\commerce_tax\TaxZone;
 use Drupal\commerce_tax\Resolver\ChainTaxRateResolverInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
@@ -332,7 +334,11 @@ abstract class LocalTaxTypeBase extends TaxTypeBase implements LocalTaxTypeInter
    */
   public function getZones() {
     if (empty($this->zones)) {
-      $this->zones = $this->buildZones();
+      $zones = $this->buildZones();
+      // Dispatch an event to allow altering the tax zones.
+      $event = new BuildZonesEvent($zones, $this);
+      $this->eventDispatcher->dispatch(TaxEvents::BUILD_ZONES, $event);
+      $this->zones = $event->getZones();
     }
 
     return $this->zones;

@@ -64,6 +64,7 @@ class TaxZoneTest extends CommerceKernelTestBase {
    * @covers ::getRate
    * @covers ::getDefaultRate
    * @covers ::match
+   * @covers ::toArray
    */
   public function testValid() {
     // Can't use a unit test because DrupalDateTime objects use \Drupal.
@@ -104,6 +105,7 @@ class TaxZoneTest extends CommerceKernelTestBase {
     $serbian_address = new Address('RS');
     $this->assertTrue($zone->match($irish_address));
     $this->assertFalse($zone->match($serbian_address));
+    $this->assertEquals($definition, $zone->toArray());
   }
 
 }

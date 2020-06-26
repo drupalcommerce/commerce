@@ -300,7 +300,9 @@ class EuropeanUnionVat extends LocalTaxTypeBase {
           'id' => 'standard',
           'label' => $labels['standard'],
           'percentages' => [
-            ['number' => '0.19', 'start_date' => '2007-01-01'],
+            ['number' => '0.19', 'start_date' => '2007-01-01', 'end_date' => '2020-06-30'],
+            ['number' => '0.16', 'start_date' => '2020-07-01', 'end_date' => '2020-12-31'],
+            ['number' => '0.19', 'start_date' => '2021-01-01'],
           ],
           'default' => TRUE,
         ],
@@ -308,7 +310,9 @@ class EuropeanUnionVat extends LocalTaxTypeBase {
           'id' => 'reduced',
           'label' => $labels['reduced'],
           'percentages' => [
-            ['number' => '0.07', 'start_date' => '1983-07-01'],
+            ['number' => '0.07', 'start_date' => '1983-07-01', 'end_date' => '2020-06-30'],
+            ['number' => '0.05', 'start_date' => '2020-07-01', 'end_date' => '2020-12-31'],
+            ['number' => '0.07', 'start_date' => '2021-01-01'],
           ],
         ],
       ],

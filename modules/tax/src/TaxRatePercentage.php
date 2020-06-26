@@ -118,6 +118,20 @@ class TaxRatePercentage {
   }
 
   /**
+   * Gets the array representation of the tax rate percentage.
+   *
+   * @return array
+   *   The array representation of the tax rate percentage.
+   */
+  public function toArray() : array {
+    return array_filter([
+      'number' => $this->number,
+      'start_date' => $this->startDate,
+      'end_date' => $this->endDate,
+    ]);
+  }
+
+  /**
    * Calculates the tax amount for the given price.
    *
    * @param \Drupal\commerce_price\Price $price

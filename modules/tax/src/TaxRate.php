@@ -94,6 +94,23 @@ class TaxRate {
   }
 
   /**
+   * Gets the array representation of the tax rate.
+   *
+   * @return array
+   *   The array representation of the tax rate.
+   */
+  public function toArray() : array {
+    return [
+      'id' => $this->id,
+      'default' => $this->default,
+      'label' => $this->label,
+      'percentages' => array_map(function (TaxRatePercentage $percentage) {
+        return $percentage->toArray();
+      }, $this->percentages),
+    ];
+  }
+
+  /**
    * Gets the percentage valid for the given date.
    *
    * @param \Drupal\Core\Datetime\DrupalDateTime $date

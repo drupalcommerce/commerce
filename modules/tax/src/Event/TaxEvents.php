@@ -5,6 +5,15 @@ namespace Drupal\commerce_tax\Event;
 final class TaxEvents {
 
   /**
+   * Name of the event fired when building the tax zones.
+   *
+   * @Event
+   *
+   * @see \Drupal\commerce_tax\Event\BuildZonesEvent
+   */
+  const BUILD_ZONES = 'commerce_tax.build_zones';
+
+  /**
    * Name of the event fired when determining the customer's profile.
    *
    * By default the billing profile is used to determine tax type

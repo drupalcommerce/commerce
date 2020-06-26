@@ -1,4 +1,9 @@
 services:
+  commerce_tax_test.build_zones_subscriber:
+    class: Drupal\commerce_tax_test\EventSubscriber\BuildZonesEventSubscriber
+    tags:
+      - { name: event_subscriber }
+
   commerce_tax_test.tax_rate_resolver:
     class: Drupal\commerce_tax_test\Resolver\TaxRateResolver
     tags:

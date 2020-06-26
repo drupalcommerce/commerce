@@ -128,6 +128,34 @@ class TaxZone {
   }
 
   /**
+   * Gets the array representation of the tax zone.
+   *
+   * @return array
+   *   The array representation of the tax zone.
+   */
+  public function toArray() : array {
+    return [
+      'id' => $this->id,
+      'label' => $this->label,
+      'display_label' => $this->displayLabel,
+      'territories' => array_map(function (ZoneTerritory $territory) {
+        // This logic would be best suited in the addressing library.
+        return array_filter([
+          'country_code' => $territory->getCountryCode(),
+          'administrative_area' => $territory->getAdministrativeArea(),
+          'locality' => $territory->getLocality(),
+          'dependent_locality' => $territory->getDependentLocality(),
+          'included_postal_codes' => $territory->getIncludedPostalCodes(),
+          'excluded_postal_codes' => $territory->getExcludedPostalCodes(),
+        ]);
+      }, $this->territories),
+      'rates' => array_map(function (TaxRate $rate) {
+        return $rate->toArray();
+      }, array_values($this->rates)),
+    ];
+  }
+
+  /**
    * Gets the tax rate with the given ID.
    *
    * @param string $rate_id
