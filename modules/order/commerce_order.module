@@ -45,6 +45,9 @@ function commerce_order_theme($existing, $type, $theme, $path) {
         'totals' => NULL,
       ],
     ],
+    'commerce_order_receipt__entity_print' => [
+      'base hook' => 'commerce_order_receipt',
+    ],
     'commerce_order_total_summary' => [
       'variables' => [
         'order_entity' => NULL,
@@ -83,6 +86,20 @@ function template_preprocess_commerce_order_item(array &$variables) {
   $variables['order_item'] = [];
   foreach (Element::children($variables['elements']) as $key) {
     $variables['order_item'][$key] = $variables['elements'][$key];
+  }
+}
+
+/**
+ * Implements hook_entity_extra_field_info_alter().
+ */
+function commerce_order_entity_extra_field_info_alter(&$info) {
+  if (isset($info['commerce_order'])) {
+    // Show the 'View PDF' link by default.
+    foreach ($info['commerce_order'] as $bundle => &$fields) {
+      if (isset($fields['display']['entity_print_view_pdf'])) {
+        $fields['display']['entity_print_view_pdf']['visible'] = TRUE;
+      }
+    }
   }
 }
 

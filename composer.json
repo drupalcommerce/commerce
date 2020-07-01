@@ -18,6 +18,7 @@
         "commerceguys/intl": "^1.0.0"
     },
     "require-dev": {
+        "drupal/entity_print": "^2.2",
         "drupal/mailsystem": "^4.3"
     },
     "minimum-stability": "dev"

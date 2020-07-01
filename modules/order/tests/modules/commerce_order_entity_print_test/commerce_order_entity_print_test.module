@@ -1,0 +1,17 @@
+<?php
+
+/**
+ * @file
+ * A test module for the commerce_order_entity_print_test module.
+ */
+
+/**
+ * Implements hook_theme().
+ */
+function commerce_order_entity_print_test_theme($existing, $type, $theme, $path) {
+  return [
+    'commerce_order_receipt__entity_print' => [
+      'base hook' => 'commerce_order_receipt',
+    ],
+  ];
+}

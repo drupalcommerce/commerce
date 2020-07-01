@@ -55,6 +55,7 @@ use Drupal\profile\Entity\ProfileInterface;
  *       "default" = "Drupal\commerce_order\OrderRouteProvider",
  *       "delete-multiple" = "Drupal\entity\Routing\DeleteMultipleRouteProvider",
  *     },
+ *     "entity_print" = "Drupal\commerce_order\EntityPrint\OrderRenderer"
  *   },
  *   base_table = "commerce_order",
  *   admin_permission = "administer commerce_order",

@@ -1,0 +1,8 @@
+name: commerce_order_entity_print_test
+type: module
+core_version_requirement: ^8.8 || ^9
+package: Testing
+dependencies:
+  - commerce:commerce_order
+  - commerce:commerce_product
+  - entity_print:entity_print
