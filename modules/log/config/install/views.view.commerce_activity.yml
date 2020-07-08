@@ -288,7 +288,16 @@ display:
           entity_field: log_id
           plugin_id: standard
       title: 'Order logs'
-      header: {  }
+      header:
+        commerce_log_admin_comment_form:
+          id: commerce_log_admin_comment_form
+          table: views
+          field: commerce_log_admin_comment_form
+          relationship: none
+          group_type: group
+          admin_label: ''
+          empty: true
+          plugin_id: commerce_log_admin_comment_form
       footer: {  }
       empty:
         area_text_custom:

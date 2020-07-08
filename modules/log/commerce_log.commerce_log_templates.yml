@@ -43,3 +43,7 @@ mail_order_receipt_failure:
   category: commerce_order
   label: 'Order receipt email failure'
   template: '<p>Order receipt email failed to send to {{ to_email }}.</p>'
+commerce_order_admin_comment:
+  category: commerce_order
+  label: 'Admin comment'
+  template: '<p><strong>Admin comment:</strong><br /> {{ comment }}</p>'
