@@ -1,6 +1,7 @@
 <?php
 
 namespace Drupal\commerce_order;
+
 use Drupal\Component\Render\MarkupInterface;
 
 /**

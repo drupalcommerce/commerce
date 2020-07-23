@@ -34,7 +34,7 @@ class BuildZonesEvent extends Event {
    * @param \Drupal\commerce_tax\Plugin\Commerce\TaxType\LocalTaxTypeInterface $plugin
    *   The local tax type plugin.
    */
-  public function __construct($zones, LocalTaxTypeInterface $plugin) {
+  public function __construct(array $zones, LocalTaxTypeInterface $plugin) {
     $this->zones = $zones;
     $this->plugin = $plugin;
   }
@@ -57,7 +57,7 @@ class BuildZonesEvent extends Event {
    *
    * @return $this
    */
-  public function setZones($zones) {
+  public function setZones(array $zones) {
     $this->zones = $zones;
     return $this;
   }

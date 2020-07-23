@@ -2,6 +2,7 @@
 
 namespace Drupal\Tests\commerce_cart\Functional;
 
+use Drupal\commerce_order\Entity\OrderInterface;
 use Drupal\Tests\commerce_order\Functional\OrderBrowserTestBase;
 
 /**
@@ -68,22 +69,34 @@ class CartTest extends OrderBrowserTestBase {
         'currency_code' => 'USD',
       ],
     ]);
+    // Add a test variation that shouldn't be available.
+    $test_variation = $this->createEntity('commerce_product_variation', [
+      'type' => 'default',
+      'sku' => 'TEST_' . strtolower($this->randomMachineName()),
+      'price' => [
+        'number' => 500,
+        'currency_code' => 'USD',
+      ],
+    ]);
     // We need a product too otherwise tests complain about the missing
     // backreference.
     $this->createEntity('commerce_product', [
       'type' => 'default',
       'title' => $this->randomMachineName(),
       'stores' => [$this->store],
-      'variations' => [$variation],
+      'variations' => [$variation, $test_variation],
     ]);
     $this->variations[] = $variation;
+    $this->variations[] = $test_variation;
     $this->cart = $this->container->get('commerce_cart.cart_provider')->createCart('default');
     $this->cartManager = $this->container->get('commerce_cart.cart_manager');
 
-    // Add both variations to the cart.
+    // Add variations to the cart.
     foreach ($this->variations as $variation) {
-      $this->cartManager->addEntity($this->cart, $variation);
+      $this->cartManager->addEntity($this->cart, $variation, '1', TRUE, FALSE);
     }
+    $this->cart->setRefreshState(OrderInterface::REFRESH_SKIP);
+    $this->cart->save();
   }
 
   /**
@@ -96,16 +109,25 @@ class CartTest extends OrderBrowserTestBase {
     $this->assertSession()->elementTextContains('css', '.order-total-line', 'Total');
     $this->assertSession()->pageTextContains('$999.00');
     $this->assertSession()->pageTextContains('$350.00');
+    $this->assertSession()->pageTextContains('$500.00');
     // Confirm the presence and functioning of the Quantity field.
     $this->assertSession()->fieldValueEquals('edit-edit-quantity-0', 1);
     $this->assertSession()->fieldValueEquals('edit-edit-quantity-1', 1);
+    $this->assertSession()->fieldValueEquals('edit-edit-quantity-2', 1);
     $this->assertSession()->buttonExists('Update cart');
+    $values = [
+      'edit_quantity[0]' => 2,
+      'edit_quantity[1]' => 3,
+      'edit_quantity[2]' => 3,
+    ];
+    $this->submitForm($values, t('Update cart'));
+    $this->assertSession()->pageTextContains(sprintf('%s is not available with a quantity of %s.', $this->variations[2]->label(), 3));
+    $this->getSession()->getPage()->findButton('edit-remove-button-2')->press();
     $values = [
       'edit_quantity[0]' => 2,
       'edit_quantity[1]' => 3,
     ];
     $this->submitForm($values, t('Update cart'));
-    $this->assertSession()->pageTextContains(t('Your shopping cart has been updated.'));
     $this->assertSession()->fieldValueEquals('edit-edit-quantity-0', 2);
     $this->assertSession()->fieldValueEquals('edit-edit-quantity-1', 3);
     $this->assertSession()->elementTextContains('css', '.order-total-line', 'Total');
