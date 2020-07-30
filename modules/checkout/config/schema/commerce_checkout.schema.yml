@@ -74,6 +74,14 @@ commerce_checkout.commerce_checkout_pane.order_summary:
       type: string
       label: 'View'
 
+commerce_checkout.commerce_checkout_pane.completion_message:
+  type: commerce_checkout_pane_configuration
+  mapping:
+    message:
+      type: text_format
+      label: 'message'
+      translatable: true
+
 commerce_checkout_pane_configuration:
   type: mapping
   mapping:

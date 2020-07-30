@@ -6,6 +6,7 @@ use Drupal\commerce_order\Entity\Order;
 use Drupal\Core\Url;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
+use Drupal\filter\Entity\FilterFormat;
 use Drupal\Tests\commerce\Functional\CommerceBrowserTestBase;
 
 /**
@@ -713,6 +714,56 @@ class CheckoutOrderTest extends CommerceBrowserTestBase {
       'login[returning_customer][password]' => 'pass',
     ], 'Log in');
     $this->assertCheckoutProgressStep('Order information');
+  }
+
+  /**
+   * Tests a customized checkout complete message.
+   *
+   * @group debug
+   */
+  public function testCustomCheckoutCompletionMessage() {
+    // Create Full HTML text format.
+    $full_html_format = FilterFormat::create([
+      'format' => 'full_html',
+      'name' => 'Full HTML',
+    ]);
+    $full_html_format->save();
+
+    $config = \Drupal::configFactory()->getEditable('commerce_checkout.commerce_checkout_flow.default');
+    $config->set('configuration.panes.completion_message.message.value', '<h1>Your order number is [commerce_order:order_number].</h1><p>Click here you view your order: [commerce_order:url].</p>');
+    $config->set('configuration.panes.completion_message.message.format', 'full_html');
+    $config->save();
+
+    $this->drupalLogout();
+    $this->drupalGet($this->product->toUrl());
+    $this->submitForm([], 'Add to cart');
+    $cart_link = $this->getSession()->getPage()->findLink('your cart');
+    $cart_link->click();
+    $this->submitForm([], 'Checkout');
+
+    $this->submitForm([], 'Continue as Guest');
+    $this->submitForm([
+      'contact_information[email]' => 'guest@example.com',
+      'contact_information[email_confirm]' => 'guest@example.com',
+      'billing_information[profile][address][0][address][given_name]' => 'John',
+      'billing_information[profile][address][0][address][family_name]' => 'Smith',
+      'billing_information[profile][address][0][address][organization]' => 'Centarro',
+      'billing_information[profile][address][0][address][address_line1]' => '9 Drupal Ave',
+      'billing_information[profile][address][0][address][postal_code]' => '94043',
+      'billing_information[profile][address][0][address][locality]' => 'Mountain View',
+      'billing_information[profile][address][0][address][administrative_area]' => 'CA',
+    ], 'Continue to review');
+    $this->submitForm([], 'Complete checkout');
+
+    $expected_order_url = Url::fromRoute('entity.commerce_order.user_view', [
+      'commerce_order' => 1,
+      'user' => 0,
+    ], ['absolute' => TRUE]);
+    // We have text seperated by <h1> and <p> tags, so they appear individually.
+    $this->assertSession()->pageTextNotContains("Your order number is 1. Click here you view your order: {$expected_order_url->toString()}.");
+    $this->assertSession()->pageTextContains('Your order number is 1.');
+    $this->assertSession()->pageTextContains("Click here you view your order: {$expected_order_url->toString()}.");
+
   }
 
   /**

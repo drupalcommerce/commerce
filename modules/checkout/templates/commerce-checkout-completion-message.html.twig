@@ -5,14 +5,14 @@
  *
  * Available variables:
  * - order_entity: The order entity.
+ * - message: The completion message.
  * - payment_instructions: The payment instructions, if provided.
  *
  * @ingroup themeable
  */
 #}
 <div class="checkout-complete">
-  {{ 'Your order number is @number.'|t({'@number': order_entity.getOrderNumber}) }} <br>
-  {{ 'You can view your order on your account page when logged in.'|t }} <br>
+  {{- message -}}
 
   {% if payment_instructions %}
     <div class="checkout-complete__payment-instructions">
