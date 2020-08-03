@@ -68,6 +68,20 @@ commerce.commerce_condition.plugin.order_total_price:
 commerce.commerce_condition.plugin.order_type:
   type: commerce.commerce_condition.plugin.entity_bundle
 
+commerce.commerce_condition.plugin.order_purchased_entity:
+  type: commerce_condition_configuration
+  mapping:
+    entities:
+      type: sequence
+      label: 'Entities'
+      orderby: value
+      sequence:
+        type: string
+        label: 'Purchased entity'
+
+commerce.commerce_condition.plugin.order_item_purchased_entity:
+  type: commerce.commerce_condition.plugin.order_purchased_entity
+
 commerce_order.commerce_order_type.*:
   type: commerce_config_entity_bundle
   label: 'Order type'

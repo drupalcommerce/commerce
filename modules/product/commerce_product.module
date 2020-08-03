@@ -5,6 +5,7 @@
  * Defines the Product entity and associated features.
  */
 
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\entity\BundleFieldDefinition;
 use Drupal\commerce\EntityHelper;
 use Drupal\commerce_product\Entity\ProductTypeInterface;
@@ -343,5 +344,17 @@ function commerce_product_config_schema_info_alter(&$definitions) {
       'type' => 'integer',
       'label' => 'Maximum number of autocomplete suggestions.',
     ];
+  }
+}
+
+/**
+ * Implements hook_commerce_condition_info_alter().
+ */
+function commerce_product_commerce_condition_info_alter(array &$definitions) {
+  if (isset($definitions['order_purchased_entity:commerce_product_variation'])) {
+    $definitions['order_purchased_entity:commerce_product_variation']['category'] = new TranslatableMarkup('Products');
+  }
+  if (isset($definitions['order_item_purchased_entity:commerce_product_variation'])) {
+    $definitions['order_item_purchased_entity:commerce_product_variation']['category'] = new TranslatableMarkup('Products');
   }
 }
