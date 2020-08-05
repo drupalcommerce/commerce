@@ -122,4 +122,20 @@ final class PaymentOption {
     return $this->paymentMethodTypeId;
   }
 
+  /**
+   * Gets the array representation of the payment option.
+   *
+   * @return array
+   *   The array representation of the payment option.
+   */
+  public function toArray() : array {
+    return [
+      'id' => $this->id,
+      'label' => $this->label,
+      'payment_gateway_id' => $this->paymentGatewayId,
+      'payment_method_id' => $this->paymentMethodId,
+      'payment_method_type_id' => $this->paymentMethodTypeId,
+    ];
+  }
+
 }

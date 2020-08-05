@@ -209,6 +209,13 @@ class PaymentOptionsBuilderTest extends OrderKernelTestBase {
     $this->assertEquals('onsite', $options[0]->getPaymentGatewayId());
     $this->assertEquals('1', $options[0]->getPaymentMethodId());
     $this->assertNull($options[0]->getPaymentMethodTypeId());
+    $this->assertEquals([
+      'id' => '1',
+      'label' => 'Visa ending in 1111',
+      'payment_gateway_id' => 'onsite',
+      'payment_method_id' => '1',
+      'payment_method_type_id' => NULL,
+    ], $options[0]->toArray());
 
     // Order payment method.
     $this->assertEquals('3', $options[1]->getId());
