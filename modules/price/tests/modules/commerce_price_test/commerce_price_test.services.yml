@@ -3,3 +3,8 @@ services:
     class: Drupal\commerce_price_test\TestPriceResolver
     tags:
       - { name: commerce_price.price_resolver, priority: 100 }
+  commerce_test.price_number_normalizer:
+    class: Drupal\commerce_price_test\Normalizer\PriceNumberNormalizer
+    tags:
+      # The priority must be higher than serialization.normalizer.primitive_data.
+      - { name: normalizer , priority: 1000 }

@@ -5,6 +5,9 @@
  * Defines the Product entity and associated features.
  */
 
+use Drupal\Core\Access\AccessResult;
+use Drupal\Core\Entity\EntityTypeInterface;
+use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\entity\BundleFieldDefinition;
 use Drupal\commerce\EntityHelper;
@@ -357,4 +360,17 @@ function commerce_product_commerce_condition_info_alter(array &$definitions) {
   if (isset($definitions['order_item_purchased_entity:commerce_product_variation'])) {
     $definitions['order_item_purchased_entity:commerce_product_variation']['category'] = new TranslatableMarkup('Products');
   }
+}
+
+/**
+ * Implements hook_jsonapi_ENTITY_TYPE_filter_access().
+ *
+ * Product variations do not have a query access handler, so we must define
+ * the access for JSON:API filter access here.
+ */
+function commerce_product_jsonapi_commerce_product_variation_filter_access(EntityTypeInterface $entity_type, AccountInterface $account) {
+  return [
+    JSONAPI_FILTER_AMONG_OWN => AccessResult::allowedIfHasPermission($account, 'view own unpublished commerce_product'),
+    JSONAPI_FILTER_AMONG_PUBLISHED => AccessResult::allowedIfHasPermission($account, 'view commerce_product'),
+  ];
 }

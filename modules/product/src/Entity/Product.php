@@ -279,7 +279,7 @@ class Product extends CommerceContentEntityBase implements ProductInterface {
     // Ensure there's a back-reference on each product variation.
     foreach ($this->variations as $item) {
       $variation = $item->entity;
-      if ($variation->product_id->isEmpty()) {
+      if ($variation && $variation->product_id->isEmpty()) {
         $variation->product_id = $this->id();
         $variation->save();
       }

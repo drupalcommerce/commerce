@@ -21,3 +21,17 @@ function commerce_product_test_entity_access(EntityInterface $entity, $operation
   }
   return AccessResult::neutral();
 }
+
+/**
+ * Implements hook_module_implements_alter().
+ */
+function commerce_product_test_module_implements_alter(&$implementations, $hook) {
+  // Remove the EventOnlyQueryAccessHandler added to all entities in entity:1.1
+  // for testing. The generic query_access handler provided by the Entity module
+  // bypasses the need to define hook_jsonapi_ENTITY_TYPE_filter_access. We
+  // remove it in the test to verify commerce_product_jsonapi_commerce_product_variation_filter_access
+  // is working as expected.
+  if ($hook === 'entity_type_alter') {
+    unset($implementations['entity']);
+  }
+}
