@@ -113,9 +113,7 @@ class QuantityWidget extends NumberWidget {
    * {@inheritdoc}
    */
   public static function isApplicable(FieldDefinitionInterface $field_definition) {
-    $entity_type = $field_definition->getTargetEntityTypeId();
-    $field_name = $field_definition->getName();
-    return $entity_type == 'commerce_order_item' && $field_name == 'quantity';
+    return $field_definition->getName() === 'quantity';
   }
 
 }
