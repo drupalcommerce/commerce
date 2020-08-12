@@ -28,6 +28,8 @@ class AdjustmentDefaultWidget extends WidgetBase {
     /** @var \Drupal\commerce_order\Adjustment $adjustment */
     $adjustment = $items[$delta]->value;
 
+    $element['#type'] = 'container';
+    $element['#attributes']['class'][] = 'form--inline';
     $element['#attached']['library'][] = 'commerce_price/admin';
 
     /** @var \Drupal\Component\Plugin\PluginManagerInterface $plugin_manager */
@@ -77,6 +79,7 @@ class AdjustmentDefaultWidget extends WidgetBase {
     $element['definition']['label'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Label'),
+      '#size' => 20,
       '#default_value' => ($adjustment) ? $adjustment->getLabel() : '',
     ];
     $element['definition']['amount'] = [
@@ -89,6 +92,7 @@ class AdjustmentDefaultWidget extends WidgetBase {
           'select[name="' . $states_selector_name . '"]' => ['value' => '_none'],
         ],
       ],
+      '#attributes' => ['class' => ['clearfix']],
     ];
     $element['definition']['included'] = [
       '#type' => 'checkbox',
