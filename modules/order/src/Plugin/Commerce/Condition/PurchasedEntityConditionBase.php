@@ -62,6 +62,15 @@ abstract class PurchasedEntityConditionBase extends ConditionBase implements Con
   }
 
   /**
+   * {@inheritdoc}
+   */
+  public function defaultConfiguration() {
+    return [
+      'entities' => [],
+    ] + parent::defaultConfiguration();
+  }
+
+  /**
    * Gets the purchasable entity type.
    *
    * @return string
@@ -87,7 +96,7 @@ abstract class PurchasedEntityConditionBase extends ConditionBase implements Con
     }
     $form['entities'] = [
       '#type' => 'entity_autocomplete',
-      '#title' => $purchasable_entity_type->getCollectionLabsel(),
+      '#title' => $purchasable_entity_type->getCollectionLabel(),
       '#default_value' => $entities,
       '#target_type' => $purchasable_entity_type->id(),
       '#tags' => TRUE,
