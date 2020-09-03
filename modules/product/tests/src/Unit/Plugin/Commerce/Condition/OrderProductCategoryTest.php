@@ -11,6 +11,7 @@ use Drupal\commerce_product\Plugin\Commerce\Condition\OrderProductCategory;
 use Drupal\Core\Entity\EntityFieldManagerInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Field\EntityReferenceFieldItemList;
+use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Tests\UnitTestCase;
 
 /**
@@ -57,7 +58,10 @@ class OrderProductCategoryTest extends UnitTestCase {
     $first_order_item = $first_order_item->reveal();
 
     // Product with a non-matching product category.
+    $entity_reference_field_definition = $this->prophesize(FieldDefinitionInterface::class);
+    $entity_reference_field_definition->getSetting('target_type')->willReturn('taxonomy_term');
     $entity_reference_item_list = $this->prophesize(EntityReferenceFieldItemList::class);
+    $entity_reference_item_list->getFieldDefinition()->willReturn($entity_reference_field_definition->reveal());
     $entity_reference_item_list->isEmpty()->willReturn(FALSE);
     $entity_reference_item_list->getValue()->willReturn([
       '1' => [

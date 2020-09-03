@@ -134,7 +134,9 @@ trait ProductCategoryTrait {
     foreach ($this->getEntityReferenceFieldMap() as $field_name => $field_info) {
       if ($product->hasField($field_name)) {
         $field = $product->get($field_name);
-        if (!$field->isEmpty()) {
+        $field_definition = $field->getFieldDefinition();
+        $target_type = $field_definition->getSetting('target_type');
+        if ($target_type === 'taxonomy_term' && !$field->isEmpty()) {
           foreach ($field->getValue() as $index => $field_item) {
             $ids[] = $field_item['target_id'];
           }
