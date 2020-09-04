@@ -9,6 +9,7 @@ use Drupal\commerce_order\Entity\OrderTypeInterface;
 use Drupal\commerce_order\Plugin\Field\FieldFormatter\PriceCalculatedFormatter;
 use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\Element;
 use Drupal\Core\Session\AccountInterface;
@@ -379,4 +380,21 @@ function commerce_order_form_field_config_edit_form_alter(array &$form, FormStat
       $form['settings']['available_countries']['#access'] = FALSE;
     }
   }
+}
+
+/**
+ * Implements hook_jsonapi_ENTITY_TYPE_filter_access().
+ */
+function commerce_order_jsonapi_commerce_order_filter_access(EntityTypeInterface $entity_type, AccountInterface $account) {
+  // Entity API automatically hooks into the JSON:API query filter system for
+  // entities that has a permission_provider and query_handler. However, orders
+  // do not have an `owner` key and are not evaluated for the
+  // JSONAPI_FILTER_AMONG_OWN check. This means only JSONAPI_FILTER_AMONG_ALL is
+  // evaluated, which defaults to the admin permission.
+  //
+  // Since we have a query_handler configured and inaccessible entities will
+  // be filtered out automatically, we set it to allowed.
+  return ([
+    JSONAPI_FILTER_AMONG_ALL => AccessResult::allowed(),
+  ]);
 }
