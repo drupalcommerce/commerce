@@ -29,6 +29,12 @@ services:
     tags:
       - { name: 'context_provider' }
 
+  commerce_product.product_variation_route_context:
+    class: Drupal\commerce_product\ContextProvider\ProductVariationContext
+    arguments: ['@current_route_match', '@entity_type.manager']
+    tags:
+      - { name: 'context_provider' }
+
   commerce_product.variation_attribute_mapper:
     class: Drupal\commerce_product\ProductVariationAttributeMapper
     arguments: ['@commerce_product.attribute_field_manager', '@entity_type.manager', '@entity.repository']

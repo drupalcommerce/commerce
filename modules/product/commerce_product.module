@@ -9,6 +9,8 @@ use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\commerce_product\Plugin\Block\VariationFieldBlock;
+use Drupal\Component\Plugin\PluginBase;
 use Drupal\entity\BundleFieldDefinition;
 use Drupal\commerce\EntityHelper;
 use Drupal\commerce_product\Entity\ProductTypeInterface;
@@ -373,4 +375,18 @@ function commerce_product_jsonapi_commerce_product_variation_filter_access(Entit
     JSONAPI_FILTER_AMONG_OWN => AccessResult::allowedIfHasPermission($account, 'view own unpublished commerce_product'),
     JSONAPI_FILTER_AMONG_PUBLISHED => AccessResult::allowedIfHasPermission($account, 'view commerce_product'),
   ];
+}
+
+/**
+ * Implements hook_block_alter().
+ */
+function commerce_product_block_alter(array &$info) {
+  if (\Drupal::moduleHandler()->moduleExists('layout_builder')) {
+    $base_plugin_id = 'field_block' . PluginBase::DERIVATIVE_SEPARATOR . 'commerce_product_variation' . PluginBase::DERIVATIVE_SEPARATOR;
+    foreach ($info as $block_plugin_id => $block_definition) {
+      if (strpos($block_plugin_id, $base_plugin_id) !== FALSE) {
+        $info[$block_plugin_id]['class'] = VariationFieldBlock::class;
+      }
+    }
+  }
 }

@@ -113,6 +113,15 @@ class ProductVariationFieldInjectionTest extends ProductBrowserTestBase {
   }
 
   /**
+   * Verifies installing Layout Builder does not break field injection.
+   */
+  public function testInjectedFieldsWithLayoutBuilderInstalled() {
+    $this->container->get('module_installer')->install(['layout_builder']);
+    $this->rebuildContainer();
+    $this->testInjectedVariationDefault();
+  }
+
+  /**
    * Tests that the default injected variation respects the URL context.
    */
   public function testInjectedVariationFromUrl() {

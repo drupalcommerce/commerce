@@ -10,6 +10,7 @@ use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Entity\EntityViewBuilder;
 use Drupal\Core\Language\LanguageManagerInterface;
+use Drupal\layout_builder\Entity\LayoutEntityDisplayInterface;
 use Drupal\Core\Theme\Registry;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -76,6 +77,13 @@ class ProductViewBuilder extends EntityViewBuilder {
    * {@inheritdoc}
    */
   protected function alterBuild(array &$build, EntityInterface $entity, EntityViewDisplayInterface $display, $view_mode) {
+    // If we're in a Layout Builder controlled display, we do not need to run
+    // variation field injection, as any of these fields will be placed as
+    // blocks within the display.
+    $is_layout_builder = $display instanceof LayoutEntityDisplayInterface && $display->isLayoutBuilderEnabled();
+    if ($is_layout_builder) {
+      return;
+    }
     $product_type_storage = $this->entityTypeManager->getStorage('commerce_product_type');
     /** @var \Drupal\commerce_product\ProductVariationStorageInterface $variation_storage */
     $variation_storage = $this->entityTypeManager->getStorage('commerce_product_variation');

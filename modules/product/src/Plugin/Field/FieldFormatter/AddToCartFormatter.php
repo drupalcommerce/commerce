@@ -64,11 +64,33 @@ class AddToCartFormatter extends FormatterBase {
    */
   public function viewElements(FieldItemListInterface $items, $langcode) {
     $elements = [];
+
+    $product = $items->getEntity();
+    if (!empty($product->in_preview)) {
+      $elements[0]['add_to_cart_form'] = [
+        '#type' => 'actions',
+        ['#type' => 'button', '#value' => $this->t('Add to cart')],
+      ];
+      return $elements;
+    }
+    if ($product->isNew()) {
+      return [];
+    }
+
+    $view_mode = $this->viewMode;
+    // If the field formatter is rendered in Layout Builder, the `viewMode`
+    // property will be `_custom` and the original view mode is stored in the
+    // third party settings.
+    // @see \Drupal\layout_builder\Plugin\Block\FieldBlock::build
+    if (isset($this->thirdPartySettings['layout_builder'])) {
+      $view_mode = $this->thirdPartySettings['layout_builder']['view_mode'];
+    }
+
     $elements[0]['add_to_cart_form'] = [
       '#lazy_builder' => [
         'commerce_product.lazy_builders:addToCartForm', [
-          $items->getEntity()->id(),
-          $this->viewMode,
+          $product->id(),
+          $view_mode,
           $this->getSetting('combine'),
           $langcode,
         ],
