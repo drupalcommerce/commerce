@@ -264,7 +264,7 @@ class PaymentMethod extends ContentEntityBase implements PaymentMethodInterface 
       ->setDescription(t('Billing profile'))
       ->setSetting('target_type', 'profile')
       ->setSetting('handler', 'default')
-      ->setSetting('handler_settings', ['target_bundles' => ['customer']])
+      ->setSetting('handler_settings', ['target_bundles' => ['customer' => 'customer']])
       ->setDisplayOptions('form', [
         'type' => 'options_select',
         'weight' => 0,

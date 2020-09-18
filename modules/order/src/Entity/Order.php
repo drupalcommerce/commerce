@@ -770,7 +770,7 @@ class Order extends CommerceContentEntityBase implements OrderInterface {
       ->setDescription(t('Billing profile'))
       ->setSetting('target_type', 'profile')
       ->setSetting('handler', 'default')
-      ->setSetting('handler_settings', ['target_bundles' => ['customer']])
+      ->setSetting('handler_settings', ['target_bundles' => ['customer' => 'customer']])
       ->setTranslatable(TRUE)
       ->setDisplayOptions('form', [
         'type' => 'commerce_billing_profile',
