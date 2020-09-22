@@ -126,3 +126,22 @@ function commerce_payment_update_8205() {
   $storage_definition->setDefaultValueCallback($default_value_callback);
   $definition_update_manager->updateFieldStorageDefinition($storage_definition);
 }
+
+/**
+ * Add the avs_response_code and avs_response_code_label fields to payments.
+ */
+function commerce_payment_update_8206() {
+  $entity_definition_update = \Drupal::entityDefinitionUpdateManager();
+
+  $storage_definition = BaseFieldDefinition::create('string')
+    ->setLabel(t('AVS response code'))
+    ->setDescription(t('The AVS response code.'))
+    ->setDisplayConfigurable('view', TRUE);
+  $entity_definition_update->installFieldStorageDefinition('avs_response_code', 'commerce_payment', 'commerce_payment', $storage_definition);
+
+  $storage_definition = BaseFieldDefinition::create('string')
+    ->setLabel(t('AVS response code label'))
+    ->setDescription(t('The AVS response code label.'))
+    ->setDisplayConfigurable('view', TRUE);
+  $entity_definition_update->installFieldStorageDefinition('avs_response_code_label', 'commerce_payment', 'commerce_payment', $storage_definition);
+}

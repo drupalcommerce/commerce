@@ -177,6 +177,8 @@ class DefaultPaymentAdminTest extends CommerceBrowserTestBase {
     $this->assertEquals($this->order->id(), $payment->getOrderId());
     $this->assertEquals('100.00', $payment->getAmount()->getNumber());
     $this->assertNotEmpty($payment->getCompletedTime());
+    $this->assertEquals('A', $payment->getAvsResponseCode());
+    $this->assertEquals('Address', $payment->getAvsResponseCodeLabel());
   }
 
   /**

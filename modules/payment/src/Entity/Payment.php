@@ -161,6 +161,36 @@ class Payment extends ContentEntityBase implements PaymentInterface {
   /**
    * {@inheritdoc}
    */
+  public function getAvsResponseCode() {
+    return $this->get('avs_response_code')->value;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setAvsResponseCode($avs_response_code) {
+    $this->set('avs_response_code', $avs_response_code);
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getAvsResponseCodeLabel() {
+    return $this->get('avs_response_code_label')->value;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setAvsResponseCodeLabel($avs_response_code_label) {
+    $this->set('avs_response_code_label', $avs_response_code_label);
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function getBalance() {
     if ($amount = $this->getAmount()) {
       $balance = $amount;
@@ -421,6 +451,16 @@ class Payment extends ContentEntityBase implements PaymentInterface {
     $fields['completed'] = BaseFieldDefinition::create('timestamp')
       ->setLabel(t('Completed'))
       ->setDescription(t('The time when the payment was completed.'))
+      ->setDisplayConfigurable('view', TRUE);
+
+    $fields['avs_response_code'] = BaseFieldDefinition::create('string')
+      ->setLabel(t('AVS response code'))
+      ->setDescription(t('The AVS response code.'))
+      ->setDisplayConfigurable('view', TRUE);
+
+    $fields['avs_response_code_label'] = BaseFieldDefinition::create('string')
+      ->setLabel(t('AVS response code label'))
+      ->setDescription(t('The AVS response code label.'))
       ->setDisplayConfigurable('view', TRUE);
 
     // These fields have been replaced by payment_gateway_mode and completed.

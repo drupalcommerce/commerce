@@ -118,12 +118,16 @@ class PaymentTest extends OrderKernelTestBase {
       'amount' => new Price('30', 'USD'),
       'refunded_amount' => new Price('10', 'USD'),
       'state' => 'refunded',
+      'avs_response_code' => 'X',
+      'avs_response_code_label' => 'Meaning of X',
     ]);
     $payment->save();
 
     $this->assertInstanceOf(PaymentDefault::class, $payment->getType());
     $this->assertEquals('example', $payment->getPaymentGatewayId());
     $this->assertEquals('test', $payment->getPaymentGatewayMode());
+    $this->assertEquals('X', $payment->getAvsResponseCode());
+    $this->assertEquals('Meaning of X', $payment->getAvsResponseCodeLabel());
 
     $this->assertEquals($this->order, $payment->getOrder());
     $this->assertEquals($this->order->id(), $payment->getOrderId());
@@ -133,6 +137,11 @@ class PaymentTest extends OrderKernelTestBase {
 
     $payment->setRemoteState('pending');
     $this->assertEquals('pending', $payment->getRemoteState());
+
+    $payment->setAvsResponseCode('Z');
+    $this->assertEquals('Z', $payment->getAvsResponseCode());
+    $payment->setAvsResponseCodeLabel('Meaning of Z');
+    $this->assertEquals('Meaning of Z', $payment->getAvsResponseCodeLabel());
 
     $this->assertEquals(new Price('30', 'USD'), $payment->getAmount());
     $this->assertEquals(new Price('10', 'USD'), $payment->getRefundedAmount());

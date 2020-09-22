@@ -125,6 +125,7 @@ class PaymentListBuilder extends EntityListBuilder {
     $header['label'] = $this->t('Payment');
     $header['state'] = $this->t('State');
     $header['payment_gateway'] = $this->t('Payment gateway');
+    $header['avs_response'] = '';
     $header['remote_id'] = $this->t('Remote ID');
     return $header + parent::buildHeader();
   }
@@ -146,6 +147,15 @@ class PaymentListBuilder extends EntityListBuilder {
     $row['label'] = $formatted_amount;
     $row['state'] = $entity->getState()->getLabel();
     $row['payment_gateway'] = $payment_gateway ? $payment_gateway->label() : $this->t('N/A');
+
+    // Add the AVS response code label beneath the gateway name if it exists.
+    if ($avs_response_code = $entity->getAvsResponseCode()) {
+      $row['avs_response'] = $this->t('AVS response: [@code] @label', ['@code' => $avs_response_code, '@label' => $entity->getAvsResponseCodeLabel()]);
+    }
+    else {
+      $row['avs_response'] = '';
+    }
+
     $row['remote_id'] = $entity->getRemoteId() ?: $this->t('N/A');
 
     return $row + parent::buildRow($entity);

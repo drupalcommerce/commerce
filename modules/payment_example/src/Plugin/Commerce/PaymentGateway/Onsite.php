@@ -114,6 +114,11 @@ class Onsite extends OnsitePaymentGatewayBase implements OnsiteInterface {
 
     $payment->setState($next_state);
     $payment->setRemoteId($remote_id);
+    $payment->setAvsResponseCode('A');
+    if (!$payment_method->card_type->isEmpty()) {
+      $avs_response_code_label = $this->buildAvsResponseCodeLabel('A', $payment_method->card_type->value);
+      $payment->setAvsResponseCodeLabel($avs_response_code_label);
+    }
     $payment->save();
   }
 
@@ -249,6 +254,19 @@ class Onsite extends OnsitePaymentGatewayBase implements OnsiteInterface {
     //
     // Perform the update request here, throw an exception if it fails.
     // See \Drupal\commerce_payment\Exception for the available exceptions.
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function buildAvsResponseCodeLabel($avs_response_code, $card_type) {
+    if ($card_type == 'dinersclub' || $card_type == 'jcb') {
+      if ($avs_response_code == 'A') {
+        return $this->t('Approved.');
+      }
+      return NULL;
+    }
+    return parent::buildAvsResponseCodeLabel($avs_response_code, $card_type);
   }
 
 }

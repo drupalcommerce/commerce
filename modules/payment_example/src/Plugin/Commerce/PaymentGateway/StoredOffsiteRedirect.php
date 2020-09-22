@@ -155,8 +155,26 @@ class StoredOffsiteRedirect extends OffsiteRedirect implements SupportsStoredPay
       'remote_id' => $request->query->get('txn_id'),
       'remote_state' => $request->query->get('payment_status'),
       'payment_method' => $payment_method,
+      'avs_response_code' => 'Z',
     ]);
+    if (!$payment_method->card_type->isEmpty()) {
+      $avs_response_code_label = $this->buildAvsResponseCodeLabel('Z', $payment_method->card_type->value);
+      $payment->setAvsResponseCodeLabel($avs_response_code_label);
+    }
     $payment->save();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function buildAvsResponseCodeLabel($avs_response_code, $card_type) {
+    if ($card_type == 'dinersclub' || $card_type == 'jcb') {
+      if ($avs_response_code == 'Z') {
+        return $this->t('Zip code.');
+      }
+      return NULL;
+    }
+    return parent::buildAvsResponseCodeLabel($avs_response_code, $card_type);
   }
 
 }

@@ -273,4 +273,70 @@ final class CreditCard {
     return TRUE;
   }
 
+  /**
+   * Gets all available AVS response code meanings.
+   *
+   * @return array
+   *   The AVS response code meanings.
+   *
+   * @see https://developer.paypal.com/docs/nvp-soap-api/AVSResponseCodes/#avs-error-response-codes
+   */
+  public static function getAvsResponseCodeMeanings() : array {
+    // AVS codes for Visa, MasterCard, Discover, and American Express.
+    $standard_codes = [
+      'A' => new TranslatableMarkup('Address'),
+      'B' => new TranslatableMarkup('International "A"'),
+      'C' => new TranslatableMarkup('International "N"'),
+      'D' => new TranslatableMarkup('International "X"'),
+      'E' => new TranslatableMarkup('Not allowed for MOTO (Internet/Phone) transactions'),
+      'F' => new TranslatableMarkup('UK-specific "X"'),
+      'G' => new TranslatableMarkup('Global Unavailable'),
+      'I' => new TranslatableMarkup('International Unavailable'),
+      'M' => new TranslatableMarkup('Address'),
+      'N' => new TranslatableMarkup('No'),
+      'P' => new TranslatableMarkup('Postal (International "Z")'),
+      'R' => new TranslatableMarkup('Retry'),
+      'S' => new TranslatableMarkup('AVS not Supported'),
+      'U' => new TranslatableMarkup('Unavailable'),
+      'W' => new TranslatableMarkup('Whole ZIP'),
+      'X' => new TranslatableMarkup('Exact match'),
+      'Y' => new TranslatableMarkup('Yes'),
+      'Z' => new TranslatableMarkup('ZIP'),
+    ];
+
+    // Additional codes for American Express.
+    $amex_codes = [
+      'A' => new TranslatableMarkup('Card holder address only correct.'),
+      'D' => new TranslatableMarkup('Card holder name incorrect, postal code matches.'),
+      'E' => new TranslatableMarkup('Card holder name incorrect, address and postal code match.'),
+      'F' => new TranslatableMarkup('Card holder name incorrect, address matches.'),
+      'K' => new TranslatableMarkup('Card holder name matches.'),
+      'L' => new TranslatableMarkup('Card holder name and postal code match.'),
+      'M' => new TranslatableMarkup('Card holder name, address and postal code match.'),
+      'N' => new TranslatableMarkup('No, card holder address and postal code are both incorrect.'),
+      'O' => new TranslatableMarkup('Card holder name and address match.'),
+      'R' => new TranslatableMarkup('System unavailable; retry.'),
+      'S' => new TranslatableMarkup('AVS not supported.'),
+      'U' => new TranslatableMarkup('Information unavailable.'),
+      'W' => new TranslatableMarkup('No, card holder name, address and postal code are all incorrect.'),
+      'Y' => new TranslatableMarkup('Yes, card holder address and postal code are both correct.'),
+      'Z' => new TranslatableMarkup('Card holder postal code only correct.'),
+    ] + $standard_codes;
+
+    return [
+      'visa' => $standard_codes,
+      'mastercard' => $standard_codes,
+      'amex' => $amex_codes,
+      'discover' => $standard_codes,
+      'maestro' => [
+        '0' => new TranslatableMarkup('All the address information matched.'),
+        '1' => new TranslatableMarkup('None of the address information matched.'),
+        '2' => new TranslatableMarkup('Part of the address information matched.'),
+        '3' => new TranslatableMarkup('The merchant did not provide AVS information. Not processed.'),
+        '4' => new TranslatableMarkup('Address not checked, or acquirer had no response. Service not available.'),
+        'U' => new TranslatableMarkup('Address not checked, or acquirer had no response. Service not available.'),
+      ],
+    ];
+  }
+
 }

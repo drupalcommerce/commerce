@@ -440,6 +440,17 @@ abstract class PaymentGatewayBase extends PluginBase implements PaymentGatewayIn
   /**
    * {@inheritdoc}
    */
+  public function buildAvsResponseCodeLabel($avs_response_code, $card_type) {
+    $avs_code_meanings = CreditCard::getAvsResponseCodeMeanings();
+    if (!isset($avs_code_meanings[$card_type][$avs_response_code])) {
+      return NULL;
+    }
+    return $avs_code_meanings[$card_type][$avs_response_code];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function toMinorUnits(Price $amount) {
     $currency_storage = $this->entityTypeManager->getStorage('commerce_currency');
     /** @var \Drupal\commerce_price\Entity\CurrencyInterface $currency */

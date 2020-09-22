@@ -4,6 +4,7 @@ namespace Drupal\Tests\commerce_payment\Unit;
 
 use Drupal\commerce_payment\CreditCard;
 use Drupal\commerce_payment\CreditCardType;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Tests\UnitTestCase;
 
 /**
@@ -151,6 +152,22 @@ class CreditCardTest extends UnitTestCase {
       // Valid number.
       [111, 'visa', TRUE],
     ];
+  }
+
+  /**
+   * @covers ::getAvsResponseCodeMeanings
+   */
+  public function testGetAvsResponseCodeMeanings() {
+    $response_meanings = CreditCard::getAvsResponseCodeMeanings();
+    $types = CreditCard::getTypes();
+    $this->assertIsArray($response_meanings);
+    foreach ($response_meanings as $credit_card_type => $mapping) {
+      $this->assertInstanceOf(CreditCardType::class, $types[$credit_card_type]);
+      $this->assertIsArray($mapping);
+      foreach ($mapping as $code => $meaning) {
+        $this->assertInstanceOf(TranslatableMarkup::class, $meaning);
+      }
+    }
   }
 
 }

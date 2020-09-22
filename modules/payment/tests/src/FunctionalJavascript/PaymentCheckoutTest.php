@@ -361,6 +361,8 @@ class PaymentCheckoutTest extends CommerceWebDriverTestBase {
     $this->assertNotNull($payment);
     $this->assertEquals($payment->getAmount(), $order->getTotalPrice());
     $this->assertEquals('authorization', $payment->getState()->getId());
+    $this->assertEquals('A', $payment->getAvsResponseCode());
+    $this->assertEquals('Address', $payment->getAvsResponseCodeLabel());
   }
 
   /**
@@ -410,6 +412,8 @@ class PaymentCheckoutTest extends CommerceWebDriverTestBase {
     $this->assertEquals(new Price('19.99', 'USD'), $payment->getAmount());
     $this->assertEquals(new Price('39.99', 'USD'), $order->getTotalPaid());
     $this->assertEquals(new Price('0', 'USD'), $order->getBalance());
+    $this->assertEquals('A', $payment->getAvsResponseCode());
+    $this->assertEquals('Address', $payment->getAvsResponseCodeLabel());
 
     /** @var \Drupal\profile\Entity\ProfileInterface $order_billing_profile */
     $order_billing_profile = $order->getBillingProfile();
@@ -753,6 +757,8 @@ class PaymentCheckoutTest extends CommerceWebDriverTestBase {
     $payment = Payment::load(1);
     $this->assertNotNull($payment);
     $this->assertEquals($payment->getAmount(), $order->getTotalPrice());
+    $this->assertEquals('Z', $payment->getAvsResponseCode());
+    $this->assertEquals('ZIP', $payment->getAvsResponseCodeLabel());
     $this->assertEquals(3, $payment->get('payment_method')->target_id);
   }
 
