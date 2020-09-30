@@ -6,6 +6,7 @@ label: Default
 plugin: multistep_default
 configuration:
   display_checkout_progress: true
+  display_checkout_progress_breadcrumb_links: false
   panes:
     login:
       allow_guest_checkout: true
