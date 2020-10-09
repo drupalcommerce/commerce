@@ -194,6 +194,15 @@ final class ProductEvents {
   const PRODUCT_VARIATION_TRANSLATION_DELETE = 'commerce_product.commerce_product_variation.translation_delete';
 
   /**
+   * Name of the event fired after generating a product variation title.
+   *
+   * @Event
+   *
+   * @see \Drupal\commerce_product\Event\ProductVariationTitleGenerateEvent
+   */
+  const PRODUCT_VARIATION_TITLE_GENERATE = 'commerce_product.commerce_product_variation.title_generate';
+
+  /**
    * Name of the event fired when filtering variations.
    *
    * @Event

@@ -6,6 +6,8 @@ use Drupal\commerce\Entity\CommerceContentEntityBase;
 use Drupal\commerce\EntityHelper;
 use Drupal\commerce\EntityOwnerTrait;
 use Drupal\commerce_price\Price;
+use Drupal\commerce_product\Event\ProductEvents;
+use Drupal\commerce_product\Event\ProductVariationTitleGenerateEvent;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Entity\EntityChangedTrait;
 use Drupal\Core\Entity\EntityPublishedTrait;
@@ -428,6 +430,12 @@ class ProductVariation extends CommerceContentEntityBase implements ProductVaria
       // When there are no attribute fields, there's only one variation.
       $title = $product_title;
     }
+
+    /** @var \Symfony\Component\EventDispatcher\EventDispatcherInterface $event_dispatcher */
+    $event_dispatcher = \Drupal::service('event_dispatcher');
+    $event = new ProductVariationTitleGenerateEvent($title, $this);
+    $event_dispatcher->dispatch(ProductEvents::PRODUCT_VARIATION_TITLE_GENERATE, $event);
+    $title = $event->getTitle();
 
     return $title;
   }
