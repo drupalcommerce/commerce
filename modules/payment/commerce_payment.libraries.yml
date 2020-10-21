@@ -1,3 +1,10 @@
+credit_card_validation:
+  version: VERSION
+  js:
+    js/credit-card-validation.js: {}
+  dependencies:
+    - core/jquery
+
 payment_method_form:
   version: VERSION
   css:
