@@ -44,6 +44,7 @@ class CalculatorTest extends UnitTestCase {
    * @covers ::ceil
    * @covers ::floor
    * @covers ::round
+   * @covers ::roundDown
    */
   public function testRounding() {
     $this->assertEquals('5', Calculator::ceil('4.4'));
@@ -90,6 +91,15 @@ class CalculatorTest extends UnitTestCase {
     foreach ($rounding_data as $item) {
       $this->assertEquals($item[3], Calculator::round($item[0], $item[1], $item[2]));
     }
+
+    $this->assertEquals('1.95', Calculator::roundDown('1.95583', 2));
+  }
+
+  /**
+   * @covers ::getPrecision
+   */
+  public function testPrecision() {
+    $this->assertEquals(2, Calculator::getPrecision('1.99'));
   }
 
 }
